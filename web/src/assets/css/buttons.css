@@ -1,0 +1,37 @@
+.btn-primary,
+.btn-primary:hover {
+  color: var(--text-color);
+  background-color: var(--color-primary);
+  background-image: unset;
+  border-color: var(--color-secondary);
+}
+
+.btn-primary:focus,
+.btn-primary:hover {
+  background-color: var(--color-secondary);
+}
+
+.btn-primary:disabled {
+  background-color: #9c9c9c;
+  background-image: unset;
+  border-color: var(--color-secondary);
+  color: var(--color-primary);
+}
+
+.btn-default,
+.move-button,
+.select-button {
+  background: #333;
+}
+
+.btn-default,
+.btn-outline-default {
+  color: #ccc;
+  text-shadow: initial;
+  border-color: #999;
+}
+
+.btn-default:hover,
+.btn-outline-default:hover {
+  color: white;
+}

@@ -1,0 +1,3 @@
+{
+  "exclude": ["web/node_modules"]
+}

@@ -1,0 +1,33 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "cflnews",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "Id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "PublishTimestamp",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "roster-positions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "is_player_position",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "order",
+          "order": "ASCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

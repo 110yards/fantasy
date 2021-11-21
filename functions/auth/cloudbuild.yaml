@@ -1,0 +1,10 @@
+steps:
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "functions deploy auth_on_user_create"
+    args: ["functions", "deploy", "auth_on_user_create", 
+            "--trigger-event", "providers/firebase.auth/eventTypes/user.create",
+            "--retry",
+            "--runtime", "python38",
+            "--trigger-resource", "$PROJECT_ID",
+            "--entry-point=auth_on_user_create"
+        ]

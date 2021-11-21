@@ -1,0 +1,119 @@
+﻿:root {
+  /* team flair colors */
+  --bc-primary: #f05523;
+  --bc-secondary: #231f20;
+
+  --cgy-primary: #cc092f;
+  --cgy-secondary: white;
+
+  --edm-primary: #004211;
+  --edm-secondary: #f9b730;
+
+  --ham-primary: #ffb514;
+  --ham-secondary: black;
+
+  --mtl-primary: #003d79;
+  --mtl-secondary: #98012e;
+
+  --ott-primary: #c4122f;
+  --ott-secondary: black;
+
+  --ssk-primary: #006241;
+  --ssk-secondary: white;
+
+  --tor-primary: #719fd3;
+  --tor-secondary: #183661;
+
+  --wpg-primary: #032d5f;
+  --wpg-secondary: #b6985a;
+}
+
+.team-colors,
+.team-icon::before {
+  width: 1.5em;
+  display: inline-block;
+  margin-right: 3px;
+  border: 1px solid white;
+  text-align: center;
+  font-weight: bold;
+}
+
+.team-icon::before {
+  content: "-";
+}
+
+.team-icon.FA::before {
+  content: "\2003";
+}
+
+.team-colors.BC,
+.team-icon.BC::before {
+  content: "B";
+  color: var(--bc-secondary);
+  background-color: var(--bc-primary);
+  border-color: white;
+}
+
+.team-colors.CGY,
+.team-icon.CGY::before {
+  content: "C";
+  color: black;
+  background-color: var(--cgy-primary);
+  border-color: var(--cgy-secondary);
+}
+
+.team-colors.EDM,
+.team-icon.EDM::before {
+  content: "E";
+  color: var(--edm-secondary);
+  background-color: var(--edm-primary);
+  border-color: var(--edm-secondary);
+}
+
+.team-colors.HAM,
+.team-icon.HAM::before {
+  content: "H";
+  color: var(--ham-secondary);
+  background-color: var(--ham-primary);
+  border-color: white;
+}
+
+.team-colors.MTL,
+.team-icon.MTL::before {
+  content: "M";
+  color: white;
+  background-color: var(--mtl-primary);
+  border-color: var(--mtl-secondary);
+}
+
+.team-colors.OTT,
+.team-icon.OTT::before {
+  content: "O";
+  color: var(--ott-primary);
+  background-color: var(--ott-secondary);
+  border-color: var(--ott-primary);
+}
+
+.team-colors.SSK,
+.team-icon.SSK::before {
+  content: "S";
+  color: var(--ssk-secondary);
+  background-color: var(--ssk-primary);
+  border-color: var(--ssk-secondary);
+}
+
+.team-colors.TOR,
+.team-icon.TOR::before {
+  content: "T";
+  color: var(--tor-secondary);
+  background-color: var(--tor-primary);
+  border-color: white;
+}
+
+.team-colors.WPG,
+.team-icon.WPG::before {
+  content: "W";
+  color: var(--wpg-secondary);
+  background-color: var(--wpg-primary);
+  border-color: var(--wpg-secondary);
+}

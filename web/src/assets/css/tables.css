@@ -1,0 +1,16 @@
+.table td,
+.table th {
+  border: inherit;
+  padding: 0.3em;
+}
+
+.table > tbody > tr > td,
+.table > tbody > tr > th,
+.table > tfoot > tr > td,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > thead > tr > th,
+hr {
+  border-top: 1px solid #111;
+  border-bottom: 1px solid #111;
+}

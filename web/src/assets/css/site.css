@@ -1,0 +1,173 @@
+﻿:root {
+  --text-color: #cccccc;
+
+  --color-primary: #581010;
+  --color-secondary: #bf8753;
+
+  --bg-color-primary: #121212;
+  --bg-color-secondary: #222222;
+}
+
+body,
+.table {
+  color: var(--text-color);
+  background-color: var(--bg-color-primary);
+  font-family: "Roboto", sans-serif;
+  font-weight: 300;
+}
+
+#body {
+  margin-top: 1rem;
+}
+
+#nprogress .spinner {
+  /* 18px x 18px*/
+  display: block;
+  position: relative;
+  z-index: auto;
+  top: 0;
+  left: 0;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.brand {
+  font-weight: 500;
+}
+
+a {
+  text-decoration: none;
+}
+a,
+a:hover {
+  color: var(--color-secondary);
+}
+
+a .glyphicon {
+  color: #999;
+}
+
+a .glyphicon-plus {
+  color: limegreen;
+}
+
+a .glyphicon-minus {
+  color: red;
+}
+
+.form-inline input {
+  margin-right: 0.5rem;
+}
+
+h5 {
+  font-weight: 500;
+}
+
+.cfl-news h5 {
+  font-weight: 500;
+}
+
+.validation-summary-errors ul {
+  padding-left: 20px;
+}
+
+.validation-summary-errors li {
+  list-style: none;
+}
+article.cfl-news {
+  padding-bottom: 1em;
+}
+
+article.cfl-news header h5 {
+  margin-bottom: 0;
+}
+
+article.cfl-news label {
+  padding: 0;
+  color: darkgrey;
+  font-weight: normal;
+}
+
+.game-score {
+  padding-bottom: 1em;
+}
+
+.ideal {
+  font-weight: bold;
+}
+
+.winning {
+  font-weight: bold;
+}
+
+#matchups-carousel thead th {
+  text-align: center;
+}
+
+.roster-spot.bye td.name {
+  color: #aaaaaa;
+}
+
+.roster-spot.disabled {
+  opacity: 0.3;
+}
+
+.roster-spot.bench-hidden {
+  display: none;
+}
+
+.roster-spot.selected {
+  background-color: #333;
+}
+
+.scoreboard-heading {
+  margin-left: 1em;
+}
+
+.move-button:hover,
+.select-button:hover {
+  color: white;
+}
+
+.name-readonly.value {
+  display: inline-block;
+}
+
+.inactive {
+  color: red;
+  font-size: x-small;
+  vertical-align: super;
+  font-weight: bold;
+}
+
+.players-filter {
+  padding-left: 0px;
+}
+
+.players-filter-owners {
+  text-align: right;
+  padding-right: 0px;
+}
+
+.player {
+  white-space: nowrap;
+}
+
+.glyphicon-star {
+  color: gold;
+}
+
+.commissioner-unlock {
+  display: none;
+}
+
+.theme--dark.v-input input,
+.theme--dark.v-input textarea {
+  color: var(--text-color);
+}
+
+.theme--dark.v-text-field--filled > .v-input__control > .v-input__slot {
+  background: rgba(255, 255, 255, 0.08);
+}

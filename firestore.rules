@@ -1,0 +1,128 @@
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function userIsAdmin() {
+      return 'ADMIN' in get(/databases/$(database)/documents/user_roles/$(request.auth.uid)).data.roles;      
+    }    
+      
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isForUser(uid) {
+    	return uid == request.auth.uid;
+    }
+    
+    function isForUserOrAdmin(uid) {
+    	return isForUser(uid) || userIsAdmin();
+    }
+    
+    match /admin/state {
+      allow read: if true;
+    }
+    
+    match /admin/stats {
+      allow read: if userIsAdmin();
+    }
+    
+    match /user/{uid} {
+    	allow read: if isForUserOrAdmin(uid)
+      
+      match /league/{leagueId} {
+      	allow read: if isForUserOrAdmin(uid)
+      }
+    }
+
+		match /public/{document=**} {
+    	allow read: if true;
+    }
+    
+    match /user_roles/{uid} {
+      allow read: if isForUserOrAdmin(uid)
+    }
+    
+    match /season/{season}/game/{document=**} {
+    	allow read: if true;
+    }
+    
+    match /season/{season}/player/{document=**} {
+    	allow read: if true;
+    }
+    
+    match /roster-positions/{document=**} {
+    	allow read: if true;
+    }
+    
+    match /playoff-types/{document=**} {
+    	allow read: if true;
+    }
+    
+    match /league/{leagueId} {      
+      function userInLeague() {
+      	return exists(/databases/$(database)/documents/league/$(leagueId)/roster/$(request.auth.uid));
+      }      
+    
+    	function userIsCommissioner() {
+    		return get(/databases/$(database)/documents/league/$(leagueId)).data.commissioner_id == request.auth.uid;
+    	}
+    
+    	allow read: if userInLeague() || userIsAdmin();
+      
+      match /roster/{document=**} {
+      	allow read: if userInLeague() || userIsAdmin();
+      }
+      
+      match /owned_player/{document=**} {
+      	allow read: if userInLeague() || userIsAdmin();
+      }
+      
+      match /players/{document=**} {
+      	allow read: if userInLeague() || userIsAdmin();
+      }
+      
+      match /player_score/{document=**} {
+      	allow read: if userInLeague() || userIsAdmin();
+      }
+      
+      match /transaction/{document=**} {
+      	allow read: if userInLeague() || userIsAdmin();
+      }
+      
+      match /week/{document=**} {
+      			allow read: if userInLeague() || userIsAdmin();      
+      }
+      
+      match /week/{weekNumber}/matchup/{document=**} {
+      			allow read: if userInLeague() || userIsAdmin();      
+      }
+      
+      match /config/private {
+      	allow read: if userIsCommissioner() || userIsAdmin();
+      }
+      
+      match /config/scoring {
+      	allow read: if userInLeague() || userIsAdmin();
+      }
+      
+      match /config/positions {
+        allow read: if userInLeague() || userIsAdmin();
+      }
+      
+      match /config/schedule {
+        allow read: if userInLeague() || userIsAdmin();
+      }
+      
+      match /config/draft {
+      	allow read: if userInLeague() || userIsAdmin();
+      }
+            
+      match /draft_roster/{document=**} {
+        allow read: if userInLeague();
+      }
+            
+      match /weeks/{document=**} {
+      	allow read: if userInLeague()
+      }
+    }
+    
+  }
+}

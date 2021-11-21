@@ -1,0 +1,14 @@
+{
+  "license": "MIT",
+  "scripts": {
+    "start": "run-pty run-pty.json",
+    "start:api": "uvicorn api.app.main:app --reload --port 8000 --env-file ./api/.env",
+    "start:emulators": "firebase emulators:start --only auth,firestore,pubsub --import=./.data --export-on-exit --project yards-dev",
+    "start:web": "(cd web && yarn serve)",
+    "config:dependencies": "npm install && .scripts/common/install-dependencies.sh",
+    "config:switches": "python setup-dev.py"
+  },
+  "devDependencies": {
+    "run-pty": "^2.3.2"
+  }
+}

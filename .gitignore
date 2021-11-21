@@ -1,0 +1,40 @@
+*service-account.json
+*.log
+.firebaserc
+/.data
+/.data/**
+
+**/node_modules/
+.pytest_cache/
+
+.env
+*.pyc
+**/__pycache__/**
+
+*.egg-info/
+.terraform/
+
+.DS_Store
+node_modules
+/dist
+
+*.local
+.firebase
+
+# test output
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+firebase-debug.log
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+

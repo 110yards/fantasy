@@ -1,0 +1,9 @@
+steps:
+  - name: "gcr.io/cloud-builders/gcloud"
+    args: ["functions", "deploy", "active_league_counter", 
+            "--trigger-event", "providers/cloud.firestore/eventTypes/document.update",
+            "--trigger-resource", "projects/$PROJECT_ID/databases/(default)/documents/league/{league_id}",
+            "--retry",
+            "--runtime", "python38",
+            "--entry-point=update_active_league_count"
+        ]

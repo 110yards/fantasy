@@ -1,0 +1,10 @@
+steps:
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "functions deploy user_counter"
+    args: ["functions", "deploy", "user_counter", 
+            "--trigger-event", "providers/cloud.firestore/eventTypes/document.update",
+            "--trigger-resource", "projects/$PROJECT_ID/databases/(default)/documents/user/{user_id}",
+            "--retry",
+            "--runtime", "python38",
+            "--entry-point=update_user_count"
+        ]
