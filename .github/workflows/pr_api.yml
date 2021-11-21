@@ -1,0 +1,27 @@
+name: "Pull Request: API"
+
+on:
+  pull_request:
+    paths:
+      - "api/**"
+      - ".python-version"
+      - ".github/workflows/pr_api.yml"
+      - ".scripts/python/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: .scripts/common/install-dependencies-api.sh
+
+      - name: Run checks
+        run: .scripts/python/checks.sh

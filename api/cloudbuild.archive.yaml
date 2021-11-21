@@ -1,0 +1,9 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "gcr.io/$_REGISTRY/$_IMAGE_NAME:$_TAG", "."]
+
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/$_REGISTRY/$_IMAGE_NAME:$_TAG"]
+
+substitutions:
+  _IMAGE_NAME: api-110yards
