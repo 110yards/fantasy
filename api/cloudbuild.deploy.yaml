@@ -1,11 +1,5 @@
 steps:  
 
-  - name: "gcr.io/cloud-builders/docker"
-    args: ["build", "-t", "gcr.io/$_REGISTRY/$_IMAGE_NAME:$_TAG", "."]
-
-  - name: "gcr.io/cloud-builders/docker"
-    args: ["push", "gcr.io/$_REGISTRY/$_IMAGE_NAME:$_TAG"]
-
   - name: "gcr.io/cloud-builders/gcloud"
     args: ["beta", "run", "deploy", "$_SERVICE_NAME", 
             "--image", "gcr.io/$_REGISTRY/$_IMAGE_NAME:$_TAG", 
@@ -24,7 +18,7 @@ steps:
             "--set-env-vars", "ORIGINS=$_ORIGINS",
             "--set-env-vars", "VERSION=$_TAG", # injected
             # GCP
-            "--set-env-vars", "GOOGLE_PROJECT_ID=$_TARGET_PROJECT_ID", # injected
+            "--set-env-vars", "GCLOUD_PROJECT=$_TARGET_PROJECT_ID", # injected
             "--set-env-vars", "SERVICE_NAME=$_SERVICE_NAME",
             "--set-env-vars", "REGION=$_REGION",
             # API CONFIG

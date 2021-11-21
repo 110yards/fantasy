@@ -169,3 +169,39 @@ $ kill -9 <pid of found process>
 ```
 
 Repeat until you've found and killed all of the emulator processses.
+
+## Deploying to production environments
+
+### Test
+
+All commits to the "test" branch will be automatically deployed to the test environment.
+
+To deploy a pull request to test, reset the test branch to the PR branch:
+
+```
+$ git checkout test # switch to test branch
+$ git reset --hard origin/<branch_name> # reset test branch to pr branch
+$ git push --force # replace the origin test branch with your local copy
+```
+
+### Live
+
+All commits to the "main" branch will be automatically deployed to the live environment.
+
+### Other environments / development projects
+
+If you have configured a project in GCP to host the API, you can deploy to that using the scripts that CI uses:
+
+#### API
+
+```
+$ cd api
+$ ./archive.sh <tag> <project>
+$ ./deploy.sh <tag> <project> <project> <endpoint> <origins>
+```
+
+Options:
+TAG = any valid docker image tag (eg: dev)
+PROJECT = your google project id (note: this is intentionally included twice during deployment)
+ENDPOINT = the expected cloud run URL after deploying (if you've never used cloud run on this project before, use a dummy value and then re-deploy after you know it)
+ORIGINS = CORS origins for the deployed API. Can be "\*" for testing purposes.
