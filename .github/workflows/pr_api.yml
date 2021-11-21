@@ -6,6 +6,7 @@ on:
       - "api/**"
       - ".python-version"
       - ".github/workflows/pr_api.yml"
+      - ".scripts/python/**"
 
 jobs:
   build:
@@ -21,8 +22,10 @@ jobs:
 
       - name: Setup python
         uses: actions/setup-python@v2
+        env:
+          PYTHON_VERSION: ${{ steps.setup.python-version }}
         with:
-          python-version: ${{ steps.setup.python-version }}
+          python-version: $PYTHON_VERSION
 
       - name: Install dependencies
         run: .scripts/common/install-dependencies-api.sh
