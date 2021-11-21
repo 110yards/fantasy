@@ -1,3 +1,5 @@
+[![Main Branch: API](https://github.com/mdryden/110yards/actions/workflows/main_api.yml/badge.svg)](https://github.com/mdryden/110yards/actions/workflows/main_api.yml)
+
 # 110yards
 
 As of November, 2021, 110 Yards is an open source project.
