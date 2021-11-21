@@ -23,3 +23,9 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ steps.setup.python-version }}
+
+      - name: Install dependencies
+        run: .scripts/common/install-dependencies-api.sh
+
+      - name: Run checks
+        run: .scripts/python/checks.sh
