@@ -1,11 +1,13 @@
-name: "Pull Request: API"
+name: "Main Branch: API"
 
 on:
-  pull_request:
+  push:
+    branches:
+      - main
     paths:
       - "api/**"
       - ".python-version"
-      - ".github/workflows/pr_api.yml"
+      - ".github/workflows/main_api.yml"
       - ".scripts/python/**"
 
 jobs:
@@ -25,3 +27,5 @@ jobs:
 
       - name: Run checks
         run: .scripts/python/checks.sh
+
+      # TODO: deploy to test, smoke test, deploy to live, smoke test
