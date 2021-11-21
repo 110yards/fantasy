@@ -1,5 +1,3 @@
-
-import firebase_admin
 import requests
 from api.app.config.config import Settings
 

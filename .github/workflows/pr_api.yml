@@ -1,0 +1,25 @@
+name: API
+
+on:
+  pull_request:
+    paths:
+      - "api/**"
+      - ".python-version"
+      - ".github/workflows/pr_api.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup
+        id: setup
+        run: |
+          echo "::set-output name=python-version::$(cat .python-version)"
+
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ steps.setup.python-version }}
