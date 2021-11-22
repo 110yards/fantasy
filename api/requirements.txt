@@ -1,4 +1,4 @@
-fastapi==0.63.0
+fastapi==0.70.0
 firebase_admin==5.1.0
 google-cloud-logging==2.7.0
 google-cloud-pubsub==2.9.0
