@@ -37,4 +37,4 @@ jobs:
           VUE_APP_SEASON: 2022 # TODO: this should be a firestore switch
           VUE_APP_WEB_URL: "https://test.110yards.ca"
           VUE_APP_API_110_YARDS_URL: "https://api.test.110yards.ca"
-        run: npm run build --mode test
+        run: npm run build:test

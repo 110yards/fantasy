@@ -5,6 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve --mode dev",
     "build": "vue-cli-service build",
+    "build:test": "vue-cli-service build --mode test",
     "deploy-test": "firebase deploy --only hosting",
     "format-check": "prettier --check src/**/*.{js,vue}",
     "format": "prettier --write src/**/*.{js,vue}",
