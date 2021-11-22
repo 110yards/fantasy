@@ -2,9 +2,7 @@
   <v-snackbar v-model="visible" :timeout="timeout" :color="color">
     {{ message }}
     <template v-slot:action="{ attrs }">
-      <v-btn text v-bind="attrs" @click="visible = false">
-        Close
-      </v-btn>
+      <v-btn text v-bind="attrs" @click="visible = false"> Close </v-btn>
     </template>
   </v-snackbar>
 </template>

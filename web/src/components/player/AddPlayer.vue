@@ -56,9 +56,7 @@
           </tr>
 
           <tr>
-            <th colspan="9">
-              Drop player
-            </th>
+            <th colspan="9">Drop player</th>
           </tr>
 
           <tr v-if="canAddWithoutDrop">

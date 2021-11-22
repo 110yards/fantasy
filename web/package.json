@@ -6,9 +6,9 @@
     "serve": "vue-cli-service serve --mode dev",
     "build": "vue-cli-service build",
     "deploy-test": "firebase deploy --only hosting",
-    "format": "prettier --check src/**/*.{js,vue}",
-    "format-fix": "prettier src/**/*.{js,vue}",
-    "predeploy-test": "yarn build --mode test",
+    "format-check": "prettier --check src/**/*.{js,vue}",
+    "format": "prettier --write src/**/*.{js,vue}",
+    "predeploy-test": "npm run build --mode test",
     "test": "jest --detectOpenHandles --testPathIgnorePatterns=.*/ui/.* --passWithNoTests",
     "testAll": "jest --detectOpenHandles",
     "ui-test": "jest --detectOpenHandles --testPathPatterns=.*/ui/.*"

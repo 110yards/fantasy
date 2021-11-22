@@ -4,9 +4,7 @@
     <v-card-text v-if="previousSlot">
       {{ previousSlot.result }}
     </v-card-text>
-    <v-card-text v-else>
-      N/A
-    </v-card-text>
+    <v-card-text v-else> N/A </v-card-text>
   </v-card>
 </template>
 

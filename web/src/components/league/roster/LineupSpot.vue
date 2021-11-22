@@ -50,7 +50,7 @@
       <!-- todo: max name length -->
 
       <v-row>
-        <span v-if="spot.player && scoreboard"><game-state :player="spot.player" :scoreboard="scoreboard"/></span>
+        <span v-if="spot.player && scoreboard"><game-state :player="spot.player" :scoreboard="scoreboard" /></span>
       </v-row>
       <!-- could I get some stats in here? -->
     </v-col>

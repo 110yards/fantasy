@@ -63,7 +63,7 @@ export default {
       },
     },
   },
-  mounted: function() {
+  mounted: function () {
     this.password = this.$route.query.password
     this.leagueId = this.$route.params.joinId
   },

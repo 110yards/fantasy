@@ -2,20 +2,14 @@
   <v-row>
     <v-col cols="12" class="registration-control">
       <div v-if="league.registration_closed">
-        <p>
-          Registration for this league has been closed, so no other managers may join.
-        </p>
+        <p>Registration for this league has been closed, so no other managers may join.</p>
         <app-primary-button v-if="!leagueStarted" @click="reopenRegistration()">
           Re-open registration
         </app-primary-button>
       </div>
       <div v-if="!league.is_full && !league.registration_closed">
-        <p>
-          Registration for this league is open. To prevent new registrations, generate a schedule or click here:
-        </p>
-        <app-primary-button @click="closeRegistration()">
-          Close registration
-        </app-primary-button>
+        <p>Registration for this league is open. To prevent new registrations, generate a schedule or click here:</p>
+        <app-primary-button @click="closeRegistration()"> Close registration </app-primary-button>
       </div>
 
       <start-draft :league="league" />
@@ -148,11 +142,7 @@ export default {
       immediate: true,
       handler(league) {
         if (league == null) return
-        let ref = firestore
-          .collection("league")
-          .doc(league.id)
-          .collection("config")
-          .doc("private")
+        let ref = firestore.collection("league").doc(league.id).collection("config").doc("private")
         this.$bind("privateConfig", ref)
       },
     },

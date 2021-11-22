@@ -58,9 +58,7 @@
         to the winning bidder's roster. In the case of a tie, the team with the highest
         <a href="#waiver-priority">waiver priority</a> will win.
       </p>
-      <p>
-        Bids can fail for several reasons:
-      </p>
+      <p>Bids can fail for several reasons:</p>
       <ul>
         <li>You get out bid by another manager</li>
         <li>You bid the same as another manager, but that manager has a worse record than you and wins on priority</li>
@@ -82,9 +80,7 @@
         A, you might still win the bid on Player B.
       </p>
 
-      <p>
-        Your pending waiver bids and the results from your past waiver bids can be seen on your roster page.
-      </p>
+      <p>Your pending waiver bids and the results from your past waiver bids can be seen on your roster page.</p>
     </v-card-text>
 
     <a name="waiver-priority"></a>
@@ -95,9 +91,7 @@
         the case of a tie, <a href="#tie-breakers">tie breakers will be used</a>) gets the highest waiver priority, and
         so on down the list.
       </p>
-      <p>
-        Each time a team wins a waiver bid, they are moved to the bottom of the waiver priority list.
-      </p>
+      <p>Each time a team wins a waiver bid, they are moved to the bottom of the waiver priority list.</p>
       <p>
         E.g. Bob and Joe both bid $5 on the same two players. Bob has the worst record in his league, so his $5 for
         player 1 is accepted. Next, when the system looks at their bids on player 2, they are tied again, but now Joe

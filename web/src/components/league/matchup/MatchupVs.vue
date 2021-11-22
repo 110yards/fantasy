@@ -56,7 +56,7 @@
             </v-row>
 
             <v-row class="caption grey--text">
-              <v-col class="pt-1  text-right">
+              <v-col class="pt-1 text-right">
                 <player-projection
                   v-if="enableProjections"
                   :leagueId="league.id"
@@ -81,7 +81,7 @@
             </v-row>
 
             <v-row class="caption grey--text">
-              <v-col class="pt-1  text-left">
+              <v-col class="pt-1 text-left">
                 <player-projection
                   v-if="enableProjections"
                   :leagueId="league.id"
@@ -93,7 +93,7 @@
 
           <v-col cols="4" class="pl-0 pr-4">
             <v-row>
-              <v-col class="pb-0 text-right ">
+              <v-col class="pb-0 text-right">
                 <player-link
                   :player="getPlayer(position.id, home)"
                   :leagueId="league.id"

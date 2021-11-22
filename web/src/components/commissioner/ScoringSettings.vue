@@ -143,11 +143,7 @@ export default {
     },
 
     configureReferences() {
-      let leagueScoringRef = firestore
-        .collection("league")
-        .doc(this.leagueId)
-        .collection("config")
-        .doc("scoring")
+      let leagueScoringRef = firestore.collection("league").doc(this.leagueId).collection("config").doc("scoring")
 
       this.$bind("leagueScoring", leagueScoringRef)
       this.$bind("scoringInfo", firestore.doc("public/scoring_info"))

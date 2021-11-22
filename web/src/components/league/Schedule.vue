@@ -75,11 +75,7 @@ export default {
     leagueId: {
       immediate: true,
       handler(leagueId) {
-        let ref = firestore
-          .collection("league")
-          .doc(leagueId)
-          .collection("config")
-          .doc("schedule")
+        let ref = firestore.collection("league").doc(leagueId).collection("config").doc("schedule")
 
         this.$bind("schedule", ref)
       },

@@ -1,9 +1,7 @@
 <template>
   <v-container v-if="matchup">
     <v-row v-if="matchup.type == 'loser'">
-      <v-col cols="12" class="text-center">
-        Loser Game
-      </v-col>
+      <v-col cols="12" class="text-center"> Loser Game </v-col>
     </v-row>
     <v-row>
       <v-col cols="5">

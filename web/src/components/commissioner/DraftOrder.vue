@@ -19,9 +19,7 @@
           </li>
         </draggable>
       </ol>
-      <app-primary-button type="button" @click="save">
-        Update
-      </app-primary-button>
+      <app-primary-button type="button" @click="save"> Update </app-primary-button>
       <saved-indicator :saved="saved" />
     </v-col>
   </v-row>
@@ -108,10 +106,7 @@ export default {
       handler(league) {
         if (!league) return
 
-        let ref = firestore
-          .collection("league")
-          .doc(league.id)
-          .collection("roster")
+        let ref = firestore.collection("league").doc(league.id).collection("roster")
 
         this.$bind("rosters", ref)
       },

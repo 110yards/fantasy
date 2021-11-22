@@ -27,9 +27,7 @@
     </v-card-text>
 
     <v-card-text v-if="!enableLogin">
-      <p class="text-left">
-        Logging in to the site is currently disabled, please try again later.
-      </p>
+      <p class="text-left">Logging in to the site is currently disabled, please try again later.</p>
     </v-card-text>
   </v-card>
 </template>

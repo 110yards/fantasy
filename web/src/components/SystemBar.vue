@@ -1,4 +1,4 @@
-<template> </template>
+<template></template>
 
 <script>
 import { firestore } from "../modules/firebase"
