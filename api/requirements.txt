@@ -1,9 +1,9 @@
-fastapi==0.63.0
+fastapi==0.70.0
 firebase_admin==5.1.0
-google-cloud-logging==2.2.0
-google-cloud-pubsub==2.3.0
-python-dotenv==0.15.0
+google-cloud-logging==2.7.0
+google-cloud-pubsub==2.9.0
+python-dotenv==0.19.2
 pytz==2021.3
-requests==2.25.1
+requests==2.26.0
 starlette-context==0.3.3
-uvicorn==0.13.4
+uvicorn==0.15.0
