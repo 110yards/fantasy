@@ -18,7 +18,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: "web/**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-log.json')}}
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json')}}
 
       - name: Install dependencies
         working-directory: web
