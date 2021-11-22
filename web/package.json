@@ -38,7 +38,7 @@
     "prettier": "^2.4.1",
     "sass": "^1.32.13",
     "sass-loader": "^10.2.0",
-    "selenium-webdriver": "^4.0.0-alpha.5",
+    "selenium-webdriver": "^4.0.0",
     "vue-cli-plugin-vuetify": "^2.4.4",
     "vue-template-compiler": "^2.6.10",
     "vuetify-loader": "^1.7.3"

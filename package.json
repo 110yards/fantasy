@@ -9,7 +9,8 @@
     "config:switches": "python setup-dev.py"
   },
   "devDependencies": {
-    "run-pty": "^2.3.2"
+    "run-pty": "^2.3.2",
+    "selenium-webdriver": "^4.0.0"
   },
   "dependencies": {}
 }
