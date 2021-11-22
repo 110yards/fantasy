@@ -18,11 +18,11 @@ jobs:
         uses: actions/cache@v2
         with:
           path: "web/**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json')}}
+          key: ${{ runner.os }}-modules-${{ hashFiles('web/**/package-lock.json')}}
 
       - name: Install dependencies
         working-directory: web
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Lint check
         working-directory: web
