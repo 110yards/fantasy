@@ -53,7 +53,7 @@ jobs:
           python -m smoke_test_script.py
 
       - name: Smoke test
-        working_directory: api
+        working-directory: api
         env:
           TAG: ${{ github.sha }}
           ENDPOINT: ${{ secrets.TEST_ENDPOINT }}
