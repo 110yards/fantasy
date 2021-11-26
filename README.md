@@ -26,7 +26,7 @@ The following dependencies should be installed for development:
 $ python3.10 -m venv .env
 ```
 
-2. Node 12
+2. Node 16
 
 3. Firebase SDK:
 

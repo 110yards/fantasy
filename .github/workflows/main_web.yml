@@ -1,11 +1,13 @@
-name: "Pull Request: Web"
+name: "Main Branch: Web"
 
 on:
-  pull_request:
+  push:
+    branches:
+      - main
     paths:
       - "web/**"
       - ".prettierrc"
-      - ".github/workflows/pr_web.yml"
+      - ".github/workflows/main_web.yml"
 
 jobs:
   build:
