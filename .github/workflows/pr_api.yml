@@ -31,7 +31,7 @@ jobs:
         env:
           CLOUDSDK_PYTHON: /usr/bin/python3
         with:
-          project_id: ${{ secrets.REGISTRY} }
+          project_id: ${{ secrets.REGISTRY }}
           service_account_key: ${{secrets.TEST_GCLOUD_CREDENTIALS}}
           export_default_credentials: true
         uses: google-github-actions/setup-gcloud@master
