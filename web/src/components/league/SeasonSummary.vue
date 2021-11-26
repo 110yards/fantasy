@@ -68,7 +68,7 @@ export default {
 
   computed: {
     currentSeason() {
-      return this.$root.state?.current_season
+      return this.$root.currentSeason
     },
   },
 
