@@ -45,7 +45,6 @@ jobs:
           ENDPOINT: ${{ secrets.TEST_ENDPOINT }}
           ORIGINS: ${{ secrets.TEST_ORIGINS }}
           API_KEY: ${{ secrets.TEST_API_KEY }}
-          CLIENT_ORIGIN: ${{ env.TEST_ORIGINS }}
         run: |
           cd api
           ./archive.sh $TAG $REGISTRY
@@ -57,6 +56,6 @@ jobs:
           TAG: ${{ github.sha }}
           ENDPOINT: ${{ secrets.TEST_ENDPOINT }}
           API_KEY: ${{ secrets.TEST_API_KEY }}
-          CLIENT_ORIGIN: ${{ env.TEST_ORIGINS }}
-        run: python -m smoke_test_script.py
+          CLIENT_ORIGIN: ${{ secrets.TEST_ORIGINS }}
+        run: python smoke_test_script.py
 
