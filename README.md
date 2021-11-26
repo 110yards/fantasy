@@ -120,10 +120,11 @@ $ npm run start:web # start the Vue Web App
 $ npm run start:emulators # start the Firebase Emulators
 ```
 
-**Note: after starting the emulators for the first time, you should run the following script to configure switches:**
+**Note: after starting the emulators for the first time, you should run the following commands to configure switches:**
 
 ```
-$ npm config:switches
+$ gcloud auth application-default login # configures default credentials for the emulator
+$ npm config:switches # runs scripts to create required data in firestore
 ```
 
 ### Authentication
