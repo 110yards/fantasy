@@ -40,7 +40,8 @@ jobs:
           REGISTRY: ${{ secrets.REGISTRY }}
         run: ./archive.sh '${{ github.sha }}' '$REGISTRY'
 
-      - name: Deploy
+      - shell: bash
+        name: Deploy
         working-directory: api
         with:
           REGISTRY: ${{ secrets.REGISTRY }}
