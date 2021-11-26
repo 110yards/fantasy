@@ -1,4 +1,4 @@
-name: "Pull Request: Web"
+name: "Pull Request: Rules"
 
 on:
   pull_request:
