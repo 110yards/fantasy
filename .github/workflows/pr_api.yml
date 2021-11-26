@@ -28,9 +28,11 @@ jobs:
 
       # Deploy to test
       - name: Setup gcloud
+        env:
+          CLOUDSDK_PYTHON: /usr/bin/python3
         with:
-          project_id: ${{env.TEST_PROJECT}}
-          service_account_key: ${{secrets.SERVICE_ACCOUNT_TEST}}
+          project_id: ${{secrets.REGISTRY}}
+          service_account_key: ${{secrets.GCLOUD_CREDENTIALS}}
           export_default_credentials: true
         uses: google-github-actions/setup-gcloud@master
 
