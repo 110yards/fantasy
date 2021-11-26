@@ -1,9 +1,7 @@
 <template>
   <div>
     <v-row v-if="!enoughTeams">
-      <v-alert type="warning">
-        League must have an even number of teams.
-      </v-alert>
+      <v-alert type="warning"> League must have an even number of teams. </v-alert>
     </v-row>
 
     <v-row v-else>
@@ -218,14 +216,7 @@ export default {
     },
 
     bindSchedule(leagueId) {
-      this.$bind(
-        "schedule",
-        firestore
-          .collection("league")
-          .doc(leagueId)
-          .collection("config")
-          .doc("schedule"),
-      )
+      this.$bind("schedule", firestore.collection("league").doc(leagueId).collection("config").doc("schedule"))
     },
 
     bindLeague(leagueId) {
@@ -262,7 +253,7 @@ export default {
     },
   },
 
-  mounted: function() {
+  mounted: function () {
     this.bindPlayoffTypes()
   },
 }

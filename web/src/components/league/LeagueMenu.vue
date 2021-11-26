@@ -7,9 +7,7 @@
       Commissioner
     </v-btn>
 
-    <v-btn v-if="isAdmin" text :to="{ name: 'league-admin', params: { leagueId: league.id } }">
-      Admin
-    </v-btn>
+    <v-btn v-if="isAdmin" text :to="{ name: 'league-admin', params: { leagueId: league.id } }"> Admin </v-btn>
   </v-row>
 </template>
 

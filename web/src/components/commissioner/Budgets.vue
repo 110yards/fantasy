@@ -91,10 +91,7 @@ export default {
       handler(league) {
         if (!league) return
 
-        let ref = firestore
-          .collection("league")
-          .doc(league.id)
-          .collection("roster")
+        let ref = firestore.collection("league").doc(league.id).collection("roster")
 
         this.$bind("rosters", ref)
       },

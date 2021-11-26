@@ -49,9 +49,7 @@
           <v-card-text>
             <p>
               <app-primary-button :to="{ name: 'join-league' }">Join a league</app-primary-button>&nbsp;or
-              <app-default-button :to="{ name: 'create-league' }">
-                Create a league
-              </app-default-button>
+              <app-default-button :to="{ name: 'create-league' }"> Create a league </app-default-button>
             </p>
             <small v-if="isAnonymous">
               Already have a league?
@@ -130,11 +128,7 @@ export default {
   },
   methods: {
     bind(uid) {
-      let ref = firestore
-        .collection("user")
-        .doc(uid)
-        .collection("league")
-        .orderBy("joined")
+      let ref = firestore.collection("user").doc(uid).collection("league").orderBy("joined")
 
       this.$bind("leagues", ref)
     },

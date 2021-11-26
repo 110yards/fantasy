@@ -56,7 +56,7 @@ export default {
       this.visible = false
     },
   },
-  provide: function() {
+  provide: function () {
     return { yes: this.yes, no: this.no }
   },
 }

@@ -116,12 +116,7 @@ export default {
         if (league == null) return
 
         let privateSettings = (
-          await firestore
-            .collection("league")
-            .doc(league.id)
-            .collection("config")
-            .doc("private")
-            .get()
+          await firestore.collection("league").doc(league.id).collection("config").doc("private").get()
         ).data()
 
         this.form.name = league.name

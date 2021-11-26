@@ -1,0 +1,41 @@
+name: "Pull Request: Web"
+
+on:
+  pull_request:
+    paths:
+      - "web/**"
+      - ".prettierrc"
+      - ".github/workflows/pr_web.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "12"
+          cache: "npm"
+          cache-dependency-path: "web/package-lock.json"
+
+      - name: Install dependencies
+        working-directory: web
+        run: npm install
+
+      - name: Lint check
+        working-directory: web
+        run: npm run format-check
+
+      - name: Build vue app
+        working-directory: web
+        env:
+          VUE_APP_FIREBASE_API_KEY: ${{ secrets.TEST_FIREBASE_API_KEY }}
+          VUE_APP_FIREBASE_PROJECT: ${{ secrets.TEST_GCLOUD_PROJECT }}
+          VUE_APP_SEASON_WEEKS: 21 # TODO: this should be a firestore switch
+          VUE_APP_SEASON: 2022 # TODO: this should be a firestore switch
+          VUE_APP_WEB_URL: "https://test.110yards.ca"
+          VUE_APP_API_110_YARDS_URL: "https://api.test.110yards.ca"
+        run: npm run build:test

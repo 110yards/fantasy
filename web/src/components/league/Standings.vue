@@ -11,7 +11,7 @@
           <v-col cols="2" class="caption text-center">$</v-col>
         </v-row>
 
-        <v-row v-for="roster in rosters" :key="roster.id" class="mt-0 ">
+        <v-row v-for="roster in rosters" :key="roster.id" class="mt-0">
           <v-col cols="6" md="6" class="roster-name">
             <router-link
               :to="{
@@ -93,14 +93,7 @@ export default {
     league: {
       immediate: true,
       handler(league) {
-        this.$bind(
-          "rosters",
-          firestore
-            .collection("league")
-            .doc(league.id)
-            .collection("roster")
-            .orderBy("rank"),
-        )
+        this.$bind("rosters", firestore.collection("league").doc(league.id).collection("roster").orderBy("rank"))
       },
     },
   },

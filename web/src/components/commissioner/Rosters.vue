@@ -110,12 +110,7 @@ export default {
 
     async bindLeague(leagueId) {
       this.leaguePositions = (
-        await firestore
-          .collection("league")
-          .doc(leagueId)
-          .collection("config")
-          .doc("positions")
-          .get()
+        await firestore.collection("league").doc(leagueId).collection("config").doc("positions").get()
       ).data()
     },
 

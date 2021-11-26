@@ -20,10 +20,10 @@ Note: Environment configuration instructions are intended for a Linux-based work
 
 The following dependencies should be installed for development:
 
-1. Python 3.8 (a virtual environment is recommended):
+1. Python 3.10 (a virtual environment is recommended):
 
 ```
-$ python3.8 -m venv .env
+$ python3.10 -m venv .env
 ```
 
 2. Node 12

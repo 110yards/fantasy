@@ -7,9 +7,7 @@
         <span v-if="slot.completed"> - {{ slot.player.id }} </span>
       </p>
     </v-card-text>
-    <v-card-text v-if="yourTurn">
-      Your turn!
-    </v-card-text>
+    <v-card-text v-if="yourTurn"> Your turn! </v-card-text>
   </v-card>
 </template>
 

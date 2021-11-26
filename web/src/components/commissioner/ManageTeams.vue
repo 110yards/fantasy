@@ -37,9 +37,7 @@
               </td>
 
               <td class="text-right" v-if="canRemove(roster)">
-                <app-primary-button @click="confirmRemoval(roster)">
-                  Remove
-                </app-primary-button>
+                <app-primary-button @click="confirmRemoval(roster)"> Remove </app-primary-button>
               </td>
             </tr>
           </tbody>
@@ -132,13 +130,7 @@ export default Vue.extend({
 
         try {
           await this.bindLeague(leagueId)
-          await this.$bind(
-            "rosters",
-            firestore
-              .collection("league")
-              .doc(leagueId)
-              .collection("roster"),
-          )
+          await this.$bind("rosters", firestore.collection("league").doc(leagueId).collection("roster"))
         } catch (exception) {
           this.$eventBus.$emit("exception", exception)
         }
