@@ -35,13 +35,13 @@ jobs:
         uses: google-github-actions/setup-gcloud@master
 
       - name: Archive
-        with:
-          registry: ${{ secrets.REGISTRY }}
+        env:
+          REGISTRY: ${{ secrets.REGISTRY }}
         run: cd api && ./archive.sh '${{ github.sha }}' '$REGISTRY'
 
       - shell: bash
         name: Deploy
-        with:
+        env:
           REGISTRY: ${{ secrets.REGISTRY }}
           TARGET_PROJECT: ${{ secrets.REGISTRY }}
           ENDPOINT: ${{ secrets.REGISTRY }}
