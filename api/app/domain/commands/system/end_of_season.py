@@ -7,7 +7,7 @@ from api.app.domain.repositories.league_repository import LeagueRepository, crea
 from api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
 from api.app.domain.repositories.season_summary_repository import SeasonSummaryRepository, create_season_summary_repository
 from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
-from typing import Optional
+from typing import List, Optional
 from api.app.core.publisher import Publisher, create_publisher
 from fastapi import Depends
 from api.app.core.annotate_args import annotate_args
@@ -39,7 +39,8 @@ class EndOfSeasonCommand(BaseCommand):
 
 @annotate_args
 class EndOfSeasonResult(BaseCommandResult[EndOfSeasonCommand]):
-    pass
+    failed: List[str]
+    successful: List[str]
 
 
 class EndOfSeasonCommandExecutor(BaseCommandExecutor[EndOfSeasonCommand, EndOfSeasonResult]):
@@ -69,18 +70,25 @@ class EndOfSeasonCommandExecutor(BaseCommandExecutor[EndOfSeasonCommand, EndOfSe
         state = self.state_repo.get()
         season = state.current_season
 
+        failed = []
+        successful = []
+
         for league in leagues:
             if league.draft_state != DraftState.COMPLETE:
                 continue
 
-            schedule = self.league_config_repo.get_schedule_config(league.id)
-            rosters = self.league_roster_repo.get_all(league.id)
-            draft = self.league_config_repo.get_draft(league.id)
-            summary = SeasonSummary.create_from_schedule(season, schedule, rosters, draft)
+            try:
+                schedule = self.league_config_repo.get_schedule_config(league.id)
+                rosters = self.league_roster_repo.get_all(league.id)
+                draft = self.league_config_repo.get_draft(league.id)
+                summary = SeasonSummary.create_from_schedule(season, schedule, rosters, draft)
 
-            self.season_summary_repo.set(league.id, summary)
+                self.season_summary_repo.set(league.id, summary)
+                successful.append(league.id)
+            except BaseException:
+                failed.append(league.id)
 
         state.is_offseason = True
         self.state_repo.set(state)
 
-        return EndOfSeasonResult(command=command)
+        return EndOfSeasonResult(command=command, failed=failed, successful=successful)
