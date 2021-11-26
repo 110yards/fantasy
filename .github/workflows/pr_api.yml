@@ -34,10 +34,9 @@ jobs:
           export_default_credentials: true
         uses: google-github-actions/setup-gcloud@master
 
-      - shell: bash
-        name: Archive
+      - name: Archive
         with:
-          REGISTRY: ${{ secrets.REGISTRY }}
+          registry: ${{ secrets.REGISTRY }}
         working-directory: api
         run: ./archive.sh '${{ github.sha }}' '$REGISTRY'
 
