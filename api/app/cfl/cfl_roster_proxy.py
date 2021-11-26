@@ -1,6 +1,6 @@
 from api.app.core.logging import Logger
 from api.app.core.exceptions import ApiException
-from api.app.config.config import Settings, get_settings
+from api.app.config.settings import Settings, get_settings
 import logging
 from fastapi.param_functions import Depends
 

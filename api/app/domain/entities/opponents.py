@@ -3,10 +3,12 @@ from __future__ import annotations
 from api.app.domain.entities.team import Team
 from typing import Dict, Union
 from api.app.core.base_entity import BaseEntity
+from api.app.core.annotate_args import annotate_args
 
 BYE = "BYE"
 
 
+@annotate_args
 class Opponents(BaseEntity):
     BC: str
     CGY: str

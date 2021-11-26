@@ -1,6 +1,6 @@
 from api.app.domain.entities.league_player_score import LeaguePlayerScore
 from api.app.domain.repositories.league_player_score_repository import LeaguePlayerScoreRepository, create_league_player_score_repository
-from api.app.config.config import Settings, get_settings
+from api.app.config.settings import Settings, get_settings
 from api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
 from typing import Dict
 

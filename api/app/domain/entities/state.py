@@ -96,6 +96,8 @@ class Locks(BaseModel):
 @annotate_args
 class State(BaseEntity):
     current_week: int
+    current_season: int
+    season_weeks: int
     waivers_end: Optional[datetime]
 
     locks: Locks = Locks()

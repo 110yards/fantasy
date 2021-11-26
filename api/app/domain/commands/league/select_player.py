@@ -4,7 +4,7 @@ from api.app.domain.repositories.league_repository import LeagueRepository, crea
 from api.app.domain.enums.draft_type import DraftType
 from api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
 from api.app.domain.services.roster_player_service import RosterPlayerService, create_roster_player_service
-from api.app.config.config import Settings, get_settings
+from api.app.config.settings import Settings, get_settings
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
 from api.app.domain.repositories.league_owned_player_repository import LeagueOwnedPlayerRepository, create_league_owned_player_repository
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository

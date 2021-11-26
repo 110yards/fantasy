@@ -1,5 +1,5 @@
 
-from api.app.config.config import Settings, get_settings
+from api.app.config.settings import Settings, get_settings
 from api.app.domain.entities.user import User
 from api.app.domain.enums.login_type import LoginType
 from api.app.domain.repositories.user_repository import UserRepository, create_user_repository

@@ -1,7 +1,7 @@
 
 from api.app.core.date_utils import hours_since
 import pytz
-from api.app.config.config import Settings, get_settings
+from api.app.config.settings import Settings, get_settings
 from api.app.core.logging import Logger
 from api.app.domain.commands.league.process_waivers import ProcessWaiversCommand
 from api.app.domain.enums.league_command_type import LeagueCommandType

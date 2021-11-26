@@ -4,7 +4,7 @@ import logging
 import traceback
 from typing import Dict, Optional
 
-from api.app.config.config import Settings
+from api.app.config.settings import Settings
 from google.cloud.logging_v2.client import Client
 from google.cloud.logging_v2.resource import Resource
 from starlette_context import context

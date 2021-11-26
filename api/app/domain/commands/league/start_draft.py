@@ -13,7 +13,7 @@ from api.app.domain.repositories.league_roster_repository import LeagueRosterRep
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from api.app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
 from api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from api.app.config.config import Settings, get_settings
+from api.app.config.settings import Settings, get_settings
 from fastapi import Depends
 from api.app.core.annotate_args import annotate_args
 from api.app.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor

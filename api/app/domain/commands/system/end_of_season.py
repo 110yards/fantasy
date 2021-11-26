@@ -6,7 +6,7 @@
 # from api.app.domain.commands.league.calculate_season_score import CalculateSeasonScoreCommand
 # from api.app.core.logging import Logger
 # from api.app.domain.entities.player import Player
-# from api.app.config.config import Settings, get_settings
+# from api.app.config.settings import Settings, get_settings
 # from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 # from api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 # from api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository

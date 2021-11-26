@@ -3,7 +3,7 @@
 from api.app.domain.entities.team import Team
 from api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
 from api.app.domain.entities.player import STATUS_ACTIVE
-from api.app.config.config import Settings, get_settings
+from api.app.config.settings import Settings, get_settings
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
 
 from fastapi.param_functions import Depends
