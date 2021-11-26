@@ -41,18 +41,14 @@ jobs:
           CLOUDSDK_PYTHON: /usr/bin/python3
           REGISTRY: ${{ secrets.REGISTRY }}
           TAG: ${{ github.sha }}
-          TARGET_PROJECT: ${{ secrets.REGISTRY }}
-          ENDPOINT: ${{ secrets.REGISTRY }}
-          ORIGINS: ${{ secrets.REGISTRY }}
+          TARGET_PROJECT: ${{ secrets.TEST_GCLOUD_PROJECT }}
+          ENDPOINT: ${{ secrets.TEST_ENDPOINT }}
+          ORIGINS: ${{ secrets.TEST_ORIGINS }}
+          API_KEY: ${{ secrets.TEST_API_KEY }}
+          CLIENT_ORIGIN: ${{ env.TEST_ORIGINS }}
         run: |
           cd api
           ./archive.sh '${{ github.sha }}' '$REGISTRY'
           ./deploy.sh '$TAG' '$REGISTRY' '$TARGET_PROJECT' '$ENDPOINT' '$ORIGINS'
+          python -m smoke_test_script.py
 
-      - name: Smoke test
-        working-directory: ${{ env.PROJECT_PATH }}
-        env:
-          API_KEY: ${{ secrets.TEST_API_KEY }}
-          ENDPOINT: ${{ env.TEST_ENDPOINT }}
-          CLIENT_ORIGIN: ${{ env.TEST_ORIGINS }}
-        run: python -m smoke_test_script.py
