@@ -36,9 +36,9 @@ jobs:
 
       - shell: bash
         name: Archive
-        working-directory: api
         with:
           REGISTRY: ${{ secrets.REGISTRY }}
+        working-directory: api
         run: ./archive.sh '${{ github.sha }}' '$REGISTRY'
 
       - shell: bash
