@@ -50,7 +50,6 @@ jobs:
           cd api
           ./archive.sh $TAG $REGISTRY
           ./deploy.sh $TAG $REGISTRY $TARGET_PROJECT $ENDPOINT $ORIGINS
-          python -m smoke_test_script.py
 
       - name: Smoke test
         working-directory: api
