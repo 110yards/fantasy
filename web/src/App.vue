@@ -12,7 +12,7 @@
       >
         {{ siteMessage.text }}
       </v-system-bar>
-      <v-container v-if="!siteOffline" id="body" class="spacing-playground pa-1" fluid :data-version="version">
+      <v-container v-if="!siteOffline" id="body" class="spacing-playground pa-1" fluid>
         <div class="container">
           <donate v-if="donateAtTop" />
           <router-view />

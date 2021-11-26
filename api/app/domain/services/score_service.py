@@ -34,6 +34,11 @@ class RosterScoreService:
 
     def get_score(self, league_id: str, roster_id: str) -> Dict[str, float]:
         roster = self.roster_repo.get(league_id, roster_id)
+        if not roster:
+            return {
+                "projection": 0,
+                "score": 0,
+            }
         scoreboard = self.public_repo.get_scoreboard()
 
         player_ids = [p.player.id for p in roster.positions.values() if p.position_type.is_starting_position_type() and p.player]

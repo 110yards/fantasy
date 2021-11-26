@@ -122,6 +122,10 @@ service cloud.firestore {
       match /weeks/{document=**} {
       	allow read: if userInLeague()
       }
+      
+      match /seasons/{document=**} {
+      	allow read: if userInLeague() || userIsAdmin();
+      }
     }
     
   }

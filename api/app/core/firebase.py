@@ -16,7 +16,7 @@ def login(email, password, settings: Settings):
 
     # payload = json.dumps(payload)
 
-    url = LOCAL_TOKEN_URL if settings.is_dev else LIVE_TOKEN_URL
+    url = LOCAL_TOKEN_URL if settings.is_dev() else LIVE_TOKEN_URL
 
     headers = {
         "Content-Type": "application/json"

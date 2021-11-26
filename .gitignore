@@ -3,6 +3,8 @@
 .firebaserc
 /.data
 /.data/**
+/.data.*
+accounts.json
 
 **/node_modules/
 .pytest_cache/

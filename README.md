@@ -115,15 +115,16 @@ Follow the run-pty prompts to view console output for a specific component.
 You can also start them individually:
 
 ```
-$ yarn start:api # start the Python API
-$ yarn start:web # start the Vue Web App
-$ yarn start:emulators # start the Firebase Emulators
+$ npm run start:api # start the Python API
+$ npm run start:web # start the Vue Web App
+$ npm run start:emulators # start the Firebase Emulators
 ```
 
-**Note: after starting the emulators for the first time, you should run the following script to configure switches:**
+**Note: after starting the emulators for the first time, you should run the following commands to configure switches:**
 
 ```
-$ npm config:switches
+$ gcloud auth application-default login # configures default credentials for the emulator
+$ npm config:switches # runs scripts to create required data in firestore
 ```
 
 ### Authentication
@@ -173,6 +174,42 @@ $ kill -9 <pid of found process>
 ```
 
 Repeat until you've found and killed all of the emulator processses.
+
+### Creating and restoring a production firebase backup
+
+Create the target data folder on your local machine:
+
+```
+$ mkdir .data.test
+```
+
+Export firestore to a cloud storage bucket:
+
+```
+$ gcloud firestore export gs://<project_id>.appspot.com/test_backup
+```
+
+Download backup:
+
+```
+$ gsutil -m cp -r gs://<project_id>.appspot.com/test_backup ./.data.test
+```
+
+Copy the firebase-export-metadata.json file from the .data folder which exists if you have run the emulator once before. Edit the copy so that the metadata_file attribute points at the exported data (test_backup/test_backup.overall_export_metadata, if using the names from this guide).
+
+Export authentication data:
+
+```
+$ firebase auth:export accounts.json --format=json
+```
+
+Import authentication data by copying accounts.json to ./.data.test/auth_export
+
+If using the names in this guide, you will need to manually start the emulators with this command in order to work with this data:
+
+```
+$ firebase emulators:start --only firestore,auth --import=./.data.test --export-on-exit --project yards-dev
+```
 
 ## Deploying to production environments
 
