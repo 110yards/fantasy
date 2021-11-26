@@ -25,27 +25,27 @@ jobs:
 
       - name: Run checks
         run: .scripts/python/checks.sh
-    
-    # Deploy to test
-    - name: Setup gcloud
-      with: 
-        project_id: ${{env.TEST_PROJECT}}
-        service_account_key: ${{secrets.SERVICE_ACCOUNT_TEST}}
-        export_default_credentials: true
-      uses: google-github-actions/setup-gcloud@master
-      
-    - name: Archive
-      working-directory: api 
-      run: archive.sh '${{ github.sha }}' '${{ env.REGISTRY }}'
-      
-    - name: Deploy
-      working-directory: api 
-      run: deploy.sh '${{ github.sha }}' '${{ env.REGISTRY }}' '${{ env.TEST_PROJECT }}' '${{ env.TEST_ENDPOINT }}' '${{ env.TEST_ORIGINS }}'
-      
-    - name: Smoke test
-      working-directory: ${{ env.PROJECT_PATH }} 
-      env:
-        API_KEY: ${{ secrets.TEST_API_KEY }}
-        ENDPOINT: ${{ env.TEST_ENDPOINT }}
-        CLIENT_ORIGIN: ${{ env.TEST_ORIGINS }}
-      run: python -m smoke_test_script.py
+
+      # Deploy to test
+      - name: Setup gcloud
+        with:
+          project_id: ${{env.TEST_PROJECT}}
+          service_account_key: ${{secrets.SERVICE_ACCOUNT_TEST}}
+          export_default_credentials: true
+        uses: google-github-actions/setup-gcloud@master
+
+      - name: Archive
+        working-directory: api
+        run: archive.sh '${{ github.sha }}' '${{ env.REGISTRY }}'
+
+      - name: Deploy
+        working-directory: api
+        run: deploy.sh '${{ github.sha }}' '${{ env.REGISTRY }}' '${{ env.TEST_PROJECT }}' '${{ env.TEST_ENDPOINT }}' '${{ env.TEST_ORIGINS }}'
+
+      - name: Smoke test
+        working-directory: ${{ env.PROJECT_PATH }}
+        env:
+          API_KEY: ${{ secrets.TEST_API_KEY }}
+          ENDPOINT: ${{ env.TEST_ENDPOINT }}
+          CLIENT_ORIGIN: ${{ env.TEST_ORIGINS }}
+        run: python -m smoke_test_script.py
