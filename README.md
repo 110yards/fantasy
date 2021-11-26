@@ -1,6 +1,6 @@
-[![Main Branch: API](https://github.com/mdryden/110yards/actions/workflows/main_api.yml/badge.svg)](https://github.com/mdryden/110yards/actions/workflows/main_api.yml)
+[![Main Branch: API](https://github.com/mdryden/110yards/actions/workflows/main_api.yml/badge.svg)](https://github.com/mdryden/110yards/actions/workflows/main_api.yml) [![Main Branch: Web](https://github.com/mdryden/110yards/actions/workflows/main_web.yml/badge.svg)](https://github.com/mdryden/110yards/actions/workflows/main_web.yml)
 
-[![Main Branch: Web](https://github.com/mdryden/110yards/actions/workflows/main_web.yml/badge.svg)](https://github.com/mdryden/110yards/actions/workflows/main_web.yml)
+<img src="https://img.shields.io/badge/gitmoji-%20%F0%9F%8F%88%20%F0%9F%8D%81-FFDD67.svg" alt="gitmoji" />
 
 # 110yards
 
