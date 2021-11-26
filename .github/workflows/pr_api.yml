@@ -35,9 +35,9 @@ jobs:
         uses: google-github-actions/setup-gcloud@master
 
       - name: Archive
+        working-directory: api
         with:
           registry: ${{ secrets.REGISTRY }}
-        working-directory: api
         run: ./archive.sh '${{ github.sha }}' '$REGISTRY'
 
       - shell: bash
