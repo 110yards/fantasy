@@ -35,20 +35,18 @@ jobs:
         uses: google-github-actions/setup-gcloud@master
 
       - name: Archive
-        working-directory: api
         with:
           registry: ${{ secrets.REGISTRY }}
-        run: ./archive.sh '${{ github.sha }}' '$REGISTRY'
+        run: cd api && ./archive.sh '${{ github.sha }}' '$REGISTRY'
 
       - shell: bash
         name: Deploy
-        working-directory: api
         with:
           REGISTRY: ${{ secrets.REGISTRY }}
           TARGET_PROJECT: ${{ secrets.REGISTRY }}
           ENDPOINT: ${{ secrets.REGISTRY }}
           ORIGINS: ${{ secrets.REGISTRY }}
-        run: ./deploy.sh '${{ github.sha }}' '$REGISTRY' '$TARGET_PROJECT' '$ENDPOINT' '$ORIGINS'
+        run: cd api && ./deploy.sh '${{ github.sha }}' '$REGISTRY' '$TARGET_PROJECT' '$ENDPOINT' '$ORIGINS'
 
       - name: Smoke test
         working-directory: ${{ env.PROJECT_PATH }}
