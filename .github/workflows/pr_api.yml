@@ -36,12 +36,14 @@ jobs:
 
       - name: Archive
         env:
+          CLOUDSDK_PYTHON: /usr/bin/python3
           REGISTRY: ${{ secrets.REGISTRY }}
         run: cd api && ./archive.sh '${{ github.sha }}' '$REGISTRY'
 
       - shell: bash
         name: Deploy
         env:
+          CLOUDSDK_PYTHON: /usr/bin/python3
           REGISTRY: ${{ secrets.REGISTRY }}
           TARGET_PROJECT: ${{ secrets.REGISTRY }}
           ENDPOINT: ${{ secrets.REGISTRY }}
