@@ -51,7 +51,7 @@ jobs:
           ENDPOINT: ${{ secrets.REGISTRY }}
           ORIGINS: ${{ secrets.REGISTRY }}
           TAG: ${{ github.sha }}
-        run: cd api && ./deploy.sh '$TAG' '$REGISTRY' '$TARGET_PROJECT' '$ENDPOINT' '$ORIGINS'
+        run: cd api && echo '$TAG' '$REGISTRY' '$TARGET_PROJECT' '$ENDPOINT' '$ORIGINS'
 
       - name: Smoke test
         working-directory: ${{ env.PROJECT_PATH }}
