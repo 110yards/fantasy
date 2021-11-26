@@ -45,7 +45,6 @@ jobs:
           TARGET_PROJECT: ${{ secrets.TEST_GCLOUD_PROJECT }}
           ENDPOINT: ${{ secrets.TEST_ENDPOINT }}
           ORIGINS: ${{ secrets.TEST_ORIGINS }}
-          API_KEY: ${{ secrets.TEST_API_KEY }}
         run: |
           ./archive.sh $TAG $REGISTRY
           ./deploy.sh $TAG $REGISTRY $TARGET_PROJECT $ENDPOINT $ORIGINS
