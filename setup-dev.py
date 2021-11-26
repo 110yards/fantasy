@@ -37,7 +37,7 @@ public_repo.set_switches(default_switches)
 print("Done")
 
 print("Configuring default state")
-state = State(current_week=1, current_season=2021, season_weeks=16)
+state = State.default()
 public_repo.set_state(state)
 
 opponents = Opponents.create({})

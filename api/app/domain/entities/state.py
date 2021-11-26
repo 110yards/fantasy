@@ -110,3 +110,17 @@ class State(BaseEntity):
             return True
 
         return self.locks.changed(previous.locks)
+
+    @staticmethod
+    def default(
+        with_current_week: int = None,
+        with_current_season: int = None,
+        with_season_weeks: int = None,
+        with_waivers_end: datetime = None
+    ):
+        return State(
+            current_week=with_current_week or 1,
+            current_season=with_current_season or 2021,
+            season_weeks=with_season_weeks or 16,
+            waivers_end=with_waivers_end or None,
+        )
