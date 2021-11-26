@@ -52,3 +52,12 @@ jobs:
           ./deploy.sh $TAG $REGISTRY $TARGET_PROJECT $ENDPOINT $ORIGINS
           python -m smoke_test_script.py
 
+      - name: Smoke test
+        working_directory: api
+        env:
+          TAG: ${{ github.sha }}
+          ENDPOINT: ${{ secrets.TEST_ENDPOINT }}
+          API_KEY: ${{ secrets.TEST_API_KEY }}
+          CLIENT_ORIGIN: ${{ env.TEST_ORIGINS }}
+        run: python -m smoke_test_script.py
+
