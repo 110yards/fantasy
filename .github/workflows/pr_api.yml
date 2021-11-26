@@ -48,7 +48,7 @@ jobs:
           CLIENT_ORIGIN: ${{ env.TEST_ORIGINS }}
         run: |
           cd api
-          ./archive.sh '${{ github.sha }}' '$REGISTRY'
-          ./deploy.sh '$TAG' '$REGISTRY' '$TARGET_PROJECT' '$ENDPOINT' '$ORIGINS'
+          ./archive.sh $TAG $REGISTRY
+          ./deploy.sh $TAG $REGISTRY $TARGET_PROJECT $ENDPOINT $ORIGINS
           python -m smoke_test_script.py
 
