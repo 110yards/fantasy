@@ -69,7 +69,6 @@ class EndOfSeasonCommandExecutor(BaseCommandExecutor[EndOfSeasonCommand, EndOfSe
         state = self.state_repo.get()
         season = state.current_season
 
-        # For all leagues which have drafted
         for league in leagues:
             if league.draft_state != DraftState.COMPLETE:
                 continue
