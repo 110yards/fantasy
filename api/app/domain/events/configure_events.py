@@ -1,5 +1,5 @@
 
-from api.app.config.config import Settings, get_settings
+from api.app.config.settings import Settings, get_settings
 from fastapi.params import Depends
 from api.app.domain import topics
 from api.app.core.publisher import Publisher, SubscriptionConfig, create_publisher

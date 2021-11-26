@@ -10,7 +10,7 @@ from api.app.cfl.cfl_player_proxy import CflPlayerProxy, create_cfl_player_proxy
 from api.app.domain.enums.league_command_type import LeagueCommandType
 from api.app.domain.services.league_command_push_data import LeagueCommandPushData
 from api.app.domain.commands.league.update_league_player_details import UpdateLeaguePlayerDetailsCommand
-from api.app.config.config import Settings, get_settings
+from api.app.config.settings import Settings, get_settings
 from api.app.domain.topics import LEAGUE_COMMAND_TOPIC
 from api.app.core.batch import create_batches
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository

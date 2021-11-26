@@ -1,6 +1,6 @@
 from api.app.domain.repositories.user_roles_repository import create_user_roles_repository
 from typing import List, Union
-from api.app.config.config import get_settings
+from api.app.config.settings import get_settings
 from api.app.core.role import Role
 from api.app.core.abort import abort_unauthorized
 from fastapi import Request

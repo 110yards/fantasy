@@ -1,5 +1,5 @@
 
-from api.app.config.config import Settings, get_settings
+from api.app.config.settings import Settings, get_settings
 from api.app.core.logging import Logger
 from api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository

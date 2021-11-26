@@ -1,6 +1,6 @@
 from typing import Optional
 
-from api.app.config.config import Settings, get_settings
+from api.app.config.settings import Settings, get_settings
 from api.app.core.pubsub.pubsub_push import PubSubPush
 from api.app.domain.commands.system.end_of_day import (
     EndOfDayCommand, EndOfDayCommandExecutor,

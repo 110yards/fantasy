@@ -1,7 +1,7 @@
 from api.app.core.logging import Logger
 
 import requests
-from api.app.config.config import Settings, get_settings
+from api.app.config.settings import Settings, get_settings
 from fastapi import Depends
 from datetime import datetime
 

@@ -4,7 +4,7 @@ import json
 from typing import Dict, Optional
 
 
-from api.app.config.config import Settings, get_settings
+from api.app.config.settings import Settings, get_settings
 from api.app.core.exceptions import InvalidPushException
 from api.app.core.logging import Logger
 from fastapi import Depends

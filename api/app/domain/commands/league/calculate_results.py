@@ -1,5 +1,5 @@
 
-from api.app.config.config import Settings, get_settings
+from api.app.config.settings import Settings, get_settings
 from api.app.core.publisher import Publisher, create_publisher
 from api.app.domain.commands.league.calculate_playoffs import CalculatePlayoffsCommand
 from api.app.domain.enums.league_command_type import LeagueCommandType

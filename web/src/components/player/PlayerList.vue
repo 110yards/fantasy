@@ -81,7 +81,7 @@
           </template>
 
           <template v-slot:[`item.display_name`]="{ item }">
-            <player-link :player="item" :leagueId="leagueId" />
+            <player-link :player="item" :leagueId="leagueId" :showShortPlayerStatus="true" />
           </template>
 
           <template v-slot:[`item.points`]="{ item }">

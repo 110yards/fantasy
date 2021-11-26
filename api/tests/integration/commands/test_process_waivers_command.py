@@ -28,7 +28,7 @@ wr1 = Player(id="4", cfl_central_id=4, first_name="Player", last_name="Four", po
 
 league_positions = LeaguePositionsConfig().create_positions()
 league = League.construct(id="test_league", name="Test League", waivers_active=True)
-state = State(current_week=2)
+state = State.default(with_current_week=2)
 
 
 def get_target(rosters: List[Roster]) -> ProcessWaiversCommandExecutor:

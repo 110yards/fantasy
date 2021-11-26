@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from api.app.config.config import Settings, get_settings
+from api.app.config.settings import Settings, get_settings
 from api.app.core.annotate_args import annotate_args
 from api.app.core.base_command_executor import (BaseCommand, BaseCommandExecutor,
                                                 BaseCommandResult)

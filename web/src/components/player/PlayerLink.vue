@@ -20,7 +20,7 @@
         {{ statusText }}
       </span>
 
-      <v-icon v-if="showShortPlayerStatus && isInjured" color="red" small>mdi-hospital</v-icon>
+      <v-icon v-if="showShortPlayerStatus && isInjured" color="red" small>mdi-hospital-box-outline</v-icon>
 
       <national-status v-if="showNational" :national_status="player.national_status" />
     </template>
@@ -29,7 +29,7 @@
     <template v-else>
       <national-status v-if="showNational" :national_status="player.national_status" />
 
-      <v-icon v-if="showShortPlayerStatus && isInjured" color="red" small>mdi-hospital</v-icon>
+      <v-icon v-if="showShortPlayerStatus && isInjured" color="red" small>mdi-hospital-box-outline</v-icon>
       <span class="red--text" v-if="showPlayerStatus">
         {{ statusText }}
       </span>

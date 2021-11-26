@@ -4,7 +4,7 @@ from api.app.domain.repositories.game_repository import GameRepository, create_g
 from api.app.domain.commands.league.calculate_season_score import CalculateSeasonScoreCommand
 from api.app.core.logging import Logger
 from api.app.domain.entities.player import Player
-from api.app.config.config import Settings, get_settings
+from api.app.config.settings import Settings, get_settings
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
 from api.app.domain.enums.league_command_type import LeagueCommandType
 from api.app.domain.services.league_command_push_data import LeagueCommandPushData

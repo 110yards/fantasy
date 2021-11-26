@@ -46,3 +46,6 @@ class PublicRepository:
     def get_state(self, transaction: Transaction = None) -> State:
         state = self.firestore.get(self.path, "state", transaction)
         return State.parse_obj(state)
+
+    def set_state(self, state: State, transaction: Transaction = None):
+        self.firestore.set(self.path, state, transaction)

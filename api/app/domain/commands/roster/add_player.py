@@ -2,7 +2,7 @@
 from api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from api.app.domain.entities.waiver_bid import WaiverBid
 from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
-from api.app.config.config import Settings, get_settings
+from api.app.config.settings import Settings, get_settings
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
 from api.app.domain.services.roster_player_service import RosterPlayerService, create_roster_player_service
 from typing import Optional
