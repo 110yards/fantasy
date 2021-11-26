@@ -42,8 +42,8 @@ jobs:
 
 
       - name: Deploy
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          firebaseServiceAccount: "${{ secrets.TEST_GCLOUD_CREDENTIALS }}"
-          projectId: ${{ secrets.TEST_GCLOUD_PROJECT }}
-          channelId: live
+        working-directory: web
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          TARGET_PROJECT: ${{ secrets.TEST_GCLOUD_PROJECT }}
+        run: firebase deploy --only hosting --token $FIREBASE_TOKEN --project $TARGET_PROJECT

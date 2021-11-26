@@ -37,6 +37,7 @@ jobs:
         uses: google-github-actions/setup-gcloud@master
 
       - name: Archive and deploy
+        working-directory: api
         env:
           CLOUDSDK_PYTHON: /usr/bin/python3
           REGISTRY: ${{ secrets.REGISTRY }}
@@ -46,7 +47,6 @@ jobs:
           ORIGINS: ${{ secrets.TEST_ORIGINS }}
           API_KEY: ${{ secrets.TEST_API_KEY }}
         run: |
-          cd api
           ./archive.sh $TAG $REGISTRY
           ./deploy.sh $TAG $REGISTRY $TARGET_PROJECT $ENDPOINT $ORIGINS
 
