@@ -29,7 +29,7 @@ jobs:
         working-directory: web
         run: npm run format-check
 
-      - name: Build vue app
+      - name: Build
         working-directory: web
         env:
           VUE_APP_FIREBASE_API_KEY: ${{ secrets.TEST_FIREBASE_API_KEY }}
@@ -39,3 +39,11 @@ jobs:
           VUE_APP_WEB_URL: "https://test.110yards.ca"
           VUE_APP_API_110_YARDS_URL: "https://api.test.110yards.ca"
         run: npm run build:test
+
+
+      - name: Deploy
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          firebaseServiceAccount: "${{ secrets.TEST_GCLOUD_CREDENTIALS }}"
+          projectId: ${{ secrets.TEST_GCLOUD_PROJECT }}
+          channelId: live
