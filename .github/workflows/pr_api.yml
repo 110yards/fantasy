@@ -36,11 +36,11 @@ jobs:
 
       - name: Archive
         working-directory: api
-        run: archive.sh '${{ github.sha }}' '${{ env.REGISTRY }}'
+        run: ./archive.sh '${{ github.sha }}' '${{ env.REGISTRY }}'
 
       - name: Deploy
         working-directory: api
-        run: deploy.sh '${{ github.sha }}' '${{ env.REGISTRY }}' '${{ env.TEST_PROJECT }}' '${{ env.TEST_ENDPOINT }}' '${{ env.TEST_ORIGINS }}'
+        run: ./deploy.sh '${{ github.sha }}' '${{ env.REGISTRY }}' '${{ env.TEST_PROJECT }}' '${{ env.TEST_ENDPOINT }}' '${{ env.TEST_ORIGINS }}'
 
       - name: Smoke test
         working-directory: ${{ env.PROJECT_PATH }}
