@@ -36,22 +36,18 @@ jobs:
           export_default_credentials: true
         uses: google-github-actions/setup-gcloud@master
 
-      - name: Archive
+      - name: Archive and deploy
         env:
           CLOUDSDK_PYTHON: /usr/bin/python3
           REGISTRY: ${{ secrets.REGISTRY }}
-        run: cd api && ./archive.sh '${{ github.sha }}' '$REGISTRY'
-
-      - shell: bash
-        name: Deploy
-        env:
-          CLOUDSDK_PYTHON: /usr/bin/python3
-          REGISTRY: ${{ secrets.REGISTRY }}
+          TAG: ${{ github.sha }}
           TARGET_PROJECT: ${{ secrets.REGISTRY }}
           ENDPOINT: ${{ secrets.REGISTRY }}
           ORIGINS: ${{ secrets.REGISTRY }}
-          TAG: ${{ github.sha }}
-        run: cd api && echo '$TAG' '$REGISTRY' '$TARGET_PROJECT' '$ENDPOINT' '$ORIGINS'
+        run: |
+          cd api
+          ./archive.sh '${{ github.sha }}' '$REGISTRY'
+          ./deploy.sh '$TAG' '$REGISTRY' '$TARGET_PROJECT' '$ENDPOINT' '$ORIGINS'
 
       - name: Smoke test
         working-directory: ${{ env.PROJECT_PATH }}
