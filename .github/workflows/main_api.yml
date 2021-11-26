@@ -28,4 +28,61 @@ jobs:
       - name: Run checks
         run: .scripts/python/checks.sh
 
-      # TODO: deploy to test, smoke test, deploy to live, smoke test.  Can't turn this on until the 2021 fantasy season is over.
+
+      # Deploy to test
+      - name: Setup gcloud
+        env:
+          CLOUDSDK_PYTHON: /usr/bin/python3
+        with:
+          project_id: ${{ secrets.REGISTRY }}
+          service_account_key: ${{secrets.TEST_GCLOUD_CREDENTIALS}}
+          export_default_credentials: true
+        uses: google-github-actions/setup-gcloud@master
+
+      - name: Archive and deploy (test)
+        working-directory: api
+        env:
+          CLOUDSDK_PYTHON: /usr/bin/python3
+          REGISTRY: ${{ secrets.REGISTRY }}
+          TAG: ${{ github.sha }}
+          TARGET_PROJECT: ${{ secrets.TEST_GCLOUD_PROJECT }}
+          ENDPOINT: ${{ secrets.TEST_ENDPOINT }}
+          ORIGINS: ${{ secrets.TEST_ORIGINS }}
+          API_KEY: ${{ secrets.TEST_API_KEY }}
+        run: |
+          ./archive.sh $TAG $REGISTRY
+          ./deploy.sh $TAG $REGISTRY $TARGET_PROJECT $ENDPOINT $ORIGINS
+
+      - name: Smoke test (test)
+        working-directory: api
+        env:
+          TAG: ${{ github.sha }}
+          ENDPOINT: ${{ secrets.TEST_ENDPOINT }}
+          API_KEY: ${{ secrets.TEST_API_KEY }}
+          CLIENT_ORIGIN: ${{ secrets.TEST_ORIGINS }}
+        run: python smoke_test_script.py
+
+
+
+      # Deploy to live
+      - name: Deploy (live)
+        working-directory: api
+        env:
+          CLOUDSDK_PYTHON: /usr/bin/python3
+          REGISTRY: ${{ secrets.REGISTRY }}
+          TAG: ${{ github.sha }}
+          TARGET_PROJECT: ${{ secrets.LIVE_GCLOUD_PROJECT }}
+          ENDPOINT: ${{ secrets.LIVE ENDPOINT }}
+          ORIGINS: ${{ secrets.LIVE_ORIGINS }}
+          API_KEY: ${{ secrets.LIVE_API_KEY }}
+        run: |
+          ./deploy.sh $TAG $REGISTRY $TARGET_PROJECT $ENDPOINT $ORIGINS
+
+      - name: Smoke test (live)
+        working-directory: api
+        env:
+          TAG: ${{ github.sha }}
+          ENDPOINT: ${{ secrets.LIVE_ENDPOINT }}
+          API_KEY: ${{ secrets.LIVE_API_KEY }}
+          CLIENT_ORIGIN: ${{ secrets.LIVE_ORIGINS }}
+        run: python smoke_test_script.py
