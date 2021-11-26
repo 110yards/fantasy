@@ -1,7 +1,10 @@
 name: "Main Branch: Rules"
 
 on:
-  pull_request:
+  push:
+    branches:
+      - main
+
     paths:
       - "firestore.rules"
       - ".github/workflows/main_rules.yml"
