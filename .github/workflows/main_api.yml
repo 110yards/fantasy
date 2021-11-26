@@ -72,9 +72,8 @@ jobs:
           REGISTRY: ${{ secrets.REGISTRY }}
           TAG: ${{ github.sha }}
           TARGET_PROJECT: ${{ secrets.LIVE_GCLOUD_PROJECT }}
-          ENDPOINT: ${{ secrets.LIVE ENDPOINT }}
+          ENDPOINT: ${{ secrets.LIVE_ENDPOINT }}
           ORIGINS: ${{ secrets.LIVE_ORIGINS }}
-          API_KEY: ${{ secrets.LIVE_API_KEY }}
         run: |
           ./deploy.sh $TAG $REGISTRY $TARGET_PROJECT $ENDPOINT $ORIGINS
 
