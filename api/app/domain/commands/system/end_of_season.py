@@ -70,8 +70,8 @@ class EndOfSeasonCommandExecutor(BaseCommandExecutor[EndOfSeasonCommand, EndOfSe
         state = self.state_repo.get()
         season = state.current_season
 
-        failed=[]
-        successful=[]
+        failed = []
+        successful = []
 
         for league in leagues:
             if league.draft_state != DraftState.COMPLETE:
@@ -85,7 +85,7 @@ class EndOfSeasonCommandExecutor(BaseCommandExecutor[EndOfSeasonCommand, EndOfSe
 
                 self.season_summary_repo.set(league.id, summary)
                 successful.append(league.id)
-            except:
+            except BaseException:
                 failed.append(league.id)
 
         state.is_offseason = True
