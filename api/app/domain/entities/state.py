@@ -102,6 +102,7 @@ class State(BaseEntity):
 
     locks: Locks = Locks()
     waivers_active = False
+    is_offseason: bool = False
 
     id: str = "state"
 

@@ -5,6 +5,7 @@ from api.app.core.pubsub.pubsub_push import PubSubPush
 from api.app.domain.commands.system.end_of_day import (
     EndOfDayCommand, EndOfDayCommandExecutor,
     create_end_of_day_command_executor)
+from api.app.domain.commands.system.end_of_season import EndOfSeasonCommand, EndOfSeasonCommandExecutor, create_end_of_season_command_executor
 from api.app.domain.commands.system.end_of_week import (
     EndOfWeekCommand, EndOfWeekCommandExecutor,
     create_end_of_week_command_executor)
@@ -128,9 +129,9 @@ async def update_player_stats_for_week(
     return command_executor.execute(command)
 
 
-# @router.post("/set_end_of_season")
-# async def set_end_of_season(
-#     command: EndOfSeasonCommand,
-#     command_executor: EndOfSeasonCommandExecutor = Depends(create_end_of_season_command_executor),
-# ):
-#     return command_executor.execute(command)
+@router.post("/set_end_of_season")
+async def set_end_of_season(
+    command: EndOfSeasonCommand,
+    command_executor: EndOfSeasonCommandExecutor = Depends(create_end_of_season_command_executor),
+):
+    return command_executor.execute(command)

@@ -6,10 +6,12 @@
         <h4 class="brand">{{ league.name }}</h4>
         <start-draft :league="league" />
 
-        <schedule v-if="scheduleGenerated" :leagueId="leagueId" />
+        <schedule v-if="scheduleGenerated && !isOffseason" :leagueId="leagueId" />
 
-        <standings class="mt-5" v-if="league" :league="league" />
-        <transactions class="mt-5" :leagueId="leagueId" />
+        <standings class="mt-5" v-if="!isOffseason" :league="league" />
+        <transactions class="mt-5" v-if="!isOffseason" :leagueId="leagueId" />
+
+        <season-summary :leagueId="leagueId" v-if="isOffseason" />
 
         <!-- @*@Html.Partial("CflNews", Model.News)*@ -->
       </v-col>
@@ -40,6 +42,7 @@ import Standings from "../../components/league/Standings.vue"
 import Transactions from "../../components/league/Transactions.vue"
 import Scoreboard from "../../components/common/Scoreboard.vue"
 import LeagueMenu from "../../components/league/LeagueMenu.vue"
+import SeasonSummary from "../../components/league/SeasonSummary.vue"
 
 export default {
   name: "league-index",
@@ -52,9 +55,9 @@ export default {
     Transactions,
     Scoreboard,
     LeagueMenu,
+    SeasonSummary,
   },
   data() {
-    Standings
     return {
       league: null,
       rosters: [],
@@ -70,6 +73,10 @@ export default {
 
     scheduleGenerated() {
       return this.league && this.league.schedule_generated
+    },
+
+    isOffseason() {
+      return this.$root.state && this.$root.state.is_offseason
     },
   },
 

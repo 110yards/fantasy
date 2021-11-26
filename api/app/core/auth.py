@@ -30,7 +30,7 @@ api_key_endpoints = [
     "/system/smoke_test",
     "/system/configure",
     "/system/end_of_day",
-    "/system/end_of_week",
+    "/system/end_of_week"
 ]
 
 
