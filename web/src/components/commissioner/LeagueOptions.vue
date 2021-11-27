@@ -29,6 +29,11 @@
           </p>
         </div>
 
+        <p>
+          <app-text-field v-model="form.discord_webhook_url" label="Discord webhook URL" />
+          <v-icon>mdi-help-circle</v-icon>
+        </p>
+
         <app-primary-button>Update</app-primary-button>
         <saved-indicator :saved="saved" />
       </v-form>
@@ -67,6 +72,7 @@ export default {
         isPrivate: false,
         password: null,
         draft_type: null,
+        discord_webhook_url: null,
       },
       saved: false,
       draftTypes: [
