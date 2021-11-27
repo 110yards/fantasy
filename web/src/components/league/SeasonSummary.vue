@@ -70,6 +70,10 @@ export default {
     currentSeason() {
       return this.$root.currentSeason
     },
+
+    rosters() {
+      return this.seasonSummary ? this.seasonSummary.rosters.sort((a, b) => a.regular_season_rank.localeCompare(b.regular_season_rank)) : null
+    }
   },
 
   methods: {
