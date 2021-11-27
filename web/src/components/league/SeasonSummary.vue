@@ -30,7 +30,7 @@
 
     <v-card-title class="subtitle-1">Regular Season Standings</v-card-title>
     <v-card-text>
-      <v-row v-for="roster in seasonSummary.rosters" :key="roster.id" class="mt-0">
+      <v-row v-for="roster in rosters" :key="roster.id" class="mt-0">
         <v-col cols="10" md="6" class="roster-name">
           {{ roster.regular_season_rank }}.
           <router-link
@@ -73,7 +73,7 @@ export default {
 
     rosters() {
       return this.seasonSummary
-        ? this.seasonSummary.rosters.sort((a, b) => a.regular_season_rank.localeCompare(b.regular_season_rank))
+        ? this.seasonSummary.rosters.sort((a, b) => a.regular_season_rank - b.regular_season_rank)
         : null
     },
   },
