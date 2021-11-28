@@ -32,10 +32,14 @@ class League(BaseEntity):
     waivers_active: bool = False
     league_start_week: int = 1
     is_complete: bool = False
-    discord_webhool_url: str = None
+    enable_discord_notifications: bool = False
+    notifications_draft: bool = False
+    notifications_end_of_week: bool = False
+    notifications_transactions: bool = False
 
 
 @annotate_args
 class PrivateConfig(BaseEntity):
     password: Optional[str]
     id: str = "private"
+    discord_webhook_url: str = None

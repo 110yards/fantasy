@@ -36,6 +36,11 @@ class UpdateLeagueCommand(BaseCommand):
     private: bool
     password: Optional[str]
     draft_type: DraftType
+    enable_discord_notifications: bool
+    discord_webhook_url: Optional[str]
+    notifications_draft: bool = False
+    notifications_end_of_week: bool = False
+    notifications_transactions: bool = False
 
 
 @annotate_args
