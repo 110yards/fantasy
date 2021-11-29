@@ -1,4 +1,6 @@
 
+from api.app.domain.entities.league import League
+from api.app.domain.services.notification_service import NotificationService, create_notification_service
 from api.app.domain.services.schedule_service import ScheduledMatchup
 from typing import Dict
 from api.app.domain.entities.user_league_preview import UserLeaguePreview
@@ -28,7 +30,7 @@ def create_start_draft_command_executor(
     league_roster_repo: LeagueRosterRepository = Depends(create_league_roster_repository),
     state_repo: StateRepository = Depends(create_state_repository),
     league_week_matchup_repo: LeagueWeekMatchupRepository = Depends(create_league_week_matchup_repository),
-
+    notification_service: NotificationService = Depends(create_notification_service),
 ):
     return StartDraftCommandExecutor(
         settings.season_weeks,
@@ -38,6 +40,7 @@ def create_start_draft_command_executor(
         league_roster_repo,
         state_repo,
         league_week_matchup_repo,
+        notification_service,
     )
 
 
@@ -49,6 +52,7 @@ class StartDraftCommand(BaseCommand):
 @annotate_args
 class StartDraftResult(BaseCommandResult[StartDraftCommand]):
     draft: Draft
+    league: League
 
 
 class StartDraftCommandExecutor(BaseCommandExecutor[StartDraftCommand, StartDraftResult]):
@@ -61,6 +65,7 @@ class StartDraftCommandExecutor(BaseCommandExecutor[StartDraftCommand, StartDraf
                  league_roster_repo: LeagueRosterRepository,
                  state_repo: StateRepository,
                  league_week_matchup_repo: LeagueWeekMatchupRepository,
+                 notification_service: NotificationService,
                  ):
         self.season_weeks = season_weeks
         self.league_repo = league_repo
@@ -69,6 +74,7 @@ class StartDraftCommandExecutor(BaseCommandExecutor[StartDraftCommand, StartDraf
         self.league_roster_repo = league_roster_repo
         self.state_repo = state_repo
         self.league_week_matchup_repo = league_week_matchup_repo
+        self.notification_service = notification_service
 
     def on_execute(self, command: StartDraftCommand) -> StartDraftResult:
 
@@ -134,9 +140,12 @@ class StartDraftCommandExecutor(BaseCommandExecutor[StartDraftCommand, StartDraf
 
                 self.league_roster_repo.set(league.id, roster, transaction)
 
-            return StartDraftResult(command=command, draft=draft)
+            return StartDraftResult(command=command, draft=draft, league=league)
 
         transaction = self.league_repo.firestore.create_transaction()
-        return start_draft(transaction)
+        result = start_draft(transaction)
 
-        pass
+        if result.success:
+            self.notification_service.send_draft_event(result.league, "The commissioner has started the draft")
+
+        return result

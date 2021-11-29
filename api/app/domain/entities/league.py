@@ -36,6 +36,7 @@ class League(BaseEntity):
     notifications_draft: bool = False
     notifications_end_of_week: bool = False
     notifications_transactions: bool = False
+    notifications_waivers: bool = False
 
 
 @annotate_args

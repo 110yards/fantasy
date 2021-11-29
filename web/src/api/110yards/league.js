@@ -85,3 +85,7 @@ export const endDraft = async league_id => {
 export const fixSubscriptions = async command => {
   return client.post(null, `/league/fix_subscriptions`, command)
 }
+
+export const testDiscord = async (league_id, webhook_url) => {
+  return client.post(null, `league/${league_id}/test_discord?webhook_url=${webhook_url}`)
+}

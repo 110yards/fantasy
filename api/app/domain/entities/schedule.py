@@ -21,6 +21,15 @@ class PlayoffType(int, Enum):
     TOP_6 = 6
 
 
+def get_playoff_type_config():
+    return [
+        {"id": str(PlayoffType.TOP_2.value), "name": "Top 2", "weeks": 1},
+        {"id": str(PlayoffType.TOP_3.value), "name": "Top 3", "weeks": 2},
+        {"id": str(PlayoffType.TOP_4.value), "name": "Top 4", "weeks": 2},
+        {"id": str(PlayoffType.TOP_6.value), "name": "Top 6", "weeks": 3}
+    ]
+
+
 @annotate_args
 class Matchup(BaseEntity):
     away: Optional[Roster]

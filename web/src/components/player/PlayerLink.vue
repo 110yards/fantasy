@@ -57,12 +57,10 @@
 <script>
 import { playerStatus } from "../../api/110yards/constants"
 import NationalStatus from "./NationalStatus.vue"
-import PlayerStatus from "./PlayerStatus.vue"
 
 export default {
   name: "player-link",
   components: {
-    PlayerStatus,
     NationalStatus,
   },
   props: {

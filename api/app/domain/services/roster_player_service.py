@@ -5,7 +5,7 @@ from api.app.domain.entities.league_transaction import LeagueTransaction
 from api.app.domain.repositories.league_transaction_repository import LeagueTransactionRepository, create_league_transaction_repository
 from api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
 from api.app.domain.entities.roster import Roster
-from typing import Tuple
+from typing import List, Optional, Tuple, Union
 
 from api.app.domain.entities.league_position import LeaguePosition
 from api.app.domain.entities.owned_player import OwnedPlayer
@@ -63,7 +63,7 @@ class RosterPlayerService:
         target_position: LeaguePosition = None,
         record_transaction: bool = False,
         waiver_bid: int = None
-    ) -> Tuple[bool, str]:
+    ) -> Tuple[bool, Union[str, List[LeagueTransaction]]]:
         position = target_position or self.find_position_for(player, roster)
 
         if not position:
@@ -78,12 +78,13 @@ class RosterPlayerService:
         if player.position == PositionType.k and roster.count_kickers() == 1 and not self.dropping(PositionType.k, target_position):
             return False, "Rosters are limited to 1 kicker"
 
-        self.assign_player_to_roster_position(league_id, roster, player, position, transaction, record_transaction=record_transaction, waiver_bid=waiver_bid)
+        league_transactions = self.assign_player_to_roster_position(
+            league_id, roster, player, position, transaction, record_transaction=record_transaction, waiver_bid=waiver_bid)
 
-        return True, None
+        return True, league_transactions
 
     def dropping(self, type: PositionType, target_position: LeaguePosition) -> bool:
-        return target_position.player and target_position.player.position == type
+        return target_position and target_position.player and target_position.player.position == type
 
     def assign_player_to_roster_position(
             self,
@@ -94,7 +95,7 @@ class RosterPlayerService:
             transaction: Transaction = None,
             record_transaction: bool = False,
             waiver_bid: int = None,
-    ):
+    ) -> Optional[List[LeagueTransaction]]:
         drop_player: Player = None
         if position.player:
             drop_player = position.player
@@ -107,16 +108,22 @@ class RosterPlayerService:
         self.league_owned_player_repo.set(league_id, owned_player, transaction)
         self.roster_repo.set(league_id, roster, transaction)
 
+        league_transactions = []
+
         if record_transaction:
             if drop_player:
                 drop_transaction = LeagueTransaction.drop_transaction(league_id, roster, drop_player)
                 self.league_transaction_repo.create(league_id, drop_transaction, transaction)
+                league_transactions.append(drop_transaction)
 
             if waiver_bid is not None:
                 add_transaction = LeagueTransaction.waiver_claim_transaction(league_id, roster, player, waiver_bid)
             else:
                 add_transaction = LeagueTransaction.add_transaction(league_id, roster, player)
             self.league_transaction_repo.create(league_id, add_transaction, transaction)
+            league_transactions.append(add_transaction)
+
+        return league_transactions
 
     def remove_player_from_roster(
         self,

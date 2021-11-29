@@ -41,6 +41,7 @@ class UpdateLeagueCommand(BaseCommand):
     notifications_draft: bool = False
     notifications_end_of_week: bool = False
     notifications_transactions: bool = False
+    notifications_waivers: bool = False
 
 
 @annotate_args
@@ -66,13 +67,20 @@ class UpdateLeagueCommandExecutor(BaseCommandExecutor[UpdateLeagueCommand, Updat
         def update(transaction):
             league = self.league_repo.get(command.league_id, transaction)
             league.name = command.name
+            league.enable_discord_notifications = command.enable_discord_notifications
+            league.notifications_draft = command.notifications_draft
+            league.notifications_end_of_week = command.notifications_end_of_week
+            league.notifications_transactions = command.notifications_transactions
+            league.notifications_waivers = command.notifications_waivers
+
+            private_config = self.league_config_repo.get_private_config(command.league_id, transaction)
+            private_config.discord_webhook_url = command.discord_webhook_url
 
             started = league.draft_state != DraftState.NOT_STARTED
+
             if not started:
                 league.private = command.private
                 league.draft_type = command.draft_type
-
-                private_config = self.league_config_repo.get_private_config(command.league_id, transaction)
                 private_config.password = command.password
 
             rosters = self.league_roster_repo.get_all(command.league_id, transaction)
@@ -84,8 +92,7 @@ class UpdateLeagueCommandExecutor(BaseCommandExecutor[UpdateLeagueCommand, Updat
 
             league = self.league_repo.update(league, transaction)
 
-            if not started:
-                self.league_config_repo.set_private_config(league.id, private_config, transaction)
+            self.league_config_repo.set_private_config(league.id, private_config, transaction)
 
             for roster_id in user_leagues:
                 self.user_league_repo.set(roster_id, user_league, transaction)
