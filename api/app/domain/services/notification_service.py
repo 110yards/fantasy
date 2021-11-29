@@ -8,13 +8,20 @@ from api.app.domain.services.discord_service import DiscordService, create_disco
 
 def create_notification_service(
     config_repo: LeagueConfigRepository = Depends(create_league_config_repository),
-    discord_service: DiscordService = Depends(create_discord_service)
+    discord_service: DiscordService = Depends(create_discord_service),
 ):
-    return NotificationService(config_repo, discord_service)
+    return NotificationService(
+        config_repo=config_repo,
+        discord_service=discord_service,
+    )
 
 
 class NotificationService:
-    def __init__(self, config_repo: LeagueConfigRepository, discord_service: DiscordService):
+    def __init__(
+        self,
+        config_repo: LeagueConfigRepository,
+        discord_service: DiscordService,
+    ):
         self.config_repo = config_repo
         self.discord_service = discord_service
 

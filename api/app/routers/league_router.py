@@ -1,4 +1,3 @@
-# from api.app.core.auth import require_role
 from api.app.core.pubsub.pubsub_push import PubSubPush
 from api.app.domain.commands.league.close_league_registration import (
     CloseLeagueRegistrationCommand, CloseLeagueRegistrationCommandExecutor,

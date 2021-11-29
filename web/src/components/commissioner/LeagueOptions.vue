@@ -29,7 +29,7 @@
           </p>
         </div>
 
-        <div>
+        <div v-if="enableDiscordIntegration">
           <app-form-label>
             <span>Enable discord notifications?</span>
             <v-btn icon class="ml-2" href="https://github.com/mdryden/110yards/wiki#discord" target="_blank"
@@ -43,7 +43,7 @@
           </v-layout>
         </div>
 
-        <div v-if="form.enable_discord_notifications" class="ml-8">
+        <div v-if="enableDiscordIntegration && form.enable_discord_notifications" class="ml-8">
           <app-text-field
             v-model="form.discord_webhook_url"
             label="Discord webhook URL"
@@ -144,6 +144,10 @@ export default {
         default:
           return ""
       }
+    },
+
+    enableDiscordIntegration() {
+      return this.$root.enableDiscordIntegration
     },
   },
   methods: {
