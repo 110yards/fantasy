@@ -1,6 +1,5 @@
 
 from typing import Optional
-from api.app.domain.entities.league import League
 from api.app.domain.enums.draft_type import DraftType
 from api.app.domain.entities.draft import DraftSlot
 from api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository

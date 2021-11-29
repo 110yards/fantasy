@@ -2,8 +2,6 @@
 from typing import Optional
 from api.app.domain.entities.draft import DraftSlot
 from api.app.domain.entities.league import League
-from api.app.domain.entities.player import Player
-from api.app.domain.entities.roster import Roster
 from api.app.domain.services.draft_service import DraftService, create_draft_service
 from api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from api.app.domain.enums.draft_type import DraftType
