@@ -1,4 +1,6 @@
 
+from typing import Optional
+from api.app.domain.entities.league import League
 from api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
 from api.app.domain.entities.league_transaction import LeagueTransaction
@@ -10,6 +12,8 @@ from api.app.core.annotate_args import annotate_args
 from api.app.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
 from firebase_admin import firestore
 
+from api.app.domain.services.notification_service import NotificationService, create_notification_service
+
 
 def create_drop_player_command_executor(
     league_roster_repo: LeagueRosterRepository = Depends(create_league_roster_repository),
@@ -17,13 +21,15 @@ def create_drop_player_command_executor(
     league_owned_players_repo: LeagueOwnedPlayerRepository = Depends(create_league_owned_player_repository),
     state_repo: StateRepository = Depends(create_state_repository),
     league_repo: LeagueRepository = Depends(create_league_repository),
+    notification_service: NotificationService = Depends(create_notification_service),
 ):
     return DropPlayerCommandExecutor(
         league_roster_repo=league_roster_repo,
         league_transaction_repo=league_transaction_repo,
         league_owned_players_repo=league_owned_players_repo,
         state_repo=state_repo,
-        league_repo=league_repo
+        league_repo=league_repo,
+        notification_service=notification_service,
     )
 
 
@@ -36,7 +42,8 @@ class DropPlayerCommand(BaseCommand):
 
 @annotate_args
 class DropPlayerResult(BaseCommandResult[DropPlayerCommand]):
-    pass
+    league: Optional[League]
+    transaction: Optional[LeagueTransaction]
 
 
 class DropPlayerCommandExecutor(BaseCommandExecutor[DropPlayerCommand, DropPlayerResult]):
@@ -48,12 +55,14 @@ class DropPlayerCommandExecutor(BaseCommandExecutor[DropPlayerCommand, DropPlaye
         league_owned_players_repo: LeagueOwnedPlayerRepository,
         state_repo: StateRepository,
         league_repo: LeagueRepository,
+        notification_service: NotificationService,
     ):
         self.league_roster_repo = league_roster_repo
         self.league_transaction_repo = league_transaction_repo
         self.league_owned_players_repo = league_owned_players_repo
         self.state_repo = state_repo
         self.league_repo = league_repo
+        self.notification_service = notification_service
 
     def on_execute(self, command: DropPlayerCommand) -> DropPlayerResult:
 
@@ -94,7 +103,12 @@ class DropPlayerCommandExecutor(BaseCommandExecutor[DropPlayerCommand, DropPlaye
             self.league_transaction_repo.create(command.league_id, league_transaction, transaction)
             self.league_owned_players_repo.delete(command.league_id, command.player_id, transaction)
 
-            return DropPlayerResult(command=command)
+            return DropPlayerResult(command=command, league=league, transaction=league_transaction)
 
         transaction = self.league_roster_repo.firestore.create_transaction()
-        return update(transaction)
+        result = update(transaction)
+
+        if result.success:
+            self.notification_service.send_transaction_event(result.league, result.transaction.message)
+
+        return result

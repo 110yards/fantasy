@@ -1,5 +1,7 @@
 
+from typing import Optional
 from api.app.domain.entities.draft import Draft
+from api.app.domain.entities.league import League
 from api.app.domain.enums.draft_state import DraftState
 from api.app.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository, create_league_week_matchup_repository
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
@@ -9,17 +11,21 @@ from api.app.core.annotate_args import annotate_args
 from api.app.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
 from firebase_admin import firestore
 
+from api.app.domain.services.notification_service import NotificationService, create_notification_service
+
 
 def create_reset_draft_command_executor(
     league_repo: LeagueRepository = Depends(create_league_repository),
     league_config_repo: LeagueConfigRepository = Depends(create_league_config_repository),
     league_week_matchup_repo: LeagueWeekMatchupRepository = Depends(create_league_week_matchup_repository),
+    notification_service: NotificationService = Depends(create_notification_service),
 
 ):
     return ResetDraftCommandExecutor(
         league_repo,
         league_config_repo,
         league_week_matchup_repo,
+        notification_service=notification_service,
     )
 
 
@@ -31,18 +37,22 @@ class ResetDraftCommand(BaseCommand):
 @annotate_args
 class ResetDraftResult(BaseCommandResult[ResetDraftCommand]):
     draft: Draft
+    league: Optional[League]
 
 
 class ResetDraftCommandExecutor(BaseCommandExecutor[ResetDraftCommand, ResetDraftResult]):
 
-    def __init__(self,
-                 league_repo: LeagueRepository,
-                 league_config_repo: LeagueConfigRepository,
-                 league_week_matchup_repo: LeagueWeekMatchupRepository,
-                 ):
+    def __init__(
+        self,
+        league_repo: LeagueRepository,
+        league_config_repo: LeagueConfigRepository,
+        league_week_matchup_repo: LeagueWeekMatchupRepository,
+        notification_service: NotificationService,
+    ):
         self.league_repo = league_repo
         self.league_config_repo = league_config_repo
         self.league_week_matchup_repo = league_week_matchup_repo
+        self.notification_service = notification_service
 
     def on_execute(self, command: ResetDraftCommand) -> ResetDraftResult:
         @firestore.transactional
@@ -82,11 +92,14 @@ class ResetDraftCommandExecutor(BaseCommandExecutor[ResetDraftCommand, ResetDraf
 
             self.league_repo.update(league, transaction)
 
-            return ResetDraftResult(command=command, draft=draft)
+            return ResetDraftResult(command=command, draft=draft, league=league)
 
         transaction = self.league_repo.firestore.create_transaction()
         result = start_draft(transaction)
 
-        self.league_repo.partial_update(command.league_id, {"draft_state": DraftState.NOT_STARTED})
+        if result.success:
+            self.league_repo.partial_update(command.league_id, {"draft_state": DraftState.NOT_STARTED})
+
+            self.notification_service.send_draft_event(result.league, "The commissioner reset the draft")
 
         return result

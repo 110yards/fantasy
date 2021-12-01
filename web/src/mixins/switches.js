@@ -64,6 +64,9 @@ export default {
       if (!this.switchesLoaded) return false
       return this.switches.donate_message
     },
+    enableDiscordIntegration() {
+      return this.getSwitch("enable_discord_integration")
+    },
   },
   created() {
     this.$bind("switches", firestore.collection("public").doc("switches"))

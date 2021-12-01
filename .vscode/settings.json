@@ -1,9 +1,14 @@
 {
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "emmet.includeLanguages": {
+    "vue": "html"
+  },
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[python]": {
-    "editor.defaultFormatter": "ms-python.python"
-  }
+    "editor.defaultFormatter": "ms-python.python",
+  },
+  "python.linting.flake8Enabled": true,
+  "python.testing.pytestEnabled": true
 }

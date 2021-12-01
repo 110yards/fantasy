@@ -1,4 +1,5 @@
 
+from api.app.domain.entities.league import League
 from api.app.domain.services.draft_service import DraftService, create_draft_service
 from api.app.domain.enums.draft_state import DraftState
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
@@ -8,17 +9,21 @@ from api.app.core.annotate_args import annotate_args
 from api.app.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
 from firebase_admin import firestore
 
+from api.app.domain.services.notification_service import NotificationService, create_notification_service
+
 
 def create_end_draft_command_executor(
     league_repo: LeagueRepository = Depends(create_league_repository),
     league_config_repo: LeagueConfigRepository = Depends(create_league_config_repository),
     draft_service: DraftService = Depends(create_draft_service),
+    notification_service: NotificationService = Depends(create_notification_service),
 
 ):
     return EndDraftCommandExecutor(
         league_repo,
         league_config_repo,
         draft_service=draft_service,
+        notification_service=notification_service,
     )
 
 
@@ -29,19 +34,22 @@ class EndDraftCommand(BaseCommand):
 
 @annotate_args
 class EndDraftResult(BaseCommandResult[EndDraftCommand]):
-    pass
+    league: League
 
 
 class EndDraftCommandExecutor(BaseCommandExecutor[EndDraftCommand, EndDraftResult]):
 
-    def __init__(self,
-                 league_repo: LeagueRepository,
-                 league_config_repo: LeagueConfigRepository,
-                 draft_service: DraftService,
-                 ):
+    def __init__(
+        self,
+        league_repo: LeagueRepository,
+        league_config_repo: LeagueConfigRepository,
+        draft_service: DraftService,
+        notification_service: NotificationService,
+    ):
         self.league_repo = league_repo
         self.league_config_repo = league_config_repo
         self.draft_service = draft_service
+        self.notification_service = notification_service
 
     def on_execute(self, command: EndDraftCommand) -> EndDraftResult:
 
@@ -65,9 +73,12 @@ class EndDraftCommandExecutor(BaseCommandExecutor[EndDraftCommand, EndDraftResul
 
             self.draft_service.complete(draft, league, transaction)
 
-            return EndDraftResult(command=command, draft=draft)
+            return EndDraftResult(command=command, league=league)
 
         transaction = self.league_repo.firestore.create_transaction()
         result = end_draft(transaction)
+
+        if result.success:
+            self.notification_service.send_draft_event(result.league, "The commissioner ended the draft early")
 
         return result

@@ -29,6 +29,56 @@
           </p>
         </div>
 
+        <div v-if="enableDiscordIntegration">
+          <app-form-label>
+            <span>Enable discord notifications?</span>
+            <v-btn icon class="ml-2" href="https://github.com/mdryden/110yards/wiki#discord" target="_blank"
+              ><v-icon>mdi-help-circle</v-icon></v-btn
+            >
+          </app-form-label>
+
+          <v-layout align-center class="mb-2"
+            ><v-simple-checkbox v-model="form.enable_discord_notifications" class="form-check-input" :ripple="false" />
+            <span>Yes</span>
+          </v-layout>
+        </div>
+
+        <div v-if="enableDiscordIntegration && form.enable_discord_notifications" class="ml-8">
+          <app-text-field
+            v-model="form.discord_webhook_url"
+            label="Discord webhook URL"
+            :required="form.enable_discord_notifications"
+            :rules="discordWebhookRules"
+          />
+
+          <app-form-label>
+            <span>Send discord notifications for:</span>
+          </app-form-label>
+          <v-layout align-center class="ml-2 mb-2 mt-2">
+            <v-simple-checkbox v-model="form.notifications_draft" class="form-check-input" :ripple="false" />
+            <span>Draft events</span>
+          </v-layout>
+
+          <v-layout align-center class="ml-2 mb-2"
+            ><v-simple-checkbox v-model="form.notifications_transactions" class="form-check-input" :ripple="false" />
+            <span>Transactions</span>
+          </v-layout>
+
+          <v-layout align-center class="ml-2 mb-2"
+            ><v-simple-checkbox v-model="form.notifications_waivers" class="form-check-input" :ripple="false" />
+            <span>Waivers</span>
+          </v-layout>
+
+          <v-layout align-center class="ml-2 mb-2"
+            ><v-simple-checkbox v-model="form.notifications_end_of_week" class="form-check-input" :ripple="false" />
+            <span>End of week</span>
+          </v-layout>
+
+          <app-default-button v-if="form.discord_webhook_url" class="mb-4" @click="testDiscordIntegration()"
+            >Send a test notification</app-default-button
+          >
+        </div>
+
         <app-primary-button>Update</app-primary-button>
         <saved-indicator :saved="saved" />
       </v-form>
@@ -45,6 +95,7 @@ import AppSelect from "../inputs/AppSelect.vue"
 import AppFormLabel from "../inputs/AppFormLabel.vue"
 import AppPrimaryButton from "../buttons/AppPrimaryButton.vue"
 import { draftType } from "../../api/110yards/constants"
+import AppDefaultButton from "../buttons/AppDefaultButton.vue"
 
 export default {
   name: "league-options",
@@ -54,19 +105,24 @@ export default {
     AppSelect,
     AppFormLabel,
     AppPrimaryButton,
+    AppDefaultButton,
   },
-  props: {
-    league: Object,
-    leagueStarted: Boolean,
-  },
+  props: { league: Object, leagueStarted: Boolean },
   data() {
     return {
       leagueNameRules: [v => !!v || "League name is required"],
+      discordWebhookRules: [v => (this.form.enable_discord_notifications && !!v) || "Discord webhook url is required"],
       form: {
         name: null,
         isPrivate: false,
         password: null,
         draft_type: null,
+        enable_discord_notifications: false,
+        discord_webhook_url: null,
+        notifications_draft: true,
+        notifications_end_of_week: true,
+        notifications_transactions: true,
+        notifications_waivers: true,
       },
       saved: false,
       draftTypes: [
@@ -89,10 +145,14 @@ export default {
           return ""
       }
     },
+
+    enableDiscordIntegration() {
+      return this.$root.enableDiscordIntegration
+    },
   },
   methods: {
-    submit() {
-      let valid = this.$refs.form.validate()
+    async submit() {
+      let valid = await this.$refs.form.validate()
       if (!valid) return
 
       this.save()
@@ -104,9 +164,20 @@ export default {
         private: this.form.isPrivate,
         password: this.form.isPrivate ? this.form.password : null,
         draft_type: this.form.draft_type,
+        enable_discord_notifications: this.form.enable_discord_notifications,
+        discord_webhook_url: this.form.discord_webhook_url,
+        notifications_draft: this.form.notifications_draft,
+        notifications_end_of_week: this.form.notifications_end_of_week,
+        notifications_transactions: this.form.notifications_transactions,
+        notifications_waivers: this.form.notifications_waivers,
       }
+      // alert(JSON.stringify(options))
       await leagueService.update(user, this.league.id, options)
       this.saved = true
+    },
+
+    async testDiscordIntegration() {
+      await leagueService.testDiscord(this.league.id, this.form.discord_webhook_url)
     },
   },
   watch: {
@@ -123,6 +194,12 @@ export default {
         this.form.isPrivate = league.private
         this.form.password = privateSettings.password
         this.form.draft_type = league.draft_type
+        this.form.enable_discord_notifications = league.enable_discord_notifications || false
+        this.form.discord_webhook_url = privateSettings.discord_webhook_url || null
+        this.form.notifications_draft = league.notifications_draft || false
+        this.form.notifications_end_of_week = league.notifications_end_of_week || false
+        this.form.notifications_transactions = league.notifications_transactions || false
+        this.form.notifications_waivers = league.notifications_waivers || false
       },
     },
     form: {

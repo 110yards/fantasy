@@ -1,4 +1,3 @@
-# from api.app.core.auth import require_role
 from api.app.core.pubsub.pubsub_push import PubSubPush
 from api.app.domain.commands.league.close_league_registration import (
     CloseLeagueRegistrationCommand, CloseLeagueRegistrationCommandExecutor,
@@ -37,6 +36,8 @@ from api.app.domain.entities.league import League
 from api.app.domain.repositories.league_repository import LeagueRepository
 from api.app.domain.repositories.repository_factory import get_league_repository
 from fastapi import Depends, Request
+
+from api.app.domain.services.discord_service import DiscordService, create_discord_service
 
 from .api_router import APIRouter
 
@@ -167,3 +168,12 @@ async def update_draft_order(
 ):
     command.league_id = league_id
     return command_executor.execute(command)
+
+
+@router.post("/{league_id}/test_discord")
+async def test_discord(
+    league_id: str,
+    webhook_url: str,
+    service: DiscordService = Depends(create_discord_service),
+):
+    service.send_test_notification(webhook_url)

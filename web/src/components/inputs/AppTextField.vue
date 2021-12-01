@@ -9,6 +9,7 @@
     :readonly="readonly"
     :disabled="disabled"
     :required="required"
+    :append-outer-icon="appendOuterIcon"
   />
 </template>
 
@@ -43,6 +44,10 @@ export default {
       default: false,
     },
     hint: {
+      type: String,
+      required: false,
+    },
+    appendOuterIcon: {
       type: String,
       required: false,
     },

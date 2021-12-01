@@ -1,11 +1,14 @@
 
+from api.app.domain.entities.league import League
+from api.app.domain.entities.league_transaction import LeagueTransaction
 from api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from api.app.domain.entities.waiver_bid import WaiverBid
 from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
 from api.app.config.settings import Settings, get_settings
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
+from api.app.domain.services.notification_service import NotificationService, create_notification_service
 from api.app.domain.services.roster_player_service import RosterPlayerService, create_roster_player_service
-from typing import Optional
+from typing import List, Optional
 from api.app.domain.repositories.league_owned_player_repository import LeagueOwnedPlayerRepository, create_league_owned_player_repository
 from api.app.domain.repositories.league_transaction_repository import LeagueTransactionRepository, create_league_transaction_repository
 from api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
@@ -24,6 +27,7 @@ def create_add_player_command_executor(
     roster_player_service: RosterPlayerService = Depends(create_roster_player_service),
     state_repo: StateRepository = Depends(create_state_repository),
     league_repo: LeagueRepository = Depends(create_league_repository),
+    notification_service: NotificationService = Depends(create_notification_service),
 ):
     return AddPlayerCommandExecutor(
         season=settings.current_season,
@@ -34,6 +38,7 @@ def create_add_player_command_executor(
         roster_player_service=roster_player_service,
         state_repo=state_repo,
         league_repo=league_repo,
+        notification_service=notification_service,
     )
 
 
@@ -48,7 +53,8 @@ class AddPlayerCommand(BaseCommand):
 
 @annotate_args
 class AddPlayerResult(BaseCommandResult[AddPlayerCommand]):
-    pass
+    league: Optional[League]
+    transactions: List[LeagueTransaction] = None
 
 
 class AddPlayerCommandExecutor(BaseCommandExecutor[AddPlayerCommand, AddPlayerResult]):
@@ -63,6 +69,7 @@ class AddPlayerCommandExecutor(BaseCommandExecutor[AddPlayerCommand, AddPlayerRe
         player_repo: PlayerRepository,
         state_repo: StateRepository,
         league_repo: LeagueRepository,
+        notification_service: NotificationService,
     ):
         self.season = season
         self.league_roster_repo = league_roster_repo
@@ -72,6 +79,7 @@ class AddPlayerCommandExecutor(BaseCommandExecutor[AddPlayerCommand, AddPlayerRe
         self.player_repo = player_repo
         self.state_repo = state_repo
         self.league_repo = league_repo
+        self.notification_service = notification_service
 
     def on_execute(self, command: AddPlayerCommand) -> AddPlayerResult:
 
@@ -127,7 +135,7 @@ class AddPlayerCommandExecutor(BaseCommandExecutor[AddPlayerCommand, AddPlayerRe
                 if not target_position:
                     return AddPlayerResult(command=command, error=f"There is no space on roster for a {player.position.display_name()}")
 
-                success, error = self.roster_player_service.assign_player_to_roster(
+                success, info = self.roster_player_service.assign_player_to_roster(
                     league_id=command.league_id,
                     roster=roster,
                     player=player,
@@ -137,9 +145,19 @@ class AddPlayerCommandExecutor(BaseCommandExecutor[AddPlayerCommand, AddPlayerRe
                 )
 
                 if success:
-                    return AddPlayerResult(command=command)
+                    return AddPlayerResult(command=command, league=league, transactions=info)
                 else:
-                    return AddPlayerResult(command=command, error=error)
+                    return AddPlayerResult(command=command, error=info)
 
         transaction = self.league_roster_repo.firestore.create_transaction()
-        return update(transaction)
+        result = update(transaction)
+
+        if result.success and result.transactions:
+            if len(result.transactions) == 1:
+                message = result.transactions[0].message
+            else:
+                message = result.transactions[0].message + " and " + result.transactions[1].message
+
+            self.notification_service.send_transaction_event(result.league, message)
+
+        return result

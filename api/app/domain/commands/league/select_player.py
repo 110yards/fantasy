@@ -1,8 +1,12 @@
 
+from typing import Optional
+from api.app.domain.entities.draft import DraftSlot
+from api.app.domain.entities.league import League
 from api.app.domain.services.draft_service import DraftService, create_draft_service
 from api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from api.app.domain.enums.draft_type import DraftType
 from api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from api.app.domain.services.notification_service import NotificationService, create_notification_service
 from api.app.domain.services.roster_player_service import RosterPlayerService, create_roster_player_service
 from api.app.config.settings import Settings, get_settings
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
@@ -23,6 +27,7 @@ def create_select_player_command_executor(
     league_roster_repo: LeagueRosterRepository = Depends(create_league_roster_repository),
     league_repo: LeagueRepository = Depends(create_league_repository),
     draft_service: DraftService = Depends(create_draft_service),
+    notification_service: NotificationService = Depends(create_notification_service),
 ):
     return SelectPlayerCommandExecutor(
         settings.current_season,
@@ -33,6 +38,7 @@ def create_select_player_command_executor(
         league_roster_repo,
         league_repo,
         draft_service,
+        notification_service,
     )
 
 
@@ -46,7 +52,10 @@ class SelectPlayerCommand(BaseCommand):
 
 @annotate_args
 class SelectPlayerResult(BaseCommandResult[SelectPlayerCommand]):
-    pass
+    league: Optional[League]
+    slot: Optional[DraftSlot]
+    next_slot: Optional[DraftSlot]
+    draft_complete: bool = False
 
 
 class SelectPlayerCommandExecutor(BaseCommandExecutor[SelectPlayerCommand, SelectPlayerResult]):
@@ -60,6 +69,7 @@ class SelectPlayerCommandExecutor(BaseCommandExecutor[SelectPlayerCommand, Selec
                  league_roster_repo: LeagueRosterRepository,
                  league_repo: LeagueRepository,
                  draft_service: DraftService,
+                 notification_service: NotificationService,
                  ):
         self.season = season
         self.league_config_repo = league_config_repo
@@ -69,6 +79,7 @@ class SelectPlayerCommandExecutor(BaseCommandExecutor[SelectPlayerCommand, Selec
         self.league_roster_repo = league_roster_repo
         self.league_repo = league_repo
         self.draft_service = draft_service
+        self.notification_service = notification_service
 
     def on_execute(self, command: SelectPlayerCommand) -> SelectPlayerResult:
         existing = self.league_owned_player_repo.get(command.league_id, command.player_id)
@@ -121,12 +132,31 @@ class SelectPlayerCommandExecutor(BaseCommandExecutor[SelectPlayerCommand, Selec
                 return SelectPlayerResult(command=command, error=error)
 
             draft_complete = self.draft_service.was_last_pick(draft, command.pick_number)
+            next_slot = None
+
             if draft_complete:
                 self.draft_service.complete(draft, league, transaction)
             else:
                 self.league_config_repo.set_draft(command.league_id, draft, transaction)
+                next_slot = draft.slots[pick_index + 1]
 
-            return SelectPlayerResult(command=command)
+            return SelectPlayerResult(command=command, league=league, slot=slot, next_slot=next_slot, draft_complete=draft_complete)
 
         transaction = self.league_config_repo.firestore.create_transaction()
-        return update(transaction)
+        result = update(transaction)
+
+        if result.success:
+            message = f"Pick #{result.slot.pick_number}: {result.slot.result}."
+            if result.draft_complete:
+                message += "\n\nThe draft has ended. Good luck!"
+            else:
+                modifier = " "
+                if result.next_slot.roster_id == command.roster_id:
+                    modifier = " still "
+                next_roster = self.league_roster_repo.get(command.league_id, result.next_slot.roster_id)
+
+                message += f" {next_roster.name} is{modifier}on the clock."
+
+            self.notification_service.send_draft_event(result.league, message)
+
+        return result
