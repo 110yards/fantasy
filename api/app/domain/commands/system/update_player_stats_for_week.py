@@ -3,7 +3,7 @@ from __future__ import annotations
 from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
 
 
-from api.app.domain.entities.player import PlayerGameStats, from_game_player
+from api.app.domain.entities.player import PlayerGame, from_game_player
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
 from api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
 from api.app.core.logging import Logger
@@ -90,7 +90,7 @@ class UpdatePlayerStatsForWeekCommandExecutor(BaseCommandExecutor[UpdatePlayerSt
                 if not player.game_stats:
                     player.game_stats = {}
 
-                player.game_stats[game_id] = PlayerGameStats(team=player.team, **player_update.stats.dict())
+                player.game_stats[game_id] = PlayerGame(team=player.team, **player_update.stats.dict())
                 pending_player_updates.append(player)
 
             for player in pending_player_updates:

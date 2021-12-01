@@ -14,8 +14,11 @@ STATUS_ACTIVE = 1
 
 
 @annotate_args
-class PlayerGameStats(Stats):
-    team: Optional[Team]
+class PlayerGame(BaseEntity):
+    player_id: str
+    game_id: str
+    team: Team
+    opponent: Team
 
 
 @annotate_args
@@ -45,10 +48,6 @@ class Player(BaseEntity):
     profile_image_url: Optional[str]
     profile_image_circ_url: Optional[str]
 
-    game_scores: Optional[Dict[str, PlayerScore]]
-    season_score: Optional[PlayerScore]
-
-    game_stats: Optional[Dict[str, PlayerGameStats]]
     season_stats: Stats = Stats()
     hash: str = ""
 

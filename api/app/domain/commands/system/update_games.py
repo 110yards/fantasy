@@ -6,12 +6,13 @@ from api.app.domain.entities.opponents import Opponents
 from api.app.domain.entities.scoreboard import Scoreboard
 from api.app.domain.entities.state import Locks
 from api.app.domain.entities.team import Team
+from api.app.domain.repositories.player_game_repository import PlayerGameRepository, create_player_game_repository
 from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
 from api.app.domain.enums.league_command_type import LeagueCommandType
 
 from api.app.domain.services.league_command_push_data import LeagueCommandPushData
 
-from api.app.domain.entities.player import PlayerGameStats, from_game_player
+from api.app.domain.entities.player import PlayerGame
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
 from api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
 from api.app.core.logging import Logger
@@ -41,8 +42,9 @@ def create_update_games_command_executor(
     public_repo: PublicRepository = Depends(create_public_repository),
     player_repo: PlayerRepository = Depends(create_player_repository),
     state_repo: StateRepository = Depends(create_state_repository),
+    player_game_repo: PlayerGameRepository = Depends(create_player_game_repository),
 ):
-    return UpdateGamesCommandExecutor(cfl_proxy, game_repo, publisher, public_repo, player_repo, state_repo)
+    return UpdateGamesCommandExecutor(cfl_proxy, game_repo, publisher, public_repo, player_repo, state_repo, player_game_repo)
 
 
 class UpdateGamesCommand(BaseCommand):
@@ -65,6 +67,7 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
         public_repo: PublicRepository,
         player_repo: PlayerRepository,
         state_repo: StateRepository,
+        player_game_repo: PlayerGameRepository,
     ):
         self.cfl_proxy = cfl_proxy
         self.game_repo = game_repo
@@ -72,6 +75,7 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
         self.public_repo = public_repo
         self.player_repo = player_repo
         self.state_repo = state_repo
+        self.player_game_repo = player_game_repo
 
     def on_execute(self, command: UpdateGamesCommand) -> UpdateGamesResult:
         Logger.info(f"Updating games for week {command.week}")
@@ -95,6 +99,7 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
             if current_game.home_roster and (not stored_game or not stored_game.home_roster):
                 roster_added = True
 
+        # we filter down the list of games and players in those games to only the ones which have changed since last update.
         game_updates = get_changed_games(current_games, stored_games)
         player_updates = get_changed_players(game_updates, stored_games)
 
@@ -137,24 +142,31 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
             pending_player_updates = []
 
             for player_update in players:
-                player = self.player_repo.get(season, player_update.player.id, transaction)
-                game_id = player_update.game_id
-                if not player:
-                    player = from_game_player(player_update.player, player_update.team)
+                # player = self.player_repo.get(season, player_update.player.id, transaction)
+                # game_id = player_update.game_id
+                # if not player:
+                #     player = from_game_player(player_update.player, player_update.team)
 
-                if not player.game_stats:
-                    player.game_stats = {}
+                # if not player.game_stats:
+                #     player.game_stats = {}
 
-                player.game_stats[game_id] = PlayerGameStats(team=player.team, **player_update.stats.dict())
-                player.recalc_season_stats()  # Should this be here?
-                pending_player_updates.append(player)
+                # player.game_stats[game_id] = PlayerGameStats(team=player.team, **player_update.stats.dict())
+                # pending_player_updates.append(player)
+                player_game = PlayerGame(
+                    id=player_update.player.id,
+                    game_id=player_update.game_id,
+                    player_id=player_update.player.id,
+                    team=player_update.team,
+                    opponent=player_update.opponent
+                )
+                self.player_game_repo.set(season, player_game, transaction)
 
             for game_id in games:
                 game = game_updates[game_id]
                 self.game_repo.set(season, game, transaction)
 
-            for player in pending_player_updates:
-                self.player_repo.set(season, player, transaction)
+            # for player in pending_player_updates:
+            #     self.player_repo.set(season, player, transaction)
 
             if new_state.changed(state):
                 self.state_repo.set(new_state, transaction)
@@ -168,7 +180,7 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
             return pending_player_updates
 
         update_games(transaction, game_updates, player_updates)
-        payloads = self.publish_changed_players(player_updates)
+        # payloads = self.publish_changed_players(player_updates)
 
         if roster_added:
             self.publisher.publish(BaseModel(), UPDATE_PLAYERS_TOPIC)
@@ -176,7 +188,7 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
         return UpdateGamesResult(
             command=command,
             changed_games=[game_updates[game_id] for game_id in game_updates],
-            changed_players=payloads
+            # changed_players=payloads
         )
 
     def get_current_games(self, season, week) -> Dict[str, Game]:
@@ -220,16 +232,16 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
 
         return {game.id: game for game in games}
 
-    def publish_changed_players(self, updated_players: List[GamePlayerStats]):
-        payloads = []
-        for updated_player in updated_players:
-            command = UpdatePlayerStatsCommand(game_id=updated_player.game_id, player_stats=updated_player)
-            payload = LeagueCommandPushData(command_type=LeagueCommandType.UPDATE_PLAYER_STATS, command_data=command.dict())
-            self.publisher.publish(payload, LEAGUE_COMMAND_TOPIC)
+    # def publish_changed_players(self, updated_players: List[GamePlayerStats]):
+    #     payloads = []
+    #     for updated_player in updated_players:
+    #         command = UpdatePlayerStatsCommand(game_id=updated_player.game_id, player_stats=updated_player)
+    #         payload = LeagueCommandPushData(command_type=LeagueCommandType.UPDATE_PLAYER_STATS, command_data=command.dict())
+    #         self.publisher.publish(payload, LEAGUE_COMMAND_TOPIC)
 
-            payloads.append(command)
+    #         payloads.append(command)
 
-        return payloads
+    #     return payloads
 
 
 def get_changed_games(current_games: Dict[str, Game], stored_games: Dict[str, Game]) -> Dict[str, Game]:

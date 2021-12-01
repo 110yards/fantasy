@@ -10,7 +10,6 @@ from api.app.domain.entities.opponents import Opponents
 from api.app.domain.entities.schedule import get_playoff_type_config
 from api.app.domain.entities.state import State
 from api.app.domain.entities.switches import Switches
-from api.app.domain.entities.user import User
 from api.app.domain.enums.position_type import get_position_type_config
 from api.app.domain.repositories.public_repository import create_public_repository
 from api.app.domain.repositories.user_repository import create_user_repository
