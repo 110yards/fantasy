@@ -7,6 +7,8 @@ from firebase_admin import firestore
 from google.cloud.firestore_v1.base_client import BaseClient
 from google.cloud.firestore_v1.transaction import Transaction
 
+from api.app.core.batching import create_batches
+
 T = TypeVar("T", bound=BaseEntity)
 
 
@@ -133,6 +135,20 @@ class FirestoreProxy(Generic[T]):
             document_ref.set(entity.dict(exclude_none=True))
 
         return entity
+
+    def set_all(self, collection_path: str, entities: List[T]):
+        collection_ref = self.client.collection(collection_path)
+
+        batches = create_batches(entities, 500)
+
+        for batch in batches:
+            firestore_batch = self.client.batch()
+
+            for item in batch:
+                document_ref = collection_ref.document(str(item.id))
+                firestore_batch.set(document_ref, item.dict(exclude_none=True))
+
+            firestore_batch.commit()
 
     def partial_update(self, collection_path: str, entity_id: str, updates: Dict, transaction: Transaction = None):
         collection_ref = self.client.collection(collection_path)

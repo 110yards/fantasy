@@ -1,4 +1,5 @@
-from api.app.domain.entities.player_score import PlayerScore
+from __future__ import annotations
+
 from pydantic.class_validators import root_validator
 from api.app.domain.entities.game_player import GamePlayer
 from api.app.domain.enums.position_type import PositionType
@@ -30,26 +31,34 @@ class Player(BaseEntity):
     display_name: Optional[str]
     uniform: Optional[str]
     position: PositionType
-    height_inches: Optional[str]
-    weight_pounds: Optional[str]
+    height: Optional[str]
+    weight: Optional[int]
     team: Team
-    status_current: int
-    birth_birthDate_full: Optional[str]
-    birth_city: Optional[str]
-    birth_state_abbreviation: Optional[str]
-    birth_country_name: Optional[str]
-    college_fullName: Optional[str]
-    twitter: Optional[str]
-    facebook: Optional[str]
-    instagram: Optional[str]
-    vine: Optional[str]
-    custom_fields: Optional[str]
-    national_status: Optional[str]
-    profile_image_url: Optional[str]
-    profile_image_circ_url: Optional[str]
+    status_current: Optional[int]
+    birth_date: Optional[str]
+    birth_place: Optional[str]
+    college: Optional[str]
+    foreign_player: Optional[bool]
+    image_url: Optional[str]
 
     season_stats: Stats = Stats()
     hash: str = ""
+
+    def compute_hash(self):
+        self.hash = hash_dict(self.dict())
+
+    @staticmethod
+    def from_cfl_api(input: Dict) -> Player:
+        uniform = input["team"].get("uniform", None)
+        input["team"] = Team.from_cfl_api(input["team"])
+        input["position"] = PositionType.from_cfl_roster(input["position"]["abbreviation"])
+        input["last_name"] = input["last_name"].title()
+
+        player = Player.parse_obj(input)
+        player.id = str(player.cfl_central_id)
+        player.college = input.get("school", {}).get("name", None)
+        player.uniform = uniform
+        return player
 
     @root_validator
     def set_display_name(cls, values):
@@ -77,7 +86,7 @@ class Player(BaseEntity):
                         setattr(self.season_stats, key, season_total)
 
 
-def from_cfl(player: dict) -> Player:
+def from_team_roster(player: dict) -> Player:
     player["id"] = str(player["cfl_central_id"])
     player["stats_inc_id"] = player["playerId"]
     player["last_name"] = clean_name(player["lastName"])

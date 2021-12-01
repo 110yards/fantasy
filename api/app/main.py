@@ -13,9 +13,9 @@ from api.app.routers import (
     logging_router,
     login_router,
     migration_router,
-    projection_router,
+    # projection_router,
     roster_router,
-    score_router,
+    # score_router,
     system_router,
     user_router
 )

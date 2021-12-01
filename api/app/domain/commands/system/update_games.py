@@ -8,16 +8,14 @@ from api.app.domain.entities.state import Locks
 from api.app.domain.entities.team import Team
 from api.app.domain.repositories.player_game_repository import PlayerGameRepository, create_player_game_repository
 from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
-from api.app.domain.enums.league_command_type import LeagueCommandType
 
-from api.app.domain.services.league_command_push_data import LeagueCommandPushData
 
 from api.app.domain.entities.player import PlayerGame
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
 from api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
 from api.app.core.logging import Logger
 from api.app.domain.commands.league.update_player_stats import UpdatePlayerStatsCommand
-from api.app.domain.topics import LEAGUE_COMMAND_TOPIC, UPDATE_PLAYERS_TOPIC
+from api.app.domain.topics import UPDATE_PLAYERS_TOPIC
 
 import time
 import logging
