@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { progress } from "../../../api/110yards/roster"
+// import { progress } from "../../../api/110yards/roster"
 
 export default {
   name: "MatchupProgress",

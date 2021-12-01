@@ -70,7 +70,7 @@ import { firestore } from "../../../modules/firebase"
 import { matchupType } from "../../../api/110yards/constants"
 import MatchupVs from "../../../components/league/matchup/MatchupVs.vue"
 import TeamHeader from "../../../components/league/matchup/TeamHeader.vue"
-import { rosterScore } from "../../../api/110yards/score"
+// import { rosterScore } from "../../../api/110yards/score"
 import scoreboard from "../../../mixins/scoreboard"
 
 export default {
