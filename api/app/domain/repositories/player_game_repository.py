@@ -18,7 +18,8 @@ class PlayerGameRepository():
 
     @staticmethod
     def path(season: int, player_id: str):
-        return f"season/{season}/player/{player_id}/game"
+        # return f"season/{season}/player/{player_id}/game"
+        return f"season/{season}/player_game"
 
     def get(self, season: int, player_id: str, game_id: str, transaction: Transaction = None) -> PlayerGame:
         return self.firestore.get(PlayerGameRepository.path(season, player_id), game_id, transaction)

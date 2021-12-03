@@ -58,10 +58,11 @@ export default {
     configureReferences() {
       if (!this.position || !this.position.player || !this.leagueId || !this.weekNumber) return
 
-      let path = `season/${this.season}/player/${this.position.player.id}/game`
+      let path = `season/${this.season}/player_game/`
 
       let ref = firestore
         .collection(path)
+        .where("player_id", "==", this.position.player.id)
         .where("week_number", "==", parseInt(this.weekNumber))
         .orderBy("game_id")
         .limit(1)

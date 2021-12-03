@@ -1,36 +1,6 @@
 <template>
   <v-sheet v-if="league && matchup">
-    <v-row class="heading mb-2 text-right">
-      <v-col cols="5" class="roster-name pl-4">
-        <team-header
-          :leagueId="leagueId"
-          :roster="awayRoster"
-          :opponent="homeRoster"
-          :reverse="true"
-          :enableProjections="enableProjections"
-          :isCurrentWeek="isCurrentWeek"
-          :projection="awayProjection"
-          :weekNumber="weekNumber"
-        />
-      </v-col>
-
-      <v-col cols="2" class="text-center">
-        <v-row>
-          <v-col class="pb-0">vs</v-col>
-        </v-row>
-      </v-col>
-
-      <v-col cols="5" class="roster-name pr-4 text-left">
-        <team-header
-          :leagueId="leagueId"
-          :roster="homeRoster"
-          :opponent="awayRoster"
-          :enableProjections="enableProjections"
-          :isCurrentWeek="isCurrentWeek"
-          :projection="homeProjection"
-        />
-      </v-col>
-    </v-row>
+    <matchup-header :away="awayRoster" :home="homeRoster" :weekNumber="weekNumber" />
 
     <matchup-vs
       class="d-none d-md-block"
@@ -69,12 +39,14 @@ import MatchupVs from "../../../components/league/matchup/MatchupVs.vue"
 import TeamHeader from "../../../components/league/matchup/TeamHeader.vue"
 // import { rosterScore } from "../../../api/110yards/score"
 import scoreboard from "../../../mixins/scoreboard"
+import MatchupHeader from "../../../components/league/matchup/MatchupHeader.vue"
 
 export default {
   name: "matchup",
   components: {
     MatchupVs,
     TeamHeader,
+    MatchupHeader,
   },
   mixins: [scoreboard],
   props: {
@@ -91,8 +63,6 @@ export default {
   },
   data() {
     return {
-      // TODO: compile the list of players on each roster
-      // Pass the list of players into a method which fetches their game stats and compiles the score
       matchup: null,
       awayRoster: null,
       homeRoster: null,
@@ -156,25 +126,25 @@ export default {
       }
     },
 
-    async updateHomeScores() {
-      if (this.homeRoster && this.isCurrentWeek && this.scoreboard) {
-        let homeResult = await rosterScore(this.leagueId, this.homeRoster.id)
-        this.homeScore = homeResult.score
-        this.homeProjection = homeResult.projection
-      } else {
-        this.homeScore = this.matchup.home_score
-      }
-    },
+    // async updateHomeScores() {
+    //   if (this.homeRoster && this.isCurrentWeek && this.scoreboard) {
+    //     let homeResult = await rosterScore(this.leagueId, this.homeRoster.id)
+    //     this.homeScore = homeResult.score
+    //     this.homeProjection = homeResult.projection
+    //   } else {
+    //     this.homeScore = this.matchup.home_score
+    //   }
+    // },
 
-    async updateAwayScores() {
-      if (this.awayRoster && this.isCurrentWeek && this.scoreboard) {
-        let awayResult = await rosterScore(this.leagueId, this.awayRoster.id)
-        this.awayScore = awayResult.score
-        this.awayProjection = awayResult.projection
-      } else {
-        this.awayScore = this.matchup.away_score
-      }
-    },
+    // async updateAwayScores() {
+    //   if (this.awayRoster && this.isCurrentWeek && this.scoreboard) {
+    //     let awayResult = await rosterScore(this.leagueId, this.awayRoster.id)
+    //     this.awayScore = awayResult.score
+    //     this.awayProjection = awayResult.projection
+    //   } else {
+    //     this.awayScore = this.matchup.away_score
+    //   }
+    // },
   },
   watch: {
     matchupId: {
@@ -202,24 +172,24 @@ export default {
       },
     },
 
-    awayRoster: {
-      async handler(awayRoster) {
-        this.updateAwayScores()
-      },
-    },
+    // awayRoster: {
+    //   async handler(awayRoster) {
+    //     this.updateAwayScores()
+    //   },
+    // },
 
-    homeRoster: {
-      handler(homeRoster) {
-        this.updateHomeScores()
-      },
-    },
+    // homeRoster: {
+    //   handler(homeRoster) {
+    //     this.updateHomeScores()
+    //   },
+    // },
 
-    scoreboard: {
-      handler(scoreboard) {
-        this.updateHomeScores()
-        this.updateAwayScores()
-      },
-    },
+    // scoreboard: {
+    //   handler(scoreboard) {
+    //     this.updateHomeScores()
+    //     this.updateAwayScores()
+    //   },
+    // },
   },
 }
 </script>

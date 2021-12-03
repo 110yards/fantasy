@@ -1,8 +1,11 @@
 <template>
-  <span> </span>
+  <span>{{ score }} </span>
 </template>
 
 <script>
+import { firestore } from "../../modules/firebase"
+import { calculate, calculateMultiple } from "../../modules/scoring"
+
 export default {
   props: {
     roster: {
@@ -37,6 +40,10 @@ export default {
     isCurrentWeek() {
       return this.$root.state.current_week == this.weekNumber
     },
+
+    score() {
+      return this.playersFor ? calculateMultiple(this.$root.leagueScoringSettings, this.playersFor) : 0 // TODO: not working
+    },
   },
 
   methods: {
@@ -45,7 +52,13 @@ export default {
       let players = positions.filter(x => x.player).map(x => x.player)
       let playerIds = players.map(x => x.id)
 
-      let path = `season/${this.season}/player/${this.position.player.id}/game` // TODO: figure this out - doesn't work, as the games are under the players
+      let path = `season/${this.season}/player_game/`
+      let ref = firestore
+        .collection(path)
+        .where("week_number", "==", parseInt(this.weekNumber))
+        .where("player_id", "in", playerIds)
+
+      this.$bind("playersFor", ref)
     },
   },
 

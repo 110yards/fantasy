@@ -48,6 +48,10 @@ service cloud.firestore {
     	allow read: if true;
     }
     
+    match /season/{season}/player_game/{document=**} {
+    	allow read: if true;
+    }
+    
     match /roster-positions/{document=**} {
     	allow read: if true;
     }

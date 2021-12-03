@@ -1,35 +1,5 @@
 <template>
-  <div>
-    <v-row>
-      <v-col class="pb-0 caption roster-name" :class="teamClass">
-        <span v-if="roster">
-          <router-link :to="{ name: 'roster', params: { leagueId: leagueId, rosterId: roster.id } }">
-            {{ roster.name }}
-          </router-link>
-        </span>
-        <span v-else>TBD</span>
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col class="py-0 text-h4" :class="scoreClass">
-        <!-- <score :score="scoreFor" /> -->
-        <roster-score :roster="roster" :weekNumber="weekNumber" />
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col class="py-0 grey--text">
-        <score v-if="enableProjections" :score="projection" />
-      </v-col>
-    </v-row>
-
-    <v-row v-if="showMatchupProgress">
-      <v-col>
-        <matchup-progress :roster="roster" :reverse="reverse" :leagueId="leagueId" :class="!reverse ? 'pr-1' : ''" />
-      </v-col>
-    </v-row>
-  </div>
+  <div></div>
 </template>
 
 <script>
@@ -43,7 +13,6 @@ export default {
   props: {
     leagueId: { type: String, required: true },
     roster: { type: Object, required: false },
-    opponent: { type: Object, required: false },
     reverse: { type: Boolean, required: false, default: false },
     enableProjections: { type: Boolean, required: false, default: false },
     isCurrentWeek: { type: Boolean, required: false, default: false },

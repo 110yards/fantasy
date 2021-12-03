@@ -151,7 +151,8 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
                 # player.game_stats[game_id] = PlayerGameStats(team=player.team, **player_update.stats.dict())
                 # pending_player_updates.append(player)
                 player_game = PlayerGame(
-                    id=player_update.game_id,
+                    # id=player_update.game_id,
+                    id=f"{player_update.player.id}_{player_update.game_id}",
                     game_id=player_update.game_id,
                     week_number=command.week,
                     player_id=player_update.player.id,
