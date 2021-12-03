@@ -17,9 +17,11 @@ STATUS_ACTIVE = 1
 @annotate_args
 class PlayerGame(BaseEntity):
     player_id: str
-    game_id: str
+    game_id: int
+    week_number: int
     team: Team
     opponent: Team
+    stats: Stats
 
 
 @annotate_args

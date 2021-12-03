@@ -16,19 +16,19 @@ export default {
   methods: {},
 
   watch: {
-    // leagueId: {
-    //   immediate: true,
-    //   handler(leagueId) {
-    //     if (leagueId) {
-    //       let path = `league/${leagueId}/config/scoring`
-    //       let ref = firestore.doc(path)
-    //       this.$bind("leagueScoringSettings", ref)
-    //     } else {
-    //       if (this.leagueScoringSettings) {
-    //         this.$unbind("leagueScoringSettings")
-    //       }
-    //     }
-    //   },
-    // },
+    leagueId: {
+      immediate: true,
+      handler(leagueId) {
+        if (leagueId) {
+          let path = `league/${leagueId}/config/scoring`
+          let ref = firestore.doc(path)
+          this.$bind("leagueScoringSettings", ref)
+        } else {
+          if (this.leagueScoringSettings) {
+            this.$unbind("leagueScoringSettings")
+          }
+        }
+      },
+    },
   },
 }

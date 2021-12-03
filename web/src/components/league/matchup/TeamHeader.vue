@@ -13,7 +13,8 @@
 
     <v-row>
       <v-col class="py-0 text-h4" :class="scoreClass">
-        <score :score="scoreFor" />
+        <!-- <score :score="scoreFor" /> -->
+        <roster-score :roster="roster" :weekNumber="weekNumber" />
       </v-col>
     </v-row>
 
@@ -49,6 +50,7 @@ export default {
     scoreFor: { type: Number, required: false },
     scoreAgainst: { type: Number, required: false },
     projection: { type: Number },
+    weekNumber: { type: Number, required: true },
   },
 
   computed: {

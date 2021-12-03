@@ -9,9 +9,8 @@
           :reverse="true"
           :enableProjections="enableProjections"
           :isCurrentWeek="isCurrentWeek"
-          :scoreFor="awayScore"
-          :scoreAgainst="homeScore"
           :projection="awayProjection"
+          :weekNumber="weekNumber"
         />
       </v-col>
 
@@ -28,8 +27,6 @@
           :opponent="awayRoster"
           :enableProjections="enableProjections"
           :isCurrentWeek="isCurrentWeek"
-          :scoreFor="homeScore"
-          :scoreAgainst="awayScore"
           :projection="homeProjection"
         />
       </v-col>
@@ -94,12 +91,12 @@ export default {
   },
   data() {
     return {
+      // TODO: compile the list of players on each roster
+      // Pass the list of players into a method which fetches their game stats and compiles the score
       matchup: null,
       awayRoster: null,
       homeRoster: null,
       league: null,
-      awayScore: null,
-      homeScore: null,
       awayProjection: null,
       homeProjection: null,
     }
