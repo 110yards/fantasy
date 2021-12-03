@@ -3,7 +3,7 @@
 </template>
 
 <script>
-// import { playerProjection } from "../../api/110yards/projection"
+import { playerProjection } from "../../api/110yards/projection"
 import * as formatter from "../../modules/formatter"
 
 export default {

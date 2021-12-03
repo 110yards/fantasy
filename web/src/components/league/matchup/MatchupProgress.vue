@@ -6,7 +6,9 @@
 </template>
 
 <script>
-// import { progress } from "../../../api/110yards/roster"
+import { eventStatus } from "../../../api/110yards/constants"
+import { progress } from "../../../api/110yards/roster"
+import { firestore } from "../../../modules/firebase"
 
 export default {
   name: "MatchupProgress",
@@ -19,6 +21,7 @@ export default {
   data() {
     return {
       progress: null,
+      remainingGames: null,
     }
   },
 
@@ -26,10 +29,14 @@ export default {
     currentUser() {
       return this.$store.state.currentUser
     },
+
+    season() {
+      return this.$root.currentSeason
+    },
   },
 
   methods: {
-    async updateExternal() {
+    async update() {
       if (!this.currentUser || !this.roster) return // can't hit this endpoint until we have a user
 
       if (this.$root.enableMatchupProgress) {
@@ -39,23 +46,20 @@ export default {
   },
 
   watch: {
-    roster: {
+    remainingGames: {
       immediate: true,
-      handler(roster) {
-        if (roster) {
-          this.updateExternal()
-        }
+      handler(_) {
+        this.update()
       },
     },
+  },
 
-    currentUser: {
-      immediate: true,
-      handler(currentUser) {
-        if (!currentUser) return
+  mounted() {
+    let ref = firestore
+      .collection(`season/${this.season}/game`)
+      .where("event_status.event_status_id", "in", [eventStatus.PreGame, eventStatus.InProgress])
 
-        this.updateExternal()
-      },
-    },
+    this.$bind("remainingGames", ref)
   },
 }
 </script>

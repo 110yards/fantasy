@@ -1,6 +1,12 @@
 <template>
   <v-sheet v-if="league && matchup">
-    <matchup-header :away="awayRoster" :home="homeRoster" :weekNumber="weekNumber" />
+    <matchup-header
+      :away="awayRoster"
+      :home="homeRoster"
+      :weekNumber="weekNumber"
+      :enableProjections="enableProjections"
+      :isCurrentWeek="isCurrentWeek"
+    />
 
     <matchup-vs
       class="d-none d-md-block"
@@ -36,8 +42,6 @@
 import { firestore } from "../../../modules/firebase"
 import { matchupType } from "../../../api/110yards/constants"
 import MatchupVs from "../../../components/league/matchup/MatchupVs.vue"
-import TeamHeader from "../../../components/league/matchup/TeamHeader.vue"
-// import { rosterScore } from "../../../api/110yards/score"
 import scoreboard from "../../../mixins/scoreboard"
 import MatchupHeader from "../../../components/league/matchup/MatchupHeader.vue"
 
@@ -45,7 +49,6 @@ export default {
   name: "matchup",
   components: {
     MatchupVs,
-    TeamHeader,
     MatchupHeader,
   },
   mixins: [scoreboard],
@@ -67,8 +70,6 @@ export default {
       awayRoster: null,
       homeRoster: null,
       league: null,
-      awayProjection: null,
-      homeProjection: null,
     }
   },
   computed: {
@@ -125,26 +126,6 @@ export default {
         this.homeRoster = this.matchup.home
       }
     },
-
-    // async updateHomeScores() {
-    //   if (this.homeRoster && this.isCurrentWeek && this.scoreboard) {
-    //     let homeResult = await rosterScore(this.leagueId, this.homeRoster.id)
-    //     this.homeScore = homeResult.score
-    //     this.homeProjection = homeResult.projection
-    //   } else {
-    //     this.homeScore = this.matchup.home_score
-    //   }
-    // },
-
-    // async updateAwayScores() {
-    //   if (this.awayRoster && this.isCurrentWeek && this.scoreboard) {
-    //     let awayResult = await rosterScore(this.leagueId, this.awayRoster.id)
-    //     this.awayScore = awayResult.score
-    //     this.awayProjection = awayResult.projection
-    //   } else {
-    //     this.awayScore = this.matchup.away_score
-    //   }
-    // },
   },
   watch: {
     matchupId: {
@@ -171,25 +152,6 @@ export default {
         this.configureRosterReferences()
       },
     },
-
-    // awayRoster: {
-    //   async handler(awayRoster) {
-    //     this.updateAwayScores()
-    //   },
-    // },
-
-    // homeRoster: {
-    //   handler(homeRoster) {
-    //     this.updateHomeScores()
-    //   },
-    // },
-
-    // scoreboard: {
-    //   handler(scoreboard) {
-    //     this.updateHomeScores()
-    //     this.updateAwayScores()
-    //   },
-    // },
   },
 }
 </script>

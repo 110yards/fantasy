@@ -1,18 +1,8 @@
 <template>
   <v-row v-if="leagueId && weekNumber" class="heading mb-2 text-right">
     <v-col cols="5" class="roster-name pl-4">
-      <!-- <team-header
-          :leagueId="leagueId"
-          :roster="awayRoster"
-          :opponent="homeRoster"
-          :reverse="true"
-          :enableProjections="enableProjections"
-          :isCurrentWeek="isCurrentWeek"
-          :projection="awayProjection"
-          :weekNumber="weekNumber"
-        /> -->
       <v-row>
-        <v-col class="pb-0 caption roster-name" :class="teamClass">
+        <v-col class="pb-0 caption roster-name" :class="awayHeaderClass">
           <span v-if="away">
             <router-link :to="{ name: 'roster', params: { leagueId: leagueId, rosterId: away.id } }">
               {{ away.name }}
@@ -23,20 +13,20 @@
       </v-row>
 
       <v-row>
-        <v-col class="py-0 text-h4" :class="scoreClass">
+        <v-col class="py-0 text-h4 score" :class="awayScoreClass">
           <score :score="awayScore" />
         </v-col>
       </v-row>
 
       <v-row>
         <v-col class="py-0 grey--text">
-          <!-- <score v-if="enableProjections" :score="projection" /> -->
+          <score v-if="enableProjections" :score="awayProjection" />
         </v-col>
       </v-row>
 
-      <v-row v-if="showMatchupProgress">
+      <v-row v-if="showMatchupProgress && away">
         <v-col>
-          <matchup-progress :roster="home" :reverse="reverse" :leagueId="leagueId" :class="!reverse ? 'pr-1' : ''" />
+          <matchup-progress :roster="away" :reverse="true" :leagueId="leagueId" class="pr-1" />
         </v-col>
       </v-row>
     </v-col>
@@ -48,17 +38,8 @@
     </v-col>
 
     <v-col cols="5" class="roster-name pr-4 text-left">
-      <!-- <team-header
-        :leagueId="leagueId"
-        :roster="homeRoster"
-        :opponent="awayRoster"
-        :enableProjections="enableProjections"
-        :isCurrentWeek="isCurrentWeek"
-        :projection="homeProjection"
-        :weekNumber="weekNumber"
-      /> -->
       <v-row>
-        <v-col class="pb-0 caption roster-name" :class="teamClass">
+        <v-col class="pb-0 caption roster-name" :class="homeHeaderClass">
           <span v-if="home">
             <router-link :to="{ name: 'roster', params: { leagueId: leagueId, rosterId: home.id } }">
               {{ home.name }}
@@ -69,20 +50,20 @@
       </v-row>
 
       <v-row>
-        <v-col class="py-0 text-h4" :class="scoreClass">
+        <v-col class="py-0 text-h4" :class="homeScoreClass">
           <score :score="homeScore" />
         </v-col>
       </v-row>
 
       <v-row>
         <v-col class="py-0 grey--text">
-          <!-- <score v-if="enableProjections" :score="projection" /> -->
+          <score v-if="enableProjections" :score="homeProjection" />
         </v-col>
       </v-row>
 
-      <v-row v-if="showMatchupProgress">
+      <v-row v-if="showMatchupProgress && home">
         <v-col>
-          <matchup-progress :roster="home" :reverse="reverse" :leagueId="leagueId" :class="!reverse ? 'pr-1' : ''" />
+          <matchup-progress :roster="home" :reverse="false" :leagueId="leagueId" class="pr-1'" />
         </v-col>
       </v-row>
     </v-col>
@@ -90,15 +71,19 @@
 </template>
 
 <script>
+import { rosterProjection } from "../../../api/110yards/projection"
 import { calculateMultiple, getRosterScoreRef } from "../../../modules/scoring"
 import Score from "../../Score.vue"
+import MatchupProgress from "./MatchupProgress.vue"
 
 export default {
-  components: { Score },
+  components: { Score, MatchupProgress },
 
   props: {
     away: { type: Object, required: false },
     home: { type: Object, required: false },
+    isCurrentWeek: { type: Boolean, required: true },
+    enableProjections: { type: Boolean, required: false, default: false },
     weekNumber: { required: true },
   },
 
@@ -106,6 +91,8 @@ export default {
     return {
       awayPlayers: null,
       homePlayers: null,
+      awayProjection: null,
+      homeProjection: null,
     }
   },
 
@@ -119,7 +106,6 @@ export default {
     },
 
     awayScore() {
-      // TODO: roster score does not update as player scores update.  Need a way to trigger a firebase refresh.
       return this.awayPlayers ? calculateMultiple(this.$root.leagueScoringSettings, this.awayPlayers) : 0
     },
 
@@ -127,31 +113,49 @@ export default {
       return this.homePlayers ? calculateMultiple(this.$root.leagueScoringSettings, this.homePlayers) : 0
     },
 
+    awayHeaderClass() {
+      return this.awayScore >= this.homeScore ? "font-weight-black" : ""
+    },
+
+    awayScoreClass() {
+      return this.awayScore >= this.homeScore ? "" : "grey--text"
+    },
+
+    homeHeaderClass() {
+      return this.homeScore >= this.awayScore ? "font-weight-black" : ""
+    },
+
+    homeScoreClass() {
+      return this.homeScore >= this.awayScore ? "" : "grey--text"
+    },
+
     showMatchupProgress() {
-      return false // TODO
-    },
-
-    enableProjections() {
-      return false //  TODO
+      return this.isCurrentWeek && this.$root.enableMatchupProgress
     },
   },
 
-  methods: {
-    setupScoreRef() {},
-  },
+  methods: {},
 
   watch: {
     away: {
       immediate: true,
-      handler(away) {
-        if (away) this.$bind("awayPlayers", getRosterScoreRef(this.season, this.weekNumber, away))
+      async handler(away) {
+        if (away) {
+          this.$bind("awayPlayers", getRosterScoreRef(this.season, this.weekNumber, away))
+
+          this.awayProjection = await rosterProjection(this.leagueId, away.id)
+        }
       },
     },
 
     home: {
       immediate: true,
-      handler(home) {
-        if (home) this.$bind("homePlayers", getRosterScoreRef(this.season, this.weekNumber, home))
+      async handler(home) {
+        if (home) {
+          this.$bind("homePlayers", getRosterScoreRef(this.season, this.weekNumber, home))
+
+          this.homeProjection = await rosterProjection(this.leagueId, home.id)
+        }
       },
     },
   },

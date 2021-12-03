@@ -13,7 +13,7 @@ from api.app.routers import (
     logging_router,
     login_router,
     migration_router,
-    # projection_router,
+    projection_router,
     roster_router,
     # score_router,
     system_router,
@@ -41,7 +41,7 @@ app.include_router(roster_router.router)
 app.include_router(logging_router.router)
 app.include_router(admin_router.router)
 app.include_router(migration_router.router)
-# app.include_router(projection_router.router)
+app.include_router(projection_router.router)
 # app.include_router(score_router.router)
 
 firebase_admin.initialize_app(options={"projectId": settings.gcloud_project})

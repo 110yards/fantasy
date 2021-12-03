@@ -114,7 +114,6 @@ td.vs {
 </style>
 
 <script>
-import { rosterScore } from "../../api/110yards/score"
 import scoreboard from "../../mixins/scoreboard"
 import * as formatter from "../../modules/formatter"
 
