@@ -22,7 +22,7 @@ export const calculateMultiple = (scoring, playerGames) => {
   let totalScore = 0.0
 
   for (let playerGame of playerGames) {
-    totalScore += calculateScore(scoring, playerGame.stats)
+    totalScore += calculate(scoring, playerGame.stats)
   }
 
   return totalScore
