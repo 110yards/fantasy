@@ -161,7 +161,7 @@ export default {
       let user = this.$store.state.currentUser
       let options = {
         name: this.form.name,
-        private: this.form.isPrivate,
+      private: this.form.isPrivate,
         password: this.form.isPrivate ? this.form.password : null,
         draft_type: this.form.draft_type,
         enable_discord_notifications: this.form.enable_discord_notifications,

@@ -13,7 +13,8 @@
 
     <template v-if="positions && !confirming">
       <lineup-spot
-        :class="spot.position_type"
+        class="spot"
+        :class="[spot.position_type, isActive(spot.position_type)]"
         v-for="spot in sortedSpots"
         :key="spot.id"
         :spot="spot"
@@ -27,31 +28,18 @@
         v-on:cancelMovePlayer="cancelMovePlayer"
         :scoreboard="scoreboard"
       />
-
-      <!-- <lineup-spot-mobile
-        class="d-md-none"
-        :class="spot.active ? 'active' : ''"
-        v-for="spot in sortedSpots"
-        :key="'m' + spot.id"
-        :spot="spot"
-        :leagueId="leagueId"
-        :player="spot.player"
-        :canEdit="canEdit"
-        :playerToBeMoved="playerToBeMoved"
-        v-on:confirmDrop="confirmDropPlayer"
-        v-on:movePlayer="showMoveTargets"
-        v-on:acceptPlayer="movePlayer"
-        v-on:cancelMovePlayer="cancelMovePlayer"
-      /> -->
     </template>
   </v-container>
 </template>
 
 <style scoped>
-/* .spot.active:last-child() {
-  
+.spot {
+  border-bottom: 1px solid black;
+}
+
+.spot.active:last-of-type {
   border-bottom: 1px solid red;
-} */
+}
 </style>
 
 <script>
@@ -64,6 +52,7 @@ import { draftState } from "../../../api/110yards/constants"
 // import LineupSpotMobile from "./LineupSpotMobile.vue"
 import LineupSpot from "./LineupSpot.vue"
 import scoreboard from "../../../mixins/scoreboard"
+import { positionType } from "../../../../dist/js/app"
 
 export default {
   name: "lineup",
@@ -139,6 +128,9 @@ export default {
     },
   },
   methods: {
+    isActive(position_type) {
+      return this.$root.isActivePositionType(position_type) ? "active" : "active"
+    },
     formatScore(score) {
       if (score == null || score == undefined) score = 0
 

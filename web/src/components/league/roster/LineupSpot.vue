@@ -106,10 +106,6 @@
 </template>
 
 <style scoped>
-.spot {
-  border-bottom: 1px solid black;
-}
-
 .nohand {
   pointer-events: none;
 }
