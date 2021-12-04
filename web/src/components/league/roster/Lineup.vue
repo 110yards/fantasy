@@ -14,6 +14,7 @@
     <template v-if="positions && !confirming">
       <lineup-spot
         :class="spot.position_type"
+        :active="true"
         v-for="spot in sortedSpots"
         :key="spot.id"
         :spot="spot"
@@ -27,51 +28,24 @@
         v-on:cancelMovePlayer="cancelMovePlayer"
         :scoreboard="scoreboard"
       />
-
-      <!-- <lineup-spot-mobile
-        class="d-md-none"
-        :class="spot.active ? 'active' : ''"
-        v-for="spot in sortedSpots"
-        :key="'m' + spot.id"
-        :spot="spot"
-        :leagueId="leagueId"
-        :player="spot.player"
-        :canEdit="canEdit"
-        :playerToBeMoved="playerToBeMoved"
-        v-on:confirmDrop="confirmDropPlayer"
-        v-on:movePlayer="showMoveTargets"
-        v-on:acceptPlayer="movePlayer"
-        v-on:cancelMovePlayer="cancelMovePlayer"
-      /> -->
     </template>
   </v-container>
 </template>
 
-<style scoped>
-/* .spot.active:last-child() {
-  
-  border-bottom: 1px solid red;
-} */
-</style>
-
 <script>
-// import LineupSpotDesktop from "./LineupSpotDesktop.vue"
 import * as formatter from "../../../modules/formatter"
 import AppPrimaryButton from "../../buttons/AppPrimaryButton.vue"
 import AppDefaultButton from "../../buttons/AppDefaultButton.vue"
 import { dropPlayer, movePlayer } from "../../../api/110yards/roster"
 import { draftState } from "../../../api/110yards/constants"
-// import LineupSpotMobile from "./LineupSpotMobile.vue"
 import LineupSpot from "./LineupSpot.vue"
 import scoreboard from "../../../mixins/scoreboard"
 
 export default {
   name: "lineup",
   components: {
-    // LineupSpotDesktop,
     AppPrimaryButton,
     AppDefaultButton,
-    // LineupSpotMobile,
     LineupSpot,
   },
   mixins: [scoreboard],

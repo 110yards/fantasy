@@ -49,6 +49,9 @@ class LeaguePositionsConfig(BaseEntity):
         positions.extend(LeaguePositionsConfig.create_positions_for_type(starting_id, self.wr, "WR", PositionType.wr))
         starting_id = starting_id + self.wr
 
+        positions.extend(LeaguePositionsConfig.create_positions_for_type(starting_id, self.o_flex, "OFlex", PositionType.o_flex))
+        starting_id = starting_id + self.o_flex
+
         positions.extend(LeaguePositionsConfig.create_positions_for_type(starting_id, self.k, "K", PositionType.k))
         starting_id = starting_id + self.k
 
@@ -60,9 +63,6 @@ class LeaguePositionsConfig(BaseEntity):
 
         positions.extend(LeaguePositionsConfig.create_positions_for_type(starting_id, self.db, "DB", PositionType.db))
         starting_id = starting_id + self.db
-
-        positions.extend(LeaguePositionsConfig.create_positions_for_type(starting_id, self.o_flex, "OFlex", PositionType.o_flex))
-        starting_id = starting_id + self.o_flex
 
         positions.extend(LeaguePositionsConfig.create_positions_for_type(starting_id, self.d_flex, "DFlex", PositionType.d_flex))
         starting_id = starting_id + self.d_flex

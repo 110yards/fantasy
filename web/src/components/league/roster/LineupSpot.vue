@@ -106,12 +106,12 @@
 </template>
 
 <style scoped>
-.spot {
-  border-bottom: 1px solid black;
-}
-
 .nohand {
   pointer-events: none;
+}
+
+.spot {
+  border-bottom: 1px solid black;
 }
 </style>
 
@@ -152,6 +152,10 @@ export default {
     scoreboard: {
       type: Object,
       required: false,
+    },
+    active: {
+      type: Boolean,
+      required: true,
     },
   },
 
