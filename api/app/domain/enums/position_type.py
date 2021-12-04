@@ -133,5 +133,5 @@ def get_position_type_config():
 
         {"id": str(PositionType.bench.value), "display": "Bench", "is_player_position": False, "order": 100, "reserve": False, "short": "BN"},
         {"id": str(PositionType.bye.value), "display": "Bye", "is_player_position": False, "order": 110, "reserve": True, "short": "BYE"},
-        {"id": str(PositionType.ir.value), "display": "Injury Reserve", "is_player_position": False, "order": 120, "reserve": False, "short": "IR"},
+        {"id": str(PositionType.ir.value), "display": "Injury Reserve", "is_player_position": False, "order": 120, "reserve": True, "short": "IR"},
     ]

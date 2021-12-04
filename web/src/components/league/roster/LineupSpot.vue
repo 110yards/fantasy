@@ -109,6 +109,10 @@
 .nohand {
   pointer-events: none;
 }
+
+.spot {
+  border-bottom: 1px solid black;
+}
 </style>
 
 <script>
@@ -148,6 +152,10 @@ export default {
     scoreboard: {
       type: Object,
       required: false,
+    },
+    active: {
+      type: Boolean,
+      required: true,
     },
   },
 

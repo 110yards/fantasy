@@ -14,8 +14,30 @@
     <template v-if="positions && !confirming">
       <lineup-spot
         class="spot"
-        :class="[spot.position_type, isActive(spot.position_type)]"
-        v-for="spot in sortedSpots"
+        :class="spot.position_type"
+        :active="true"
+        v-for="spot in activeSpots"
+        :key="spot.id"
+        :spot="spot"
+        :leagueId="leagueId"
+        :player="spot.player"
+        :canEdit="canEdit"
+        :playerToBeMoved="playerToBeMoved"
+        v-on:confirmDrop="confirmDropPlayer"
+        v-on:movePlayer="showMoveTargets"
+        v-on:acceptPlayer="movePlayer"
+        v-on:cancelMovePlayer="cancelMovePlayer"
+        :scoreboard="scoreboard"
+      />
+
+      <!-- <v-row>
+        <v-col cols="12" class="divider"></v-col>
+      </v-row> -->
+
+      <lineup-spot
+        :class="spot.position_type"
+        v-for="spot in inactiveSpots"
+        :active="false"
         :key="spot.id"
         :spot="spot"
         :leagueId="leagueId"
@@ -32,35 +54,20 @@
   </v-container>
 </template>
 
-<style scoped>
-.spot {
-  border-bottom: 1px solid black;
-}
-
-.spot.active:last-of-type {
-  border-bottom: 1px solid red;
-}
-</style>
-
 <script>
-// import LineupSpotDesktop from "./LineupSpotDesktop.vue"
 import * as formatter from "../../../modules/formatter"
 import AppPrimaryButton from "../../buttons/AppPrimaryButton.vue"
 import AppDefaultButton from "../../buttons/AppDefaultButton.vue"
 import { dropPlayer, movePlayer } from "../../../api/110yards/roster"
 import { draftState } from "../../../api/110yards/constants"
-// import LineupSpotMobile from "./LineupSpotMobile.vue"
 import LineupSpot from "./LineupSpot.vue"
 import scoreboard from "../../../mixins/scoreboard"
-import { positionType } from "../../../../dist/js/app"
 
 export default {
   name: "lineup",
   components: {
-    // LineupSpotDesktop,
     AppPrimaryButton,
     AppDefaultButton,
-    // LineupSpotMobile,
     LineupSpot,
   },
   mixins: [scoreboard],
@@ -115,6 +122,7 @@ export default {
     },
 
     sortedSpots() {
+      // TODO: remove
       if (this.positions.length == 0) return null
       let active = this.positions.filter(spot => this.$root.isActivePositionType(spot.position_type))
       for (let x of active) {
@@ -126,10 +134,27 @@ export default {
 
       return active.concat(bench).concat(reserve)
     },
+
+    activeSpots() {
+      if (this.positions.length == 0) return null
+      let active = this.positions.filter(spot => this.$root.isActivePositionType(spot.position_type))
+      for (let x of active) {
+        x.active = true
+      }
+
+      return active
+    },
+
+    inactiveSpots() {
+      let bench = this.positions.filter(spot => this.$root.isBenchPositionType(spot.position_type))
+      let reserve = this.positions.filter(spot => this.$root.isReservePositionType(spot.position_type))
+
+      return bench.concat(reserve)
+    },
   },
   methods: {
     isActive(position_type) {
-      return this.$root.isActivePositionType(position_type) ? "active" : "active"
+      return this.$root.isActivePositionType(position_type) ? "active" : "not-active"
     },
     formatScore(score) {
       if (score == null || score == undefined) score = 0
