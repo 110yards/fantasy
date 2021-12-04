@@ -32,10 +32,12 @@
 
           <v-col cols="3" class="pa-0">
             <v-row>
-              <v-col class="pb-0 text-right font-weight-medium">{{ formatScore(score) }}</v-col>
+              <v-col class="pb-0 text-right font-weight-medium"><score :score="score" /></v-col>
             </v-row>
             <v-row>
-              <v-col class="py-0 text-right caption" v-if="projection">Proj. {{ formatScore(projection) }} </v-col>
+              <v-col class="py-0 text-right caption" v-if="projection !== null">
+                Proj. <score :score="projection" />
+              </v-col>
             </v-row>
           </v-col>
         </v-card-text>
@@ -105,8 +107,10 @@ import AppDefaultButton from "../../../components/buttons/AppDefaultButton.vue"
 import { draftState } from "../../../api/110yards/constants"
 import PlayerLink from "../../../components/player/PlayerLink.vue"
 import Waivers from "./Waivers.vue"
-import * as formatter from "../../../modules/formatter"
 import scoreboard from "../../../mixins/scoreboard"
+import { calculateMultiple, getRosterScoreRef } from "../../../modules/scoring"
+import { rosterProjection } from "../../../api/110yards/projection"
+import Score from "../../../components/Score.vue"
 
 export default {
   name: "roster",
@@ -117,6 +121,7 @@ export default {
     AppDefaultButton,
     PlayerLink,
     Waivers,
+    Score,
   },
   props: {
     leagueId: String,
@@ -135,9 +140,9 @@ export default {
         rosterName: null,
       },
       rosterNameRules: [v => !!v || "Roster name is required"],
-      currentMatchup: null,
+      matchups: null,
       projection: null,
-      score: null,
+      playersStats: null,
     }
   },
   computed: {
@@ -147,7 +152,9 @@ export default {
     currentWeek() {
       return this.$root.state.current_week
     },
-
+    currentSeason() {
+      return this.$root.currentSeason
+    },
     isCommissioner() {
       if (this.league == null || this.$store.state.uid == null) return false
 
@@ -192,28 +199,15 @@ export default {
       return this.canEdit && this.league != null && this.league.draft_state == draftState.Complete
     },
 
-    currentMatchupStatus() {
-      if (this.roster == null) return ""
+    score() {
+      return this.playersStats ? calculateMultiple(this.$root.leagueScoringSettings, this.playersStats) : 0
+    },
 
-      if (this.hasBye) return "Bye"
-
-      if (this.currentMatchup == null) return ""
-
-      let isAwayTeam = this.currentMatchup.away && this.currentMatchup.away.id == this.rosterId
-      let rosterScore = isAwayTeam ? this.currentMatchup.away_score : this.currentMatchup.home_score
-      let opponentScore = isAwayTeam ? this.currentMatchup.home_score : this.currentMatchup.away_score
-      let opponentName = isAwayTeam ? this.currentMatchup.home.name : this.currentMatchup.away.name
-
-      return `${rosterScore} - ${opponentScore} vs ${opponentName}`
+    matchup() {
+      return this.matchups && this.matchups.length > 0 ? this.matchups[0] : null
     },
   },
   methods: {
-    formatScore(score) {
-      if (score == null || score == undefined) score = 0
-
-      return formatter.formatScore(score)
-    },
-
     formatRank(rank) {
       switch (rank) {
         case 1:
@@ -259,14 +253,6 @@ export default {
       this.$bind("league", leagueRef)
       this.$bind("roster", rosterRef)
     },
-
-    async updateScore() {
-      if (!this.scoreboard) return
-
-      let rosterInfo = await rosterScore(this.leagueId, this.rosterId)
-      this.projection = rosterInfo.projection
-      this.score = rosterInfo.score
-    },
   },
   watch: {
     leagueId: {
@@ -294,21 +280,12 @@ export default {
     },
     roster: {
       immediate: true,
-      handler(roster) {
+      async handler(roster) {
         if (roster != null && !!this.roster.current_matchup) {
-          let collection = firestore.collection(`league/${this.leagueId}/week/${this.currentWeek}/matchup/`)
-          let doc = collection.doc(`${this.roster.current_matchup}`)
+          this.$bind("playersStats", getRosterScoreRef(this.currentSeason, this.currentWeek, roster))
 
-          this.$bind("currentMatchup", doc)
-          this.updateScore()
+          this.projection = await rosterProjection(this.leagueId, roster.id)
         }
-      },
-    },
-
-    scoreboard: {
-      immediate: true,
-      handler(scoreboard) {
-        this.updateScore()
       },
     },
   },
