@@ -16,28 +16,7 @@
         class="spot"
         :class="spot.position_type"
         :active="true"
-        v-for="spot in activeSpots"
-        :key="spot.id"
-        :spot="spot"
-        :leagueId="leagueId"
-        :player="spot.player"
-        :canEdit="canEdit"
-        :playerToBeMoved="playerToBeMoved"
-        v-on:confirmDrop="confirmDropPlayer"
-        v-on:movePlayer="showMoveTargets"
-        v-on:acceptPlayer="movePlayer"
-        v-on:cancelMovePlayer="cancelMovePlayer"
-        :scoreboard="scoreboard"
-      />
-
-      <!-- <v-row>
-        <v-col cols="12" class="divider"></v-col>
-      </v-row> -->
-
-      <lineup-spot
-        :class="spot.position_type"
-        v-for="spot in inactiveSpots"
-        :active="false"
+        v-for="spot in sortedSpots"
         :key="spot.id"
         :spot="spot"
         :leagueId="leagueId"
@@ -122,7 +101,6 @@ export default {
     },
 
     sortedSpots() {
-      // TODO: remove
       if (this.positions.length == 0) return null
       let active = this.positions.filter(spot => this.$root.isActivePositionType(spot.position_type))
       for (let x of active) {
@@ -133,23 +111,6 @@ export default {
       let reserve = this.positions.filter(spot => this.$root.isReservePositionType(spot.position_type))
 
       return active.concat(bench).concat(reserve)
-    },
-
-    activeSpots() {
-      if (this.positions.length == 0) return null
-      let active = this.positions.filter(spot => this.$root.isActivePositionType(spot.position_type))
-      for (let x of active) {
-        x.active = true
-      }
-
-      return active
-    },
-
-    inactiveSpots() {
-      let bench = this.positions.filter(spot => this.$root.isBenchPositionType(spot.position_type))
-      let reserve = this.positions.filter(spot => this.$root.isReservePositionType(spot.position_type))
-
-      return bench.concat(reserve)
     },
   },
   methods: {
