@@ -13,7 +13,6 @@
 
     <template v-if="positions && !confirming">
       <lineup-spot
-        class="spot"
         :class="spot.position_type"
         :active="true"
         v-for="spot in sortedSpots"
@@ -114,9 +113,6 @@ export default {
     },
   },
   methods: {
-    isActive(position_type) {
-      return this.$root.isActivePositionType(position_type) ? "active" : "not-active"
-    },
     formatScore(score) {
       if (score == null || score == undefined) score = 0
 
