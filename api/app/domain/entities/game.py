@@ -3,6 +3,8 @@
 #   timestamp: 2021-03-19T11:38:10+00:00
 
 from __future__ import annotations
+from api.app.core.sim_state import SimState
+
 from api.app.domain.entities.game_player import GamePlayer
 from api.app.domain.enums.position_type import PositionType
 
@@ -32,9 +34,20 @@ class Game(BaseEntity):
     away_roster: Optional[Dict[str, GamePlayer]]
     home_roster: Optional[Dict[str, GamePlayer]]
 
+    def calculate_hash(self):
+        for stats in self.player_stats.values():
+            stats.calculate_hash()
 
-def from_cfl(game: dict, count_away_players: bool, count_home_players: bool) -> Game:
+        self.hash = hash_dict(self.dict(exclude={"away_roster": ..., "home_roster": ...}))
+
+
+def from_cfl(game: dict, count_away_players: bool, count_home_players: bool, sim_state: Optional[SimState]) -> Game:
     game["id"] = str(game["game_id"])
+
+    # this code is used for simulating game progress during the offseason
+    if sim_state:
+        sim_state.apply_to_score(game)
+    # end of simulation code
 
     game["score"] = {
         "away": game["team_1"]["score"],
@@ -71,11 +84,15 @@ def from_cfl(game: dict, count_away_players: bool, count_home_players: bool) -> 
     all_stats = stats1 + stats2
     game["player_stats"] = {stats["player"]["id"]: stats for stats in all_stats}
 
-    game["hash"] = hash_dict(game)
+    # More simulation code
+    if sim_state:
+        sim_state.apply_to_stats(game)
 
     game_entity = Game.parse_obj(game)
     game_entity.away_roster = get_roster(game["rosters"]["teams"]["team_1"]["roster"])
     game_entity.home_roster = get_roster(game["rosters"]["teams"]["team_2"]["roster"])
+
+    game_entity.calculate_hash()
 
     return game_entity
 
@@ -156,7 +173,7 @@ def get_player_stats(boxscore: dict, player: dict, team: dict, opponent: dict):
         "opponent": opponent,
     }
 
-    combined["hash"] = hash_dict(combined)
+    # combined["hash"] = hash_dict(combined)
 
     return combined
 

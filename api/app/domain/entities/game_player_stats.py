@@ -1,4 +1,5 @@
 from __future__ import annotations
+from api.app.core.hash_dict import hash_dict
 from api.app.domain.entities.stats import Stats
 
 from typing import Optional
@@ -16,3 +17,6 @@ class GamePlayerStats(BaseModel):
     opponent: Team
     hash: Optional[str]
     stats: Stats
+
+    def calculate_hash(self):
+        self.hash = hash_dict(self.dict())

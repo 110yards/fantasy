@@ -1,4 +1,5 @@
 from __future__ import annotations
+from api.app.core.sim_state import SimState
 from api.app.domain.entities.event_status import EVENT_STATUS_POSTPONED
 
 from pydantic.main import BaseModel
@@ -29,6 +30,8 @@ from api.app.domain.entities.game_player_stats import GamePlayerStats
 from api.app.domain.repositories.game_repository import GameRepository, create_game_repository
 from fastapi.param_functions import Depends
 from firebase_admin import firestore
+from timeit import default_timer as timer
+
 
 logger = logging.getLogger()
 
@@ -48,6 +51,7 @@ def create_update_games_command_executor(
 class UpdateGamesCommand(BaseCommand):
     season: int
     week: Optional[int]
+    sim_state: Optional[SimState]
 
 
 class UpdateGamesResult(BaseCommandResult):
@@ -76,6 +80,8 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
         self.player_game_repo = player_game_repo
 
     def on_execute(self, command: UpdateGamesCommand) -> UpdateGamesResult:
+        start = timer()
+
         Logger.info(f"Updating games for week {command.week}")
 
         season = command.season
@@ -84,9 +90,12 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
             season = 2019
             Logger.warn("SCORE TESTING SWITCH IS ENABLED")
 
-        current_games = self.get_current_games(season, command.week)
+        Logger.debug(f"Loading games from CFL ({timer() - start})")
+        current_games = self.get_current_games(season, command.week, command.sim_state)
+        Logger.debug(f"Loading games from DB ({timer() - start})")
         stored_games = self.get_stored_games(season, command.week)
 
+        Logger.debug(f"Checking if any game rosters have been added ({timer() - start})")
         roster_added = False
         for game_id in current_games:
             current_game = current_games[game_id]
@@ -98,16 +107,17 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
                 roster_added = True
 
         # we filter down the list of games and players in those games to only the ones which have changed since last update.
+        Logger.debug(f"Checking for updated games ({timer() - start})")
         game_updates = get_changed_games(current_games, stored_games)
+        Logger.debug(f"Checking for changed players ({timer() - start})")
         player_updates = get_changed_players(game_updates, stored_games)
-
-        transaction = self.game_repo.firestore.create_transaction()
 
         locked_teams: List[str] = []
         active_games_count = 0
 
         opponents: Dict[str, str] = {}
 
+        Logger.debug(f"Initializing locks ({timer() - start})")
         for game in current_games.values():
             if game.event_status.event_status_id == EVENT_STATUS_POSTPONED:
                 continue
@@ -124,7 +134,9 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
 
         new_locks_state = Locks.create(locked_teams, all_games_active)
 
+        Logger.debug(f"Initializing scoreboard ({timer() - start})")
         new_scoreboard = Scoreboard.create(current_games.values())
+        Logger.debug(f"Initializing opponents ({timer() - start})")
         new_opponents = Opponents.create(opponents)
 
         @firestore.transactional
@@ -140,18 +152,7 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
             pending_player_updates = []
 
             for player_update in players:
-                # player = self.player_repo.get(season, player_update.player.id, transaction)
-                # game_id = player_update.game_id
-                # if not player:
-                #     player = from_game_player(player_update.player, player_update.team)
-
-                # if not player.game_stats:
-                #     player.game_stats = {}
-
-                # player.game_stats[game_id] = PlayerGameStats(team=player.team, **player_update.stats.dict())
-                # pending_player_updates.append(player)
                 player_game = PlayerGame(
-                    # id=player_update.game_id,
                     id=f"{player_update.player.id}_{player_update.game_id}",
                     game_id=player_update.game_id,
                     week_number=command.week,
@@ -166,9 +167,6 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
                 game = game_updates[game_id]
                 self.game_repo.set(season, game, transaction)
 
-            # for player in pending_player_updates:
-            #     self.player_repo.set(season, player, transaction)
-
             if new_state.changed(state):
                 self.state_repo.set(new_state, transaction)
 
@@ -180,19 +178,23 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
 
             return pending_player_updates
 
+        Logger.debug(f"Saving changes ({timer() - start})")
+        transaction = self.game_repo.firestore.create_transaction()
         update_games(transaction, game_updates, player_updates)
         # payloads = self.publish_changed_players(player_updates)
 
         if roster_added:
+            Logger.debug(f"Sending UPDATE_PLAYERS event ({timer() - start})")
             self.publisher.publish(BaseModel(), UPDATE_PLAYERS_TOPIC)
 
+        Logger.info(f"Games update complete ({timer() - start})")
         return UpdateGamesResult(
             command=command,
             changed_games=[game_updates[game_id] for game_id in game_updates],
             # changed_players=payloads
         )
 
-    def get_current_games(self, season, week) -> Dict[str, Game]:
+    def get_current_games(self, season: int, week: int, sim_state: Optional[SimState]) -> Dict[str, Game]:
         response = self.cfl_proxy.get_game_summaries_for_week(season, week)
 
         game_ids = [str(game["game_id"]) for game in response["data"]]
@@ -219,7 +221,7 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
             count_away_players = game_count_for_team[game["team_1"]["team_id"]] <= 1
             count_home_players = game_count_for_team[game["team_2"]["team_id"]] <= 1
 
-            games[game_id] = from_cfl(game, count_away_players, count_home_players)
+            games[game_id] = from_cfl(game, count_away_players, count_home_players, sim_state)
             if len(game_ids) > 20:
                 time.sleep(2.5)  # sleep 1 second to avoid rate limiting from the API
 
@@ -232,17 +234,6 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
             games = self.game_repo.get_all(season)
 
         return {game.id: game for game in games}
-
-    # def publish_changed_players(self, updated_players: List[GamePlayerStats]):
-    #     payloads = []
-    #     for updated_player in updated_players:
-    #         command = UpdatePlayerStatsCommand(game_id=updated_player.game_id, player_stats=updated_player)
-    #         payload = LeagueCommandPushData(command_type=LeagueCommandType.UPDATE_PLAYER_STATS, command_data=command.dict())
-    #         self.publisher.publish(payload, LEAGUE_COMMAND_TOPIC)
-
-    #         payloads.append(command)
-
-    #     return payloads
 
 
 def get_changed_games(current_games: Dict[str, Game], stored_games: Dict[str, Game]) -> Dict[str, Game]:

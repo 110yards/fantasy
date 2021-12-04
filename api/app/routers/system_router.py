@@ -16,7 +16,7 @@ from api.app.domain.commands.system.update_active_players import (
     UpdateActivePlayersCommand, UpdateActivePlayersCommandExecutor,
     UpdateActivePlayersCommandResult, update_active_players_command_executor)
 from api.app.domain.commands.system.update_games import (
-    UpdateGamesCommand, UpdateGamesCommandExecutor,
+    SimState, UpdateGamesCommand, UpdateGamesCommandExecutor,
     create_update_games_command_executor)
 from api.app.domain.commands.system.update_player_stats_for_week import (
     UpdatePlayerStatsForWeekCommand, UpdatePlayerStatsForWeekCommandExecutor,
@@ -69,12 +69,13 @@ async def run_smoke_test(
 @router.post("/games")
 async def update_games(
     week: Optional[int] = None,
+    sim_state: Optional[SimState] = None,
     state_repo: StateRepository = Depends(create_state_repository),
     settings: Settings = Depends(get_settings),
     command_executor: UpdateGamesCommandExecutor = Depends(create_update_games_command_executor)
 ):
     state = state_repo.get()
-    command = UpdateGamesCommand(season=settings.current_season, week=week or state.current_week)
+    command = UpdateGamesCommand(season=settings.current_season, week=week or state.current_week, sim_state=sim_state)
     return command_executor.execute(command)
 
 

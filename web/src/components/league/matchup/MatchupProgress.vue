@@ -22,6 +22,7 @@ export default {
     return {
       progress: null,
       remainingGames: null,
+      completedGames: null,
     }
   },
 
@@ -46,7 +47,7 @@ export default {
   },
 
   watch: {
-    remainingGames: {
+    completedGames: {
       immediate: true,
       handler(_) {
         this.update()
@@ -55,11 +56,16 @@ export default {
   },
 
   mounted() {
+    // let ref = firestore
+    //   .collection(`season/${this.season}/game`)
+    //   .where("event_status.event_status_id", "in", [eventStatus.PreGame, eventStatus.InProgress])
+
+    // this.$bind("remainingGames", ref)
     let ref = firestore
       .collection(`season/${this.season}/game`)
-      .where("event_status.event_status_id", "in", [eventStatus.PreGame, eventStatus.InProgress])
+      .where("event_status.event_status_id", "in", [eventStatus.Final, eventStatus.Cancelled])
 
-    this.$bind("remainingGames", ref)
+    this.$bind("completedGames", ref)
   },
 }
 </script>

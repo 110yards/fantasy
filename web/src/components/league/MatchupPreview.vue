@@ -40,7 +40,7 @@
 
       <v-col cols="5" class="pt-0">
         <span v-if="awayScore != null && !isBye" :class="matchupStateClass(awayScore, homeScore)">
-          {{ formatScore(awayScore) }}
+          <score :score="awayScore" />
         </span>
       </v-col>
 
@@ -61,7 +61,7 @@
 
       <v-col cols="5" class="pt-0 text-right">
         <span v-if="homeScore != null" :class="matchupStateClass(homeScore, awayScore)">
-          {{ formatScore(homeScore) }}
+          <score :score="homeScore" />
         </span>
       </v-col>
     </v-row>
@@ -115,9 +115,13 @@ td.vs {
 
 <script>
 import scoreboard from "../../mixins/scoreboard"
+import { firestore } from "../../modules/firebase"
 import * as formatter from "../../modules/formatter"
+import { calculateMultiple, getRosterScoreRef } from "../../modules/scoring"
+import Score from "../Score.vue"
 
 export default {
+  components: { Score },
   name: "matchup-preview",
   mixins: [scoreboard],
   props: {
@@ -128,18 +132,27 @@ export default {
 
   data() {
     return {
-      awayScore: null,
-      homeScore: null,
+      away: null,
+      home: null,
+      awayPlayers: null,
+      homePlayers: null,
+      scoringSettings: null,
     }
   },
 
   computed: {
+    season() {
+      return this.$root.currentSeason
+    },
+
     matchupType() {
       return this.matchup.type
     },
+
     isBye() {
       return this.matchup.type == "playoff_bye"
     },
+
     noAwayTeamText() {
       if (this.isBye) return "Bye"
 
@@ -150,15 +163,16 @@ export default {
       return this.matchup.id || this.matchup.matchup_id
     },
 
-    awayRoster() {
-      return this.matchup != null ? this.matchup.away : null
-    },
-
-    homeRoster() {
-      return this.matchup != null ? this.matchup.home : null
-    },
     isCurrentWeek() {
       return this.weekNumber == this.$root.state.current_week
+    },
+
+    awayScore() {
+      return this.awayPlayers && this.scoringSettings ? calculateMultiple(this.scoringSettings, this.awayPlayers) : 0
+    },
+
+    homeScore() {
+      return this.homePlayers && this.scoringSettings ? calculateMultiple(this.scoringSettings, this.homePlayers) : 0
     },
   },
   methods: {
@@ -175,45 +189,53 @@ export default {
         params: { leagueId, matchupId: matchup.id },
       })
     },
-
-    async updateAwayScore() {
-      if (this.awayRoster && this.isCurrentWeek && this.scoreboard) {
-        let awayInfo = await rosterScore(this.leagueId, this.awayRoster.id)
-        this.awayScore = awayInfo.score
-      } else {
-        this.awayScore = this.matchup.away_score
-      }
-    },
-
-    async updateHomeScore() {
-      if (this.homeRoster && this.isCurrentWeek && this.scoreboard) {
-        let homeInfo = await rosterScore(this.leagueId, this.homeRoster.id)
-        this.homeScore = homeInfo.score
-      } else {
-        this.homeScore = this.matchup.home_score
-      }
-    },
   },
 
   watch: {
-    awayRoster: {
+    leagueId: {
       immediate: true,
-      async handler(awayRoster) {
-        this.updateAwayScore()
+      handler(leagueId) {
+        if (leagueId) {
+          let path = `league/${leagueId}/config/scoring`
+          let ref = firestore.doc(path)
+          this.$bind("scoringSettings", ref)
+        }
       },
     },
 
-    homeRoster: {
+    matchup: {
       immediate: true,
-      async handler(homeRoster) {
-        this.updateHomeScore()
+      handler(matchup) {
+        if (matchup) {
+          if (matchup.away) {
+            let path = `league/${this.leagueId}/roster/${matchup.away.id}`
+            let ref = firestore.doc(path)
+            this.$bind("away", ref)
+          }
+
+          if (matchup.home) {
+            let path = `league/${this.leagueId}/roster/${matchup.home.id}`
+            let ref = firestore.doc(path)
+            this.$bind("home", ref)
+          }
+        }
+      },
+    },
+    away: {
+      immediate: true,
+      async handler(away) {
+        if (away) {
+          this.$bind("awayPlayers", getRosterScoreRef(this.season, this.weekNumber, away))
+        }
       },
     },
 
-    scoreboard: {
-      async handler(scoreboard) {
-        this.updateAwayScore()
-        this.updateHomeScore()
+    home: {
+      immediate: true,
+      async handler(home) {
+        if (home) {
+          this.$bind("homePlayers", getRosterScoreRef(this.season, this.weekNumber, home))
+        }
       },
     },
   },
