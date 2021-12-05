@@ -6,9 +6,6 @@ from api.app.domain.commands.system.end_of_day import (
     EndOfDayCommand, EndOfDayCommandExecutor,
     create_end_of_day_command_executor)
 from api.app.domain.commands.system.end_of_season import EndOfSeasonCommand, EndOfSeasonCommandExecutor, create_end_of_season_command_executor
-from api.app.domain.commands.system.end_of_week import (
-    EndOfWeekCommand, EndOfWeekCommandExecutor,
-    create_end_of_week_command_executor)
 from api.app.domain.commands.system.insert_public_config import (
     InsertPublicConfigCommand, InsertPublicConfigCommandExecutor,
     create_insert_public_config_command_executor)
@@ -25,6 +22,7 @@ from api.app.domain.events.configure_events import (ConfigureEvents,
                                                     create_configure_events)
 from api.app.domain.repositories.state_repository import (StateRepository,
                                                           create_state_repository)
+from api.app.domain.services.end_of_week_service import EndOfWeekRequest, EndOfWeekService, create_end_of_week_service
 from api.app.domain.services.league_command_service import (
     LeagueCommandService, create_league_command_service)
 from api.app.domain.services.smoke_test_service import smoke_test
@@ -106,11 +104,11 @@ async def end_of_day(
 @router.post("/end_of_week")
 async def end_of_week(
     push: PubSubPush,
-    command_executor: EndOfWeekCommandExecutor = Depends(create_end_of_week_command_executor)
+    service: EndOfWeekService = Depends(create_end_of_week_service)
 ):
     push_data = push.get_data()
-    command = EndOfWeekCommand(**push_data)
-    return command_executor.execute(command)
+    request = EndOfWeekRequest(**push_data)
+    return service.run_workflow(request.completed_week_number)
 
 
 @router.post("/league_command")

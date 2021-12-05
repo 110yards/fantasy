@@ -46,9 +46,12 @@ class Publisher:
     def get_topic_path(self, topic_name):
         return topic_name if "/" in topic_name else f"projects/{self.project_id}/topics/{topic_name}"
 
-    def serialize_payload(self, payload: BaseModel):
-        serialized = payload.json()
-        return serialized.encode("utf-8")
+    def serialize_payload(self, payload: Optional[BaseModel]):
+        if payload:
+            serialized = payload.json()
+            return serialized.encode("utf-8")
+        else:
+            return None
 
 
 class PubSubPublisher(Publisher):

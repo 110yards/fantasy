@@ -21,7 +21,9 @@
           </v-card-subtitle>
 
           <v-card-subtitle>
-            <div><label>Height/Weight:</label> {{ height }} / {{ weight }}</div>
+            <div v-if="hasHeight && hasWeight"><label>Height/Weight:</label> {{ height }} / {{ weight }}</div>
+            <div v-if="hasHeight && !hasWeight"><label>Height:</label> {{ height }}</div>
+            <div v-if="!hasHeight && hasWeight"><label>Weight:</label> {{ weight }}</div>
             <div v-if="hometown"><label>Hometown:</label> {{ hometown }}</div>
             <div v-if="college"><label>College:</label> {{ college }}</div>
           </v-card-subtitle>
@@ -375,22 +377,30 @@ export default {
       return `https://www.cfl.ca/players/player/${this.player.id}`
     },
 
+    hasHeight() {
+      return this.player && this.player.height
+    },
+
+    hasWeight() {
+      return this.player && this.player.weight
+    },
+
     height() {
-      if (!this.player || !this.player.height_inches) return
-      let height = parseInt(this.player.height_inches)
+      if (!this.hasHeight) return
+      let height = this.player.height
 
       if (!height) return
 
-      let ft = parseInt(height / 12)
-      let inches = height - ft * 12
+      let ft = parseInt(height)
+      let inches = parseInt(height.split(".")[1])
 
       return `${ft}'${inches}"`
     },
 
     weight() {
-      if (!this.player) return
+      if (!this.hasWeight) return
 
-      return `${this.player.weight_pounds} lbs`
+      return `${this.player.weight} lbs`
     },
 
     hometown() {

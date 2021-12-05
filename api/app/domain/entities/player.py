@@ -5,7 +5,7 @@ from api.app.domain.entities.game_player import GamePlayer
 from api.app.domain.enums.position_type import PositionType
 from api.app.domain.entities.stats import Stats
 from api.app.core.hash_dict import hash_dict
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 from api.app.core.base_entity import BaseEntity
 from .team import Team
 from api.app.core.annotate_args import annotate_args
@@ -25,6 +25,34 @@ class PlayerGame(BaseEntity):
 
 
 @annotate_args
+class PlayerSeason(BaseEntity):
+    season: int
+    player_id: str
+    stats: Stats
+
+    @staticmethod
+    def create(season: int, player_id: str, player_games: List[PlayerGame]):
+        stats = Stats()
+
+        for player_game in player_games:
+            for key in player_game.stats.dict():
+                game_total = getattr(player_game.stats, key)
+                if game_total is None:
+                    continue
+
+                season_total = getattr(stats, key)
+
+                if season_total is None:
+                    season_total = 0
+
+                season_total += game_total
+                setattr(stats, key, season_total)
+
+        id = f"{player_id}_{season}"
+        return PlayerSeason(id=id, player_id=player_id, season=season, stats=stats)
+
+
+@annotate_args
 class Player(BaseEntity):
     stats_inc_id: Optional[str]
     cfl_central_id: int
@@ -36,12 +64,12 @@ class Player(BaseEntity):
     height: Optional[str]
     weight: Optional[int]
     team: Team
-    status_current: Optional[int]
     birth_date: Optional[str]
     birth_place: Optional[str]
     college: Optional[str]
     foreign_player: Optional[bool]
     image_url: Optional[str]
+    status_current: int = 1
 
     season_stats: Stats = Stats()
     hash: str = ""
@@ -67,25 +95,6 @@ class Player(BaseEntity):
         if "first_name" in values and "last_name" in values:
             values["display_name"] = f"{values['first_name']} {values['last_name']}"
         return values
-
-    def recalc_season_stats(self):
-        for stat_key in self.season_stats.dict():
-            setattr(self.season_stats, stat_key, 0)
-
-        season_total = 0
-        if self.game_stats:
-            for game_id in self.game_stats:
-                game = self.game_stats[game_id]
-                for key in game.dict():
-                    game_total = getattr(game, key)
-                    if game_total is None:
-                        continue
-
-                    season_total = getattr(self.season_stats, key, None)
-
-                    if season_total is not None:
-                        season_total += game_total
-                        setattr(self.season_stats, key, season_total)
 
 
 def from_team_roster(player: dict) -> Player:

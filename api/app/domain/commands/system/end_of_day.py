@@ -5,6 +5,7 @@ from api.app.config.settings import Settings, get_settings
 from api.app.core.logging import Logger
 from api.app.domain.commands.league.process_waivers import ProcessWaiversCommand
 from api.app.domain.enums.league_command_type import LeagueCommandType
+from api.app.domain.services.end_of_week_service import EndOfWeekRequest
 from api.app.domain.services.league_command_push_data import LeagueCommandPushData
 from api.app.domain.commands.league.calculate_results import CalculateResultsCommand
 from pydantic.main import BaseModel
@@ -64,9 +65,10 @@ class EndOfDayCommandExecutor(BaseCommandExecutor[EndOfDayCommand, EndOfDayResul
 
     def on_execute(self, command: EndOfDayCommand) -> EndOfDayResult:
 
+        scoreboard = self.public_repo.get_scoreboard()
+
         @firestore.transactional
         def end_of_day(transaction: Transaction) -> EndOfDayResult:
-            scoreboard = self.public_repo.get_scoreboard(transaction)
 
             state = self.state_repo.get(transaction)
 
@@ -109,7 +111,7 @@ class EndOfDayCommandExecutor(BaseCommandExecutor[EndOfDayCommand, EndOfDayResul
         result: EndOfDayResult = end_of_day(transaction)
 
         if result.success and result.waivers_enabled:
-            self.publisher.publish(BaseModel(), END_OF_WEEK_TOPIC)
+            self.publisher.publish(EndOfWeekRequest(completed_week_number=result.completed_week_number), END_OF_WEEK_TOPIC)
 
             command = CalculateResultsCommand(week_number=result.completed_week_number)
             payload = LeagueCommandPushData(command_type=LeagueCommandType.CALCULATE_RESULTS, command_data=command.dict())
