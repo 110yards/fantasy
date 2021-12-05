@@ -14,3 +14,4 @@ class User(BaseEntity):
     last_sign_in: Optional[datetime]
     confirmed: bool = False
     commissioner_of: List[str] = []
+    is_admin: bool = False

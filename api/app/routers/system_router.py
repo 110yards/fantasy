@@ -2,9 +2,6 @@ from typing import Optional
 
 from api.app.config.settings import Settings, get_settings
 from api.app.core.pubsub.pubsub_push import PubSubPush
-from api.app.domain.commands.system.end_of_day import (
-    EndOfDayCommand, EndOfDayCommandExecutor,
-    create_end_of_day_command_executor)
 from api.app.domain.commands.system.end_of_season import EndOfSeasonCommand, EndOfSeasonCommandExecutor, create_end_of_season_command_executor
 from api.app.domain.commands.system.insert_public_config import (
     InsertPublicConfigCommand, InsertPublicConfigCommandExecutor,
@@ -22,6 +19,7 @@ from api.app.domain.events.configure_events import (ConfigureEvents,
                                                     create_configure_events)
 from api.app.domain.repositories.state_repository import (StateRepository,
                                                           create_state_repository)
+from api.app.domain.services.end_of_day_service import EndOfDayService, create_end_of_day_service
 from api.app.domain.services.end_of_week_service import EndOfWeekRequest, EndOfWeekService, create_end_of_week_service
 from api.app.domain.services.league_command_service import (
     LeagueCommandService, create_league_command_service)
@@ -95,10 +93,9 @@ async def update_players(command_executor: UpdateActivePlayersCommandExecutor = 
 
 @router.post("/end_of_day")
 async def end_of_day(
-    command_executor: EndOfDayCommandExecutor = Depends(create_end_of_day_command_executor)
+    service: EndOfDayService = Depends(create_end_of_day_service)
 ):
-    command = EndOfDayCommand()
-    return command_executor.execute(command)
+    service.run_workflow()
 
 
 @router.post("/end_of_week")

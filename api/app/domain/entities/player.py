@@ -74,6 +74,10 @@ class Player(BaseEntity):
     season_stats: Stats = Stats()
     hash: str = ""
 
+    @property
+    def national_status(self):
+        return None if self.foreign_player else "N"
+
     def compute_hash(self):
         self.hash = hash_dict(self.dict())
 

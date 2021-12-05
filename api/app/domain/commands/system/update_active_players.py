@@ -101,7 +101,7 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
             team_players = self.roster_proxy.get_roster(team.roster_id)
             rostered_players2.extend(team_players)
 
-        rostered_players2 = {p["cfl_central_id"]: p for p in rostered_players2 if p.get("cfl_central_id")}
+        rostered_players2 = {str(p["cfl_central_id"]): p for p in rostered_players2 if p.get("cfl_central_id")}
 
         for player in current_players:
             roster_match = rostered_players2.get(player.id, None)
