@@ -8,6 +8,7 @@ from api.app.core.publisher import VirtualPubSubPublisher
 from api.app.domain.commands.user.register_email import RegisterCommandExecutor, RegisterEmailCommand
 from api.app.domain.entities.opponents import Opponents
 from api.app.domain.entities.schedule import get_playoff_type_config
+from api.app.domain.entities.scoring_info import ScoringInfo
 from api.app.domain.entities.state import State
 from api.app.domain.entities.switches import Switches
 from api.app.domain.enums.position_type import get_position_type_config
@@ -83,6 +84,11 @@ print("Setting up position types...")
 for item in get_position_type_config():
     ref = firestore.document(f"roster-positions/{item['id']}")
     ref.set(item)
+print("Done")
+
+print("Setting up scoring info...")
+ref = firestore.document("public/scoring_info")
+ref.set(ScoringInfo().dict())
 print("Done")
 
 print("Setup script complete")

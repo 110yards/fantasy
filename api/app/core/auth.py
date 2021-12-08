@@ -1,4 +1,4 @@
-from api.app.domain.repositories.user_roles_repository import create_user_roles_repository
+from api.app.domain.repositories.user_repository import create_user_repository
 from typing import List, Union
 from api.app.config.settings import get_settings
 from api.app.core.role import Role
@@ -136,20 +136,23 @@ def require_role(roles: Union[str, List[Role]], **kwargs):
             if not current_user_id:
                 abort_unauthorized()
 
-            user_roles_repo = create_user_roles_repository()
+            # user_roles_repo = create_user_roles_repository()
+            user_repo = create_user_repository()
 
             roles_to_check = roles
             if not isinstance(roles, List):
                 roles_to_check = [roles]
 
             allowed = False
-            user_roles = user_roles_repo.get(current_user_id)
+            # user_roles = user_roles_repo.get(current_user_id)
+            user = user_repo.get(current_user_id)
 
-            if not user_roles:
+            if not user:
                 return abort_unauthorized()
 
             for role in roles_to_check:
-                if role in user_roles.roles:
+                # this could be better
+                if role == Role.admin and user.is_admin:
                     allowed = True
                     break
 

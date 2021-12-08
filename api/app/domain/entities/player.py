@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pydantic.class_validators import root_validator
 from api.app.domain.entities.game_player import GamePlayer
+from api.app.domain.entities.scoring_settings import ScoringSettings
 from api.app.domain.enums.position_type import PositionType
 from api.app.domain.entities.stats import Stats
 from api.app.core.hash_dict import hash_dict
@@ -27,6 +28,7 @@ class PlayerGame(BaseEntity):
 @annotate_args
 class PlayerSeason(BaseEntity):
     season: int
+    games_played: int
     player_id: str
     stats: Stats
 
@@ -49,7 +51,24 @@ class PlayerSeason(BaseEntity):
                 setattr(stats, key, season_total)
 
         id = f"{player_id}_{season}"
-        return PlayerSeason(id=id, player_id=player_id, season=season, stats=stats)
+        games_played = len(player_games)
+        return PlayerSeason(id=id, player_id=player_id, season=season, stats=stats, games_played=games_played)
+
+
+@annotate_args
+class PlayerLeagueSeasonScore(BaseEntity):
+    season: int
+    player_id: str
+    total_score: float
+    average_score: float
+    rank: Optional[int]
+
+    @staticmethod
+    def create(id: str, player_season: PlayerSeason, scoring: ScoringSettings) -> PlayerLeagueSeasonScore:
+        total = scoring.calculate_score(player_season.stats)
+        average = total / player_season.games_played if player_season.games_played else 0
+
+        return PlayerLeagueSeasonScore(id=id, total_score=total, average_score=average)
 
 
 @annotate_args
