@@ -14,7 +14,7 @@
 
       <v-row>
         <v-col class="py-0 text-h4 score" :class="awayScoreClass">
-          <score :score="awayScore" />
+          <roster-score :roster="away" :weekNumber="weekNumber" v-on:update="updateAwayScore" />
         </v-col>
       </v-row>
 
@@ -51,7 +51,7 @@
 
       <v-row>
         <v-col class="py-0 text-h4" :class="homeScoreClass">
-          <score :score="homeScore" />
+          <roster-score :roster="home" :weekNumber="weekNumber" v-on:update="updateHomeScore" />
         </v-col>
       </v-row>
 
@@ -72,12 +72,12 @@
 
 <script>
 import { rosterProjection } from "../../../api/110yards/projection"
-import { calculateMultiple, getRosterScoreRef } from "../../../modules/scoring"
 import Score from "../../Score.vue"
+import RosterScore from "../RosterScore.vue"
 import MatchupProgress from "./MatchupProgress.vue"
 
 export default {
-  components: { Score, MatchupProgress },
+  components: { Score, MatchupProgress, RosterScore },
 
   props: {
     away: { type: Object, required: false },
@@ -89,8 +89,8 @@ export default {
 
   data() {
     return {
-      awayPlayers: null,
-      homePlayers: null,
+      awayScore: null,
+      homeScore: null,
       awayProjection: null,
       homeProjection: null,
     }
@@ -103,14 +103,6 @@ export default {
 
     leagueId() {
       return this.$root.leagueId
-    },
-
-    awayScore() {
-      return this.awayPlayers ? calculateMultiple(this.$root.leagueScoringSettings, this.awayPlayers) : 0
-    },
-
-    homeScore() {
-      return this.homePlayers ? calculateMultiple(this.$root.leagueScoringSettings, this.homePlayers) : 0
     },
 
     awayHeaderClass() {
@@ -134,15 +126,20 @@ export default {
     },
   },
 
-  methods: {},
+  methods: {
+    updateAwayScore(event) {
+      this.awayScore = event.score
+    },
+    updateHomeScore(event) {
+      this.homeScore = event.score
+    },
+  },
 
   watch: {
     away: {
       immediate: true,
       async handler(away) {
         if (away) {
-          this.$bind("awayPlayers", getRosterScoreRef(this.season, this.weekNumber, away))
-
           this.awayProjection = await rosterProjection(this.leagueId, away.id)
         }
       },
@@ -152,8 +149,6 @@ export default {
       immediate: true,
       async handler(home) {
         if (home) {
-          this.$bind("homePlayers", getRosterScoreRef(this.season, this.weekNumber, home))
-
           this.homeProjection = await rosterProjection(this.leagueId, home.id)
         }
       },
