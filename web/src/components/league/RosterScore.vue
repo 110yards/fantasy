@@ -11,6 +11,7 @@ export default {
   props: {
     roster: { type: Object, required: false },
     weekNumber: { required: true },
+    scoring: { type: Object, required: false },
   },
   data() {
     return {
@@ -35,12 +36,14 @@ export default {
       }
     },
 
-    calculateRosterScore(scoring, playerGames) {
+    recalculateRosterScore() {
       let totalScore = 0.0
 
-      if (!playerGames) return totalScore
+      if (!this.players) return totalScore
 
-      let playerGameArrays = Object.values(playerGames)
+      let scoring = this.scoring || this.$root.leagueScoringSettings
+
+      let playerGameArrays = Object.values(this.players)
 
       for (let playerGameArray of playerGameArrays) {
         if (playerGameArray.length == 0) continue
@@ -63,10 +66,17 @@ export default {
       },
     },
 
+    scoring: {
+      immediate: true,
+      handler(scoring) {
+        if (scoring) this.score = this.recalculateRosterScore()
+      },
+    },
+
     players: {
       deep: true,
       handler(players) {
-        this.score = this.calculateRosterScore(this.$root.leagueScoringSettings, players)
+        this.score = this.recalculateRosterScore()
         this.$emit("update", { score: this.score })
       },
     },

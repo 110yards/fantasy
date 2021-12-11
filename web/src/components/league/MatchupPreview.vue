@@ -39,8 +39,8 @@
       </v-col>
 
       <v-col cols="5" class="pt-0">
-        <span v-if="awayScore != null && !isBye" :class="matchupStateClass(awayScore, homeScore)">
-          <score :score="awayScore" />
+        <span v-if="away && !isBye" :class="matchupStateClass(awayScore, homeScore)">
+          <roster-score :roster="away" :weekNumber="weekNumber" :scoring="scoring" v-on:update="updateAwayScore" />
         </span>
       </v-col>
 
@@ -60,8 +60,8 @@
       </v-col>
 
       <v-col cols="5" class="pt-0 text-right">
-        <span v-if="homeScore != null" :class="matchupStateClass(homeScore, awayScore)">
-          <score :score="homeScore" />
+        <span v-if="home" :class="matchupStateClass(homeScore, awayScore)">
+          <roster-score :roster="home" :weekNumber="weekNumber" :scoring="scoring" v-on:update="updateHomeScore" />
         </span>
       </v-col>
     </v-row>
@@ -116,12 +116,11 @@ td.vs {
 <script>
 import scoreboard from "../../mixins/scoreboard"
 import { firestore } from "../../modules/firebase"
-import * as formatter from "../../modules/formatter"
-import { calculateMultiple, getRosterScoreRef } from "../../modules/scoring"
 import Score from "../Score.vue"
+import RosterScore from "./RosterScore.vue"
 
 export default {
-  components: { Score },
+  components: { Score, RosterScore },
   name: "matchup-preview",
   mixins: [scoreboard],
   props: {
@@ -134,17 +133,13 @@ export default {
     return {
       away: null,
       home: null,
-      awayPlayers: null,
-      homePlayers: null,
-      scoringSettings: null,
+      awayScore: null,
+      homeScore: null,
+      scoring: null,
     }
   },
 
   computed: {
-    season() {
-      return this.$root.currentSeason
-    },
-
     matchupType() {
       return this.matchup.type
     },
@@ -166,19 +161,13 @@ export default {
     isCurrentWeek() {
       return this.weekNumber == this.$root.state.current_week
     },
-
-    awayScore() {
-      return this.awayPlayers && this.scoringSettings ? calculateMultiple(this.scoringSettings, this.awayPlayers) : 0
-    },
-
-    homeScore() {
-      return this.homePlayers && this.scoringSettings ? calculateMultiple(this.scoringSettings, this.homePlayers) : 0
-    },
   },
   methods: {
-    formatScore(score) {
-      if (score == null || score == undefined) score = 0
-      return formatter.formatScore(score)
+    updateAwayScore(event) {
+      this.awayScore = event.score
+    },
+    updateHomeScore(event) {
+      this.homeScore = event.score
     },
     matchupStateClass(scoreFor, scoreAgainst) {
       return scoreFor > scoreAgainst ? "winning" : ""
@@ -198,7 +187,7 @@ export default {
         if (leagueId) {
           let path = `league/${leagueId}/config/scoring`
           let ref = firestore.doc(path)
-          this.$bind("scoringSettings", ref)
+          this.$bind("scoring", ref)
         }
       },
     },
@@ -218,23 +207,6 @@ export default {
             let ref = firestore.doc(path)
             this.$bind("home", ref)
           }
-        }
-      },
-    },
-    away: {
-      immediate: true,
-      async handler(away) {
-        if (away) {
-          this.$bind("awayPlayers", getRosterScoreRef(this.season, this.weekNumber, away))
-        }
-      },
-    },
-
-    home: {
-      immediate: true,
-      async handler(home) {
-        if (home) {
-          this.$bind("homePlayers", getRosterScoreRef(this.season, this.weekNumber, home))
         }
       },
     },
