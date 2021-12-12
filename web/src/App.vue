@@ -67,9 +67,8 @@
 </style>
 
 <script>
-import NavBar from "./components/NavBar"
 import Throbber from "./components/Throbber"
-import AppHeader from "./components/AppHeader.vue"
+import AppHeader from "./components/header/AppHeader.vue"
 import SnackBar from "./components/SnackBar.vue"
 import SystemBar from "./components/SystemBar.vue"
 import { firestore } from "./modules/firebase"
@@ -79,7 +78,6 @@ import Donate from "./components/Donate.vue"
 export default {
   name: "App",
   components: {
-    NavBar,
     Throbber,
     AppHeader,
     SnackBar,

@@ -1,7 +1,5 @@
 <template>
   <div v-if="league && schedule">
-    <league-menu :league="league" />
-
     <v-card class="mt-4">
       <v-card-title>Playoff settings</v-card-title>
       <v-card-text>
@@ -51,13 +49,12 @@
 
 <script>
 import AppFormLabel from "../../components/inputs/AppFormLabel.vue"
-import LeagueMenu from "../../components/league/LeagueMenu.vue"
 import { firestore } from "../../modules/firebase"
 
 export default {
   name: "LeagueSchedule",
 
-  components: { LeagueMenu, AppFormLabel },
+  components: { AppFormLabel },
   props: {
     leagueId: { type: String, required: true },
   },

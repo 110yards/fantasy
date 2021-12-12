@@ -1,6 +1,5 @@
 <template>
   <div v-if="league">
-    <league-menu :league="league" />
     <v-row>
       <v-col cols="12" md="8">
         <h4 class="brand">{{ league.name }}</h4>
@@ -41,7 +40,6 @@ import Schedule from "../../components/league/Schedule.vue"
 import Standings from "../../components/league/Standings.vue"
 import Transactions from "../../components/league/Transactions.vue"
 import Scoreboard from "../../components/common/Scoreboard.vue"
-import LeagueMenu from "../../components/league/LeagueMenu.vue"
 import SeasonSummary from "../../components/league/SeasonSummary.vue"
 
 export default {
@@ -54,7 +52,6 @@ export default {
     Standings,
     Transactions,
     Scoreboard,
-    LeagueMenu,
     SeasonSummary,
   },
   data() {

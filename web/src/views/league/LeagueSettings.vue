@@ -1,6 +1,5 @@
 <template>
   <div v-if="league && scoringInfo">
-    <league-menu :league="league" />
     <v-card class="mt-4">
       <v-card-title>Scoring settings</v-card-title>
       <v-card-text>
@@ -45,13 +44,12 @@
 
 <script>
 import AppFormLabel from "../../components/inputs/AppFormLabel.vue"
-import LeagueMenu from "../../components/league/LeagueMenu.vue"
 import { firestore } from "../../modules/firebase"
 
 export default {
   name: "LeagueSettings",
 
-  components: { LeagueMenu, AppFormLabel },
+  components: { AppFormLabel },
   props: {
     leagueId: { type: String, required: true },
   },
