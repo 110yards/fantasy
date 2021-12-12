@@ -166,7 +166,7 @@ export default {
     },
 
     weekCounts() {
-      const lastWeek = process.env.VUE_APP_SEASON_WEEKS
+      const lastWeek = this.$root.state.season_weeks
 
       let counts = []
       for (let i = 1; i <= lastWeek; i++) {

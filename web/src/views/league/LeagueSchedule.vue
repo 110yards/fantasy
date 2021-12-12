@@ -44,7 +44,7 @@
       <v-card-text></v-card-text>
     </v-card>
   </div>
-  <div v-else>League schedule has not been set up by the commissioner yet.</div>
+  <v-alert type="error" v-else>League schedule has not been set up by the commissioner yet.</v-alert>
 </template>
 
 <script>

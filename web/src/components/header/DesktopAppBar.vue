@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar app color="header" dark extension-height="-10">
+  <v-app-bar app color="header" dark extension-height="30">
     <home-link />
     <league-link v-if="hasLeague" :leagueId="leagueId" class="nav-primary" />
     <roster-link v-if="hasRoster" :leagueId="leagueId" :userId="userId" class="nav-primary" />
@@ -23,7 +23,7 @@
       >
         Scoring
       </v-btn>
-      <v-btn class="mt-n3 nav-secondary" text small :to="{ name: 'league-schedule', params: { leagueId: league.id } }"
+      <v-btn class="mt-n3 nav-secondary" text small :to="{ name: 'league-schedule', params: { leagueId: leagueId } }"
         >Schedule</v-btn
       >
 
@@ -32,7 +32,7 @@
         small
         v-if="isCommissioner || isAdmin"
         text
-        :to="{ name: 'commissioner', params: { leagueId: league.id } }"
+        :to="{ name: 'commissioner', params: { leagueId: leagueId } }"
       >
         Commissioner
       </v-btn>
@@ -42,7 +42,7 @@
         small
         v-if="isAdmin"
         text
-        :to="{ name: 'league-admin', params: { leagueId: league.id } }"
+        :to="{ name: 'league-admin', params: { leagueId: leagueId } }"
       >
         Waiver Results
       </v-btn>

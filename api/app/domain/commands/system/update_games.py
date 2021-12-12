@@ -49,7 +49,7 @@ def create_update_games_command_executor(
 
 
 class UpdateGamesCommand(BaseCommand):
-    season: int
+    season: Optional[int]
     week: Optional[int]
     sim_state: Optional[SimState]
 
@@ -82,18 +82,21 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
     def on_execute(self, command: UpdateGamesCommand) -> UpdateGamesResult:
         start = timer()
 
-        Logger.info(f"Updating games for week {command.week}")
+        state = self.public_repo.get_state()
 
-        season = command.season
+        season = command.season or state.current_season
+        week = command.week or state.current_week
+
+        Logger.info(f"Updating games for week {week}")
 
         if self.public_repo.get_switches().enable_score_testing:
             season = 2019
             Logger.warn("SCORE TESTING SWITCH IS ENABLED")
 
         Logger.debug(f"Loading games from CFL ({timer() - start})")
-        current_games = self.get_current_games(season, command.week, command.sim_state)
+        current_games = self.get_current_games(season, week, command.sim_state)
         Logger.debug(f"Loading games from DB ({timer() - start})")
-        stored_games = self.get_stored_games(season, command.week)
+        stored_games = self.get_stored_games(season, week)
 
         Logger.debug(f"Checking if any game rosters have been added ({timer() - start})")
         roster_added = False
@@ -155,7 +158,7 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
                 player_game = PlayerGame(
                     id=f"{player_update.player.id}_{player_update.game_id}",
                     game_id=player_update.game_id,
-                    week_number=command.week,
+                    week_number=week,
                     player_id=player_update.player.id,
                     team=player_update.team,
                     opponent=player_update.opponent,

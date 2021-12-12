@@ -321,6 +321,8 @@ export default {
     },
 
     isLocked(player) {
+      if (this.isDraft) return false
+
       return this.$root.isLocked(player.team.abbreviation)
     },
 
@@ -423,7 +425,7 @@ export default {
     },
 
     configureReferences() {
-      let path = `season/${this.$appConfig.season}/player`
+      let path = `season/${this.$root.currentSeason}/player`
       let playersRef = firestore.collection(path)
       this.$bind("players", playersRef)
 

@@ -7,7 +7,6 @@ from api.app.cfl.cfl_player_proxy import CflPlayerProxy, create_cfl_player_proxy
 from api.app.domain.enums.league_command_type import LeagueCommandType
 from api.app.domain.services.league_command_push_data import LeagueCommandPushData
 from api.app.domain.commands.league.update_league_player_details import UpdateLeaguePlayerDetailsCommand
-from api.app.config.settings import Settings, get_settings
 from api.app.domain.topics import LEAGUE_COMMAND_TOPIC
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
 from pydantic.class_validators import root_validator
@@ -41,14 +40,12 @@ def update_active_players_command_executor(
     cfl_roster_proxy: CflRosterProxy = Depends(cfl_roster_proxy),
     player_repo: PlayerRepository = Depends(create_player_repository),
     publisher: Publisher = Depends(create_publisher),
-    settings: Settings = Depends(get_settings),
     cfl_player_proxy: CflPlayerProxy = Depends(create_cfl_player_proxy),
     game_repo: GameRepository = Depends(create_game_repository),
     state_repo: StateRepository = Depends(create_state_repository),
     public_repo: PublicRepository = Depends(create_public_repository),
 ):
     return UpdateActivePlayersCommandExecutor(
-        settings,
         cfl_roster_proxy,
         player_repo,
         publisher,
@@ -62,7 +59,6 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
 
     def __init__(
         self,
-        settings: Settings,
         roster_proxy: CflRosterProxy,
         player_repo: PlayerRepository,
         publisher: Publisher,
@@ -71,8 +67,6 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
         state_repo: StateRepository,
         public_repo: PublicRepository,
     ):
-        self.season = settings.current_season
-        self.settings = settings
         self.roster_proxy = roster_proxy
         self.player_repo = player_repo
         self.publisher = publisher
@@ -110,25 +104,25 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
 
         current_players = {player.id: player for player in current_players}
 
-        stored_players = self.player_repo.get_all(self.season)
+        stored_players = self.player_repo.get_all(season)
         stored_players = {player.id: player for player in stored_players}
 
         if self.public_repo.get_switches().enable_game_roster_status:
-            self.update_status_from_game_rosters(current_players)
+            self.update_status_from_game_rosters(season, current_players)
 
         changed_players = get_changed_players(current_players, stored_players)
         unrostered_players = get_unrostered_players(current_players, stored_players)
         updates = changed_players + unrostered_players
 
         if updates:
-            self.player_repo.set_all(self.season, updates)
+            self.player_repo.set_all(season, updates)
             self.publish_changed_players(updates)
 
         return UpdateActivePlayersCommandResult(command=command, updated=changed_players, deactivated=unrostered_players)
 
-    def update_status_from_game_rosters(self, current_players: Dict[str, Player]):
+    def update_status_from_game_rosters(self, season, current_players: Dict[str, Player]):
         current_week = self.state_repo.get().current_week
-        games = self.game_repo.for_week(self.season, current_week)
+        games = self.game_repo.for_week(season, current_week)
 
         teams_with_rosters: List[int] = []
         player_ids_on_game_roster: List[str] = []
