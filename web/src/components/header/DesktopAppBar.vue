@@ -20,8 +20,9 @@
         text
         small
         :to="{ name: 'league-settings', params: { leagueId: league.id } }"
-        >League settings</v-btn
       >
+        Scoring
+      </v-btn>
       <v-btn class="mt-n3 nav-secondary" text small :to="{ name: 'league-schedule', params: { leagueId: league.id } }"
         >Schedule</v-btn
       >

@@ -32,7 +32,7 @@
                 small
                 :to="{ name: 'league-settings', params: { leagueId: leagueId } }"
               >
-                League settings
+                Scoring
               </v-btn>
             </v-list-item-title>
           </v-list-item>
