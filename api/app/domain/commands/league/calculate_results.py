@@ -88,6 +88,8 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
 
     def on_execute(self, command: CalculateResultsCommand) -> CalculateResultsResult:
 
+        # TODO: need to calculate player scores for league scoring
+
         #  This happens first, to block users from adding players in the event that the next part fails.
         @firestore.transactional
         def mark_league_waivers_active(transaction):
@@ -209,6 +211,8 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
             command = CalculatePlayoffsCommand(league_id=command.league_id, week_number=command.week_number + 1)
             payload = LeagueCommandPushData(command_type=LeagueCommandType.CALCULATE_PLAYOFFS, command_data=command.dict())
             self.publisher.publish(payload, LEAGUE_COMMAND_TOPIC)
+
+        return result
 
     def archive_roster(self, roster: Roster):
         copy = roster.copy(deep=True)

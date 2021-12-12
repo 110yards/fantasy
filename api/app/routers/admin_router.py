@@ -9,6 +9,7 @@ from api.app.domain.commands.system.update_active_players import (
 from api.app.domain.commands.system.update_games import UpdateGamesCommand, UpdateGamesCommandExecutor, create_update_games_command_executor
 from api.app.domain.services.league_problems_service import (
     LeagueProblemsService, create_league_problems_service)
+from api.app.domain.services.simulations.simulate_end_of_day import SimulateEndOfDay, create_simulate_end_of_day
 from api.app.routers.api_router import APIRouter
 from fastapi.params import Depends
 from starlette.requests import Request
@@ -44,3 +45,13 @@ async def update_games(
 ):
     command = UpdateGamesCommand(sim_state=sim_state)
     return command_executor.execute(command)
+
+
+@router.post("/end_of_day")
+@require_role(Role.admin)
+async def end_of_day(
+    request: Request,
+    simulation: SimulateEndOfDay = Depends(create_simulate_end_of_day)
+
+):
+    return simulation.run()

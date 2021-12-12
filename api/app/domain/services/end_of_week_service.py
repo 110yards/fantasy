@@ -2,8 +2,7 @@
 from api.app.core.publisher import Publisher, create_publisher
 from api.app.domain.commands.league.calculate_season_score import CalculateSeasonScoreCommand
 from api.app.domain.commands.system.recalc_season_stats import (
-    RecalcSeasonStatsCommand, RecalcSeasonStatsCommandExecutor,
-    create_recalc_season_stats_command_executor)
+    RecalcSeasonStatsCommand, RecalcSeasonStatsCommandExecutor, create_recalc_season_stats_command_executor)
 from fastapi import Depends
 from pydantic.main import BaseModel
 
@@ -32,7 +31,7 @@ class EndOfWeekService:
         self.publisher = publisher
         self.recalc_season_stats_command_executor = recalc_season_stats_command_executor
 
-    def run_workflow(self, completed_week_number):
+    def run_workflow(self, completed_week_number) -> bool:
         # This is wrapped in a service for clarity and future flexibility, even though it only has one step currently.
         recalc_command = RecalcSeasonStatsCommand(completed_week_number=completed_week_number)
 
@@ -42,3 +41,5 @@ class EndOfWeekService:
             command = CalculateSeasonScoreCommand()
             payload = LeagueCommandPushData(command_type=LeagueCommandType.CALCULATE_SEASON_SCORE, command_data=command.dict())
             self.publisher.publish(payload, LEAGUE_COMMAND_TOPIC)
+
+        return result.success

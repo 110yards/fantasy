@@ -1,4 +1,5 @@
 from datetime import datetime
+from api.app.core.base_command_executor import BaseCommandResult
 from api.app.core.logging import Logger
 
 import pytz
@@ -13,7 +14,7 @@ from api.app.domain.commands.system.end_system_waivers import (
     EndSystemWaiversCommand, EndSystemWaiversCommandExecutor,
     create_end_system_waivers_command_executor)
 from api.app.domain.commands.system.start_system_waivers import (
-    StartSystemWaiversCommand, StartSystemWaiversCommandExecutor,
+    StartSystemWaiversCommand, StartSystemWaiversCommandExecutor, StartSystemWaiversResult,
     create_start_system_waivers_command_executor)
 from api.app.domain.enums.league_command_type import LeagueCommandType
 from api.app.domain.repositories.public_repository import (
@@ -59,12 +60,12 @@ class EndOfDayService:
         self.start_system_waivers_command_executor = start_system_waivers_command_executor
         self.end_system_waivers_command_executor = end_system_waivers_command_executor
 
-    def run_workflow(self):
+    def run_workflow(self) -> BaseCommandResult:
 
         state = self.public_repo.get_state()
 
         if not state.waivers_active and self.should_start_waivers():
-            self.start_waivers(state.current_week)
+            return self.start_waivers(state.current_week)
 
         elif state.waivers_active:
             self.end_waivers()
@@ -89,7 +90,7 @@ class EndOfDayService:
 
         return True
 
-    def start_waivers(self, current_week: int) -> bool:
+    def start_waivers(self, current_week: int) -> StartSystemWaiversResult:
         Logger.info("Week is complete, enabling waivers and publishing end of week")
         command = StartSystemWaiversCommand(current_week_number=current_week)
         result = self.start_system_waivers_command_executor.execute(command)
@@ -102,6 +103,8 @@ class EndOfDayService:
             command = CalculateResultsCommand(week_number=result.completed_week_number)
             payload = LeagueCommandPushData(command_type=LeagueCommandType.CALCULATE_RESULTS, command_data=command.dict())
             self.publisher.publish(payload, LEAGUE_COMMAND_TOPIC)
+
+        return result
 
     def end_waivers(self):
         Logger.info("Waivers are active, initializing waiver processing")

@@ -1,11 +1,11 @@
 <template>
   <v-container>
     <v-row>
-      <v-col cols="6" md="3">
+      <v-col cols="3" md="4">
         <app-default-button @click="updatePlayers">Update players</app-default-button>
       </v-col>
 
-      <v-col cols="6" md="3">
+      <v-col cols="3" md="4">
         <app-default-button @click="updateGames">Update games</app-default-button>
         <v-container>
           <p>Simulate up to:</p>
@@ -15,19 +15,18 @@
         </v-container>
       </v-col>
 
-      <v-col cols="6" md="3">
-        <app-default-button>End of day</app-default-button>
-      </v-col>
-
-      <v-col cols="6" md="3">
-        <app-default-button>End of week</app-default-button>
+      <v-col cols="6" md="4">
+        <app-default-button @click="endOfDay">
+          <span v-if="!waiversActive">Calc results</span>
+          <span v-else>Process waivers</span>
+        </app-default-button>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
-import { updateGames, updatePlayers } from "../../api/110yards/admin"
+import { endOfDay, updateGames, updatePlayers } from "../../api/110yards/admin"
 import scoreboard from "../../mixins/scoreboard"
 import eventBus from "../../modules/eventBus"
 import AppDefaultButton from "../buttons/AppDefaultButton.vue"
@@ -68,6 +67,10 @@ export default {
         { text: "4", value: 4 },
       ]
     },
+
+    waiversActive() {
+      return this.$root.state.waivers_active
+    },
   },
 
   methods: {
@@ -85,6 +88,12 @@ export default {
       await updateGames(simState)
 
       eventBus.$emit("show-info", "Games updated")
+    },
+
+    async endOfDay() {
+      await endOfDay()
+
+      eventBus.$emit("show-info", "End of day complete")
     },
   },
 }

@@ -55,6 +55,6 @@ class BaseCommandExecutor(Generic[TCommand, TResult], metaclass=ABCMeta):
 
         return result
 
-    @ abstractmethod
+    @abstractmethod
     def on_execute(self, command: TCommand) -> TResult:
         raise NotImplementedError()

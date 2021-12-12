@@ -11,3 +11,7 @@ export const updatePlayers = async () => {
 export const updateGames = async simState => {
   return client.post(null, "/admin/update_games", simState)
 }
+
+export const endOfDay = async => {
+  return client.post(null, "/admin/end_of_day")
+}
