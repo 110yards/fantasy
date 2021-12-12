@@ -12,7 +12,6 @@ export default new Vuex.Store({
     isAnonymous: true,
     uid: null,
     currentLeagueId: null,
-    currentRoles: [],
     isAdmin: false,
     systemState: null,
   },
@@ -22,8 +21,7 @@ export default new Vuex.Store({
       state.currentProfile = data.profile
       state.isAnonymous = false
       state.uid = data.user.uid
-      state.currentRoles = data.roles || []
-      state.isAdmin = state.currentRoles.includes("ADMIN")
+      state.isAdmin = data.profile.is_admin
       state.systemState = data.systemState
     },
     logOut(state) {
@@ -32,7 +30,6 @@ export default new Vuex.Store({
       state.isAnonymous = true
       state.uid = null
       state.isAdmin = false
-      state.currentRoles = []
     },
     setCurrentLeagueId(state, leagueId) {
       state.currentLeagueId = leagueId
@@ -41,17 +38,11 @@ export default new Vuex.Store({
   actions: {
     async updateUser({ dispatch, commit }, user) {
       if (user) {
-        let roles = (await firestore.doc(`user_roles/${user.uid}`).get()).data()
         let systemState = (await firestore.doc("admin/state").get()).data()
         let profile = (await firestore.doc(`user/${user.uid}`).get()).data()
 
-        // undefined for most users
-        if (roles) {
-          roles = roles.roles
-        }
-
         await signIn(user)
-        commit("logIn", { user: user, roles: roles, systemState: systemState, profile: profile })
+        commit("logIn", { user: user, systemState: systemState, profile: profile })
       } else {
         commit("logOut")
       }

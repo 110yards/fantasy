@@ -1,10 +1,8 @@
 
-from api.app.config.settings import Settings, get_settings
 from api.app.domain.entities.player import PlayerLeagueSeasonScore
 from api.app.domain.repositories.player_season_repository import PlayerSeasonRepository, create_player_season_repository
 from api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
-from api.app.domain.entities.league_player_score import LeaguePlayerScore
 from api.app.domain.repositories.league_player_score_repository import LeaguePlayerScoreRepository, create_league_player_score_repository
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from typing import List, Optional
