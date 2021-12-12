@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar app color="header" dark short extension-height="30">
+  <v-app-bar app color="header" dark extension-height="-10">
     <home-link />
     <league-link v-if="hasLeague" :leagueId="leagueId" class="nav-primary" />
     <roster-link v-if="hasRoster" :leagueId="leagueId" :userId="userId" class="nav-primary" />
@@ -15,15 +15,19 @@
     <log-out-link v-if="!isAnonymous" class="nav-primary" />
 
     <template v-slot:extension v-if="hasLeague">
-      <v-btn class="ml-11 nav-secondary" text small :to="{ name: 'league-settings', params: { leagueId: league.id } }"
+      <v-btn
+        class="ml-11 mt-n3 nav-secondary"
+        text
+        small
+        :to="{ name: 'league-settings', params: { leagueId: league.id } }"
         >League settings</v-btn
       >
-      <v-btn class="nav-secondary" text small :to="{ name: 'league-schedule', params: { leagueId: league.id } }"
+      <v-btn class="mt-n3 nav-secondary" text small :to="{ name: 'league-schedule', params: { leagueId: league.id } }"
         >Schedule</v-btn
       >
 
       <v-btn
-        class="nav-secondary"
+        class="mt-n3 nav-secondary"
         small
         v-if="isCommissioner || isAdmin"
         text
@@ -33,13 +37,13 @@
       </v-btn>
 
       <v-btn
-        class="nav-secondary"
+        class="mt-n3 nav-secondary"
         small
         v-if="isAdmin"
         text
         :to="{ name: 'league-admin', params: { leagueId: league.id } }"
       >
-        Admin
+        Waiver Results
       </v-btn>
     </template>
   </v-app-bar>

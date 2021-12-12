@@ -18,7 +18,7 @@ import Roster from "../../views/league/roster/Roster.vue"
 import Draft from "../../views/league/draft/Draft.vue"
 import LeagueSettings from "../../views/league/LeagueSettings.vue"
 import LeagueSchedule from "../../views/league/LeagueSchedule.vue"
-import LeagueAdmin from "../../views/league/Admin.vue"
+import LeagueAdmin from "../../views/league/AdminWaiverResults.vue"
 
 import CommissionerIndex from "../../views/commissioner/Index.vue"
 
