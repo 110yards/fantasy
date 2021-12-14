@@ -37,6 +37,9 @@ class League(BaseEntity):
     notifications_end_of_week: bool = False
     notifications_transactions: bool = False
     notifications_waivers: bool = False
+    enable_qb_limit: bool = False
+    enable_k_limit: bool = False
+    enable_rb_limit: bool = False
 
 
 @annotate_args
