@@ -1,6 +1,12 @@
 <template>
   <v-container>
     <v-row>
+      <v-col cols="12">
+        <p>Current Week: {{ currentWeek }}</p>
+        <p>Waivers Active: {{ waiversActive }}</p>
+      </v-col>
+    </v-row>
+    <v-row>
       <v-col cols="3" md="4">
         <app-default-button @click="updatePlayers">Update players</app-default-button>
       </v-col>
@@ -20,13 +26,15 @@
           <span v-if="!waiversActive">Calc results</span>
           <span v-else>Process waivers</span>
         </app-default-button>
+        <br />
+        <app-default-button class="mt-2" v-if="waiversActive" @click="resetWeekEnd">Reset week end</app-default-button>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
-import { endOfDay, updateGames, updatePlayers } from "../../api/110yards/admin"
+import { endOfDay, resetWeekEnd, updateGames, updatePlayers } from "../../api/110yards/admin"
 import scoreboard from "../../mixins/scoreboard"
 import eventBus from "../../modules/eventBus"
 import AppDefaultButton from "../buttons/AppDefaultButton.vue"
@@ -45,6 +53,18 @@ export default {
   },
 
   computed: {
+    state() {
+      return this.$root.state
+    },
+
+    currentWeek() {
+      return this.state ? this.state.current_week : null
+    },
+
+    waiversActive() {
+      return this.state ? this.state.waivers_active : null
+    },
+
     gameIds() {
       let empty = [{ text: "(all)", value: null }]
 
@@ -94,6 +114,10 @@ export default {
       await endOfDay()
 
       eventBus.$emit("show-info", "End of day complete")
+    },
+
+    async resetWeekEnd() {
+      await resetWeekEnd()
     },
   },
 }

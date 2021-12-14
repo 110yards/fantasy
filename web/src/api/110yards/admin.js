@@ -15,3 +15,7 @@ export const updateGames = async simState => {
 export const endOfDay = async => {
   return client.post(null, "/admin/end_of_day")
 }
+
+export const resetWeekEnd = async => {
+  return client.post(null, "/admin/reset_week_end")
+}

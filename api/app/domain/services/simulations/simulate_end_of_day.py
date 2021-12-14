@@ -6,6 +6,9 @@ from api.app.domain.commands.league.calculate_playoffs import (
 from api.app.domain.commands.league.calculate_results import (
     CalculateResultsCommand, CalculateResultsCommandExecutor,
     create_calculate_results_command_executor)
+from api.app.domain.commands.league.calculate_season_score import (
+    CalculateSeasonScoreCommand, CalculateSeasonScoreCommandExecutor,
+    create_calculate_season_score_command_executor)
 from api.app.domain.commands.league.process_waivers import (
     ProcessWaiversCommand, ProcessWaiversCommandExecutor,
     create_process_waivers_command_executor)
@@ -29,6 +32,7 @@ def create_simulate_end_of_day(
     calculate_results_command_executor: CalculateResultsCommandExecutor = Depends(create_calculate_results_command_executor),
     process_waivers_command_executor: ProcessWaiversCommandExecutor = Depends(create_process_waivers_command_executor),
     calculate_playoffs_command_executor: CalculatePlayoffsCommandExecutor = Depends(create_calculate_playoffs_command_executor),
+    calculate_season_score_command_executor: CalculateSeasonScoreCommandExecutor = Depends(create_calculate_season_score_command_executor),
 ):
     return SimulateEndOfDay(
         end_of_day_service,
@@ -37,6 +41,7 @@ def create_simulate_end_of_day(
         calculate_results_command_executor,
         process_waivers_command_executor,
         calculate_playoffs_command_executor,
+        calculate_season_score_command_executor,
     )
 
 
@@ -49,6 +54,7 @@ class SimulateEndOfDay:
         calculate_results_command_executor: CalculateResultsCommandExecutor,
         process_waivers_command_executor: ProcessWaiversCommandExecutor,
         calculate_playoffs_command_executor: CalculatePlayoffsCommandExecutor,
+        calculate_season_score_command_executor: CalculateSeasonScoreCommandExecutor,
     ):
         self.end_of_day_service = end_of_day_service
         self.end_of_week_service = end_of_week_service
@@ -56,6 +62,7 @@ class SimulateEndOfDay:
         self.calculate_results_command_executor = calculate_results_command_executor
         self.process_waivers_command_executor = process_waivers_command_executor
         self.calculate_playoffs_command_executor = calculate_playoffs_command_executor
+        self.calculate_season_score_command_executor = calculate_season_score_command_executor
 
     def run(self):
         result = self.end_of_day_service.run_workflow()
@@ -65,18 +72,24 @@ class SimulateEndOfDay:
             success = self.end_of_week_service.run_workflow(week_number)
 
             if success:
-                leagues = self.league_repo.get_all()
-
-                for league in leagues:
-                    command = CalculateResultsCommand(league_id=league.id, week_number=week_number)
-                    calc_result = self.calculate_results_command_executor.execute(command)
-
-                    if calc_result.success and calc_result.next_week_is_playoffs:
-                        command = CalculatePlayoffsCommand(league.id, week_number + 1)
-                        self.calculate_playoffs_command_executor.execute(command)
+                self.__calculate_league_results(week_number)
 
         if isinstance(result, EndSystemWaiversResult) and result.success:
             leagues = self.league_repo.get_all()
             for league in leagues:
                 command = ProcessWaiversCommand(league_id=league.id)
                 self.process_waivers_command_executor.execute(command)
+
+    def __calculate_league_results(self, week_number):
+        leagues = self.league_repo.get_all()
+
+        for league in leagues:
+            scores_command = CalculateSeasonScoreCommand(league_id=league.id)
+            self.calculate_season_score_command_executor.execute(scores_command)
+
+            results_command = CalculateResultsCommand(league_id=league.id, week_number=week_number)
+            calc_result = self.calculate_results_command_executor.execute(results_command)
+
+            if calc_result.success and calc_result.next_week_is_playoffs:
+                results_command = CalculatePlayoffsCommand(league.id, week_number + 1)
+                self.calculate_playoffs_command_executor.execute(results_command)

@@ -31,6 +31,7 @@ class PlayerSeason(BaseEntity):
     games_played: int
     player_id: str
     stats: Stats
+    games: List[PlayerGame] = []
 
     @staticmethod
     def create(season: int, player_id: str, player_games: List[PlayerGame]):
@@ -52,7 +53,7 @@ class PlayerSeason(BaseEntity):
 
         id = f"{player_id}_{season}"
         games_played = len(player_games)
-        return PlayerSeason(id=id, player_id=player_id, season=season, stats=stats, games_played=games_played)
+        return PlayerSeason(id=id, player_id=player_id, season=season, stats=stats, games_played=games_played, games=player_games)
 
 
 @annotate_args
@@ -65,10 +66,16 @@ class PlayerLeagueSeasonScore(BaseEntity):
 
     @staticmethod
     def create(id: str, player_season: PlayerSeason, scoring: ScoringSettings) -> PlayerLeagueSeasonScore:
-        total = scoring.calculate_score(player_season.stats)
-        average = total / player_season.games_played if player_season.games_played else 0
+        score = scoring.calculate_score(player_season.stats)
+        average = score.total_score / player_season.games_played if player_season.games_played else 0
 
-        return PlayerLeagueSeasonScore(id=id, total_score=total, average_score=average)
+        return PlayerLeagueSeasonScore(
+            id=id,
+            player_id=player_season.player_id,
+            season=player_season.season,
+            total_score=score.total_score,
+            average_score=average
+        )
 
 
 @annotate_args

@@ -3,6 +3,7 @@ from typing import Optional
 from api.app.core.auth import require_role
 from api.app.core.role import Role
 from api.app.core.sim_state import SimState
+from api.app.domain.commands.admin.reset_week_end import ResetWeekEndCommand, ResetWeekEndCommandExecutor, create_reset_week_end_command_executor
 from api.app.domain.commands.system.update_active_players import (
     UpdateActivePlayersCommand, UpdateActivePlayersCommandExecutor,
     update_active_players_command_executor)
@@ -55,3 +56,13 @@ async def end_of_day(
 
 ):
     return simulation.run()
+
+
+@router.post("/reset_week_end")
+@require_role(Role.admin)
+async def reset_week_end(
+    request: Request,
+    command_executor: ResetWeekEndCommandExecutor = Depends(create_reset_week_end_command_executor),
+):
+    command = ResetWeekEndCommand()
+    return command_executor.execute(command)

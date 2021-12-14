@@ -84,7 +84,6 @@ class CalculateSeasonScoreCommandExecutor(BaseCommandExecutor[CalculateSeasonSco
             last_player_score = player_score
 
         for player_score in player_season_scores:
-            raise NotImplementedError()  # TODO: make the repo for this.  Also maybe remove the PlayerScoreRepo?  Or repurpose?
-            # self.player_score_repo.set(command.league_id, player_score)
+            self.player_score_repo.set(command.league_id, player_score)
 
         return CalculateSeasonScoreResult(command=command)
