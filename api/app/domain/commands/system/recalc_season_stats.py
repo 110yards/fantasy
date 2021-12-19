@@ -53,6 +53,7 @@ class RecalcSeasonStatsCommandExecutor(BaseCommandExecutor[RecalcSeasonStatsComm
 
         updated_players = list()
 
+        # loop through all players who played this week, and only update them.
         for player_game in player_games:
             week_query = Query("week_number", "<", command.completed_week_number)
             player_query = Query("player_id", "==", player_game.player_id)
@@ -62,6 +63,6 @@ class RecalcSeasonStatsCommandExecutor(BaseCommandExecutor[RecalcSeasonStatsComm
             player_season = PlayerSeason.create(state.current_season, player_game.player_id, player_games)
             updated_players.append(player_season)
 
-            self.player_season_repo.set(player_season)
+            self.player_season_repo.set(state.current_season, player_season)
 
         return RecalcSeasonStatsResult(command=command, updated_players=updated_players)

@@ -51,7 +51,7 @@ class PlayerSeason(BaseEntity):
                 season_total += game_total
                 setattr(stats, key, season_total)
 
-        id = f"{player_id}_{season}"
+        id = f"{player_id}"
         games_played = len(player_games)
         return PlayerSeason(id=id, player_id=player_id, season=season, stats=stats, games_played=games_played, games=player_games)
 
