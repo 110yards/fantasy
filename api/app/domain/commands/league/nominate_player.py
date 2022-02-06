@@ -1,7 +1,7 @@
 
+from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
 from api.app.domain.services.auction_draft_service import AuctionDraftService, create_auction_draft_service
 from api.app.domain.services.roster_player_service import RosterPlayerService, create_roster_player_service
-from api.app.config.settings import Settings, get_settings
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
 from api.app.domain.repositories.league_owned_player_repository import LeagueOwnedPlayerRepository, create_league_owned_player_repository
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
@@ -12,7 +12,7 @@ from firebase_admin import firestore
 
 
 def create_nominate_player_command_executor(
-    settings: Settings = Depends(get_settings),
+    state_repo: StateRepository = Depends(create_state_repository),
     league_config_repo: LeagueConfigRepository = Depends(create_league_config_repository),
     league_owned_player_repo: LeagueOwnedPlayerRepository = Depends(create_league_owned_player_repository),
     player_repo: PlayerRepository = Depends(create_player_repository),
@@ -20,7 +20,7 @@ def create_nominate_player_command_executor(
     auction_draft_service: AuctionDraftService = Depends(create_auction_draft_service),
 ):
     return NominatePlayerCommandExecutor(
-        settings.current_season,
+        state_repo,
         league_config_repo,
         league_owned_player_repo,
         player_repo,
@@ -44,15 +44,16 @@ class NominatePlayerResult(BaseCommandResult[NominatePlayerCommand]):
 
 class NominatePlayerCommandExecutor(BaseCommandExecutor[NominatePlayerCommand, NominatePlayerResult]):
 
-    def __init__(self,
-                 season: int,
-                 league_config_repo: LeagueConfigRepository,
-                 league_owned_player_repo: LeagueOwnedPlayerRepository,
-                 player_repo: PlayerRepository,
-                 roster_player_service: RosterPlayerService,
-                 auction_draft_service: AuctionDraftService,
-                 ):
-        self.season = season
+    def __init__(
+        self,
+        state_repo: StateRepository,
+        league_config_repo: LeagueConfigRepository,
+        league_owned_player_repo: LeagueOwnedPlayerRepository,
+        player_repo: PlayerRepository,
+        roster_player_service: RosterPlayerService,
+        auction_draft_service: AuctionDraftService,
+    ):
+        self.state_repo = state_repo
         self.league_config_repo = league_config_repo
         self.league_owned_player_repo = league_owned_player_repo
         self.player_repo = player_repo
@@ -66,7 +67,9 @@ class NominatePlayerCommandExecutor(BaseCommandExecutor[NominatePlayerCommand, N
         if existing:
             return NominatePlayerResult(command=command, error="Player has already been drafted")
 
-        player = self.player_repo.get(self.season, command.player_id)
+        state = self.state_repo = self.state_repo.get()
+
+        player = self.player_repo.get(state.current_season, command.player_id)
 
         if not player:
             return NominatePlayerResult(command=command, error="Player does not exist")

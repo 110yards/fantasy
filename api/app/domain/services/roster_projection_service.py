@@ -1,26 +1,26 @@
-from api.app.config.settings import Settings, get_settings
 
 from fastapi.param_functions import Depends
 from api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
 from api.app.domain.services.player_projection_service import PlayerProjectionService, create_player_projection_service
 
 
 def create_roster_projection_service(
-    settings: Settings = Depends(get_settings),
+    state_repo: StateRepository = Depends(create_state_repository),
     roster_repo: LeagueRosterRepository = Depends(create_league_roster_repository),
     player_projection_service: PlayerProjectionService = Depends(create_player_projection_service),
 ):
-    return RosterProjectionService(settings.current_season, roster_repo, player_projection_service)
+    return RosterProjectionService(state_repo, roster_repo, player_projection_service)
 
 
 class RosterProjectionService:
     def __init__(
         self,
-        season: int,
+        state_repo: StateRepository,
         roster_repo: LeagueRosterRepository,
         player_projection_service: PlayerProjectionService,
     ):
-        self.season = season
+        self.state_repo = state_repo
         self.roster_repo = roster_repo
         self.player_projection_service = player_projection_service
 

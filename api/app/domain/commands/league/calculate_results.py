@@ -1,5 +1,4 @@
 
-from api.app.config.settings import Settings, get_settings
 from api.app.core.publisher import Publisher, create_publisher
 from api.app.domain.commands.league.calculate_playoffs import CalculatePlayoffsCommand
 from api.app.domain.enums.league_command_type import LeagueCommandType
@@ -7,6 +6,7 @@ from api.app.domain.repositories.game_repository import GameRepository, create_g
 from api.app.domain.repositories.league_player_score_repository import LeaguePlayerScoreRepository, create_league_player_score_repository
 from api.app.domain.enums.draft_state import DraftState
 from api.app.domain.entities.matchup_preview import MatchupPreview
+from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
 from api.app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
 from api.app.domain.enums.week_type import WeekType
 from api.app.domain.entities.schedule import Schedule
@@ -26,7 +26,7 @@ from api.app.domain.topics import LEAGUE_COMMAND_TOPIC
 
 
 def create_calculate_results_command_executor(
-    settings: Settings = Depends(get_settings),
+    state_repo: StateRepository = Depends(create_state_repository),
     league_config_repo: LeagueConfigRepository = Depends(create_league_config_repository),
     league_roster_repo: LeagueRosterRepository = Depends(create_league_roster_repository),
     matchup_repo: LeagueWeekMatchupRepository = Depends(create_league_week_matchup_repository),
@@ -38,7 +38,7 @@ def create_calculate_results_command_executor(
 
 ):
     return CalculateResultsCommandExecutor(
-        season=settings.current_season,
+        state_repo=state_repo,
         league_config_repo=league_config_repo,
         league_roster_repo=league_roster_repo,
         matchup_repo=matchup_repo,
@@ -65,7 +65,7 @@ class CalculateResultsResult(BaseCommandResult[CalculateResultsCommand]):
 class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsCommand, CalculateResultsResult]):
     def __init__(
         self,
-        season: int,
+        state_repo: StateRepository,
         league_config_repo: LeagueConfigRepository,
         league_roster_repo: LeagueRosterRepository,
         matchup_repo: LeagueWeekMatchupRepository,
@@ -76,7 +76,7 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
         publisher: Publisher,
 
     ):
-        self.season = season
+        self.state_repo = state_repo
         self.league_config_repo = league_config_repo
         self.league_roster_repo = league_roster_repo
         self.matchup_repo = matchup_repo
@@ -89,6 +89,7 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
     def on_execute(self, command: CalculateResultsCommand) -> CalculateResultsResult:
 
         # TODO: need to calculate player scores for league scoring
+        state = self.state_repo.get()
 
         #  This happens first, to block users from adding players in the event that the next part fails.
         @firestore.transactional
@@ -111,7 +112,7 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
             # nothing to do here.
             return CalculateResultsResult(command=command)
 
-        self.games_for_week = self.game_repo.for_week(self.season, command.week_number)
+        self.games_for_week = self.game_repo.for_week(state.current_season, command.week_number)
         self.league_scoring = self.league_config_repo.get_scoring_config(command.league_id)
 
         @firestore.transactional

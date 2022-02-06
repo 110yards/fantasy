@@ -14,9 +14,9 @@ export default {
     },
 
     isCommissioner() {
-      if (this.league == null || this.$store.state.currentUser == null) return false
+      if (this.currentLeague == null || this.$store.state.currentUser == null) return false
 
-      return this.league.commissioner_id == this.$store.state.currentUser.uid
+      return this.currentLeague.commissioner_id == this.$store.state.currentUser.uid
     },
   },
 

@@ -8,37 +8,39 @@ from api.app.domain.entities.opponents import Opponents
 from api.app.domain.entities.team import Team
 from api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
 from api.app.domain.entities.player import STATUS_ACTIVE, Player
-from api.app.config.settings import Settings, get_settings
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
 
 from fastapi.param_functions import Depends
 from api.app.domain.repositories.league_player_score_repository import LeaguePlayerScoreRepository, create_league_player_score_repository
+from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
 
 
 def create_player_projection_service(
-    settings: Settings = Depends(get_settings),
+    state_repo: StateRepository = Depends(create_state_repository),
     player_repo: PlayerRepository = Depends(create_player_repository),
     player_score_repo: LeaguePlayerScoreRepository = Depends(create_league_player_score_repository),
     public_repo: PublicRepository = Depends(create_public_repository),
 ):
-    return PlayerProjectionService(settings.current_season, player_repo, player_score_repo, public_repo)
+    return PlayerProjectionService(state_repo, player_repo, player_score_repo, public_repo)
 
 
 class PlayerProjectionService:
     def __init__(
         self,
-        season: int,
+        state_repo: StateRepository,
         player_repo: PlayerRepository,
         player_score_repo: LeaguePlayerScoreRepository,
         public_repo: PublicRepository,
     ):
-        self.season = season
+        self.state_repo = state_repo
         self.player_repo = player_repo
         self.player_score_repo = player_score_repo
         self.public_repo = public_repo
 
     def get_projection(self, league_id: str, player_id: str) -> float:
-        player = self.player_repo.get(self.season, player_id)
+        state = self.state_repo.get()
+
+        player = self.player_repo.get(state.current_season, player_id)
 
         projections = self.get_projections(league_id, [player])
         return projections.get(player.id, 0.0)

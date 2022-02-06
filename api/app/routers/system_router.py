@@ -1,6 +1,5 @@
 from typing import Optional
 
-from api.app.config.settings import Settings, get_settings
 from api.app.core.pubsub.pubsub_push import PubSubPush
 from api.app.domain.commands.system.end_of_season import EndOfSeasonCommand, EndOfSeasonCommandExecutor, create_end_of_season_command_executor
 from api.app.domain.commands.system.insert_public_config import (
@@ -17,8 +16,6 @@ from api.app.domain.commands.system.update_player_stats_for_week import (
     create_update_player_stats_for_week_command_executor)
 from api.app.domain.events.configure_events import (ConfigureEvents,
                                                     create_configure_events)
-from api.app.domain.repositories.state_repository import (StateRepository,
-                                                          create_state_repository)
 from api.app.domain.services.end_of_day_service import EndOfDayService, create_end_of_day_service
 from api.app.domain.services.end_of_week_service import EndOfWeekRequest, EndOfWeekService, create_end_of_week_service
 from api.app.domain.services.league_command_service import (
@@ -66,21 +63,17 @@ async def run_smoke_test(
 async def update_games(
     week: Optional[int] = None,
     sim_state: Optional[SimState] = None,
-    state_repo: StateRepository = Depends(create_state_repository),
-    settings: Settings = Depends(get_settings),
     command_executor: UpdateGamesCommandExecutor = Depends(create_update_games_command_executor)
 ):
-    state = state_repo.get()
-    command = UpdateGamesCommand(season=settings.current_season, week=week or state.current_week, sim_state=sim_state)
+    command = UpdateGamesCommand(week=week, sim_state=sim_state)
     return command_executor.execute(command)
 
 
 @router.post("/games/all")
 async def update_all_games(
-    settings: Settings = Depends(get_settings),
     command_executor: UpdateGamesCommandExecutor = Depends(create_update_games_command_executor)
 ):
-    command = UpdateGamesCommand(season=settings.current_season)
+    command = UpdateGamesCommand()
     return command_executor.execute(command)
 
 

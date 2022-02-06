@@ -2,6 +2,7 @@
 from typing import Optional
 from api.app.domain.entities.draft import DraftSlot
 from api.app.domain.entities.league import League
+from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
 from api.app.domain.services.draft_service import DraftService, create_draft_service
 from api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from api.app.domain.enums.draft_type import DraftType
@@ -19,7 +20,7 @@ from firebase_admin import firestore
 
 
 def create_select_player_command_executor(
-    settings: Settings = Depends(get_settings),
+    state_repo: StateRepository = Depends(create_state_repository),
     league_config_repo: LeagueConfigRepository = Depends(create_league_config_repository),
     league_owned_player_repo: LeagueOwnedPlayerRepository = Depends(create_league_owned_player_repository),
     player_repo: PlayerRepository = Depends(create_player_repository),
@@ -30,7 +31,7 @@ def create_select_player_command_executor(
     notification_service: NotificationService = Depends(create_notification_service),
 ):
     return SelectPlayerCommandExecutor(
-        settings.current_season,
+        state_repo,
         league_config_repo,
         league_owned_player_repo,
         player_repo,
@@ -60,18 +61,19 @@ class SelectPlayerResult(BaseCommandResult[SelectPlayerCommand]):
 
 class SelectPlayerCommandExecutor(BaseCommandExecutor[SelectPlayerCommand, SelectPlayerResult]):
 
-    def __init__(self,
-                 season: int,
-                 league_config_repo: LeagueConfigRepository,
-                 league_owned_player_repo: LeagueOwnedPlayerRepository,
-                 player_repo: PlayerRepository,
-                 roster_player_service: RosterPlayerService,
-                 league_roster_repo: LeagueRosterRepository,
-                 league_repo: LeagueRepository,
-                 draft_service: DraftService,
-                 notification_service: NotificationService,
-                 ):
-        self.season = season
+    def __init__(
+        self,
+        state_repo: StateRepository,
+        league_config_repo: LeagueConfigRepository,
+        league_owned_player_repo: LeagueOwnedPlayerRepository,
+        player_repo: PlayerRepository,
+        roster_player_service: RosterPlayerService,
+        league_roster_repo: LeagueRosterRepository,
+        league_repo: LeagueRepository,
+        draft_service: DraftService,
+        notification_service: NotificationService,
+    ):
+        self.state_repo = state_repo
         self.league_config_repo = league_config_repo
         self.league_owned_player_repo = league_owned_player_repo
         self.player_repo = player_repo
@@ -82,12 +84,14 @@ class SelectPlayerCommandExecutor(BaseCommandExecutor[SelectPlayerCommand, Selec
         self.notification_service = notification_service
 
     def on_execute(self, command: SelectPlayerCommand) -> SelectPlayerResult:
+
         existing = self.league_owned_player_repo.get(command.league_id, command.player_id)
 
         if existing:
             return SelectPlayerResult(command=command, error="Player has already been drafted")
 
-        player = self.player_repo.get(self.season, command.player_id)
+        state = self.state_repo.get()
+        player = self.player_repo.get(state.current_season, command.player_id)
 
         if not player:
             return SelectPlayerResult(command=command, error="Player does not exist")

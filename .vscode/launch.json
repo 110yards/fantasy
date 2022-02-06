@@ -6,6 +6,7 @@
       "type": "python",
       "request": "launch",
       "module": "uvicorn",
+      "console": "internalConsole",
       "args": [
         "api.app.main:app",
         "--app-dir",
@@ -19,6 +20,6 @@
         "./api/.env"
       ],
       "jinja": true
-    },
+    }
   ]
 }

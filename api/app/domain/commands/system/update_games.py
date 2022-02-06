@@ -49,7 +49,6 @@ def create_update_games_command_executor(
 
 
 class UpdateGamesCommand(BaseCommand):
-    season: Optional[int]
     week: Optional[int]
     sim_state: Optional[SimState]
 
@@ -84,7 +83,7 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
 
         state = self.public_repo.get_state()
 
-        season = command.season or state.current_season
+        season = state.current_season
         week = command.week or state.current_week
 
         Logger.info(f"Updating games for week {week}")
