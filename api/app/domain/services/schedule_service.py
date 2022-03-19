@@ -216,4 +216,6 @@ def generate_schedule(
             matchup.id = str(matchup_id)
             matchup_id += 1
 
+    assert len(weeks) <= season_weeks
+
     return weeks

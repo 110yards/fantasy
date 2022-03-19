@@ -22,6 +22,12 @@ class CflProxy:
         self.settings = settings
 
     def get(self, path: str) -> dict:
+        if not self.settings.cfl_api_key:
+            msg = "CFL API Key is not set. To enable CFL API requests, please add CFL_API_KEY=<key> to your .env file." \
+                "you must have a key provided by the CFL; see https://api.cfl.ca/ for more information."
+            Logger.error(msg)
+            raise CflApiException(msg)
+
         url = f"{self.settings.cfl_api_endpoint}/{path}"
         url_no_key = url
 

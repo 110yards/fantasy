@@ -80,8 +80,8 @@ VUE_APP_AUTH_EMULATOR_HOST="http://localhost:9099"
 
 VUE_APP_FIREBASE_API_KEY=000000
 VUE_APP_FIREBASE_PROJECT=yards-dev
-VUE_APP_SEASON_WEEKS=21 # TODO: this should be a firestore switch
-VUE_APP_SEASON=2022 # TODO: this should be a firestore switch
+VUE_APP_SEASON_WEEKS=21 # TODO: this should be a firestore switch  - is it now?
+VUE_APP_SEASON=2022 # TODO: this should be a firestore switch  - is it now?
 VUE_APP_WEB_URL=http://localhost:8080
 VUE_APP_API_110_YARDS_URL=http://localhost:8000
 VUE_APP_SITE_OFFLINE_MESSAGE=

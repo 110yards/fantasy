@@ -15,7 +15,6 @@ from api.app.domain.repositories.league_roster_repository import LeagueRosterRep
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from api.app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
 from api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from api.app.config.settings import Settings, get_settings
 from fastapi import Depends
 from api.app.core.annotate_args import annotate_args
 from api.app.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
@@ -23,7 +22,6 @@ from firebase_admin import firestore
 
 
 def create_start_draft_command_executor(
-    settings: Settings = Depends(get_settings),
     league_repo: LeagueRepository = Depends(create_league_repository),
     league_config_repo: LeagueConfigRepository = Depends(create_league_config_repository),
     user_league_repo: UserLeagueRepository = Depends(create_user_league_repository),
@@ -33,7 +31,6 @@ def create_start_draft_command_executor(
     notification_service: NotificationService = Depends(create_notification_service),
 ):
     return StartDraftCommandExecutor(
-        settings.season_weeks,
         league_repo,
         league_config_repo,
         user_league_repo,
@@ -58,7 +55,6 @@ class StartDraftResult(BaseCommandResult[StartDraftCommand]):
 class StartDraftCommandExecutor(BaseCommandExecutor[StartDraftCommand, StartDraftResult]):
 
     def __init__(self,
-                 season_weeks: int,
                  league_repo: LeagueRepository,
                  league_config_repo: LeagueConfigRepository,
                  user_league_repo: UserLeagueRepository,
@@ -67,7 +63,6 @@ class StartDraftCommandExecutor(BaseCommandExecutor[StartDraftCommand, StartDraf
                  league_week_matchup_repo: LeagueWeekMatchupRepository,
                  notification_service: NotificationService,
                  ):
-        self.season_weeks = season_weeks
         self.league_repo = league_repo
         self.league_config_repo = league_config_repo
         self.user_league_repo = user_league_repo

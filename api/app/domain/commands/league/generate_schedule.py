@@ -17,20 +17,17 @@ from firebase_admin import firestore
 
 
 def create_generate_schedule_command_executor(
-    settings: Settings = Depends(get_settings),
     league_repo: LeagueRepository = Depends(create_league_repository),
     league_config_repo: LeagueConfigRepository = Depends(create_league_config_repository),
-    user_league_repo: UserLeagueRepository = Depends(create_user_league_repository),
     league_roster_repo: LeagueRosterRepository = Depends(create_league_roster_repository),
     state_repo: StateRepository = Depends(create_state_repository),
-    league_week_matchup_repo: LeagueWeekMatchupRepository = Depends(create_league_week_matchup_repository),
 
 ):
     return GenerateScheduleCommandExecutor(
-        settings.season_weeks,
         league_repo,
         league_config_repo,
         league_roster_repo,
+        state_repo=state_repo,
     )
 
 
@@ -50,24 +47,25 @@ class GenerateScheduleResult(BaseCommandResult[GenerateScheduleCommand]):
 class GenerateScheduleCommandExecutor(BaseCommandExecutor[GenerateScheduleCommand, GenerateScheduleResult]):
 
     def __init__(self,
-                 season_weeks: int,
                  league_repo: LeagueRepository,
                  league_config_repo: LeagueConfigRepository,
                  league_roster_repo: LeagueRosterRepository,
+                 state_repo: StateRepository
                  ):
-        self.season_weeks = season_weeks
         self.league_repo = league_repo
         self.league_config_repo = league_config_repo
         self.league_roster_repo = league_roster_repo
+        self.state_repo = state_repo
 
     def on_execute(self, command: GenerateScheduleCommand) -> GenerateScheduleResult:
+        season_weeks = self.state_repo.get().season_weeks
 
         @firestore.transactional
         def set_schedule(transaction):
             rosters = self.league_roster_repo.get_all(command.league_id, transaction)
 
             weeks = generate_schedule(
-                self.season_weeks,
+                season_weeks,
                 rosters,
                 command.first_playoff_week,
                 command.playoff_type,
