@@ -60,7 +60,6 @@ class CalculateSeasonScoreCommandExecutor(BaseCommandExecutor[CalculateSeasonSco
         player_season_scores: List[PlayerLeagueSeasonScore] = list()
 
         for player_season in players_seasons:
-            # should I calculate the week's score too? YES!
             player_season_score = PlayerLeagueSeasonScore.create(player_season.id, player_season, scoring)
             player_season_scores.append(player_season_score)
 

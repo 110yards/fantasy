@@ -1,7 +1,9 @@
 from __future__ import annotations
+from pydantic import BaseModel
 
 from pydantic.class_validators import root_validator
 from api.app.domain.entities.game_player import GamePlayer
+from api.app.domain.entities.player_score import PlayerScore
 from api.app.domain.entities.scoring_settings import ScoringSettings
 from api.app.domain.enums.position_type import PositionType
 from api.app.domain.entities.stats import Stats
@@ -56,6 +58,14 @@ class PlayerSeason(BaseEntity):
         return PlayerSeason(id=id, player_id=player_id, season=season, stats=stats, games_played=games_played, games=player_games)
 
 
+class PlayerLeagueGameScore(BaseModel):
+    game_id: str
+    week_number: int
+    team: Team
+    opponent: Team
+    score: PlayerScore
+
+
 @annotate_args
 class PlayerLeagueSeasonScore(BaseEntity):
     season: int
@@ -63,18 +73,32 @@ class PlayerLeagueSeasonScore(BaseEntity):
     total_score: float
     average_score: float
     rank: Optional[int]
+    game_scores: Dict[str, PlayerLeagueGameScore]
 
     @staticmethod
     def create(id: str, player_season: PlayerSeason, scoring: ScoringSettings) -> PlayerLeagueSeasonScore:
         score = scoring.calculate_score(player_season.stats)
         average = score.total_score / player_season.games_played if player_season.games_played else 0
+        game_scores = {}
+
+        for game in player_season.games:
+            score = scoring.calculate_score(game.stats)
+            game_score = PlayerLeagueGameScore(
+                game_id=game.id,
+                week_number=game.week_number,
+                team=game.team,
+                opponent=game.opponent,
+                score=score,
+            )
+            game_scores[game.id] = game_score
 
         return PlayerLeagueSeasonScore(
             id=id,
             player_id=player_season.player_id,
             season=player_season.season,
             total_score=score.total_score,
-            average_score=average
+            average_score=average,
+            game_scores=game_scores
         )
 
 
