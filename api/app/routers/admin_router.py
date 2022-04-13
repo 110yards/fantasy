@@ -52,10 +52,17 @@ async def update_players(
 async def update_games(
     request: Request,
     sim_state: Optional[SimState] = None,
-    command_executor: UpdateGamesCommandExecutor = Depends(create_update_games_command_executor)
+    command_executor: UpdateGamesCommandExecutor = Depends(create_update_games_command_executor),
+    settings: Settings = Depends(get_settings),
+    dev_pubsub_service: DevPubSubService = Depends(create_dev_pubsub_service),
 ):
     command = UpdateGamesCommand(sim_state=sim_state)
-    return command_executor.execute(command)
+    result = command_executor.execute(command)
+
+    if settings.is_dev():
+        dev_pubsub_service.process_pubsub_payloads()
+
+    return result
 
 
 @router.post("/end_of_day")
