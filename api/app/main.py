@@ -17,7 +17,8 @@ from api.app.routers import (
     roster_router,
     # score_router,
     system_router,
-    user_router
+    user_router,
+    dev_router,
 )
 
 app = FastAPI(middleware=app_middleware)
@@ -43,6 +44,8 @@ app.include_router(admin_router.router)
 app.include_router(migration_router.router)
 app.include_router(projection_router.router)
 # app.include_router(score_router.router)
+if settings.is_dev():
+    app.include_router(dev_router.router)
 
 firebase_admin.initialize_app(options={"projectId": settings.gcloud_project})
 

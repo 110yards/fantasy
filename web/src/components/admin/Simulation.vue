@@ -22,10 +22,7 @@
       </v-col>
 
       <v-col cols="6" md="4">
-        <app-default-button @click="endOfDay">
-          <span v-if="!waiversActive">Calc results</span>
-          <span v-else>Process waivers</span>
-        </app-default-button>
+        <app-default-button @click="endOfDay">End of Day</app-default-button>
         <br />
         <app-default-button class="mt-2" v-if="waiversActive" @click="resetWeekEnd">Reset week end</app-default-button>
       </v-col>

@@ -1,4 +1,7 @@
 from typing import Optional
+from api.app.config.settings import Settings, get_settings
+from api.app.core.abort import abort_unauthorized
+from api.app.core.logging import Logger
 
 from api.app.core.pubsub.pubsub_push import PubSubPush
 from api.app.domain.commands.system.end_of_season import EndOfSeasonCommand, EndOfSeasonCommandExecutor, create_end_of_season_command_executor
@@ -17,8 +20,10 @@ from api.app.domain.commands.system.update_player_stats_for_week import (
 from api.app.domain.commands.system.update_schedule import UpdateScheduleCommand, UpdateScheduleCommandExecutor, create_update_schedule_command_executor
 from api.app.domain.events.configure_events import (ConfigureEvents,
                                                     create_configure_events)
+from api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from api.app.domain.services.end_of_day_service import EndOfDayService, create_end_of_day_service
 from api.app.domain.services.end_of_week_service import EndOfWeekRequest, EndOfWeekService, create_end_of_week_service
+from api.app.domain.services.league_command_push_data import LeagueCommandPushData
 from api.app.domain.services.league_command_service import (
     LeagueCommandService, create_league_command_service)
 from api.app.domain.services.smoke_test_service import smoke_test
@@ -109,6 +114,27 @@ async def league_command(
     league_command_service: LeagueCommandService = Depends(create_league_command_service)
 ):
     return league_command_service.execute_league_command(league_id, push)
+
+
+@router.post("/league_command/dev")
+async def league_command_dev(
+    push: LeagueCommandPushData,
+    settings: Settings = Depends(get_settings),
+    league_repo: LeagueRepository = Depends(create_league_repository),
+    league_command_service: LeagueCommandService = Depends(create_league_command_service)
+):
+    if not settings.is_dev():
+        abort_unauthorized()
+
+    leagues = league_repo.get_all()
+    leagues = [league for league in leagues if league.is_active]
+
+    count = len(leagues)
+    for league in leagues:
+        Logger.info(f"Delivering dev league command to {league.id}")
+        league_command_service.execute_league_command(league.id, push)
+
+    return f"Delivered command to {count} leagues"
 
 
 @router.post("/update_player_stats_for_week")

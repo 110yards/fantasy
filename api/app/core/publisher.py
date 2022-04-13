@@ -1,8 +1,8 @@
 
 import base64
+from datetime import datetime
 import json
 from typing import Dict, Optional
-
 
 from api.app.config.settings import Settings, get_settings
 from api.app.core.exceptions import InvalidPushException
@@ -17,11 +17,15 @@ from google.pubsub_v1.types.pubsub import ExpirationPolicy, PushConfig, RetryPol
 from pydantic.main import BaseModel
 from google.protobuf.duration_pb2 import Duration
 from api.app.core.annotate_args import annotate_args
+from api.app.domain.repositories.virtual_pubsub_repository import VirtualPubSubPayload, VirtualPubsubRepository, create_virtual_pubsub_repository
 
 
-def create_publisher(settings: Settings = Depends(get_settings)):
+def create_publisher(
+    settings: Settings = Depends(get_settings),
+    virtual_pubsub_repo: VirtualPubsubRepository = Depends(create_virtual_pubsub_repository),
+):
     project_id = settings.gcloud_project
-    return VirtualPubSubPublisher(project_id) if settings.is_dev() else PubSubPublisher(project_id)
+    return VirtualPubSubPublisher(project_id, virtual_pubsub_repo) if settings.is_dev() else PubSubPublisher(project_id)
 
 
 @annotate_args
@@ -119,12 +123,16 @@ class PubSubPublisher(Publisher):
 
 
 class VirtualPubSubPublisher(Publisher):
-    def __init__(self, project_id):
+    def __init__(self, project_id, repo: VirtualPubsubRepository):
         super().__init__(project_id)
+        self.repo = repo
 
     def publish(self, payload: BaseModel, topic_name: str):
         topic_path = self.get_topic_path(topic_name)
         data = payload.json()
+
+        entity = VirtualPubSubPayload(topic=topic_name, data=payload.dict(), timestamp=datetime.now())
+        self.repo.create(entity)
 
         Logger.info(f"Published virtual pub/sub message to '{topic_path}")
         Logger.info(data)

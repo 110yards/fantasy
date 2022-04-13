@@ -1,5 +1,6 @@
 
 from typing import Optional
+from api.app.config.settings import Settings, get_settings
 from api.app.core.auth import require_role
 from api.app.core.role import Role
 from api.app.core.sim_state import SimState
@@ -8,9 +9,10 @@ from api.app.domain.commands.system.update_active_players import (
     UpdateActivePlayersCommand, UpdateActivePlayersCommandExecutor,
     update_active_players_command_executor)
 from api.app.domain.commands.system.update_games import UpdateGamesCommand, UpdateGamesCommandExecutor, create_update_games_command_executor
+from api.app.domain.services.dev_pubsub_service import DevPubSubService, create_dev_pubsub_service
+from api.app.domain.services.end_of_day_service import EndOfDayService, create_end_of_day_service
 from api.app.domain.services.league_problems_service import (
     LeagueProblemsService, create_league_problems_service)
-from api.app.domain.services.simulations.simulate_end_of_day import SimulateEndOfDay, create_simulate_end_of_day
 from api.app.routers.api_router import APIRouter
 from fastapi.params import Depends
 from starlette.requests import Request
@@ -49,13 +51,15 @@ async def update_games(
 
 
 @router.post("/end_of_day")
-@require_role(Role.admin)
 async def end_of_day(
-    request: Request,
-    simulation: SimulateEndOfDay = Depends(create_simulate_end_of_day)
-
+    service: EndOfDayService = Depends(create_end_of_day_service),
+    settings: Settings = Depends(get_settings),
+    dev_pubsub_service: DevPubSubService = Depends(create_dev_pubsub_service),
 ):
-    return simulation.run()
+    service.run_workflow()
+
+    if settings.is_dev():
+        dev_pubsub_service.process_pubsub_payloads()
 
 
 @router.post("/reset_week_end")
