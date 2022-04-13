@@ -7,7 +7,6 @@ from api.app.core.annotate_args import annotate_args
 @annotate_args
 class Switches(BaseEntity):
     id = "switches"
-    enable_score_testing = False
     enable_relaxed_ir = True
     enable_game_roster_status = False
     donate_message = "Like the site?  Click here to donate and help pay the bill :)"

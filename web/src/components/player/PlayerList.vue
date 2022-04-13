@@ -85,11 +85,12 @@
           </template>
 
           <template v-slot:[`item.points`]="{ item }">
-            {{ formatScore(item.points) }}
+            <!-- {{ formatScore(item.points) }} -->
+            <score :score="item.points" />
           </template>
 
           <template v-slot:[`item.average`]="{ item }">
-            {{ formatScore(item.average) }}
+            <score :score="item.points" />
           </template>
 
           <template v-slot:[`item.position`]="{ item }">
@@ -134,6 +135,7 @@ import Locked from "../icons/Locked.vue"
 import { longDate } from "../../modules/formatter"
 import AddPlayer from "./AddPlayer.vue"
 import { formatScore } from "../../modules/formatter"
+import Score from '../Score.vue'
 
 export default {
   name: "player-list",
@@ -146,6 +148,7 @@ export default {
     AppDefaultButton,
     Locked,
     AddPlayer,
+    Score,
   },
   props: {
     leagueId: null,
@@ -214,16 +217,18 @@ export default {
     playerData() {
       let players = []
 
+      // TODO: sort by rank?
       for (let player of this.players) {
         let playerScore = this.getPlayerScore(player)
 
         player.owner = this.getOwner(player.id)
         player.opponent = this.getNextOpponent(player)
 
+        player.score = playerScore
         player.rank = playerScore != null ? playerScore.rank : ""
-        player.points = playerScore != null && playerScore.season_score ? playerScore.season_score.total_score : 0
+        player.average = playerScore != null ? playerScore.average_score : 0
+        player.points = playerScore != null ? playerScore.total_score : 0
         player.games_played = playerScore != null ? playerScore.games_played : 0
-        player.average = playerScore != null ? playerScore.average : 0
 
         players.push(player)
       }

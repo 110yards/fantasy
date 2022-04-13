@@ -61,7 +61,7 @@ class EndOfDayService:
         self.end_system_waivers_command_executor = end_system_waivers_command_executor
 
     def run_workflow(self) -> BaseCommandResult:
-
+        Logger.info("End of day workflow started")
         state = self.public_repo.get_state()
 
         if not state.waivers_active and self.should_start_waivers():
@@ -69,6 +69,8 @@ class EndOfDayService:
 
         elif state.waivers_active:
             self.end_waivers()
+
+        Logger.info("End of day workflow completed")
 
     def should_start_waivers(self) -> bool:
         # TODO: write a test for this

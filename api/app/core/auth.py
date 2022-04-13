@@ -31,6 +31,7 @@ api_key_endpoints = [
     "/system/configure",
     "/system/end_of_day",
     "/system/end_of_week",
+    "/system/schedule",
 ]
 
 

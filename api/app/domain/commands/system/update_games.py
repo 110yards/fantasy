@@ -8,6 +8,7 @@ from api.app.domain.entities.scoreboard import Scoreboard
 from api.app.domain.entities.state import Locks
 from api.app.domain.entities.team import Team
 from api.app.domain.repositories.player_game_repository import PlayerGameRepository, create_player_game_repository
+from api.app.domain.repositories.scheduled_game_repository import ScheduledGameRepository, create_scheduled_game_repository
 from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
 
 
@@ -44,8 +45,9 @@ def create_update_games_command_executor(
     player_repo: PlayerRepository = Depends(create_player_repository),
     state_repo: StateRepository = Depends(create_state_repository),
     player_game_repo: PlayerGameRepository = Depends(create_player_game_repository),
+    scheduled_game_repo: ScheduledGameRepository = Depends(create_scheduled_game_repository),
 ):
-    return UpdateGamesCommandExecutor(cfl_proxy, game_repo, publisher, public_repo, player_repo, state_repo, player_game_repo)
+    return UpdateGamesCommandExecutor(cfl_proxy, game_repo, publisher, public_repo, player_repo, state_repo, player_game_repo, scheduled_game_repo)
 
 
 class UpdateGamesCommand(BaseCommand):
@@ -69,6 +71,7 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
         player_repo: PlayerRepository,
         state_repo: StateRepository,
         player_game_repo: PlayerGameRepository,
+        scheduled_game_repo: ScheduledGameRepository,
     ):
         self.cfl_proxy = cfl_proxy
         self.game_repo = game_repo
@@ -77,6 +80,7 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
         self.player_repo = player_repo
         self.state_repo = state_repo
         self.player_game_repo = player_game_repo
+        self.scheduled_game_repo = scheduled_game_repo
 
     def on_execute(self, command: UpdateGamesCommand) -> UpdateGamesResult:
         start = timer()
@@ -87,10 +91,6 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
         week = command.week or state.current_week
 
         Logger.info(f"Updating games for week {week}")
-
-        if self.public_repo.get_switches().enable_score_testing:
-            season = 2019
-            Logger.warn("SCORE TESTING SWITCH IS ENABLED")
 
         Logger.debug(f"Loading games from CFL ({timer() - start})")
         current_games = self.get_current_games(season, week, command.sim_state)
@@ -197,9 +197,9 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
         )
 
     def get_current_games(self, season: int, week: int, sim_state: Optional[SimState]) -> Dict[str, Game]:
-        response = self.cfl_proxy.get_game_summaries_for_week(season, week)
+        games_for_week = self.scheduled_game_repo.get_for_week(season, week)
 
-        game_ids = [str(game["game_id"]) for game in response["data"]]
+        game_ids = [game.id for game in games_for_week]
         games = {}
 
         game_count_for_team: List[int, int] = {

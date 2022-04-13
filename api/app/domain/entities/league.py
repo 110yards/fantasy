@@ -41,6 +41,10 @@ class League(BaseEntity):
     enable_k_limit: bool = False
     enable_rb_limit: bool = False
 
+    @property
+    def is_active(self) -> bool:
+        return self.draft_state == DraftState.COMPLETE
+
 
 @annotate_args
 class PrivateConfig(BaseEntity):

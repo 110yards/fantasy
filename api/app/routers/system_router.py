@@ -14,6 +14,7 @@ from api.app.domain.commands.system.update_games import (
 from api.app.domain.commands.system.update_player_stats_for_week import (
     UpdatePlayerStatsForWeekCommand, UpdatePlayerStatsForWeekCommandExecutor,
     create_update_player_stats_for_week_command_executor)
+from api.app.domain.commands.system.update_schedule import UpdateScheduleCommand, UpdateScheduleCommandExecutor, create_update_schedule_command_executor
 from api.app.domain.events.configure_events import (ConfigureEvents,
                                                     create_configure_events)
 from api.app.domain.services.end_of_day_service import EndOfDayService, create_end_of_day_service
@@ -122,5 +123,13 @@ async def update_player_stats_for_week(
 async def set_end_of_season(
     command: EndOfSeasonCommand,
     command_executor: EndOfSeasonCommandExecutor = Depends(create_end_of_season_command_executor),
+):
+    return command_executor.execute(command)
+
+
+@router.post("/schedule")
+async def update_schedule(
+    command: UpdateScheduleCommand,
+    command_executor: UpdateScheduleCommandExecutor = Depends(create_update_schedule_command_executor),
 ):
     return command_executor.execute(command)
