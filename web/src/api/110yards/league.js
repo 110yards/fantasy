@@ -89,3 +89,7 @@ export const fixSubscriptions = async command => {
 export const testDiscord = async (league_id, webhook_url) => {
   return client.post(null, `league/${league_id}/test_discord?webhook_url=${webhook_url}`)
 }
+
+export const getPlayerDetails = async (season, league_id, player_id) => {
+  return client.get(null, `league/${league_id}/player/${player_id}/${season}`)
+}

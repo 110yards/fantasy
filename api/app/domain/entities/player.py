@@ -1,4 +1,5 @@
 from __future__ import annotations
+from datetime import datetime
 from pydantic import BaseModel
 
 from pydantic.class_validators import root_validator
@@ -121,12 +122,43 @@ class Player(BaseEntity):
     image_url: Optional[str]
     status_current: int = 1
 
-    season_stats: Stats = Stats()
     hash: str = ""
 
     @property
     def national_status(self):
         return None if self.foreign_player else "N"
+
+    @property
+    def cfl_url(self) -> str:
+        return f"https://www.cfl.ca/players/player/{self.id}"
+
+    @property
+    def formatted_height(self) -> str:
+        if not self.height:
+            return None
+
+        ft = int(float(self.height))
+        inches = int(self.height.split(".")[1])
+
+        return f"{ft}'{inches}"
+
+    @property
+    def formatted_weight(self) -> str:
+        if not self.weight:
+            return None
+
+        return f"{self.weight} lbs"
+
+    @property
+    def age(self) -> int:
+        if not self.birth_date:
+            return None
+
+        try:
+            birth_date = datetime.strptime(self.birth_date, "%Y-%m-%d")
+            return int((datetime.now() - birth_date).days / 365.25)
+        except ValueError:
+            return None
 
     def compute_hash(self):
         self.hash = hash_dict(self.dict())

@@ -22,5 +22,8 @@ class PlayerSeasonRepository():
     def set(self, season, player_season: PlayerSeason, transaction: Transaction = None):
         return self.firestore.set(PlayerSeasonRepository.path(season), player_season, transaction)
 
+    def get(self, season, player_id: str, transaction: Transaction = None) -> PlayerSeason:
+        return self.firestore.get(PlayerSeasonRepository.path(season), player_id, transaction)
+
     def get_all(self, season: int, transaction: Transaction = None) -> List[PlayerSeason]:
         return self.firestore.get_all(PlayerSeasonRepository.path(season), transaction)

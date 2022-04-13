@@ -38,6 +38,7 @@ from api.app.domain.repositories.repository_factory import get_league_repository
 from fastapi import Depends, Request
 
 from api.app.domain.services.discord_service import DiscordService, create_discord_service
+from api.app.domain.services.player_details_service import PlayerDetailsService, create_player_details_service
 
 from .api_router import APIRouter
 
@@ -177,3 +178,13 @@ async def test_discord(
     service: DiscordService = Depends(create_discord_service),
 ):
     service.send_test_notification(webhook_url)
+
+
+@router.get("/{league_id}/player/{player_id}/{season}")
+async def get_player_details(
+    league_id: str,
+    player_id: str,
+    season: int,
+    service: PlayerDetailsService = Depends(create_player_details_service),
+):
+    return service.get_player_details(season, league_id, player_id)

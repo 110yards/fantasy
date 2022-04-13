@@ -3,11 +3,10 @@
 from typing import Dict, List
 from api.app.core.batch import create_batches
 from api.app.core.firestore_proxy import Query
-from api.app.domain.entities.league_player_score import LeaguePlayerScore
 from api.app.domain.entities.opponents import Opponents
 from api.app.domain.entities.team import Team
 from api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
-from api.app.domain.entities.player import STATUS_ACTIVE, Player
+from api.app.domain.entities.player import STATUS_ACTIVE, Player, PlayerLeagueSeasonScore
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
 
 from fastapi.param_functions import Depends
@@ -51,7 +50,7 @@ class PlayerProjectionService:
         player_ids = [p.id for p in players]
         batches = create_batches(player_ids, 10)
 
-        player_scores: Dict[str, LeaguePlayerScore] = {}
+        player_scores: Dict[str, PlayerLeagueSeasonScore] = {}
         for batch in batches:
             query = Query("id", "in", batch)
             batch_scores = self.player_score_repo.where(league_id, query)
@@ -65,7 +64,7 @@ class PlayerProjectionService:
 
         return projections
 
-    def calculate(self, opponents: Opponents, player: Player, player_score: LeaguePlayerScore) -> float:
+    def calculate(self, opponents: Opponents, player: Player, player_score: PlayerLeagueSeasonScore) -> float:
         if (player.status_current != STATUS_ACTIVE):
             return 0.0
 
@@ -78,6 +77,6 @@ class PlayerProjectionService:
         if not player_score:
             return 0.0
 
-        projection = player_score.average if player_score else 0.0  # TODO: apply some opponent adjustments to this
+        projection = player_score.average_score if player_score else 0.0  # TODO: apply some opponent adjustments to this
 
         return round(projection, 2)

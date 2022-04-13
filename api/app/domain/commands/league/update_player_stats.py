@@ -1,6 +1,7 @@
 
-from api.app.domain.entities.league_player_score import LeaguePlayerScore
+# from api.app.domain.entities.league_player_score import LeaguePlayerScore
 from api.app.domain.entities.game_player_stats import GamePlayerStats
+from api.app.domain.entities.player import PlayerLeagueSeasonScore
 from api.app.domain.repositories.league_player_score_repository import LeaguePlayerScoreRepository, create_league_player_score_repository
 from typing import Optional
 from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
@@ -63,7 +64,7 @@ class UpdatePlayerStatsCommandExecutor(BaseCommandExecutor[UpdatePlayerStatsComm
             player_score = self.league_player_score_repo.get(command.league_id, player_id, transaction)
 
             if not player_score:
-                player_score = LeaguePlayerScore(id=player_id)
+                player_score = PlayerLeagueSeasonScore(id=player_id)
 
             player_score.game_scores[game_id] = new_score
             player_score.game_stats[game_id] = stats

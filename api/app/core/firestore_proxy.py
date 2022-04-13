@@ -50,7 +50,7 @@ class FirestoreProxy(Generic[T]):
 
     def get(self, collection_path: str, id, transaction: Transaction = None) -> T:
         collection_ref = self.client.collection(collection_path)
-        document_ref = collection_ref.document(id)
+        document_ref = collection_ref.document(str(id))
 
         if transaction:
             doc = document_ref.get(transaction=transaction)
