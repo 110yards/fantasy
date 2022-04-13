@@ -138,7 +138,7 @@
               <template v-for="log in details.game_log">
                 <tr :key="'stats' + log.game_id">
                   <!-- <game-date :game="log.game" /> -->
-                  <game-result v-if="log.game" :game="log.game" :player="player" />
+                  <game-result v-if="log.game" :game="log.game" :playerTeam="log.team" />
                   <td class="text-no-wrap">
                     <span>{{ formatScore(log.score ? log.score.total_score : 0) }}</span>
                     <v-icon @click="detailedLog = log" v-if="!detailedLog" small color="grey" class="mt-n1 pl-1"
@@ -385,11 +385,11 @@ export default {
 
     showRushingFirst() {
       let positions = [positionType.QB, positionType.RB]
-      return this.player && positions.includes(this.player.position)
+      return this.details.player && positions.includes(this.details.player.position)
     },
 
     showKicking() {
-      return this.player && this.player.position == positionType.K
+      return this.details.player && this.details.player.position == positionType.K
     },
 
     showDefence() {

@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from api.app.domain.entities.player import Player, PlayerLeagueSeasonScore
 
 from api.app.domain.entities.player_score import PlayerScore
+from api.app.domain.entities.scoreboard import ScoreboardGame
 from api.app.domain.entities.stats import Stats
 from api.app.domain.entities.team import Team
 from api.app.domain.repositories.game_repository import GameRepository, create_game_repository
@@ -18,6 +19,7 @@ from api.app.domain.repositories.player_season_repository import PlayerSeasonRep
 class GameLog(BaseModel):
     game_id: int
     game_number: int
+    game: ScoreboardGame
     week: int
     season: int
     team: Team
@@ -83,6 +85,7 @@ class PlayerDetailsService:
             log = GameLog(
                 game_id=game.id,
                 game_number=game.game_number,
+                game=ScoreboardGame.create_from_game(game),
                 week=game.week,
                 season=season,
                 team=player_game.team,

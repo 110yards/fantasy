@@ -9,6 +9,7 @@ from api.app.domain.commands.system.update_active_players import (
     UpdateActivePlayersCommand, UpdateActivePlayersCommandExecutor,
     update_active_players_command_executor)
 from api.app.domain.commands.system.update_games import UpdateGamesCommand, UpdateGamesCommandExecutor, create_update_games_command_executor
+from api.app.domain.commands.system.update_schedule import UpdateScheduleCommand, UpdateScheduleCommandExecutor, create_update_schedule_command_executor
 from api.app.domain.services.dev_pubsub_service import DevPubSubService, create_dev_pubsub_service
 from api.app.domain.services.end_of_day_service import EndOfDayService, create_end_of_day_service
 from api.app.domain.services.league_problems_service import (
@@ -33,10 +34,17 @@ async def problems(
 @require_role(Role.admin)
 async def update_players(
     request: Request,
-    command_executor: UpdateActivePlayersCommandExecutor = Depends(update_active_players_command_executor)
+    command_executor: UpdateActivePlayersCommandExecutor = Depends(update_active_players_command_executor),
+    settings: Settings = Depends(get_settings),
+    dev_pubsub_service: DevPubSubService = Depends(create_dev_pubsub_service),
 ):
     command = UpdateActivePlayersCommand()
-    return command_executor.execute(command)
+    result = command_executor.execute(command)
+
+    if settings.is_dev():
+        dev_pubsub_service.process_pubsub_payloads()
+
+    return result
 
 
 @router.post("/update_games")
@@ -69,4 +77,14 @@ async def reset_week_end(
     command_executor: ResetWeekEndCommandExecutor = Depends(create_reset_week_end_command_executor),
 ):
     command = ResetWeekEndCommand()
+    return command_executor.execute(command)
+
+
+@router.post("/schedule")
+@require_role(Role.admin)
+async def update_schedule(
+    request: Request,
+    command: UpdateScheduleCommand,
+    command_executor: UpdateScheduleCommandExecutor = Depends(create_update_schedule_command_executor),
+):
     return command_executor.execute(command)

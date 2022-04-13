@@ -4,11 +4,18 @@
       <v-col cols="12">
         <p>Current Week: {{ currentWeek }}</p>
         <p>Waivers Active: {{ waiversActive }}</p>
+        <p>Pub/Sub Messages: {{ outstandingPubSubMessages }}</p>
       </v-col>
     </v-row>
     <v-row>
       <v-col cols="3" md="4">
         <app-default-button @click="updatePlayers">Update players</app-default-button>
+        <br />
+        <app-default-button class="mt-2" @click="updateSchedule">Update schedule</app-default-button>
+        <br />
+        <app-default-button v-if="outstandingPubSubMessages" class="mt-2" @click="processPubSub"
+          >Process pub/sub queue</app-default-button
+        >
       </v-col>
 
       <v-col cols="3" md="4">
@@ -31,12 +38,14 @@
 </template>
 
 <script>
-import { endOfDay, resetWeekEnd, updateGames, updatePlayers } from "../../api/110yards/admin"
+import { endOfDay, resetWeekEnd, updateGames, updatePlayers, updateSchedule } from "../../api/110yards/admin"
+import { processPubSub } from "../../api/110yards/dev"
 import scoreboard from "../../mixins/scoreboard"
 import eventBus from "../../modules/eventBus"
 import AppDefaultButton from "../buttons/AppDefaultButton.vue"
 import AppSelect from "../inputs/AppSelect.vue"
 import AppTextField from "../inputs/AppTextField.vue"
+import { firestore } from "../../modules/firebase"
 
 export default {
   components: { AppDefaultButton, AppTextField, AppSelect },
@@ -46,6 +55,7 @@ export default {
     return {
       gameId: null,
       quarter: null,
+      pubsubMessages: null,
     }
   },
 
@@ -60,6 +70,10 @@ export default {
 
     waiversActive() {
       return this.state ? this.state.waivers_active : null
+    },
+
+    outstandingPubSubMessages() {
+      return this.pubsubMessages ? this.pubsubMessages.length : 0
     },
 
     gameIds() {
@@ -96,6 +110,19 @@ export default {
       eventBus.$emit("show-info", "Players updated")
     },
 
+    async updateSchedule() {
+      let command = {
+        include_final: true,
+      }
+      await updateSchedule(command)
+      eventBus.$emit("show-info", "Schedule updated")
+    },
+
+    async processPubSub() {
+      await processPubSub()
+      eventBus.$emit("show-info", "Pub sub queue processed")
+    },
+
     async updateGames() {
       let simState = {
         game_id: this.gameId,
@@ -116,6 +143,16 @@ export default {
     async resetWeekEnd() {
       await resetWeekEnd()
     },
+
+    configureReferences() {
+      let pubsubRef = firestore.collection("/pubsub")
+
+      this.$bind("pubsubMessages", pubsubRef)
+    },
+  },
+
+  created() {
+    this.configureReferences()
   },
 }
 </script>

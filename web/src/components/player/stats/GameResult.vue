@@ -1,5 +1,5 @@
 <template>
-  <td v-if="game && player" class="text-no-wrap">
+  <td v-if="game && playerTeam" class="text-no-wrap">
     <a :href="cflLink" target="_blank">
       <span class="">{{ date }} </span>
       <span class="d-none d-md-inline pl-1">{{ result }} {{ opponent }}</span>
@@ -14,14 +14,14 @@ import * as formatter from "../../../modules/formatter"
 
 export default {
   props: {
-    player: { type: Object, required: true },
+    playerTeam: { type: Object, required: true },
     game: { type: Object, required: true },
   },
 
   computed: {
     isHome() {
       // this is going to be a problem after someone gets traded or released
-      return this.game.teams.home.id == this.player.team.id
+      return this.game.teams.home.id == this.playerTeam.id
     },
     scoreFor() {
       return this.isHome ? this.game.score.home : this.game.score.away
@@ -52,7 +52,7 @@ export default {
     opponent() {
       let game = this.game
       // this is going to be a problem after someone gets traded or released
-      let isHome = game.teams.home.id == this.player.team.id
+      let isHome = game.teams.home.id == this.playerTeam.id
       let opponent = isHome ? game.teams.away : game.teams.home
 
       return isHome ? `v ${opponent.abbreviation}` : `@ ${opponent.abbreviation}`

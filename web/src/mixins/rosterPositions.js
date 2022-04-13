@@ -71,7 +71,7 @@ export default {
       }
     },
 
-    playerIsEligibleForPosition(player, positionType) {
+    playerIsEligibleForPosition(player, positionType, includeReserves) {
       // TODO: need to remove these hard codes
       let playerPosition = player.position
 
@@ -79,11 +79,11 @@ export default {
 
       if (playerPosition == positionType) return true
 
-      if (positionType == "ir") {
+      if (positionType == "ir" && includeReserves) {
         return this.$root.enableRelaxedIR || player.status_current != playerStatus.Active
       }
 
-      if (positionType == "bye") {
+      if (positionType == "bye" && includeReserves) {
         let opponent = this.$root.getOpponent(player.team.abbreviation)
         return opponent == "BYE"
       }

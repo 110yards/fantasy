@@ -129,13 +129,12 @@ class VirtualPubSubPublisher(Publisher):
 
     def publish(self, payload: BaseModel, topic_name: str):
         topic_path = self.get_topic_path(topic_name)
-        data = payload.json()
 
-        entity = VirtualPubSubPayload(topic=topic_name, data=payload.dict(), timestamp=datetime.now())
-        self.repo.create(entity)
+        if self.repo:
+            entity = VirtualPubSubPayload(topic=topic_name, data=payload.dict(), timestamp=datetime.now())
+            self.repo.create(entity)
 
         Logger.info(f"Published virtual pub/sub message to '{topic_path}")
-        Logger.info(data)
 
     def create_topic(self, topic_name: str):
         # PubSubPublisher(self.project_id).create_topic(topic_name)

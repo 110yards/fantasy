@@ -26,7 +26,7 @@ os.environ["FIREBASE_AUTH_EMULATOR_HOST"] = "localhost:9099"
 
 firebase_admin.initialize_app(options={"projectId": DEV_PROJECT_ID})
 
-publisher = VirtualPubSubPublisher(DEV_PROJECT_ID)
+publisher = VirtualPubSubPublisher(DEV_PROJECT_ID, None)
 
 public_repo = create_public_repository()
 user_repo = create_user_repository()
@@ -58,6 +58,10 @@ if result.success:
     user = user_repo.get(result.user_id)
     user.is_admin = True
     user_repo.update(user)
+else:
+    print("Failed (if you are running the script again, you must clear all firestore and auth data).")
+    exit(1)
+
 print("Done")
 
 count = 1

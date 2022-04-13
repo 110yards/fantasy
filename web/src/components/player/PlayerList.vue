@@ -135,7 +135,7 @@ import Locked from "../icons/Locked.vue"
 import { longDate } from "../../modules/formatter"
 import AddPlayer from "./AddPlayer.vue"
 import { formatScore } from "../../modules/formatter"
-import Score from '../Score.vue'
+import Score from "../Score.vue"
 
 export default {
   name: "player-list",
@@ -199,6 +199,7 @@ export default {
       rosters: null,
       playerScores: [],
       playerToAdd: null,
+      seasonStats: [],
     }
   },
   computed: {
@@ -220,7 +221,7 @@ export default {
       // TODO: sort by rank?
       for (let player of this.players) {
         let playerScore = this.getPlayerScore(player)
-
+        let playerSeasonStats = this.getPlayerStats(player)
         player.owner = this.getOwner(player.id)
         player.opponent = this.getNextOpponent(player)
 
@@ -229,6 +230,11 @@ export default {
         player.average = playerScore != null ? playerScore.average_score : 0
         player.points = playerScore != null ? playerScore.total_score : 0
         player.games_played = playerScore != null ? playerScore.games_played : 0
+
+        if (playerSeasonStats) {
+          // Object.assign(player, playerSeasonStats.stats)
+          player.season_stats = playerSeasonStats.stats
+        }
 
         players.push(player)
       }
@@ -365,6 +371,12 @@ export default {
       return filterResults && filterResults.length == 1 ? filterResults[0] : null
     },
 
+    getPlayerStats(player) {
+      let filterResults = this.seasonStats.filter(p => p.player_id == player.id)
+
+      return filterResults && filterResults.length == 1 ? filterResults[0] : null
+    },
+
     getOwnerId(playerId) {
       return playerId in this.playerOwners ? this.playerOwners[playerId].owner_id : null
     },
@@ -451,9 +463,11 @@ export default {
       let scoresPath = `league/${this.leagueId}/player_score`
       let scoresRef = firestore.collection(scoresPath)
       this.$bind("playerScores", scoresRef)
-    },
 
-    combineData() {},
+      let seasonStatspath = `season/${this.$root.currentSeason}/player_season`
+      let seasonStatsRef = firestore.collection(seasonStatspath)
+      this.$bind("seasonStats", seasonStatsRef)
+    },
   },
   watch: {
     leagueId: {

@@ -135,10 +135,8 @@ export default {
       let positions = Object.values(this.currentRoster.positions)
 
       let eligibleEmptyPositions = positions.filter(
-        p => p.player == null && this.$root.playerIsEligibleForPosition(this.player, p.position_type),
+        p => p.player == null && this.$root.playerIsEligibleForPosition(this.player, p.position_type, false),
       )
-
-      // TODO: this is considering IR an eligible position, but the service doesn't so the request will fail.
 
       return eligibleEmptyPositions.length >= 1
     },

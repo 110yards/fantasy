@@ -202,7 +202,7 @@ export default {
       return (
         this.playerToBeMoved &&
         !this.playerToBeMovedIsSame &&
-        this.$root.playerIsEligibleForPosition(this.playerToBeMoved, this.spot.position_type)
+        this.$root.playerIsEligibleForPosition(this.playerToBeMoved, this.spot.position_type, true)
       )
     },
 

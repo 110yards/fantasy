@@ -94,6 +94,7 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
 
         Logger.debug(f"Loading games from CFL ({timer() - start})")
         current_games = self.get_current_games(season, week, command.sim_state)
+        Logger.debug(f"Done loading games from CFL ({timer() - start})")
         Logger.debug(f"Loading games from DB ({timer() - start})")
         stored_games = self.get_stored_games(season, week)
 

@@ -137,8 +137,11 @@ class Player(BaseEntity):
         if not self.height:
             return None
 
-        ft = int(float(self.height))
-        inches = int(self.height.split(".")[1])
+        try:
+            ft = int(float(self.height))
+            inches = int(self.height.split(".")[1])
+        except BaseException:
+            return None
 
         return f"{ft}'{inches}"
 
