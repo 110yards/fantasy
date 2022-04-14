@@ -158,7 +158,8 @@ class SelectPlayerCommandExecutor(BaseCommandExecutor[SelectPlayerCommand, Selec
                     modifier = " still "
                 next_roster = self.league_roster_repo.get(command.league_id, result.next_slot.roster_id)
 
-                message += f" {next_roster.name} is{modifier}on the clock."
+                if next_roster:
+                    message += f" {next_roster.name} is{modifier}on the clock."
 
             self.notification_service.send_draft_event(result.league, message)
 
