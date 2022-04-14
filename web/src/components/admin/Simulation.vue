@@ -9,7 +9,9 @@
     </v-row>
     <v-row>
       <v-col cols="3" md="4">
-        <app-default-button @click="updatePlayers">Update players</app-default-button>
+        <app-default-button class="mt-2" @click="simWeek">Sim entire week</app-default-button>
+        <br />
+        <app-default-button class="mt-2" @click="updatePlayers">Update players</app-default-button>
         <br />
         <app-default-button class="mt-2" @click="updateSchedule">Update schedule</app-default-button>
         <br />
@@ -105,6 +107,15 @@ export default {
   },
 
   methods: {
+    async simWeek() {
+      this.gameId = null
+      this.quarter = null
+
+      await this.updateGames()
+      await this.endOfDay() // trigger end of week
+      await this.endOfDay() // trigger end of waivers
+    },
+
     async updatePlayers() {
       await updatePlayers()
       eventBus.$emit("show-info", "Players updated")

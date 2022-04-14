@@ -12,21 +12,37 @@ export default {
     roster: { type: Object, required: false },
     weekNumber: { required: true },
     scoring: { type: Object, required: false },
+    calculatedScore: { type: Number, required: true },
   },
   data() {
     return {
       players: {},
-      score: 0.0,
+      liveScore: 0.0,
     }
+  },
+
+  computed: {
+    score() {
+      return this.isCurrentWeek ? this.liveScore : this.calculatedScore
+    },
+
+    isCurrentWeek() {
+      return this.weekNumber == this.$root.state.current_week
+    },
   },
 
   methods: {
     configureBindings() {
+      if (!this.isCurrentWeek) return
+
       let season = this.$root.currentSeason
 
       let positions = Object.values(this.roster.positions)
-      let players = positions.filter(x => x.player).map(x => x.player)
-      let playerIds = players.map(x => x.id)
+      let activePlayers = positions
+        .filter(x => x.player && this.$root.isActivePositionType(x.position_type))
+        .map(x => x.player)
+
+      let playerIds = activePlayers.map(x => x.id)
 
       for (let playerId of playerIds) {
         // add each player id as an observable property on dataProp.players
@@ -37,6 +53,8 @@ export default {
     },
 
     recalculateRosterScore() {
+      if (!this.isCurrentWeek) return
+
       let totalScore = 0.0
 
       if (!this.players) return totalScore
@@ -45,12 +63,26 @@ export default {
 
       let playerGameArrays = Object.values(this.players)
 
+      let calcDetails = {
+        roster: this.roster.name,
+        scores: [],
+      }
+
       for (let playerGameArray of playerGameArrays) {
         if (playerGameArray.length == 0) continue
 
         let game = playerGameArray[0]
-        totalScore += calculate(scoring, game.stats)
+        let gameScore = calculate(scoring, game.stats)
+        calcDetails.scores.push({
+          game: game.game_id,
+          player: game.player_id,
+          score: gameScore,
+        })
+
+        totalScore += gameScore
       }
+
+      console.debug(calcDetails)
 
       return totalScore
     },
@@ -69,15 +101,15 @@ export default {
     scoring: {
       immediate: true,
       handler(scoring) {
-        if (scoring) this.score = this.recalculateRosterScore()
+        if (scoring) this.liveScore = this.recalculateRosterScore()
       },
     },
 
     players: {
       deep: true,
       handler(players) {
-        this.score = this.recalculateRosterScore()
-        this.$emit("update", { score: this.score })
+        this.liveScore = this.recalculateRosterScore()
+        this.$emit("update", { score: this.liveScore })
       },
     },
   },

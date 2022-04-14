@@ -40,7 +40,13 @@
 
       <v-col cols="5" class="pt-0">
         <span v-if="away && !isBye" :class="matchupStateClass(awayScore, homeScore)">
-          <roster-score :roster="away" :weekNumber="weekNumber" :scoring="scoring" v-on:update="updateAwayScore" />
+          <roster-score
+            :roster="away"
+            :weekNumber="weekNumber"
+            :scoring="scoring"
+            v-on:update="updateAwayScore"
+            :calculatedScore="matchup.away_score"
+          />
         </span>
       </v-col>
 
@@ -61,7 +67,13 @@
 
       <v-col cols="5" class="pt-0 text-right">
         <span v-if="home" :class="matchupStateClass(homeScore, awayScore)">
-          <roster-score :roster="home" :weekNumber="weekNumber" :scoring="scoring" v-on:update="updateHomeScore" />
+          <roster-score
+            :roster="home"
+            :weekNumber="weekNumber"
+            :scoring="scoring"
+            v-on:update="updateHomeScore"
+            :calculatedScore="matchup.home_score"
+          />
         </span>
       </v-col>
     </v-row>

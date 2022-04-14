@@ -17,11 +17,8 @@
           <donate v-if="donateAtTop" />
           <router-view />
           <throbber />
-          <div id="footer">
-            <p>&copy; 2021 Michael Dryden</p>
-
-            <donate v-if="donateAtBotton" />
-          </div>
+          <donate v-if="donateAtBotton" :top="false" />
+          <app-footer />
         </div>
       </v-container>
     </v-main>
@@ -53,27 +50,20 @@
   word-break: unset;
 }
 
-#footer {
-  padding-top: 2em;
-  margin: auto;
-  text-align: center;
-  font-size: small;
-  color: gray;
-}
-
 .link {
   cursor: pointer;
 }
 </style>
 
 <script>
-import Throbber from "./components/Throbber"
+import Throbber from "./components/Throbber.vue"
 import AppHeader from "./components/header/AppHeader.vue"
 import SnackBar from "./components/SnackBar.vue"
 import SystemBar from "./components/SystemBar.vue"
 import { firestore } from "./modules/firebase"
 import * as api from "./api/110yards/root"
 import Donate from "./components/Donate.vue"
+import AppFooter from "./components/Footer.vue"
 
 export default {
   name: "App",
@@ -83,6 +73,7 @@ export default {
     SnackBar,
     SystemBar,
     Donate,
+    AppFooter,
   },
   data() {
     return {

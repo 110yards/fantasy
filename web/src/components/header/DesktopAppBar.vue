@@ -14,7 +14,7 @@
     <log-in-link v-if="isAnonymous" class="nav-primary" />
     <log-out-link v-if="!isAnonymous" class="nav-primary" />
 
-    <template v-slot:extension v-if="hasLeague">
+    <template v-slot:extension v-if="hasLeague && league">
       <v-btn
         class="ml-11 mt-n3 nav-secondary"
         text

@@ -60,6 +60,7 @@ class CalculateResultsCommand(BaseCommand):
 @annotate_args
 class CalculateResultsResult(BaseCommandResult[CalculateResultsCommand]):
     next_week_is_playoffs: bool = False
+    league_season_complete: bool = False
 
 
 class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsCommand, CalculateResultsResult]):
@@ -149,6 +150,7 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
 
                 self.matchup_repo.set(command.league_id, command.week_number, matchup, transaction)
 
+            league_season_complete = len(schedule.weeks) <= week_index + 1
             next_week_matchups = schedule.weeks[week_index + 1].matchups if len(schedule.weeks) > week_index + 1 else None
             next_week_playoffs = schedule.weeks[week_index + 1].week_type.is_playoffs() if len(schedule.weeks) > week_index + 1 else False
 
@@ -203,7 +205,7 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
 
             self.league_config_repo.set_schedule_config(command.league_id, schedule, transaction)
 
-            return CalculateResultsResult(command=command, next_week_is_playoffs=next_week_playoffs)
+            return CalculateResultsResult(command=command, next_week_is_playoffs=next_week_playoffs, league_season_complete=league_season_complete)
 
         transaction = self.league_roster_repo.firestore.create_transaction()
         result = calculate(transaction)

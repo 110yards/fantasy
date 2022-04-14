@@ -46,7 +46,11 @@ export default {
     },
 
     score() {
-      return this.game ? calculate(this.$root.leagueScoringSettings, this.game.stats) : 0
+      if (this.isCurrentWeek) {
+        return this.game ? calculate(this.$root.leagueScoringSettings, this.game.stats) : 0
+      } else {
+        return this.position.game_score
+      }
     },
 
     formattedScore() {
@@ -57,6 +61,7 @@ export default {
   methods: {
     configureReferences() {
       if (!this.position || !this.position.player || !this.leagueId || !this.weekNumber) return
+      if (!this.isCurrentWeek) return
 
       let path = `season/${this.season}/player_game/`
 

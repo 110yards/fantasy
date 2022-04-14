@@ -1,8 +1,7 @@
 <template>
   <v-sheet v-if="league && matchup">
     <matchup-header
-      :away="awayRoster"
-      :home="homeRoster"
+      :matchup="matchup"
       :weekNumber="weekNumber"
       :enableProjections="enableProjections"
       :isCurrentWeek="isCurrentWeek"
