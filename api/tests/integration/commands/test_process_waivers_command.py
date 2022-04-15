@@ -1,4 +1,5 @@
 
+from api.app.domain.entities.schedule import PlayoffType, Schedule
 from api.app.domain.entities.state import State
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository
 from api.app.domain.repositories.state_repository import StateRepository
@@ -22,6 +23,8 @@ from api.app.domain.entities.player import Player
 from api.app.domain.entities.roster import Roster
 from copy import deepcopy
 
+from api.tests.mocks.mock_notification_service import MockNotificationService
+
 rb1 = Player(id="1", cfl_central_id=1, first_name="Player", last_name="One", position=PositionType.rb, team=Team.bc(), status_current=1)
 rb2 = Player(id="2", cfl_central_id=2, first_name="Player", last_name="Two", position=PositionType.rb, team=Team.cgy(), status_current=1)
 rb3 = Player(id="3", cfl_central_id=3, first_name="Player", last_name="Three", position=PositionType.rb, team=Team.ssk(), status_current=1)
@@ -43,6 +46,9 @@ def get_target(rosters: List[Roster]) -> ProcessWaiversCommandExecutor:
     league_config_repo = LeagueConfigRepository(MockFirestoreProxy())
 
     league_config_repo.set_positions_config(league.id, LeaguePositionsConfig())
+    league_config_repo.set_schedule_config(league.id, Schedule(first_playoff_week=15, playoff_type=PlayoffType.TOP_2, weeks=[], enable_loser_playoff=False))
+
+    notification_service = MockNotificationService()
 
     roster_player_service = RosterPlayerService(league_owned_player_repo, league_roster_repo, transaction_repo, league_config_repo)
     waiver_service = WaiverService(roster_player_service)
@@ -52,7 +58,10 @@ def get_target(rosters: List[Roster]) -> ProcessWaiversCommandExecutor:
         league_roster_repo=league_roster_repo,
         league_repo=league_repo,
         waiver_service=waiver_service,
-        league_week_repo=league_week_repo)
+        league_week_repo=league_week_repo,
+        league_config_repo=league_config_repo,
+        notification_service=notification_service,
+    )
 
 
 def test_process_two_successful_bids():
