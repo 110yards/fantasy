@@ -147,6 +147,10 @@ class ScheduleWeek(BaseModel):  # base entity?
 class Schedule(BaseEntity):
     weeks: List[ScheduleWeek]
     playoff_type: PlayoffType
-    first_playoff_week: int
+    first_playoff_week: Optional[int]
     enable_loser_playoff: bool
     id: str = "schedule"
+
+    def reset(self):
+        self.weeks = []
+        self.first_playoff_week = None

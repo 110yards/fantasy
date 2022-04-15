@@ -1,3 +1,4 @@
+from api.app.domain.repositories.league_config_repository import LeagueConfigRepository
 from api.app.domain.repositories.league_transaction_repository import LeagueTransactionRepository
 from api.app.domain.repositories.league_roster_repository import LeagueRosterRepository
 from api.tests.mocks.mock_firestore_proxy import MockFirestoreProxy
@@ -23,8 +24,9 @@ def get_roster_player_service() -> RosterPlayerService:
     league_owned_player_repo = LeagueOwnedPlayerRepository(MockFirestoreProxy())
     roster_repo = LeagueRosterRepository(MockFirestoreProxy())
     league_transaction_repo = LeagueTransactionRepository(MockFirestoreProxy())
+    league_config_repo = LeagueConfigRepository(MockFirestoreProxy())
 
-    return RosterPlayerService(league_owned_player_repo, roster_repo, league_transaction_repo)
+    return RosterPlayerService(league_owned_player_repo, roster_repo, league_transaction_repo, league_config_repo)
 
 
 def test_waiver_priority_is_reverse_rank():

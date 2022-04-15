@@ -123,7 +123,7 @@ class PubSubPublisher(Publisher):
 
 
 class VirtualPubSubPublisher(Publisher):
-    def __init__(self, project_id, repo: VirtualPubsubRepository):
+    def __init__(self, project_id, repo: VirtualPubsubRepository = None):
         super().__init__(project_id)
         self.repo = repo
 

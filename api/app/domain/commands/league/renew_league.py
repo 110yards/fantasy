@@ -99,6 +99,11 @@ class RenewLeagueCommandExecutor(BaseCommandExecutor[RenewLeagueCommand, RenewLe
         league.draft_state = DraftState.NOT_STARTED
         league.first_playoff_week = None
         league.renewed = datetime.now()
+        league.schedule_generated = False
+
+        schedule = self.league_config_repo.get_schedule_config(league.id)
+        schedule.reset()
+        self.league_config_repo.set_schedule_config(league.id, schedule)
 
         for owned_player in self.owned_player_repo.get_all(league.id):
             self.owned_player_repo.delete(league.id, owned_player.id)
