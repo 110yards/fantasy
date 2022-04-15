@@ -138,6 +138,8 @@ export default {
         p => p.player == null && this.$root.playerIsEligibleForPosition(this.player, p.position_type, false),
       )
 
+      console.debug(eligibleEmptyPositions)
+
       return eligibleEmptyPositions.length >= 1
     },
   },

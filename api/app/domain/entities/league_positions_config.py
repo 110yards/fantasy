@@ -23,6 +23,9 @@ class LeaguePositionsConfig(BaseEntity):
     ir: int = 1
     bye: int = 1
     bench: int = 2
+    allow_bench_qb: bool = False
+    allow_bench_rb: bool = False
+    allow_bench_k: bool = False
 
     def active_position_count(self):
         return self.qb + self.rb + self.wr + self.k + self.lb + self.dl + self.db + self.o_flex + self.d_flex + self.flex + self.bench

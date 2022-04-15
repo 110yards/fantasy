@@ -34,6 +34,9 @@ class UpdateLeaguePositionsCommand(BaseCommand):
     ir: int
     bye: int
     bench: int
+    allow_bench_qb: bool
+    allow_bench_rb: bool
+    allow_bench_k: bool
 
 
 @annotate_args
@@ -71,6 +74,9 @@ class UpdateLeaguePositionsCommandExecutor(BaseCommandExecutor[UpdateLeaguePosit
         positions.ir = command.ir
         positions.bye = command.bye
         positions.bench = command.bench
+        positions.allow_bench_qb = command.allow_bench_qb
+        positions.allow_bench_rb = command.allow_bench_rb
+        positions.allow_bench_k = command.allow_bench_k
 
         league.positions = positions.create_positions()
 
