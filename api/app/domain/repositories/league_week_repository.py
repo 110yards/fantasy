@@ -29,3 +29,6 @@ class LeagueWeekRepository:
 
     def delete(self, league_id: str, week_id: str, transaction: Transaction = None):
         return self.firestore.delete(LeagueWeekRepository.path(league_id), week_id, transaction)
+
+    def delete_all(self, league_id: str):
+        return self.firestore.delete_all(LeagueWeekRepository.path(league_id))

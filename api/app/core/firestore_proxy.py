@@ -1,6 +1,6 @@
 from typing import Callable, Dict, Generic, List, TypeVar, Union
 
-from google.cloud.firestore_v1.base_document import BaseDocumentReference
+from google.cloud.firestore_v1.base_document import BaseDocumentReference, DocumentSnapshot
 
 from api.app.core.base_entity import BaseEntity
 from firebase_admin import firestore
@@ -167,3 +167,11 @@ class FirestoreProxy(Generic[T]):
             transaction.delete(document_ref)
         else:
             document_ref.delete()
+
+    def delete_all(self, collection_path: str):
+        collection_ref = self.client.collection(collection_path)
+
+        docs: List[DocumentSnapshot] = collection_ref.get()
+
+        for doc in docs:
+            doc.reference.delete()

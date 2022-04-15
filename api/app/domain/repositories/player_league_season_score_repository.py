@@ -33,3 +33,6 @@ class PlayerLeagueSeasonScoreRepository:
 
     def delete(self, league_id: str, player_id: str, transaction: Transaction = None):
         return self.firestore.delete(PlayerLeagueSeasonScoreRepository.path(league_id), player_id, transaction)
+
+    def delete_all(self, league_id: str):
+        self.firestore.delete_all(PlayerLeagueSeasonScoreRepository.path(league_id))

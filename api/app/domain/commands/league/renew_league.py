@@ -112,24 +112,11 @@ class RenewLeagueCommandExecutor(BaseCommandExecutor[RenewLeagueCommand, RenewLe
         schedule.reset()
         self.league_config_repo.set_schedule_config(league.id, schedule)
 
-        for owned_player in self.owned_player_repo.get_all(league.id):
-            self.owned_player_repo.delete(league.id, owned_player.id)
-
-        for score in self.player_score_repo.get_all(league.id):
-            self.player_score_repo.delete(league.id, score.id)
-
-        for transaction in self.transaction_repo.get_all(league.id):
-            self.transaction_repo.delete(league.id, transaction.id)
-
-        for week in self.league_week_repo.get_all(league.id):
-            for matchup in self.matchup_repo.get_all(league.id, week.id):
-                self.matchup_repo.delete(league.id, week.id, matchup.id)
-            self.league_week_repo.delete(league.id, week.id)
-
-        # edge case where not all the weeks get deleted (maybe just in testing?)
-        for i in range(1, 22):
-            for matchup in self.matchup_repo.get_all(league.id, i):
-                self.matchup_repo.delete(league.id, i, matchup.id)
+        self.owned_player_repo.delete_all(league.id)
+        self.player_score_repo.delete_all(league.id)
+        self.transaction_repo.delete_all(league.id)
+        self.league_week_repo.delete_all(league.id)
+        self.matchup_repo.delete_all(league.id)
 
         for roster in self.league_roster_repo.get_all(league.id):
             roster.reset()
