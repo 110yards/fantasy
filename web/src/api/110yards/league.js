@@ -93,3 +93,7 @@ export const testDiscord = async (league_id, webhook_url) => {
 export const getPlayerDetails = async (season, league_id, player_id) => {
   return client.get(null, `league/${league_id}/player/${player_id}/${season}`)
 }
+
+export const renewLeague = async leagueId => {
+  return client.post(null, `league/${leagueId}/renew/`)
+}

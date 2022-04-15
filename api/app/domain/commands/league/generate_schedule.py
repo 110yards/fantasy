@@ -55,23 +55,35 @@ class GenerateScheduleCommandExecutor(BaseCommandExecutor[GenerateScheduleComman
         self.state_repo = state_repo
 
     def on_execute(self, command: GenerateScheduleCommand) -> GenerateScheduleResult:
-        season_weeks = self.state_repo.get().season_weeks
+        state = self.state_repo.get()
+        season_weeks = state.season_weeks
+
+        min_week_start = state.current_week + 1
+
+        if state.locks.any_locks():
+            min_week_start += 1
+
+        first_playoff_week = command.first_playoff_week
+        if first_playoff_week < min_week_start:
+            first_playoff_week = min_week_start
 
         @firestore.transactional
         def set_schedule(transaction):
             rosters = self.league_roster_repo.get_all(command.league_id, transaction)
+            if command.playoff_type > len(rosters):
+                return GenerateScheduleResult(command=command, error="Invalid playoff type (not enough teams)")
 
             weeks = generate_schedule(
                 season_weeks,
                 rosters,
-                command.first_playoff_week,
+                first_playoff_week,
                 command.playoff_type,
                 command.enable_loser_playoff)
 
             schedule = Schedule(
                 weeks=weeks,
                 playoff_type=command.playoff_type,
-                first_playoff_week=command.first_playoff_week,
+                first_playoff_week=first_playoff_week,
                 enable_loser_playoff=command.enable_loser_playoff
             )
 

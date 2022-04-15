@@ -18,7 +18,7 @@ class LeagueTransactionRepository:
     def path(league_id):
         return f"league/{league_id}/transaction"
 
-    def create(self, league_id: str, league_transaction: LeagueTransaction, transaction: Transaction) -> LeagueTransaction:
+    def create(self, league_id: str, league_transaction: LeagueTransaction, transaction: Transaction = None) -> LeagueTransaction:
         return self.firestore.create(LeagueTransactionRepository.path(league_id), league_transaction, transaction)
 
     def get_all(self, league_id: str, transaction: Transaction = None) -> List[LeagueTransaction]:

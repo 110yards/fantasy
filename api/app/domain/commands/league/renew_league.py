@@ -1,4 +1,5 @@
 from api.app.core.publisher import Publisher, create_publisher
+from api.app.domain.entities.league_transaction import LeagueTransaction
 from api.app.domain.entities.user_league_preview import UserLeaguePreview
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from api.app.domain.repositories.league_owned_player_repository import LeagueOwnedPlayerRepository, create_league_owned_player_repository
@@ -125,11 +126,19 @@ class RenewLeagueCommandExecutor(BaseCommandExecutor[RenewLeagueCommand, RenewLe
                 self.matchup_repo.delete(league.id, week.id, matchup.id)
             self.league_week_repo.delete(league.id, week.id)
 
+        # edge case where not all the weeks get deleted (maybe just in testing?)
+        for i in range(1, 22):
+            for matchup in self.matchup_repo.get_all(league.id, i):
+                self.matchup_repo.delete(league.id, i, matchup.id)
+
         for roster in self.league_roster_repo.get_all(league.id):
             roster.reset()
             self.league_roster_repo.set(league.id, roster)
             preview = UserLeaguePreview.create(roster, league)
             self.user_league_repo.set(roster.id, preview)
+
+        trx = LeagueTransaction.league_event(league.id, f"🏈 The commissioner renewed the league for {state.current_season} 🏈")
+        self.transaction_repo.create(league.id, trx)
 
         # save the league and remove the archive link last, in a transaction, in case something goes wrong.  Then the user can try again.
         self.league_repo.update(league)

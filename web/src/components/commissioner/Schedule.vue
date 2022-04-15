@@ -166,10 +166,11 @@ export default {
     },
 
     weekCounts() {
+      const firstWeek = this.$root.state.current_week + 1
       const lastWeek = this.$root.state.season_weeks
 
       let counts = []
-      for (let i = 1; i <= lastWeek; i++) {
+      for (let i = firstWeek; i <= lastWeek; i++) {
         counts.push({ text: `${i}`, value: `${i}` })
       }
       return counts

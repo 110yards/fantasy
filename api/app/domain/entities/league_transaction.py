@@ -1,4 +1,4 @@
-
+from __future__ import annotations
 
 from enum import Enum
 from typing import Optional
@@ -18,6 +18,7 @@ class TransactionType(str, Enum):
     COMMISSIONER_CHANGE_ROSTER_NAME = "commissioner_change_roster_name"
     COMMISSIONER_CHANGE_SCORING = "commissioner_change_scoring"
     COMMISSIONER_MOVE_PLAYER = "commissioner_move_player"
+    LEAGUE_EVENT = "league_event"
 
 
 @annotate_args
@@ -38,19 +39,19 @@ class LeagueTransaction(BaseEntity):
             message = f"{roster.name} dropped {player.display_name}"
             trx_type = TransactionType.DROP_PLAYER
 
-        return LeagueTransaction(timestamp=datetime.now(),
+        return LeagueTransaction(timestamp=datetime.utcnow(),
                                  league_id=league_id, roster_id=roster.id, player_id=player.id, message=message, type=trx_type)
 
     @staticmethod
     def add_transaction(league_id: str, roster: Roster, player: Player):
         message = f"{roster.name} added {player.display_name}"
-        return LeagueTransaction(timestamp=datetime.now(),
+        return LeagueTransaction(timestamp=datetime.utcnow(),
                                  league_id=league_id, roster_id=roster.id, player_id=player.id, message=message, type=TransactionType.ADD_PLAYER)
 
     @staticmethod
     def waiver_claim_transaction(league_id: str, roster: Roster, player: Player, bid: int):
         message = f"{roster.name} claimed {player.display_name} on waivers (${bid})"
-        return LeagueTransaction(timestamp=datetime.now(),
+        return LeagueTransaction(timestamp=datetime.utcnow(),
                                  league_id=league_id, roster_id=roster.id, player_id=player.id, message=message, type=TransactionType.CLAIM_PLAYER)
 
     @staticmethod
@@ -62,17 +63,21 @@ class LeagueTransaction(BaseEntity):
             message = f"{old_name} changed name to {new_name}"
             trx_type = TransactionType.CHANGE_ROSTER_NAME
 
-        return LeagueTransaction(timestamp=datetime.now(),
+        return LeagueTransaction(timestamp=datetime.utcnow(),
                                  league_id=league_id, roster_id=roster_id, message=message, type=trx_type)
 
     @staticmethod
     def change_scoring(league_id: str):
         message = "Commissioner changed the league scoring settings"
-        return LeagueTransaction(timestamp=datetime.now(),
+        return LeagueTransaction(timestamp=datetime.utcnow(),
                                  league_id=league_id, message=message, type=TransactionType.COMMISSIONER_CHANGE_SCORING)
 
     @staticmethod
     def commissioner_move_player(league_id: str, roster: Roster, player: Player, from_position: str, to_position: str):
         message = f"Commissioner moved {player.display_name} on {roster.name} from {from_position} to {to_position}"
-        return LeagueTransaction(timestamp=datetime.now(), league_id=league_id, roster_id=roster.id, player_id=player.id,
+        return LeagueTransaction(timestamp=datetime.utcnow(), league_id=league_id, roster_id=roster.id, player_id=player.id,
                                  message=message, type=TransactionType.COMMISSIONER_MOVE_PLAYER)
+
+    @staticmethod
+    def league_event(league_id: str, message: str) -> LeagueTransaction:
+        return LeagueTransaction(timestamp=datetime.utcnow(), league_id=league_id, message=message, type=TransactionType.LEAGUE_EVENT)

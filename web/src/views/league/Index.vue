@@ -5,7 +5,9 @@
         <h4 class="brand">{{ league.name }}</h4>
         <start-draft :league="league" />
 
-        <app-primary-button v-if="canRenewLeague">Start {{ currentSeason }} Season</app-primary-button>
+        <app-primary-button v-if="canRenewLeague" @click="renewLeague"
+          >Start {{ currentSeason }} Season</app-primary-button
+        >
 
         <schedule v-if="scheduleGenerated && !isOffseason" :leagueId="leagueId" />
 
@@ -44,6 +46,7 @@ import Transactions from "../../components/league/Transactions.vue"
 import Scoreboard from "../../components/common/Scoreboard.vue"
 import SeasonSummary from "../../components/league/SeasonSummary.vue"
 import AppPrimaryButton from "../../components/buttons/AppPrimaryButton.vue"
+import { renewLeague } from "../../api/110yards/league"
 
 export default {
   name: "league-index",
@@ -80,12 +83,16 @@ export default {
       return (this.$root.state && this.$root.state.is_offseason) || this.isPreviousSeason
     },
 
+    leagueSeason() {
+      if (!this.league) return null
+
+      return this.league.season || 2021 // in the future, all leagues will have this set.
+    },
+
     isPreviousSeason() {
       if (!this.league) return false
 
-      let leagueSeason = this.league.season || 2021 // in the future, all leagues will have this set.
-
-      return leagueSeason != this.currentSeason
+      return this.leagueSeason != this.currentSeason
     },
 
     currentSeason() {
@@ -98,6 +105,12 @@ export default {
 
     canRenewLeague() {
       return this.isPreviousSeason && this.league.commissioner_id == this.currentUserId
+    },
+  },
+
+  methods: {
+    async renewLeague() {
+      await renewLeague(this.league.id)
     },
   },
 

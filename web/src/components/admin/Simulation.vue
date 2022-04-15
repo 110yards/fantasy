@@ -2,6 +2,7 @@
   <v-container>
     <v-row>
       <v-col cols="12">
+        <p>Current Season: {{ currentSeason }}</p>
         <p>Current Week: {{ currentWeek }}</p>
         <p>Waivers Active: {{ waiversActive }}</p>
         <p>Pub/Sub Messages: {{ outstandingPubSubMessages }}</p>
@@ -64,6 +65,10 @@ export default {
   computed: {
     state() {
       return this.$root.state
+    },
+
+    currentSeason() {
+      return this.state ? this.state.current_season : null
     },
 
     currentWeek() {
