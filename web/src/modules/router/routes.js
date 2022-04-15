@@ -18,6 +18,7 @@ import Draft from "../../views/league/draft/Draft.vue"
 import LeagueSettings from "../../views/league/LeagueSettings.vue"
 import LeagueSchedule from "../../views/league/LeagueSchedule.vue"
 import LeagueAdmin from "../../views/league/AdminWaiverResults.vue"
+import LeagueNotes from "../../views/league/LeagueNotes.vue"
 
 import CommissionerIndex from "../../views/commissioner/Index.vue"
 
@@ -127,6 +128,12 @@ export const routes = [
     name: "league-schedule",
     props: true,
     component: LeagueSchedule,
+  },
+  {
+    path: "/league/:leagueId/notes",
+    name: "league-notes",
+    props: true,
+    component: LeagueNotes,
   },
   {
     path: "/league/:leagueId/admin",

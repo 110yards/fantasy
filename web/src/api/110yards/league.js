@@ -97,3 +97,7 @@ export const getPlayerDetails = async (season, league_id, player_id) => {
 export const renewLeague = async leagueId => {
   return client.post(null, `league/${leagueId}/renew/`)
 }
+
+export const setNotes = async (user, leagueId, command) => {
+  return client.put(user, `/league/${leagueId}/notes`, command)
+}

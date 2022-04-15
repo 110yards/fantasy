@@ -23,9 +23,9 @@
       >
         Scoring
       </v-btn>
-      <v-btn class="mt-n3 nav-secondary" text small :to="{ name: 'league-schedule', params: { leagueId: leagueId } }"
-        >Schedule</v-btn
-      >
+      <v-btn class="mt-n3 nav-secondary" text small :to="{ name: 'league-schedule', params: { leagueId: leagueId } }">
+        Schedule
+      </v-btn>
 
       <v-btn
         class="mt-n3 nav-secondary"
@@ -45,6 +45,16 @@
         :to="{ name: 'league-admin', params: { leagueId: leagueId } }"
       >
         Waiver Results
+      </v-btn>
+
+      <v-btn
+        v-if="hasNotes"
+        class="mt-n3 nav-secondary"
+        text
+        small
+        :to="{ name: 'league-notes', params: { leagueId: leagueId } }"
+      >
+        Notes
       </v-btn>
     </template>
   </v-app-bar>
@@ -99,6 +109,10 @@ export default {
   computed: {
     league() {
       return this.$root.currentLeague
+    },
+
+    hasNotes() {
+      return this.league && this.league.notes
     },
   },
 }

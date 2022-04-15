@@ -43,6 +43,7 @@ class League(BaseEntity):
     season: int = 2021
     has_completed_season: bool = False
     renewed: Optional[datetime] = None
+    notes: Optional[str] = None
 
     @property
     def is_active(self) -> bool:
