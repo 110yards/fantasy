@@ -5,12 +5,12 @@ from google.cloud.firestore_v1.transaction import Transaction
 from api.app.core.firestore_proxy import FirestoreProxy, Query
 
 
-def create_league_player_score_repository():
+def create_player_league_season_score_repository():
     firestore = FirestoreProxy[PlayerLeagueSeasonScore](PlayerLeagueSeasonScore.parse_obj)
-    return LeaguePlayerScoreRepository(firestore)
+    return PlayerLeagueSeasonScoreRepository(firestore)
 
 
-class LeaguePlayerScoreRepository:
+class PlayerLeagueSeasonScoreRepository:
 
     def __init__(self, firestore: FirestoreProxy[PlayerLeagueSeasonScore]):
         self.firestore = firestore
@@ -20,16 +20,16 @@ class LeaguePlayerScoreRepository:
         return f"{LeagueRepository.path}/{league_id}/player_score"
 
     def set(self, league_id, player_score: PlayerLeagueSeasonScore, transaction: Transaction = None):
-        return self.firestore.set(LeaguePlayerScoreRepository.path(league_id), player_score, transaction)
+        return self.firestore.set(PlayerLeagueSeasonScoreRepository.path(league_id), player_score, transaction)
 
     def get(self, league_id, player_id, transaction: Transaction = None) -> PlayerLeagueSeasonScore:
-        return self.firestore.get(LeaguePlayerScoreRepository.path(league_id), player_id, transaction)
+        return self.firestore.get(PlayerLeagueSeasonScoreRepository.path(league_id), player_id, transaction)
 
     def get_all(self, league_id, transaction: Transaction = None) -> List[PlayerLeagueSeasonScore]:
-        return self.firestore.get_all(LeaguePlayerScoreRepository.path(league_id), transaction)
+        return self.firestore.get_all(PlayerLeagueSeasonScoreRepository.path(league_id), transaction)
 
     def where(self, league_id, queries: Union[List[Query], Query], transaction: Transaction = None) -> List[PlayerLeagueSeasonScore]:
-        return self.firestore.where(LeaguePlayerScoreRepository.path(league_id), queries, transaction)
+        return self.firestore.where(PlayerLeagueSeasonScoreRepository.path(league_id), queries, transaction)
 
     def delete(self, league_id: str, player_id: str, transaction: Transaction = None):
-        return self.firestore.delete(LeaguePlayerScoreRepository.path(league_id), player_id, transaction)
+        return self.firestore.delete(PlayerLeagueSeasonScoreRepository.path(league_id), player_id, transaction)

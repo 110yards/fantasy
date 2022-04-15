@@ -16,7 +16,7 @@
       </v-card-text>
     </v-card>
 
-    <v-card class="mt-4">
+    <v-card class="mt-4" v-if="generated">
       <v-card-title>Schedule</v-card-title>
       <v-card-text>
         <v-simple-table>
@@ -40,11 +40,8 @@
         </v-simple-table>
       </v-card-text>
     </v-card>
-    <v-card class="mt-5">
-      <v-card-text></v-card-text>
-    </v-card>
+    <v-alert type="error" v-else>League schedule has not been set up by the commissioner yet.</v-alert>
   </div>
-  <v-alert type="error" v-else>League schedule has not been set up by the commissioner yet.</v-alert>
 </template>
 
 <script>
@@ -71,6 +68,10 @@ export default {
   computed: {
     matchupsPerWeek() {
       return this.rosters.length / 2
+    },
+
+    generated() {
+      return this.schedule && this.schedule.weeks.length > 0
     },
 
     playoffType() {

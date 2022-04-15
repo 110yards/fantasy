@@ -11,9 +11,6 @@
         <tr v-for="position in draftablePositions" :key="position.id">
           <td>{{ position.name }}</td>
           <td v-if="position.player">
-            <!-- <span class="mr-1">{{ position.player.first_name }} {{ position.player.last_name }}</span>
-            <v-icon v-if="isInjured(position.player)" color="red" small>mdi-hospital-box-outline</v-icon>
-            <national-status v-if="position.player" :national_status="position.player.national_status" /> -->
             <player-link
               :player="position.player"
               :showShortPlayerStatus="true"

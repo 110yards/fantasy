@@ -93,16 +93,3 @@ class DevPubSubService:
 
         # unhandled
         return False
-
-# if not settings.is_dev():
-#         abort_unauthorized()
-
-#     leagues = league_repo.get_all()
-#     leagues = [league for league in leagues if league.is_active]
-
-#     count = len(leagues)
-#     for league in leagues:
-#         Logger.info(f"Delivering dev league command to {league.id}")
-#         league_command_service.execute_league_command(league.id, push)
-
-#     return f"Delivered command to {count} leagues"

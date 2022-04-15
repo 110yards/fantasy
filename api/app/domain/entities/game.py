@@ -173,8 +173,6 @@ def get_player_stats(boxscore: dict, player: dict, team: dict, opponent: dict):
         "opponent": opponent,
     }
 
-    # combined["hash"] = hash_dict(combined)
-
     return combined
 
 

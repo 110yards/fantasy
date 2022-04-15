@@ -10,7 +10,7 @@ from api.app.domain.entities.scoreboard import ScoreboardGame
 from api.app.domain.entities.stats import Stats
 from api.app.domain.entities.team import Team
 from api.app.domain.repositories.game_repository import GameRepository, create_game_repository
-from api.app.domain.repositories.league_player_score_repository import LeaguePlayerScoreRepository, create_league_player_score_repository
+from api.app.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository, create_player_league_season_score_repository
 from api.app.domain.repositories.player_game_repository import PlayerGameRepository, create_player_game_repository
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
 from api.app.domain.repositories.player_season_repository import PlayerSeasonRepository, create_player_season_repository
@@ -37,7 +37,7 @@ class PlayerDetails(BaseModel):
 
 def create_player_details_service(
     player_repo: PlayerRepository = Depends(create_player_repository),
-    score_repo: LeaguePlayerScoreRepository = Depends(create_league_player_score_repository),
+    score_repo: PlayerLeagueSeasonScoreRepository = Depends(create_player_league_season_score_repository),
     game_repo: GameRepository = Depends(create_game_repository),
     player_game_repo: PlayerGameRepository = Depends(create_player_game_repository),
     player_season_repo: PlayerSeasonRepository = Depends(create_player_season_repository),
@@ -55,7 +55,7 @@ class PlayerDetailsService:
     def __init__(
         self,
         player_repo: PlayerRepository,
-        score_repo: LeaguePlayerScoreRepository,
+        score_repo: PlayerLeagueSeasonScoreRepository,
         game_repo: GameRepository,
         player_game_repo: PlayerGameRepository,
         player_season_repo: PlayerSeasonRepository,

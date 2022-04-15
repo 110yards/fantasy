@@ -3,7 +3,7 @@ from api.app.domain.entities.player import PlayerLeagueSeasonScore
 from api.app.domain.repositories.player_season_repository import PlayerSeasonRepository, create_player_season_repository
 from api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
-from api.app.domain.repositories.league_player_score_repository import LeaguePlayerScoreRepository, create_league_player_score_repository
+from api.app.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository, create_player_league_season_score_repository
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from typing import List, Optional
 from fastapi import Depends
@@ -13,7 +13,7 @@ from api.app.core.base_command_executor import BaseCommand, BaseCommandResult, B
 
 def create_calculate_season_score_command_executor(
     league_config_repo: LeagueConfigRepository = Depends(create_league_config_repository),
-    player_score_repo: LeaguePlayerScoreRepository = Depends(create_league_player_score_repository),
+    player_score_repo: PlayerLeagueSeasonScoreRepository = Depends(create_player_league_season_score_repository),
     player_repo: PlayerRepository = Depends(create_player_repository),
     public_repo: PublicRepository = Depends(create_public_repository),
     player_season_repo: PlayerSeasonRepository = Depends(create_player_season_repository),
@@ -35,7 +35,7 @@ class CalculateSeasonScoreCommandExecutor(BaseCommandExecutor[CalculateSeasonSco
     def __init__(
         self,
         league_config_repo: LeagueConfigRepository,
-        player_score_repo: LeaguePlayerScoreRepository,
+        player_score_repo: PlayerLeagueSeasonScoreRepository,
         player_repo: PlayerRepository,
         public_repo: PublicRepository,
         player_season_repo: PlayerSeasonRepository,

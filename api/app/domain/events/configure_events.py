@@ -25,6 +25,7 @@ class ConfigureEvents:
         config = SubscriptionConfig(expiration_days=None)
         create_league_subscriptions = f"{self.endpoint}/league/subscriptions?&key={self.api_key}"
         self.publisher.create_push_subscription("push_create_league_subscriptions", topics.LEAGUE_CREATED_TOPIC, create_league_subscriptions, config)
+        self.publisher.create_push_subscription("push_renew_league_subscriptions", topics.LEAGUE_RENEWED_TOPIC, create_league_subscriptions, config)
 
         update_games = f"{self.endpoint}/system/games?key={self.api_key}"
         self.publisher.create_push_subscription("push_system_update_games", topics.UPDATE_GAMES_TOPIC, update_games, config)

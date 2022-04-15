@@ -3,7 +3,7 @@ from api.app.core.publisher import Publisher, create_publisher
 from api.app.domain.commands.league.calculate_playoffs import CalculatePlayoffsCommand
 from api.app.domain.enums.league_command_type import LeagueCommandType
 from api.app.domain.repositories.game_repository import GameRepository, create_game_repository
-from api.app.domain.repositories.league_player_score_repository import LeaguePlayerScoreRepository, create_league_player_score_repository
+from api.app.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository, create_player_league_season_score_repository
 from api.app.domain.enums.draft_state import DraftState
 from api.app.domain.entities.matchup_preview import MatchupPreview
 from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
@@ -32,7 +32,7 @@ def create_calculate_results_command_executor(
     matchup_repo: LeagueWeekMatchupRepository = Depends(create_league_week_matchup_repository),
     league_repo: LeagueRepository = Depends(create_league_repository),
     user_league_repo: UserLeagueRepository = Depends(create_user_league_repository),
-    player_score_repo: LeaguePlayerScoreRepository = Depends(create_league_player_score_repository),
+    player_score_repo: PlayerLeagueSeasonScoreRepository = Depends(create_player_league_season_score_repository),
     game_repo: GameRepository = Depends(create_game_repository),
     publisher: Publisher = Depends(create_publisher),
 
@@ -72,7 +72,7 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
         matchup_repo: LeagueWeekMatchupRepository,
         league_repo: LeagueRepository,
         user_league_repo: UserLeagueRepository,
-        player_score_repo: LeaguePlayerScoreRepository,
+        player_score_repo: PlayerLeagueSeasonScoreRepository,
         game_repo: GameRepository,
         publisher: Publisher,
 
@@ -89,7 +89,6 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
 
     def on_execute(self, command: CalculateResultsCommand) -> CalculateResultsResult:
 
-        # TODO: need to calculate player scores for league scoring
         state = self.state_repo.get()
 
         #  This happens first, to block users from adding players in the event that the next part fails.

@@ -1,7 +1,9 @@
+from api.app.core.publisher import Publisher, create_publisher
 from api.app.domain.entities.user_league_preview import UserLeaguePreview
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from api.app.domain.repositories.league_owned_player_repository import LeagueOwnedPlayerRepository, create_league_owned_player_repository
-from api.app.domain.repositories.league_player_score_repository import LeaguePlayerScoreRepository, create_league_player_score_repository
+from api.app.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository, create_league_week_matchup_repository
+from api.app.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository, create_player_league_season_score_repository
 from api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
 from api.app.domain.repositories.league_transaction_repository import LeagueTransactionRepository, create_league_transaction_repository
 from api.app.domain.repositories.league_week_repository import LeagueWeekRepository, create_league_week_repository
@@ -18,10 +20,10 @@ from api.app.domain.repositories.league_repository import (
     LeagueRepository, create_league_repository)
 from fastapi.param_functions import Depends
 from api.app.domain.repositories.user_repository import UserRepository, create_user_repository
+from api.app.domain.topics import LEAGUE_RENEWED_TOPIC
 
 
 def create_renew_league_command_executor(
-    user_repo: UserRepository = Depends(create_user_repository),
     league_repo: LeagueRepository = Depends(create_league_repository),
     user_league_repo: UserLeagueRepository = Depends(create_user_league_repository),
     league_roster_repo: LeagueRosterRepository = Depends(create_league_roster_repository),
@@ -30,12 +32,12 @@ def create_renew_league_command_executor(
     league_week_repo: LeagueWeekRepository = Depends(create_league_week_repository),
     archive_league_repo: UserArchiveLeagueRepository = Depends(create_user_archive_league_repository),
     owned_player_repo: LeagueOwnedPlayerRepository = Depends(create_league_owned_player_repository),
-    player_score_repo: LeaguePlayerScoreRepository = Depends(create_league_player_score_repository),
+    player_score_repo: PlayerLeagueSeasonScoreRepository = Depends(create_player_league_season_score_repository),
     transaction_repo: LeagueTransactionRepository = Depends(create_league_transaction_repository),
-
+    publisher: Publisher = Depends(create_publisher),
+    matchup_repo: LeagueWeekMatchupRepository = Depends(create_league_week_matchup_repository),
 ):
     return RenewLeagueCommandExecutor(
-        user_repo=user_repo,
         archive_league_repo=archive_league_repo,
         league_config_repo=league_config_repo,
         league_repo=league_repo,
@@ -46,6 +48,8 @@ def create_renew_league_command_executor(
         transaction_repo=transaction_repo,
         user_league_repo=user_league_repo,
         public_repo=public_repo,
+        publisher=publisher,
+        matchup_repo=matchup_repo,
     )
 
 
@@ -63,17 +67,18 @@ class RenewLeagueCommandExecutor(BaseCommandExecutor[RenewLeagueCommand, RenewLe
 
     def __init__(
         self,
-        user_repo: UserRepository,
         league_repo: LeagueRepository,
         user_league_repo: UserLeagueRepository,
         league_roster_repo: LeagueRosterRepository,
         league_config_repo: LeagueConfigRepository,
         public_repo: PublicRepository,
         owned_player_repo: LeagueOwnedPlayerRepository,
-        player_score_repo: LeaguePlayerScoreRepository,
+        player_score_repo: PlayerLeagueSeasonScoreRepository,
         transaction_repo: LeagueTransactionRepository,
         league_week_repo: LeagueWeekRepository,
         archive_league_repo: UserArchiveLeagueRepository,
+        publisher: Publisher,
+        matchup_repo: LeagueWeekMatchupRepository,
     ):
         self.league_repo = league_repo
         self.user_league_repo = user_league_repo
@@ -85,6 +90,8 @@ class RenewLeagueCommandExecutor(BaseCommandExecutor[RenewLeagueCommand, RenewLe
         self.transaction_repo = transaction_repo
         self.league_week_repo = league_week_repo
         self.archive_league_repo = archive_league_repo
+        self.publisher = publisher
+        self.matchup_repo = matchup_repo
 
     def on_execute(self, command: RenewLeagueCommand) -> RenewLeagueResult:
         league = self.league_repo.get(command.league_id)
@@ -115,6 +122,8 @@ class RenewLeagueCommandExecutor(BaseCommandExecutor[RenewLeagueCommand, RenewLe
             self.transaction_repo.delete(league.id, transaction.id)
 
         for week in self.league_week_repo.get_all(league.id):
+            for matchup in self.matchup_repo.get_all(league.id, week.id):
+                self.matchup_repo.delete(league.id, week.id, matchup.id)
             self.league_week_repo.delete(league.id, week.id)
 
         for roster in self.league_roster_repo.get_all(league.id):
@@ -126,5 +135,7 @@ class RenewLeagueCommandExecutor(BaseCommandExecutor[RenewLeagueCommand, RenewLe
         # save the league and remove the archive link last, in a transaction, in case something goes wrong.  Then the user can try again.
         self.league_repo.update(league)
         self.archive_league_repo.delete(league.commissioner_id, league.id)
+
+        self.publisher.publish(league, LEAGUE_RENEWED_TOPIC)
 
         return RenewLeagueResult(command=command, league=league)

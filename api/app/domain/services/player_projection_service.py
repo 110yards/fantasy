@@ -10,14 +10,14 @@ from api.app.domain.entities.player import STATUS_ACTIVE, Player, PlayerLeagueSe
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
 
 from fastapi.param_functions import Depends
-from api.app.domain.repositories.league_player_score_repository import LeaguePlayerScoreRepository, create_league_player_score_repository
+from api.app.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository, create_player_league_season_score_repository
 from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
 
 
 def create_player_projection_service(
     state_repo: StateRepository = Depends(create_state_repository),
     player_repo: PlayerRepository = Depends(create_player_repository),
-    player_score_repo: LeaguePlayerScoreRepository = Depends(create_league_player_score_repository),
+    player_score_repo: PlayerLeagueSeasonScoreRepository = Depends(create_player_league_season_score_repository),
     public_repo: PublicRepository = Depends(create_public_repository),
 ):
     return PlayerProjectionService(state_repo, player_repo, player_score_repo, public_repo)
@@ -28,7 +28,7 @@ class PlayerProjectionService:
         self,
         state_repo: StateRepository,
         player_repo: PlayerRepository,
-        player_score_repo: LeaguePlayerScoreRepository,
+        player_score_repo: PlayerLeagueSeasonScoreRepository,
         public_repo: PublicRepository,
     ):
         self.state_repo = state_repo

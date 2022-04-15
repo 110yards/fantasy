@@ -2,7 +2,6 @@ fastapi==0.68.2 # Fix for https://github.com/tiangolo/fastapi/issues/4025
 firebase_admin==5.1.0
 google-cloud-logging==2.7.0
 google-cloud-pubsub==2.9.0
-httpx==0.22.0
 python-dotenv==0.19.2
 pytz==2021.3
 requests==2.26.0

@@ -1,7 +1,7 @@
 
 from typing import Dict, List
 from api.app.cfl.cfl_game_proxy import CflGameProxy, create_cfl_game_proxy
-from api.app.domain.repositories.league_player_score_repository import LeaguePlayerScoreRepository, create_league_player_score_repository
+from api.app.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository, create_player_league_season_score_repository
 from api.app.domain.entities.roster import Roster
 from api.app.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository, create_league_week_matchup_repository
 from api.app.domain.enums.draft_state import DraftState
@@ -12,7 +12,7 @@ from api.app.domain.repositories.league_repository import LeagueRepository, crea
 def create_issue_118_migration(
     league_repo=Depends(create_league_repository),
     matchup_repo: LeagueWeekMatchupRepository = Depends(create_league_week_matchup_repository),
-    player_score_repo: LeaguePlayerScoreRepository = Depends(create_league_player_score_repository),
+    player_score_repo: PlayerLeagueSeasonScoreRepository = Depends(create_player_league_season_score_repository),
     cfl_game_proxy: CflGameProxy = Depends(create_cfl_game_proxy),
 ):
     return Issue118Migration(league_repo, matchup_repo, player_score_repo, cfl_game_proxy)
@@ -25,7 +25,7 @@ class Issue118Migration:
         self,
         league_repo: LeagueRepository,
         matchup_repo: LeagueWeekMatchupRepository,
-        player_score_repo: LeaguePlayerScoreRepository,
+        player_score_repo: PlayerLeagueSeasonScoreRepository,
         cfl_game_proxy: CflGameProxy,
     ):
         self.league_repo = league_repo

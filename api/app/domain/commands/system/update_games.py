@@ -184,7 +184,6 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
         Logger.debug(f"Saving changes ({timer() - start})")
         transaction = self.game_repo.firestore.create_transaction()
         update_games(transaction, game_updates, player_updates)
-        # payloads = self.publish_changed_players(player_updates)
 
         if roster_added:
             Logger.debug(f"Sending UPDATE_PLAYERS event ({timer() - start})")
@@ -194,7 +193,6 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
         return UpdateGamesResult(
             command=command,
             changed_games=[game_updates[game_id] for game_id in game_updates],
-            # changed_players=payloads
         )
 
     def get_current_games(self, season: int, week: int, sim_state: Optional[SimState]) -> Dict[str, Game]:
@@ -226,7 +224,7 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
 
             games[game_id] = from_cfl(game, count_away_players, count_home_players, sim_state)
             if len(game_ids) > 20:
-                time.sleep(2.5)  # sleep 1 second to avoid rate limiting from the API
+                time.sleep(2.5)  # sleep to avoid rate limiting from the API
 
         return games
 

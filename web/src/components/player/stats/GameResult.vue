@@ -20,7 +20,6 @@ export default {
 
   computed: {
     isHome() {
-      // this is going to be a problem after someone gets traded or released
       return this.game.teams.home.id == this.playerTeam.id
     },
     scoreFor() {
@@ -51,7 +50,6 @@ export default {
 
     opponent() {
       let game = this.game
-      // this is going to be a problem after someone gets traded or released
       let isHome = game.teams.home.id == this.playerTeam.id
       let opponent = isHome ? game.teams.away : game.teams.home
 

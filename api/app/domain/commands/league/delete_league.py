@@ -1,7 +1,7 @@
 from api.app.domain.repositories.league_week_repository import LeagueWeekRepository
 from api.app.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository
 from api.app.domain.repositories.league_transaction_repository import LeagueTransactionRepository
-from api.app.domain.repositories.league_player_score_repository import LeaguePlayerScoreRepository
+from api.app.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
 from api.app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
@@ -52,7 +52,7 @@ class DeleteLeagueCommandExecutor(BaseCommandExecutor[DeleteLeagueCommand, Delet
         league_repo: LeagueRepository,
         user_league_repo: UserLeagueRepository,
         league_config_repo: LeagueConfigRepository,
-        league_player_score_repo: LeaguePlayerScoreRepository,
+        league_player_score_repo: PlayerLeagueSeasonScoreRepository,
         league_roster_repo: LeagueRosterRepository,
         league_transaction_repo: LeagueTransactionRepository,
         league_week_matchup_repo: LeagueWeekMatchupRepository,

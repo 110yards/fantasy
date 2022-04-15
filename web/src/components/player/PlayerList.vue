@@ -85,7 +85,6 @@
           </template>
 
           <template v-slot:[`item.points`]="{ item }">
-            <!-- {{ formatScore(item.points) }} -->
             <score :score="item.points" />
           </template>
 
@@ -218,7 +217,6 @@ export default {
     playerData() {
       let players = []
 
-      // TODO: sort by rank?
       for (let player of this.players) {
         let playerScore = this.getPlayerScore(player)
         let playerSeasonStats = this.getPlayerStats(player)
@@ -232,7 +230,6 @@ export default {
         player.games_played = playerScore != null ? playerScore.games_played : 0
 
         if (playerSeasonStats) {
-          // Object.assign(player, playerSeasonStats.stats)
           player.season_stats = playerSeasonStats.stats
         }
 

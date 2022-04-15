@@ -15,7 +15,6 @@ from api.app.routers import (
     migration_router,
     projection_router,
     roster_router,
-    # score_router,
     system_router,
     user_router,
     dev_router,

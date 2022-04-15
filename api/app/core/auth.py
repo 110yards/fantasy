@@ -137,7 +137,6 @@ def require_role(roles: Union[str, List[Role]], **kwargs):
             if not current_user_id:
                 abort_unauthorized()
 
-            # user_roles_repo = create_user_roles_repository()
             user_repo = create_user_repository()
 
             roles_to_check = roles
@@ -145,7 +144,6 @@ def require_role(roles: Union[str, List[Role]], **kwargs):
                 roles_to_check = [roles]
 
             allowed = False
-            # user_roles = user_roles_repo.get(current_user_id)
             user = user_repo.get(current_user_id)
 
             if not user:
