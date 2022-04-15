@@ -1,10 +1,35 @@
 <template>
-  <v-row>
-    <v-alert type="info">
-      Quarterback, running back and kicker slots are capped at 1 maximum for gameplay reasons.
-    </v-alert>
+  <v-row v-if="leaguePositions && rosterPositions">
     <v-col cols="12">
       <v-form ref="form" @submit.prevent="submit()">
+        <app-form-label>Allow Quarterbacks on bench?</app-form-label>
+        <v-layout align-center class="mb-8">
+          <v-simple-checkbox class="form-check-input" :ripple="false" v-model="leaguePositions.allow_bench_qb" />
+          <span>Yes</span>
+        </v-layout>
+
+        <app-form-label>Allow Runningbacks on bench?</app-form-label>
+        <v-layout align-center class="mb-8">
+          <v-simple-checkbox class="form-check-input" :ripple="false" v-model="leaguePositions.allow_bench_rb" />
+          <span>Yes</span>
+        </v-layout>
+
+        <app-form-label>Allow Kickers on bench?</app-form-label>
+        <v-layout align-center class="mb-8">
+          <v-simple-checkbox class="form-check-input" :ripple="false" v-model="leaguePositions.allow_bench_k" />
+          <span>Yes</span>
+        </v-layout>
+
+        <v-alert type="warning" v-if="notLimitingRarePositions">
+          Allowing limited position players (QB, RB or K) on bench may allow teams to stockpile and affect league
+          balance.
+        </v-alert>
+
+        <v-alert type="info" v-else>
+          Quarterback, running back and kicker slots are capped at 1 per roster unless they are in a Bye or IR reserve
+          slot.
+        </v-alert>
+
         <v-simple-table>
           <template v-slot:default>
             <thead>
@@ -68,6 +93,7 @@ import AppPrimaryButton from "../buttons/AppPrimaryButton.vue"
 import AppTextField from "../inputs/AppTextField.vue"
 import AppNumberField from "../inputs/AppNumberField.vue"
 import AppFormLabel from "../inputs/AppFormLabel.vue"
+import AppCheckBox from "../inputs/AppCheckBox.vue"
 
 export default {
   name: "rosters",
@@ -78,11 +104,14 @@ export default {
     AppTextField,
     AppNumberField,
     AppFormLabel,
+    AppCheckBox,
   },
+
   props: {
     leagueId: String,
     leagueStarted: Boolean,
   },
+
   data() {
     return {
       leaguePositions: {},
@@ -90,10 +119,32 @@ export default {
       saved: false,
     }
   },
+
+  computed: {
+    notLimitingRarePositions() {
+      return (
+        this.leaguePositions &&
+        (this.leaguePositions.allow_bench_qb == true ||
+          this.leaguePositions.allow_bench_rb == true ||
+          this.leaguePositions.allow_bench_k == true)
+      )
+    },
+  },
+
   methods: {
     getMax(position) {
+      // Don't love this hard coding.
+      if (
+        (position.id == "qb" && this.leaguePositions.allow_bench_qb) ||
+        (position.id == "rb" && this.leaguePositions.allow_bench_rb) ||
+        (position.id == "k" && this.leaguePositions.allow_bench_k)
+      ) {
+        return ""
+      }
+
       return position.max ? position.max.toString() : ""
     },
+
     submit() {
       let valid = this.$refs.form.validate()
       if (!valid) return

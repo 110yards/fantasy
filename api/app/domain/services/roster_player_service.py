@@ -70,22 +70,26 @@ class RosterPlayerService:
         record_transaction: bool = False,
         waiver_bid: int = None
     ) -> Tuple[bool, Union[str, List[LeagueTransaction]]]:
+        config = self.league_config_repo.get_positions_config(league_id)
+        if not config:
+            return False, "League position config not found"
+
         position = target_position or self.find_position_for(player, roster)
 
         if not position:
             return False, "Unable to find position for player"
 
-        # TODO: check if limit enabled
-        if player.position == PositionType.qb and roster.count_qbs() == 1 and not self.dropping(PositionType.qb, target_position):
-            return False, "Rosters are limited to 1 quarterback"
+        if not config.allow_bench_qb:
+            if player.position == PositionType.qb and roster.count_qbs() == 1 and not self.dropping(PositionType.qb, target_position):
+                return False, "Rosters are limited to 1 quarterback"
 
-        # TODO: check if limit enabled
-        if player.position == PositionType.rb and roster.count_rbs() == 1 and not self.dropping(PositionType.rb, target_position):
-            return False, "Rosters are limited to 1 running back"
+        if not config.allow_bench_rb:
+            if player.position == PositionType.rb and roster.count_rbs() == 1 and not self.dropping(PositionType.rb, target_position):
+                return False, "Rosters are limited to 1 running back"
 
-        # TODO: check if limit enabled
-        if player.position == PositionType.k and roster.count_kickers() == 1 and not self.dropping(PositionType.k, target_position):
-            return False, "Rosters are limited to 1 kicker"
+        if not config.allow_bench_k:
+            if player.position == PositionType.k and roster.count_kickers() == 1 and not self.dropping(PositionType.k, target_position):
+                return False, "Rosters are limited to 1 kicker"
 
         league_transactions = self.assign_player_to_roster_position(
             league_id, roster, player, position, transaction, record_transaction=record_transaction, waiver_bid=waiver_bid)

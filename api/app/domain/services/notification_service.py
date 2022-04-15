@@ -1,5 +1,3 @@
-
-
 from fastapi.param_functions import Depends
 from api.app.domain.entities.league import League
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
@@ -37,8 +35,11 @@ class NotificationService:
         if league.enable_discord_notifications and league.notifications_transactions:
             self.__send_discord_message(league, message)
 
-    def send_waiver_results(self):
-        pass
+    def send_waiver_results(self, league: League, message: str):
 
-    def send_weekly_summary(self):
-        pass
+        if league.enable_discord_notifications and league.notifications_waivers:
+            self.__send_discord_message(league, message)
+
+    def send_weekly_summary(self, league: League, message: str):
+        if league.enable_discord_notifications and league.notifications_end_of_week:
+            self.__send_discord_message(league, message)

@@ -16,7 +16,7 @@ def run_check(name: str, target: Callable):
 
 
 def smoke_test(
-    state_repo: StateRepository = Depends(create_state_repository)
+    state_repo: StateRepository = Depends(create_state_repository),
 ) -> Tuple[List[str], List[str]]:
     checks = {
         "firebase:state": state_repo.get,

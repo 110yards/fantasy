@@ -38,6 +38,9 @@ def test_position_count_is_updated(position):
     d = {e: 1 for e in PositionType.all()}
     d[position] = 0
     d["league_id"] = mock_league.id
+    d["allow_bench_qb"] = False
+    d["allow_bench_rb"] = False
+    d["allow_bench_k"] = False
 
     command = UpdateLeaguePositionsCommand.parse_obj(d)
     command_executor = UpdateLeaguePositionsCommandExecutor(league_repo, league_config_repo)

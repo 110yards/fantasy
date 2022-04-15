@@ -60,6 +60,14 @@
               </v-btn></v-list-item-title
             >
           </v-list-item>
+
+          <v-list-item class="ml-4" v-if="hasNotes">
+            <v-list-item-title>
+              <v-btn class="nav-secondary" text small :to="{ name: 'league-notes', params: { leagueId: leagueId } }">
+                Notes
+              </v-btn>
+            </v-list-item-title>
+          </v-list-item>
         </v-list-group>
 
         <!-- my team-->
@@ -186,6 +194,7 @@ export default {
     isCommissioner: { required: true },
     hasLeague: { required: true },
     hasRoster: { required: true },
+    hasNotes: { required: true },
   },
 
   data() {

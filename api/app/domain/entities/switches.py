@@ -26,4 +26,4 @@ class Switches(BaseEntity):
     enable_twitter_login = False
     show_donation_link = True
     show_new_roster_ui_tip = False
-    enable_discord_integration = False
+    enable_discord_integration = True

@@ -113,7 +113,13 @@ export default {
       return this.$store.state.uid
     },
     randomSlogan() {
-      let slogans = ["Fantasy football, eh?", "Embrace the rouge", "Snow football is good football", "12 > 11"]
+      let slogans = [
+        "Fantasy football, eh?",
+        "Long live the rouge",
+        "Snow football is good football",
+        "12 > 11",
+        "3 > 4",
+      ]
       return slogans[Math.floor(Math.random() * slogans.length)]
     },
     weekNumber() {

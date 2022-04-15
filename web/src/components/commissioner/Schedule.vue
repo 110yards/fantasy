@@ -248,7 +248,7 @@ export default {
       handler(schedule) {
         if (schedule == null || schedule.length == 0) return
         this.form.playoffType = `${schedule.playoff_type}`
-        this.form.firstPlayoffWeek = `${schedule.first_playoff_week}`
+        this.form.firstPlayoffWeek = schedule.first_playoff_week ? `${schedule.first_playoff_week}` : ""
         this.form.enableLoserPlayoff = schedule.enable_loser_playoff
       },
     },

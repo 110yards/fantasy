@@ -17,6 +17,7 @@
         <v-btn class="caption" text v-if="isAuction" @click="setView('budgets')">Draft Budgets</v-btn>
         <v-btn class="caption" text @click="setView('rosters')">Roster options</v-btn>
         <v-btn class="caption" text @click="setView('schedule')">Schedule settings</v-btn>
+        <v-btn class="caption" text @click="setView('notes')">Notes</v-btn>
       </v-card-text>
 
       <v-card-text>
@@ -28,6 +29,7 @@
         <budgets v-if="view == 'budgets'" :league="league" :leagueStarted="leagueStarted" />
         <rosters v-if="view == 'rosters'" :leagueId="leagueId" :leagueStarted="leagueStarted" />
         <schedule v-if="view == 'schedule'" :leagueId="leagueId" :leagueStarted="leagueStarted" />
+        <league-notes v-if="view == 'notes'" :league="league" />
       </v-card-text>
     </v-card>
   </div>
@@ -35,15 +37,16 @@
 
 <script>
 import { firestore } from "../../modules/firebase"
-import LeagueOptions from "../../components/commissioner/LeagueOptions"
-import ManageTeams from "../../components/commissioner/ManageTeams"
-import Registration from "../../components/commissioner/Registration"
-import Rosters from "../../components/commissioner/Rosters"
-import Schedule from "../../components/commissioner/Schedule"
-import DraftOrder from "../../components/commissioner/DraftOrder"
+import LeagueOptions from "../../components/commissioner/LeagueOptions.vue"
+import ManageTeams from "../../components/commissioner/ManageTeams.vue"
+import Registration from "../../components/commissioner/Registration.vue"
+import Rosters from "../../components/commissioner/Rosters.vue"
+import Schedule from "../../components/commissioner/Schedule.vue"
+import DraftOrder from "../../components/commissioner/DraftOrder.vue"
 import { draftType, draftState } from "../../api/110yards/constants"
 import Budgets from "../../components/commissioner/Budgets.vue"
 import ScoringSettings from "../../components/commissioner/ScoringSettings.vue"
+import LeagueNotes from "../../components/commissioner/LeagueNotes.vue"
 
 export default {
   name: "commissioner-index",
@@ -56,6 +59,7 @@ export default {
     DraftOrder,
     Budgets,
     ScoringSettings,
+    LeagueNotes,
   },
   props: ["leagueId"],
   data() {

@@ -20,6 +20,19 @@ class PlayoffType(int, Enum):
     TOP_4 = 4
     TOP_6 = 6
 
+    @property
+    def weeks(self) -> int:
+        if self == PlayoffType.TOP_2:
+            return 1
+
+        if self == PlayoffType.TOP_3 or self == PlayoffType.TOP_4:
+            return 2
+
+        if self == PlayoffType.TOP_6:
+            return 3
+
+        raise ValueError()
+
 
 def get_playoff_type_config():
     return [

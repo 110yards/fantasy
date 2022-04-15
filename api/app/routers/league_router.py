@@ -21,6 +21,7 @@ from api.app.domain.commands.league.remove_roster import (
     RemoveRosterCommand, RemoveRosterCommandExecutor,
     create_remove_roster_command_executor)
 from api.app.domain.commands.league.renew_league import RenewLeagueCommand, RenewLeagueCommandExecutor, create_renew_league_command_executor
+from api.app.domain.commands.league.set_notes import SetNotesCommand, SetNotesCommandExecutor, create_set_notes_command_executor
 from api.app.domain.commands.league.update_draft_order import (
     UpdateDraftOrderCommand, UpdateDraftOrderCommandExecutor,
     create_update_draft_order_command_executor)
@@ -198,3 +199,13 @@ async def renew(
 ):
     command = RenewLeagueCommand(league_id=league_id)
     return command_executor.execute(command)
+
+
+@router.put("/{league_id}/notes")
+async def set_notes(
+    league_id: str,
+    command: SetNotesCommand,
+    command_executor: SetNotesCommandExecutor = Depends(create_set_notes_command_executor),
+):
+    assert league_id == command.league_id
+    command_executor.execute(command)

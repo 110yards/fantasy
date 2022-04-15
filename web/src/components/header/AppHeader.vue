@@ -11,6 +11,7 @@
       :leagueId="leagueId"
       :userId="userId"
       :username="username"
+      :hasNotes="hasNotes"
     />
 
     <mobile-app-bar
@@ -24,6 +25,7 @@
       :leagueId="leagueId"
       :userId="userId"
       :username="username"
+      :hasNotes="hasNotes"
     />
   </div>
 </template>
@@ -94,6 +96,12 @@ export default {
     },
     hasRoster() {
       return this.leagueId && this.userId
+    },
+    hasNotes() {
+      return this.league && this.league.notes
+    },
+    league() {
+      return this.$root.currentLeague
     },
   },
 }

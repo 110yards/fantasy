@@ -94,10 +94,14 @@ class RenewLeagueCommandExecutor(BaseCommandExecutor[RenewLeagueCommand, RenewLe
         self.matchup_repo = matchup_repo
 
     def on_execute(self, command: RenewLeagueCommand) -> RenewLeagueResult:
+
         league = self.league_repo.get(command.league_id)
 
         if not league:
-            return RenewLeagueResult(error="League not found")
+            return RenewLeagueResult(command=command, error="League not found")
+
+        if not league.commissioner_id == command.request_user_id:
+            return RenewLeagueResult(command=command, error="You are not the commissioner")
 
         state = self.public_repo.get_state()
 

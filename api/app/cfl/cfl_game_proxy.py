@@ -19,3 +19,6 @@ class CflGameProxy():
 
     def get_game(self, season: int, game_id: int) -> dict:
         return self.proxy.get(f"games/{season}/game/{game_id}?include=rosters,boxscore")
+
+    def health_check(self) -> dict:
+        return self.proxy.get("games/2022/game/6296")  # grey cup 2022
