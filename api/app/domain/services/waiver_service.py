@@ -1,8 +1,9 @@
 
 
+from api.app.domain.entities.league_transaction import LeagueTransaction
 from api.app.domain.entities.waiver_bid import WaiverBid, WaiverBidResult
 from api.app.domain.entities.roster import Roster
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 from google.cloud.firestore_v1.transaction import Transaction
 from fastapi import Depends
@@ -116,7 +117,7 @@ class WaiverService:
         if winning_bid.drop_player:
             dropped_players_for_roster[winning_bid.roster_id].append(winning_bid.drop_player.id)
 
-    def apply_winning_bid(self, league_id: str, bid: WaiverBid, roster: Roster, transaction: Transaction):
+    def apply_winning_bid(self, league_id: str, bid: WaiverBid, roster: Roster, transaction: Transaction) -> Optional[List[LeagueTransaction]]:
         if bid.drop_player:
             target_position = roster.find_player_position(bid.drop_player.id)
         else:
@@ -125,11 +126,12 @@ class WaiverService:
         if not target_position:
             bid.result = WaiverBidResult.FailedNoRosterSpace
         else:
-            success, _ = self.roster_player_service.assign_player_to_roster(league_id, roster, bid.player, transaction,
-                                                                            target_position=target_position, record_transaction=True,
-                                                                            waiver_bid=bid.amount)
+            success, trx_or_error = self.roster_player_service.assign_player_to_roster(league_id, roster, bid.player, transaction,
+                                                                                       target_position=target_position, record_transaction=True,
+                                                                                       waiver_bid=bid.amount)
 
             if success:
                 bid.result = WaiverBidResult.Success
+                return trx_or_error
             else:
                 bid.result = WaiverBidResult.FailedNoRosterSpace

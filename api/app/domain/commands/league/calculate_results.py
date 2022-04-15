@@ -1,7 +1,9 @@
 
 from api.app.core.publisher import Publisher, create_publisher
 from api.app.domain.commands.league.calculate_playoffs import CalculatePlayoffsCommand
+from api.app.domain.entities.league import League
 from api.app.domain.enums.league_command_type import LeagueCommandType
+from api.app.domain.enums.matchup_type import MatchupType
 from api.app.domain.repositories.game_repository import GameRepository, create_game_repository
 from api.app.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository, create_player_league_season_score_repository
 from api.app.domain.enums.draft_state import DraftState
@@ -22,6 +24,7 @@ from api.app.core.base_command_executor import BaseCommand, BaseCommandResult, B
 from firebase_admin import firestore
 
 from api.app.domain.services.league_command_push_data import LeagueCommandPushData
+from api.app.domain.services.notification_service import NotificationService, create_notification_service
 from api.app.domain.topics import LEAGUE_COMMAND_TOPIC
 
 
@@ -35,7 +38,7 @@ def create_calculate_results_command_executor(
     player_score_repo: PlayerLeagueSeasonScoreRepository = Depends(create_player_league_season_score_repository),
     game_repo: GameRepository = Depends(create_game_repository),
     publisher: Publisher = Depends(create_publisher),
-
+    notification_service: NotificationService = Depends(create_notification_service),
 ):
     return CalculateResultsCommandExecutor(
         state_repo=state_repo,
@@ -47,6 +50,7 @@ def create_calculate_results_command_executor(
         player_score_repo=player_score_repo,
         game_repo=game_repo,
         publisher=publisher,
+        notification_service=notification_service,
     )
 
 
@@ -61,6 +65,8 @@ class CalculateResultsCommand(BaseCommand):
 class CalculateResultsResult(BaseCommandResult[CalculateResultsCommand]):
     next_week_is_playoffs: bool = False
     league_season_complete: bool = False
+    results_message: Optional[str]
+    league: Optional[League]
 
 
 class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsCommand, CalculateResultsResult]):
@@ -75,6 +81,7 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
         player_score_repo: PlayerLeagueSeasonScoreRepository,
         game_repo: GameRepository,
         publisher: Publisher,
+        notification_service: NotificationService,
 
     ):
         self.state_repo = state_repo
@@ -86,10 +93,17 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
         self.player_score_repo = player_score_repo
         self.game_repo = game_repo
         self.publisher = publisher
+        self.notification_service = notification_service
 
     def on_execute(self, command: CalculateResultsCommand) -> CalculateResultsResult:
 
         state = self.state_repo.get()
+
+        league_config = self.league_config_repo.get_schedule_config(command.league_id)
+        last_playoff_week = league_config.first_playoff_week + league_config.playoff_type.weeks
+
+        if state.current_week > last_playoff_week:
+            return
 
         #  This happens first, to block users from adding players in the event that the next part fails.
         @firestore.transactional
@@ -116,7 +130,8 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
         self.league_scoring = self.league_config_repo.get_scoring_config(command.league_id)
 
         @firestore.transactional
-        def calculate(transaction):
+        def calculate(transaction) -> CalculateResultsResult:
+            results_message = f"Week {command.week_number} summary\n\n"
             league = self.league_repo.get(command.league_id, transaction)
 
             rosters = self.league_roster_repo.get_all(command.league_id, transaction)
@@ -143,6 +158,21 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
                     matchup.away.this_week_points_for = matchup.away.calculate_score()
                     matchup.away.this_week_bench_points_for = matchup.away.calculate_bench_score()
                     matchup.away_score = matchup.away.this_week_points_for
+
+                if matchup.home and matchup.away:
+                    home_won = matchup.home_score > matchup.away_score
+                    tied = matchup.away_score == matchup.home_score
+
+                    if tied and matchup.type == MatchupType.REGULAR:
+                        results_message += f"{matchup.away.name} tied {matchup.home.name} at {matchup.away_score}\n"
+                    elif home_won or tied and matchup.type != MatchupType.REGULAR:
+                        results_message += f"{matchup.home.name} defeated {matchup.away.name}, {matchup.home_score:.2f} - {matchup.away_score:.2f}\n"
+                        if matchup.type == MatchupType.CHAMPIONSHIP:
+                            results_message += f"\n{matchup.home.name} is the {state.current_season} league champion! 🏆"
+                    else:
+                        results_message += f"{matchup.away.name} defeated {matchup.home.name}, {matchup.away_score:.2f} - {matchup.home_score:.2f}\n"
+                        if matchup.type == MatchupType.CHAMPIONSHIP:
+                            results_message += f"\n{matchup.away.name} is the {state.current_season} league champion! 🏆"
 
                 schedule_matchup.away_score = matchup.away_score
                 schedule_matchup.home_score = matchup.home_score
@@ -204,10 +234,19 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
 
             self.league_config_repo.set_schedule_config(command.league_id, schedule, transaction)
 
-            return CalculateResultsResult(command=command, next_week_is_playoffs=next_week_playoffs, league_season_complete=league_season_complete)
+            return CalculateResultsResult(
+                command=command,
+                next_week_is_playoffs=next_week_playoffs,
+                league_season_complete=league_season_complete,
+                results_message=results_message,
+                league=league,
+            )
 
         transaction = self.league_roster_repo.firestore.create_transaction()
         result = calculate(transaction)
+
+        if result.success and not command.past_week:
+            self.notification_service.send_weekly_summary(result.league, result.results_message)
 
         if result.success and result.next_week_is_playoffs:
             command = CalculatePlayoffsCommand(league_id=command.league_id, week_number=command.week_number + 1)
