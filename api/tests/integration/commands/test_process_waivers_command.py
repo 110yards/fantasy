@@ -42,6 +42,8 @@ def get_target(rosters: List[Roster]) -> ProcessWaiversCommandExecutor:
     league_week_repo = LeagueWeekRepository(MockFirestoreProxy())
     league_config_repo = LeagueConfigRepository(MockFirestoreProxy())
 
+    league_config_repo.set_positions_config(league.id, LeaguePositionsConfig())
+
     roster_player_service = RosterPlayerService(league_owned_player_repo, league_roster_repo, transaction_repo, league_config_repo)
     waiver_service = WaiverService(roster_player_service)
 
