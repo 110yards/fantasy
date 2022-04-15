@@ -1,5 +1,4 @@
 import Home from "../../views/Home.vue"
-import FAQ from "../../views/FAQ.vue"
 import DefaultError from "../../views/error/Default.vue"
 import NotAuthorized from "../../views/error/NotAuthorized.vue"
 import Admin from "../../views/admin/Admin.vue"
@@ -30,12 +29,6 @@ export const routes = [
     path: "/",
     name: "home",
     component: Home,
-    meta: { anonymous: true },
-  },
-  {
-    path: "/faq",
-    name: "faq",
-    component: FAQ,
     meta: { anonymous: true },
   },
   {
