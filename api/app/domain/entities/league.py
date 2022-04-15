@@ -41,6 +41,8 @@ class League(BaseEntity):
     enable_k_limit: bool = False
     enable_rb_limit: bool = False
     season: int = 2021
+    has_completed_season: bool = False
+    renewed: Optional[datetime] = None
 
     @property
     def is_active(self) -> bool:

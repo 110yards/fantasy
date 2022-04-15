@@ -102,7 +102,7 @@ class StartNextSeasonService:
 
         leagues = self.league_repo.get_all()
         for league in leagues:
-            if league.is_active:
+            if league.is_active or league.has_completed_season:
                 self.archive_league(league)
             else:
                 self.cleanup_league(league)

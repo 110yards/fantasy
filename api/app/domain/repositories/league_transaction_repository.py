@@ -1,3 +1,4 @@
+from typing import List
 from google.cloud.firestore_v1.transaction import Transaction
 from api.app.domain.entities.league_transaction import LeagueTransaction
 from api.app.core.firestore_proxy import FirestoreProxy
@@ -19,3 +20,9 @@ class LeagueTransactionRepository:
 
     def create(self, league_id: str, league_transaction: LeagueTransaction, transaction: Transaction) -> LeagueTransaction:
         return self.firestore.create(LeagueTransactionRepository.path(league_id), league_transaction, transaction)
+
+    def get_all(self, league_id: str, transaction: Transaction = None) -> List[LeagueTransaction]:
+        return self.firestore.get_all(LeagueTransactionRepository.path(league_id), transaction)
+
+    def delete(self, league_id: str, transaction_id: str, transaction: Transaction = None):
+        return self.firestore.delete(LeagueTransactionRepository.path(league_id), transaction_id, transaction)

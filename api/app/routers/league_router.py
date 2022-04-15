@@ -20,6 +20,7 @@ from api.app.domain.commands.league.open_league_registration import (
 from api.app.domain.commands.league.remove_roster import (
     RemoveRosterCommand, RemoveRosterCommandExecutor,
     create_remove_roster_command_executor)
+from api.app.domain.commands.league.renew_league import RenewLeagueCommand, RenewLeagueCommandExecutor, create_renew_league_command_executor
 from api.app.domain.commands.league.update_draft_order import (
     UpdateDraftOrderCommand, UpdateDraftOrderCommandExecutor,
     create_update_draft_order_command_executor)
@@ -188,3 +189,12 @@ async def get_player_details(
     service: PlayerDetailsService = Depends(create_player_details_service),
 ):
     return service.get_player_details(season, league_id, player_id)
+
+
+@router.post("/{league_id}/renew")
+async def renew(
+    league_id: str,
+    command_executor: RenewLeagueCommandExecutor = Depends(create_renew_league_command_executor),
+):
+    command = RenewLeagueCommand(league_id=league_id)
+    return command_executor.execute(command)

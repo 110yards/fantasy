@@ -34,6 +34,26 @@ class Roster(BaseEntity):
     rank: int = 1
     name_changes_banned: bool = False
 
+    def reset(self):
+        self.current_matchup = None
+        self.positions = {}
+        self.record = "0-0"
+        self.points_for = 0.0
+        self.points_against = 0.0
+        self.transaction_count = 0
+        self.last_week_result = "-"
+        self.waiver_budget = 100
+        self.active_player_count = 0
+        self.this_week_points_for = 0.0
+        self.this_week_bench_points_for = 0.0
+        self.waiver_bids = []
+        self.processed_waiver_bids = []
+        self.wins = 0
+        self.losses = 0
+        self.ties = 0
+        self.wl_points = 0
+        self.rank = 1
+
     def find_player_position(self, player_id: str) -> Union[LeaguePosition, None]:
         for position_id in self.positions:
             position = self.positions[position_id]

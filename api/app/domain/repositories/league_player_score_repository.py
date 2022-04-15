@@ -30,3 +30,6 @@ class LeaguePlayerScoreRepository:
 
     def where(self, league_id, queries: Union[List[Query], Query], transaction: Transaction = None) -> List[PlayerLeagueSeasonScore]:
         return self.firestore.where(LeaguePlayerScoreRepository.path(league_id), queries, transaction)
+
+    def delete(self, league_id: str, player_id: str, transaction: Transaction = None):
+        return self.firestore.delete(LeaguePlayerScoreRepository.path(league_id), player_id, transaction)
