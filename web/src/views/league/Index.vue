@@ -83,7 +83,9 @@ export default {
     isPreviousSeason() {
       if (!this.league) return false
 
-      return this.league.season != this.currentSeason
+      let leagueSeason = this.league.season || 2021 // in the future, all leagues will have this set.
+
+      return leagueSeason != this.currentSeason
     },
 
     currentSeason() {
