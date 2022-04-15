@@ -96,8 +96,3 @@ class PlayerDetailsService:
             details.game_log.append(log)
 
         return details
-
-        # return PlayerDetails(
-        #     player=player,
-
-        # )
