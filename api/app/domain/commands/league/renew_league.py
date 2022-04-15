@@ -19,7 +19,6 @@ from api.app.domain.entities.league import (DraftState, League)
 from api.app.domain.repositories.league_repository import (
     LeagueRepository, create_league_repository)
 from fastapi.param_functions import Depends
-from api.app.domain.repositories.user_repository import UserRepository, create_user_repository
 from api.app.domain.topics import LEAGUE_RENEWED_TOPIC
 
 
