@@ -5,12 +5,14 @@
         <h4 class="brand">{{ league.name }}</h4>
         <start-draft :league="league" />
 
+        <app-primary-button v-if="canRenewLeague">Start {{ currentSeason }} Season</app-primary-button>
+
         <schedule v-if="scheduleGenerated && !isOffseason" :leagueId="leagueId" />
 
         <standings class="mt-5" v-if="!isOffseason" :league="league" />
         <transactions class="mt-5" v-if="!isOffseason" :leagueId="leagueId" />
 
-        <season-summary :leagueId="leagueId" v-if="isOffseason" />
+        <season-summary :leagueId="leagueId" v-if="isOffseason" :season="league.season" />
 
         <!-- @*@Html.Partial("CflNews", Model.News)*@ -->
       </v-col>
@@ -41,6 +43,7 @@ import Standings from "../../components/league/Standings.vue"
 import Transactions from "../../components/league/Transactions.vue"
 import Scoreboard from "../../components/common/Scoreboard.vue"
 import SeasonSummary from "../../components/league/SeasonSummary.vue"
+import AppPrimaryButton from "../../components/buttons/AppPrimaryButton.vue"
 
 export default {
   name: "league-index",
@@ -53,6 +56,7 @@ export default {
     Transactions,
     Scoreboard,
     SeasonSummary,
+    AppPrimaryButton,
   },
   data() {
     return {
@@ -73,7 +77,25 @@ export default {
     },
 
     isOffseason() {
-      return this.$root.state && this.$root.state.is_offseason
+      return (this.$root.state && this.$root.state.is_offseason) || this.isPreviousSeason
+    },
+
+    isPreviousSeason() {
+      if (!this.league) return false
+
+      return this.league.season != this.currentSeason
+    },
+
+    currentSeason() {
+      return this.$root.state.current_season
+    },
+
+    currentUserId() {
+      return this.$store.state.uid
+    },
+
+    canRenewLeague() {
+      return this.isPreviousSeason && this.league.commissioner_id == this.currentUserId
     },
   },
 

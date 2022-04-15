@@ -4,6 +4,7 @@ from api.app.domain.entities.user_league_preview import UserLeaguePreview
 from api.app.domain.commands.league.join_league import create_roster
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
 from api.app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
 from datetime import datetime
 from typing import Optional
@@ -30,6 +31,7 @@ def create_league_command_executor(
     league_roster_repo: LeagueRosterRepository = Depends(create_league_roster_repository),
     league_config_repo: LeagueConfigRepository = Depends(create_league_config_repository),
     publisher: Publisher = Depends(create_publisher),
+    public_repo: PublicRepository = Depends(create_public_repository),
 ):
     return CreateLeagueCommandExecutor(
         user_repo,
@@ -37,7 +39,9 @@ def create_league_command_executor(
         user_league_repo,
         league_roster_repo,
         league_config_repo,
-        publisher)
+        publisher,
+        public_repo=public_repo,
+    )
 
 
 @annotate_args
@@ -55,25 +59,29 @@ class CreateLeagueResult(BaseCommandResult):
 
 class CreateLeagueCommandExecutor(BaseCommandExecutor[CreateLeagueCommand, CreateLeagueResult]):
 
-    def __init__(self,
-                 user_repo: UserRepository,
-                 league_repo: LeagueRepository,
-                 user_league_repo: UserLeagueRepository,
-                 league_roster_repo: LeagueRosterRepository,
-                 league_config_repo: LeagueConfigRepository,
-                 publisher: Publisher,
-                 ):
+    def __init__(
+        self,
+        user_repo: UserRepository,
+        league_repo: LeagueRepository,
+        user_league_repo: UserLeagueRepository,
+        league_roster_repo: LeagueRosterRepository,
+        league_config_repo: LeagueConfigRepository,
+        publisher: Publisher,
+        public_repo: PublicRepository,
+    ):
         self.user_repo = user_repo
         self.league_repo = league_repo
         self.user_league_repo = user_league_repo
         self.league_roster_repo = league_roster_repo
         self.league_config_repo = league_config_repo
         self.publisher = publisher
+        self.public_repo = public_repo
 
     def on_execute(self, command: CreateLeagueCommand) -> CreateLeagueResult:
         commissioner = self.user_repo.get(command.commissioner_id)
 
         positions_config = LeaguePositionsConfig()
+        state = self.public_repo.get_state()
 
         draft_order = [
             DraftOrder(roster_id=commissioner.id)
@@ -87,7 +95,8 @@ class CreateLeagueCommandExecutor(BaseCommandExecutor[CreateLeagueCommand, Creat
             draft_type=DraftType.SNAKE,
             private=command.private,
             positions=positions_config.create_positions(),
-            draft_order=draft_order
+            draft_order=draft_order,
+            season=state.current_season,
         )
 
         roster = create_roster(commissioner.id, commissioner.display_name)

@@ -34,6 +34,10 @@ service cloud.firestore {
       match /league/{leagueId} {
       	allow read: if isForUserOrAdmin(uid)
       }
+      
+      match /archive_league/{leagueId} {
+      	allow read: if isForUserOrAdmin(uid)
+      }
     }
 
 		match /public/{document=**} {

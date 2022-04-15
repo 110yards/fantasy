@@ -139,6 +139,7 @@ async def update_schedule(
 
 @router.post("/start_next_season")
 async def start_next_season(
+    season: Optional[int] = None,
     service: StartNextSeasonService = Depends(create_start_next_season_service),
 ):
-    return service.run_workflow()
+    return service.run_workflow(season)
