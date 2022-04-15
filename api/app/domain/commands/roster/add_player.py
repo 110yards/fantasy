@@ -4,7 +4,6 @@ from api.app.domain.entities.league_transaction import LeagueTransaction
 from api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from api.app.domain.entities.waiver_bid import WaiverBid
 from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
-from api.app.config.settings import Settings, get_settings
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
 from api.app.domain.services.notification_service import NotificationService, create_notification_service
 from api.app.domain.services.roster_player_service import RosterPlayerService, create_roster_player_service
@@ -19,7 +18,6 @@ from firebase_admin import firestore
 
 
 def create_add_player_command_executor(
-    settings: Settings = Depends(get_settings),
     league_roster_repo: LeagueRosterRepository = Depends(create_league_roster_repository),
     league_transaction_repo: LeagueTransactionRepository = Depends(create_league_transaction_repository),
     league_owned_players_repo: LeagueOwnedPlayerRepository = Depends(create_league_owned_player_repository),
@@ -30,7 +28,6 @@ def create_add_player_command_executor(
     notification_service: NotificationService = Depends(create_notification_service),
 ):
     return AddPlayerCommandExecutor(
-        season=settings.current_season,
         league_roster_repo=league_roster_repo,
         league_transaction_repo=league_transaction_repo,
         league_owned_players_repo=league_owned_players_repo,
@@ -61,7 +58,6 @@ class AddPlayerCommandExecutor(BaseCommandExecutor[AddPlayerCommand, AddPlayerRe
 
     def __init__(
         self,
-        season: int,
         league_roster_repo: LeagueRosterRepository,
         league_transaction_repo: LeagueTransactionRepository,
         league_owned_players_repo: LeagueOwnedPlayerRepository,
@@ -71,7 +67,6 @@ class AddPlayerCommandExecutor(BaseCommandExecutor[AddPlayerCommand, AddPlayerRe
         league_repo: LeagueRepository,
         notification_service: NotificationService,
     ):
-        self.season = season
         self.league_roster_repo = league_roster_repo
         self.league_transaction_repo = league_transaction_repo
         self.league_owned_players_repo = league_owned_players_repo
@@ -101,7 +96,7 @@ class AddPlayerCommandExecutor(BaseCommandExecutor[AddPlayerCommand, AddPlayerRe
             if current_owner:
                 return AddPlayerResult(command=command, error="That player is already on a roster")
 
-            player = self.player_repo.get(self.season, command.player_id, transaction)
+            player = self.player_repo.get(state.current_season, command.player_id, transaction)
 
             if not player:
                 return AddPlayerResult(command=command, error="Player not found")

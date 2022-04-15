@@ -85,11 +85,11 @@
           </template>
 
           <template v-slot:[`item.points`]="{ item }">
-            {{ formatScore(item.points) }}
+            <score :score="item.points" />
           </template>
 
           <template v-slot:[`item.average`]="{ item }">
-            {{ formatScore(item.average) }}
+            <score :score="item.points" />
           </template>
 
           <template v-slot:[`item.position`]="{ item }">
@@ -134,6 +134,7 @@ import Locked from "../icons/Locked.vue"
 import { longDate } from "../../modules/formatter"
 import AddPlayer from "./AddPlayer.vue"
 import { formatScore } from "../../modules/formatter"
+import Score from "../Score.vue"
 
 export default {
   name: "player-list",
@@ -146,6 +147,7 @@ export default {
     AppDefaultButton,
     Locked,
     AddPlayer,
+    Score,
   },
   props: {
     leagueId: null,
@@ -196,6 +198,7 @@ export default {
       rosters: null,
       playerScores: [],
       playerToAdd: null,
+      seasonStats: [],
     }
   },
   computed: {
@@ -216,14 +219,19 @@ export default {
 
       for (let player of this.players) {
         let playerScore = this.getPlayerScore(player)
-
+        let playerSeasonStats = this.getPlayerStats(player)
         player.owner = this.getOwner(player.id)
         player.opponent = this.getNextOpponent(player)
 
+        player.score = playerScore
         player.rank = playerScore != null ? playerScore.rank : ""
-        player.points = playerScore != null && playerScore.season_score ? playerScore.season_score.total_score : 0
+        player.average = playerScore != null ? playerScore.average_score : 0
+        player.points = playerScore != null ? playerScore.total_score : 0
         player.games_played = playerScore != null ? playerScore.games_played : 0
-        player.average = playerScore != null ? playerScore.average : 0
+
+        if (playerSeasonStats) {
+          player.season_stats = playerSeasonStats.stats
+        }
 
         players.push(player)
       }
@@ -321,6 +329,8 @@ export default {
     },
 
     isLocked(player) {
+      if (this.isDraft) return false
+
       return this.$root.isLocked(player.team.abbreviation)
     },
 
@@ -354,6 +364,12 @@ export default {
 
     getPlayerScore(player) {
       let filterResults = this.playerScores.filter(p => p.id == player.id)
+
+      return filterResults && filterResults.length == 1 ? filterResults[0] : null
+    },
+
+    getPlayerStats(player) {
+      let filterResults = this.seasonStats.filter(p => p.player_id == player.id)
 
       return filterResults && filterResults.length == 1 ? filterResults[0] : null
     },
@@ -423,7 +439,7 @@ export default {
     },
 
     configureReferences() {
-      let path = `season/${this.$appConfig.season}/player`
+      let path = `season/${this.$root.currentSeason}/player`
       let playersRef = firestore.collection(path)
       this.$bind("players", playersRef)
 
@@ -444,9 +460,11 @@ export default {
       let scoresPath = `league/${this.leagueId}/player_score`
       let scoresRef = firestore.collection(scoresPath)
       this.$bind("playerScores", scoresRef)
-    },
 
-    combineData() {},
+      let seasonStatspath = `season/${this.$root.currentSeason}/player_season`
+      let seasonStatsRef = firestore.collection(seasonStatspath)
+      this.$bind("seasonStats", seasonStatsRef)
+    },
   },
   watch: {
     leagueId: {

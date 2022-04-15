@@ -2,6 +2,7 @@
 
 from api.app.domain.enums.position_type import PositionType
 from api.app.domain.entities.league_transaction import LeagueTransaction
+from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from api.app.domain.repositories.league_transaction_repository import LeagueTransactionRepository, create_league_transaction_repository
 from api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
 from api.app.domain.entities.roster import Roster
@@ -17,14 +18,17 @@ from google.cloud.firestore_v1.transaction import Transaction
 
 
 def create_roster_player_service(
-        league_owned_player_repo: LeagueOwnedPlayerRepository = Depends(create_league_owned_player_repository),
-        roster_repo: LeagueRosterRepository = Depends(create_league_roster_repository),
-        league_transaction_repo: LeagueTransactionRepository = Depends(create_league_transaction_repository),
+    league_owned_player_repo: LeagueOwnedPlayerRepository = Depends(create_league_owned_player_repository),
+    roster_repo: LeagueRosterRepository = Depends(create_league_roster_repository),
+    league_transaction_repo: LeagueTransactionRepository = Depends(create_league_transaction_repository),
+    league_config_repo: LeagueConfigRepository = Depends(create_league_config_repository),
 ):
     return RosterPlayerService(
         league_owned_player_repo,
         roster_repo=roster_repo,
-        league_transaction_repo=league_transaction_repo)
+        league_transaction_repo=league_transaction_repo,
+        league_config_repo=league_config_repo
+    )
 
 
 class RosterPlayerService:
@@ -33,10 +37,12 @@ class RosterPlayerService:
         league_owned_player_repo: LeagueOwnedPlayerRepository,
         roster_repo: LeagueRosterRepository,
         league_transaction_repo: LeagueTransactionRepository,
+        league_config_repo: LeagueConfigRepository,
     ):
         self.league_owned_player_repo = league_owned_player_repo
         self.roster_repo = roster_repo
         self.league_transaction_repo = league_transaction_repo
+        self.league_config_repo = league_config_repo
 
     def find_position_for(self, player: Player, roster: Roster) -> LeaguePosition:
 
@@ -69,12 +75,15 @@ class RosterPlayerService:
         if not position:
             return False, "Unable to find position for player"
 
+        # TODO: check if limit enabled
         if player.position == PositionType.qb and roster.count_qbs() == 1 and not self.dropping(PositionType.qb, target_position):
             return False, "Rosters are limited to 1 quarterback"
 
+        # TODO: check if limit enabled
         if player.position == PositionType.rb and roster.count_rbs() == 1 and not self.dropping(PositionType.rb, target_position):
             return False, "Rosters are limited to 1 running back"
 
+        # TODO: check if limit enabled
         if player.position == PositionType.k and roster.count_kickers() == 1 and not self.dropping(PositionType.k, target_position):
             return False, "Rosters are limited to 1 kicker"
 

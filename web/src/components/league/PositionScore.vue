@@ -5,7 +5,7 @@
 <script>
 import { firestore } from "../../modules/firebase"
 import { formatScore } from "../../modules/formatter"
-import { playerScore } from "../../api/110yards/score"
+import { calculate } from "../../modules/scoring"
 
 export default {
   props: {
@@ -27,12 +27,18 @@ export default {
     return {
       liveScore: null,
       gameScore: null,
+      games: null,
     }
   },
 
   computed: {
     season() {
-      return process.env.VUE_APP_SEASON
+      return this.$root.currentSeason
+    },
+
+    game() {
+      // some weird weeks will have teams playing two games.  We only ever score the first one.
+      return this.games && this.games.length > 0 ? this.games[0] : null
     },
 
     isCurrentWeek() {
@@ -40,19 +46,11 @@ export default {
     },
 
     score() {
-      if (!this.scoreboard) return null
-
-      if (this.liveScore != null) {
-        for (let gameId in this.liveScore.game_scores) {
-          if (gameId in this.scoreboard.games) {
-            return this.liveScore.game_scores[gameId].total_score
-          }
-        }
-
-        return 0.0
+      if (this.isCurrentWeek) {
+        return this.game ? calculate(this.$root.leagueScoringSettings, this.game.stats) : 0
+      } else {
+        return this.position.game_score
       }
-
-      return this.gameScore
     },
 
     formattedScore() {
@@ -63,15 +61,18 @@ export default {
   methods: {
     configureReferences() {
       if (!this.position || !this.position.player || !this.leagueId || !this.weekNumber) return
+      if (!this.isCurrentWeek) return
 
-      if (this.isCurrentWeek) {
-        let path = `league/${this.leagueId}/player_score/${this.position.player.id}`
-        let ref = firestore.doc(path)
+      let path = `season/${this.season}/player_game/`
 
-        this.$bind("liveScore", ref)
-      } else {
-        this.gameScore = this.position.game_score
-      }
+      let ref = firestore
+        .collection(path)
+        .where("player_id", "==", this.position.player.id)
+        .where("week_number", "==", parseInt(this.weekNumber))
+        .orderBy("game_id")
+        .limit(1)
+
+      this.$bind("games", ref)
     },
   },
 

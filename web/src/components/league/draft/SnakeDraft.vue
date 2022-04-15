@@ -42,7 +42,12 @@
     </v-row>
     <v-row>
       <v-col cols="12" md="9">
-        <player-list :leagueId="leagueId" :showActions="yourTurn && !draft.is_paused" :addFunction="addPlayer">
+        <player-list
+          :leagueId="leagueId"
+          :isDraft="true"
+          :showActions="yourTurn && !draft.is_paused"
+          :addFunction="addPlayer"
+        >
         </player-list>
       </v-col>
       <v-col cols="12" md="3">

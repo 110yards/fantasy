@@ -60,6 +60,8 @@
         </v-card>
       </v-col>
     </v-row>
+
+    <archive-leagues v-if="hasArchiveLeagues" :archiveLeagues="archiveLeagues" />
   </div>
 </template>
 
@@ -75,10 +77,11 @@
 
 <script>
 import { firestore } from "../modules/firebase"
-import MatchupPreview from "../components/league/MatchupPreview"
+import MatchupPreview from "../components/league/MatchupPreview.vue"
 import AppPrimaryButton from "../components/buttons/AppPrimaryButton.vue"
 import AppDefaultButton from "../components/buttons/AppDefaultButton.vue"
 import Scoreboard from "../components/common/Scoreboard.vue"
+import ArchiveLeagues from "./league/ArchiveLeagues.vue"
 
 export default {
   name: "home",
@@ -87,16 +90,21 @@ export default {
     AppPrimaryButton,
     AppDefaultButton,
     Scoreboard,
+    ArchiveLeagues,
   },
   data() {
     return {
       leagues: [],
+      archiveLeagues: [],
       leaguesUnsubscribe: null,
     }
   },
   computed: {
     hasLeagues() {
-      return this.leagues.length > 0
+      return this.leagues && this.leagues.length > 0
+    },
+    hasArchiveLeagues() {
+      return this.archiveLeagues && this.archiveLeagues.length > 0
     },
     isAnonymous() {
       return this.$store.state.isAnonymous
@@ -128,9 +136,11 @@ export default {
   },
   methods: {
     bind(uid) {
-      let ref = firestore.collection("user").doc(uid).collection("league").orderBy("joined")
+      let leaguesRef = firestore.collection("user").doc(uid).collection("league").orderBy("joined")
+      this.$bind("leagues", leaguesRef)
 
-      this.$bind("leagues", ref)
+      let archivesRef = firestore.collection("user").doc(uid).collection("archive_league").orderBy("joined")
+      this.$bind("archiveLeagues", archivesRef)
     },
     unbind(uid) {
       try {

@@ -1,53 +1,115 @@
 <template>
-  <span> </span>
+  <score :score="score" />
 </template>
 
 <script>
+import { calculate, getPlayerGameRef } from "../../modules/scoring"
+import Score from "../Score.vue"
+
 export default {
+  components: { Score },
   props: {
-    leagueId: {
-      type: String,
-      required: true,
-    },
-
-    rosterId: {
-      type: String,
-      required: true,
-    },
-
-    weekNumber: {
-      required: true,
-    },
+    roster: { type: Object, required: false },
+    weekNumber: { required: true },
+    scoring: { type: Object, required: false },
+    calculatedScore: { type: Number, required: true },
   },
-
   data() {
-    return {}
+    return {
+      players: {},
+      liveScore: 0.0,
+    }
   },
 
   computed: {
+    score() {
+      return this.isCurrentWeek ? this.liveScore : this.calculatedScore
+    },
+
     isCurrentWeek() {
-      return this.$root.state.current_week == this.weekNumber
+      return this.weekNumber == this.$root.state.current_week
     },
   },
 
   methods: {
-    configureReferences() {
-      if (!this.leagueId || !this.rosterId || !this.weekNumber) return
+    configureBindings() {
+      if (!this.isCurrentWeek) return
+
+      let season = this.$root.currentSeason
+
+      let positions = Object.values(this.roster.positions)
+      let activePlayers = positions
+        .filter(x => x.player && this.$root.isActivePositionType(x.position_type))
+        .map(x => x.player)
+
+      let playerIds = activePlayers.map(x => x.id)
+
+      for (let playerId of playerIds) {
+        // add each player id as an observable property on dataProp.players
+        this.$set(this.players, playerId, null)
+        // finally, bind to each player id property
+        this.$bind(`players.${playerId}`, getPlayerGameRef(season, this.weekNumber, playerId))
+      }
+    },
+
+    recalculateRosterScore() {
+      if (!this.isCurrentWeek) return
+
+      let totalScore = 0.0
+
+      if (!this.players) return totalScore
+
+      let scoring = this.scoring || this.$root.leagueScoringSettings
+
+      let playerGameArrays = Object.values(this.players)
+
+      let calcDetails = {
+        roster: this.roster.name,
+        scores: [],
+      }
+
+      for (let playerGameArray of playerGameArrays) {
+        if (playerGameArray.length == 0) continue
+
+        let game = playerGameArray[0]
+        let gameScore = calculate(scoring, game.stats)
+        calcDetails.scores.push({
+          game: game.game_id,
+          player: game.player_id,
+          score: gameScore,
+        })
+
+        totalScore += gameScore
+      }
+
+      console.debug(calcDetails)
+
+      return totalScore
     },
   },
 
   watch: {
-    leagueId: {
+    roster: {
       immediate: true,
-      handler(leagueId) {
-        this.configureReferences()
+      async handler(roster) {
+        if (roster) {
+          this.configureBindings()
+        }
       },
     },
 
-    rosterId: {
+    scoring: {
       immediate: true,
-      handler(rosterId) {
-        this.configureReferences()
+      handler(scoring) {
+        if (scoring) this.liveScore = this.recalculateRosterScore()
+      },
+    },
+
+    players: {
+      deep: true,
+      handler(players) {
+        this.liveScore = this.recalculateRosterScore()
+        this.$emit("update", { score: this.liveScore })
       },
     },
   },

@@ -1,14 +1,7 @@
 from typing import Optional
 
-from api.app.config.settings import Settings, get_settings
 from api.app.core.pubsub.pubsub_push import PubSubPush
-from api.app.domain.commands.system.end_of_day import (
-    EndOfDayCommand, EndOfDayCommandExecutor,
-    create_end_of_day_command_executor)
 from api.app.domain.commands.system.end_of_season import EndOfSeasonCommand, EndOfSeasonCommandExecutor, create_end_of_season_command_executor
-from api.app.domain.commands.system.end_of_week import (
-    EndOfWeekCommand, EndOfWeekCommandExecutor,
-    create_end_of_week_command_executor)
 from api.app.domain.commands.system.insert_public_config import (
     InsertPublicConfigCommand, InsertPublicConfigCommandExecutor,
     create_insert_public_config_command_executor)
@@ -16,19 +9,22 @@ from api.app.domain.commands.system.update_active_players import (
     UpdateActivePlayersCommand, UpdateActivePlayersCommandExecutor,
     UpdateActivePlayersCommandResult, update_active_players_command_executor)
 from api.app.domain.commands.system.update_games import (
-    UpdateGamesCommand, UpdateGamesCommandExecutor,
+    SimState, UpdateGamesCommand, UpdateGamesCommandExecutor,
     create_update_games_command_executor)
 from api.app.domain.commands.system.update_player_stats_for_week import (
     UpdatePlayerStatsForWeekCommand, UpdatePlayerStatsForWeekCommandExecutor,
     create_update_player_stats_for_week_command_executor)
+from api.app.domain.commands.system.update_schedule import UpdateScheduleCommand, UpdateScheduleCommandExecutor, create_update_schedule_command_executor
 from api.app.domain.events.configure_events import (ConfigureEvents,
                                                     create_configure_events)
-from api.app.domain.repositories.state_repository import (StateRepository,
-                                                          create_state_repository)
+from api.app.domain.services.end_of_day_service import EndOfDayService, create_end_of_day_service
+from api.app.domain.services.end_of_week_service import EndOfWeekRequest, EndOfWeekService, create_end_of_week_service
 from api.app.domain.services.league_command_service import (
     LeagueCommandService, create_league_command_service)
 from api.app.domain.services.smoke_test_service import smoke_test
 from fastapi import Depends, Response, status
+
+from api.app.domain.services.start_next_season_service import StartNextSeasonService, create_start_next_season_service
 
 from .api_router import APIRouter
 
@@ -69,21 +65,18 @@ async def run_smoke_test(
 @router.post("/games")
 async def update_games(
     week: Optional[int] = None,
-    state_repo: StateRepository = Depends(create_state_repository),
-    settings: Settings = Depends(get_settings),
+    sim_state: Optional[SimState] = None,
     command_executor: UpdateGamesCommandExecutor = Depends(create_update_games_command_executor)
 ):
-    state = state_repo.get()
-    command = UpdateGamesCommand(season=settings.current_season, week=week or state.current_week)
+    command = UpdateGamesCommand(week=week, sim_state=sim_state)
     return command_executor.execute(command)
 
 
 @router.post("/games/all")
 async def update_all_games(
-    settings: Settings = Depends(get_settings),
     command_executor: UpdateGamesCommandExecutor = Depends(create_update_games_command_executor)
 ):
-    command = UpdateGamesCommand(season=settings.current_season)
+    command = UpdateGamesCommand()
     return command_executor.execute(command)
 
 
@@ -96,20 +89,19 @@ async def update_players(command_executor: UpdateActivePlayersCommandExecutor = 
 
 @router.post("/end_of_day")
 async def end_of_day(
-    command_executor: EndOfDayCommandExecutor = Depends(create_end_of_day_command_executor)
+    service: EndOfDayService = Depends(create_end_of_day_service)
 ):
-    command = EndOfDayCommand()
-    return command_executor.execute(command)
+    service.run_workflow()
 
 
 @router.post("/end_of_week")
 async def end_of_week(
     push: PubSubPush,
-    command_executor: EndOfWeekCommandExecutor = Depends(create_end_of_week_command_executor)
+    service: EndOfWeekService = Depends(create_end_of_week_service)
 ):
     push_data = push.get_data()
-    command = EndOfWeekCommand(**push_data)
-    return command_executor.execute(command)
+    request = EndOfWeekRequest(**push_data)
+    return service.run_workflow(request.completed_week_number)
 
 
 @router.post("/league_command")
@@ -135,3 +127,19 @@ async def set_end_of_season(
     command_executor: EndOfSeasonCommandExecutor = Depends(create_end_of_season_command_executor),
 ):
     return command_executor.execute(command)
+
+
+@router.post("/schedule")
+async def update_schedule(
+    command: UpdateScheduleCommand,
+    command_executor: UpdateScheduleCommandExecutor = Depends(create_update_schedule_command_executor),
+):
+    return command_executor.execute(command)
+
+
+@router.post("/start_next_season")
+async def start_next_season(
+    season: Optional[int] = None,
+    service: StartNextSeasonService = Depends(create_start_next_season_service),
+):
+    return service.run_workflow(season)

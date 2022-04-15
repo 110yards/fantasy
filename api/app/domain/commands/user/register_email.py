@@ -1,4 +1,5 @@
 
+from typing import Optional
 from api.app.config.settings import Settings, get_settings
 from api.app.domain.entities.user import User
 from api.app.domain.enums.login_type import LoginType
@@ -28,7 +29,7 @@ class RegisterEmailCommand(BaseCommand):
 
 @annotate_args
 class RegisterEmailResult(BaseCommandResult[RegisterEmailCommand]):
-    pass
+    user_id: Optional[str]
 
 
 class RegisterCommandExecutor(BaseCommandExecutor[RegisterEmailCommand, RegisterEmailResult]):
@@ -58,4 +59,4 @@ class RegisterCommandExecutor(BaseCommandExecutor[RegisterEmailCommand, Register
             user = User(id=result.uid, display_name=command.display_name, email=command.email, login_type=LoginType.EMAIL, confirmed=True)
             self.user_repository.create(user)
 
-        return RegisterEmailResult(command=command)
+        return RegisterEmailResult(command=command, user_id=result.uid)

@@ -1,6 +1,6 @@
-import base64
 import json
+import hashlib
 
 
 def hash_dict(d: dict):
-    return base64.b64encode(json.dumps(d).encode("utf-8")).decode("ascii")
+    return hashlib.md5(json.dumps(d).encode("utf-8")).hexdigest()

@@ -1,7 +1,9 @@
 from __future__ import annotations
+from api.app.domain.entities.event_status import EVENT_STATUS_POSTPONED
+from api.app.domain.entities.scheduled_game import ScheduledGame
 
 from api.app.domain.entities.team import Team
-from typing import Dict, Union
+from typing import Dict, List, Union
 from api.app.core.base_entity import BaseEntity
 from api.app.core.annotate_args import annotate_args
 
@@ -41,6 +43,19 @@ class Opponents(BaseEntity):
             TOR=opponents.get("TOR", BYE),
             WPG=opponents.get("WPG", BYE)
         )
+
+    @staticmethod
+    def from_scheduled_games(games: List[ScheduledGame]) -> Opponents:
+        opponents: Dict[str, str] = {}
+
+        for game in games:
+            if game.event_status.event_status_id == EVENT_STATUS_POSTPONED:
+                continue
+
+            opponents[game.teams.away.abbreviation] = game.teams.home.abbreviation
+            opponents[game.teams.home.abbreviation] = game.teams.away.abbreviation
+
+        return Opponents.create(opponents)
 
     def changed(self, other: Opponents) -> bool:
         return \

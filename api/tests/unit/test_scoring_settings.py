@@ -19,7 +19,7 @@ def test_score_calculation():
     score = score.dict()
 
     for key in score:
-        if key == "total_score" or key == "id":
+        if key in ["total_score", "id", "hash"]:
             continue
         stat_score = score[key]
         setting = settings[key]

@@ -1,12 +1,12 @@
 
-from api.app.config.settings import Settings, get_settings
 from api.app.core.publisher import Publisher, create_publisher
 from api.app.domain.commands.league.calculate_playoffs import CalculatePlayoffsCommand
 from api.app.domain.enums.league_command_type import LeagueCommandType
 from api.app.domain.repositories.game_repository import GameRepository, create_game_repository
-from api.app.domain.repositories.league_player_score_repository import LeaguePlayerScoreRepository, create_league_player_score_repository
+from api.app.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository, create_player_league_season_score_repository
 from api.app.domain.enums.draft_state import DraftState
 from api.app.domain.entities.matchup_preview import MatchupPreview
+from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
 from api.app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
 from api.app.domain.enums.week_type import WeekType
 from api.app.domain.entities.schedule import Schedule
@@ -26,19 +26,19 @@ from api.app.domain.topics import LEAGUE_COMMAND_TOPIC
 
 
 def create_calculate_results_command_executor(
-    settings: Settings = Depends(get_settings),
+    state_repo: StateRepository = Depends(create_state_repository),
     league_config_repo: LeagueConfigRepository = Depends(create_league_config_repository),
     league_roster_repo: LeagueRosterRepository = Depends(create_league_roster_repository),
     matchup_repo: LeagueWeekMatchupRepository = Depends(create_league_week_matchup_repository),
     league_repo: LeagueRepository = Depends(create_league_repository),
     user_league_repo: UserLeagueRepository = Depends(create_user_league_repository),
-    player_score_repo: LeaguePlayerScoreRepository = Depends(create_league_player_score_repository),
+    player_score_repo: PlayerLeagueSeasonScoreRepository = Depends(create_player_league_season_score_repository),
     game_repo: GameRepository = Depends(create_game_repository),
     publisher: Publisher = Depends(create_publisher),
 
 ):
     return CalculateResultsCommandExecutor(
-        season=settings.current_season,
+        state_repo=state_repo,
         league_config_repo=league_config_repo,
         league_roster_repo=league_roster_repo,
         matchup_repo=matchup_repo,
@@ -60,23 +60,24 @@ class CalculateResultsCommand(BaseCommand):
 @annotate_args
 class CalculateResultsResult(BaseCommandResult[CalculateResultsCommand]):
     next_week_is_playoffs: bool = False
+    league_season_complete: bool = False
 
 
 class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsCommand, CalculateResultsResult]):
     def __init__(
         self,
-        season: int,
+        state_repo: StateRepository,
         league_config_repo: LeagueConfigRepository,
         league_roster_repo: LeagueRosterRepository,
         matchup_repo: LeagueWeekMatchupRepository,
         league_repo: LeagueRepository,
         user_league_repo: UserLeagueRepository,
-        player_score_repo: LeaguePlayerScoreRepository,
+        player_score_repo: PlayerLeagueSeasonScoreRepository,
         game_repo: GameRepository,
         publisher: Publisher,
 
     ):
-        self.season = season
+        self.state_repo = state_repo
         self.league_config_repo = league_config_repo
         self.league_roster_repo = league_roster_repo
         self.matchup_repo = matchup_repo
@@ -87,6 +88,8 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
         self.publisher = publisher
 
     def on_execute(self, command: CalculateResultsCommand) -> CalculateResultsResult:
+
+        state = self.state_repo.get()
 
         #  This happens first, to block users from adding players in the event that the next part fails.
         @firestore.transactional
@@ -109,7 +112,7 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
             # nothing to do here.
             return CalculateResultsResult(command=command)
 
-        self.games_for_week = self.game_repo.for_week(self.season, command.week_number)
+        self.games_for_week = self.game_repo.for_week(state.current_season, command.week_number)
         self.league_scoring = self.league_config_repo.get_scoring_config(command.league_id)
 
         @firestore.transactional
@@ -146,6 +149,7 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
 
                 self.matchup_repo.set(command.league_id, command.week_number, matchup, transaction)
 
+            league_season_complete = len(schedule.weeks) <= week_index + 1
             next_week_matchups = schedule.weeks[week_index + 1].matchups if len(schedule.weeks) > week_index + 1 else None
             next_week_playoffs = schedule.weeks[week_index + 1].week_type.is_playoffs() if len(schedule.weeks) > week_index + 1 else False
 
@@ -200,7 +204,7 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
 
             self.league_config_repo.set_schedule_config(command.league_id, schedule, transaction)
 
-            return CalculateResultsResult(command=command, next_week_is_playoffs=next_week_playoffs)
+            return CalculateResultsResult(command=command, next_week_is_playoffs=next_week_playoffs, league_season_complete=league_season_complete)
 
         transaction = self.league_roster_repo.firestore.create_transaction()
         result = calculate(transaction)
@@ -209,6 +213,8 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
             command = CalculatePlayoffsCommand(league_id=command.league_id, week_number=command.week_number + 1)
             payload = LeagueCommandPushData(command_type=LeagueCommandType.CALCULATE_PLAYOFFS, command_data=command.dict())
             self.publisher.publish(payload, LEAGUE_COMMAND_TOPIC)
+
+        return result
 
     def archive_roster(self, roster: Roster):
         copy = roster.copy(deep=True)

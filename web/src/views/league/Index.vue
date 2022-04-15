@@ -1,17 +1,20 @@
 <template>
   <div v-if="league">
-    <league-menu :league="league" />
     <v-row>
       <v-col cols="12" md="8">
         <h4 class="brand">{{ league.name }}</h4>
         <start-draft :league="league" />
+
+        <app-primary-button v-if="canRenewLeague" @click="renewLeague"
+          >Start {{ currentSeason }} Season</app-primary-button
+        >
 
         <schedule v-if="scheduleGenerated && !isOffseason" :leagueId="leagueId" />
 
         <standings class="mt-5" v-if="!isOffseason" :league="league" />
         <transactions class="mt-5" v-if="!isOffseason" :leagueId="leagueId" />
 
-        <season-summary :leagueId="leagueId" v-if="isOffseason" />
+        <season-summary :leagueId="leagueId" v-if="isOffseason" :season="league.season" />
 
         <!-- @*@Html.Partial("CflNews", Model.News)*@ -->
       </v-col>
@@ -41,8 +44,9 @@ import Schedule from "../../components/league/Schedule.vue"
 import Standings from "../../components/league/Standings.vue"
 import Transactions from "../../components/league/Transactions.vue"
 import Scoreboard from "../../components/common/Scoreboard.vue"
-import LeagueMenu from "../../components/league/LeagueMenu.vue"
 import SeasonSummary from "../../components/league/SeasonSummary.vue"
+import AppPrimaryButton from "../../components/buttons/AppPrimaryButton.vue"
+import { renewLeague } from "../../api/110yards/league"
 
 export default {
   name: "league-index",
@@ -54,8 +58,8 @@ export default {
     Standings,
     Transactions,
     Scoreboard,
-    LeagueMenu,
     SeasonSummary,
+    AppPrimaryButton,
   },
   data() {
     return {
@@ -76,7 +80,37 @@ export default {
     },
 
     isOffseason() {
-      return this.$root.state && this.$root.state.is_offseason
+      return (this.$root.state && this.$root.state.is_offseason) || this.isPreviousSeason
+    },
+
+    leagueSeason() {
+      if (!this.league) return null
+
+      return this.league.season || 2021 // in the future, all leagues will have this set.
+    },
+
+    isPreviousSeason() {
+      if (!this.league) return false
+
+      return this.leagueSeason != this.currentSeason
+    },
+
+    currentSeason() {
+      return this.$root.state.current_season
+    },
+
+    currentUserId() {
+      return this.$store.state.uid
+    },
+
+    canRenewLeague() {
+      return this.isPreviousSeason && this.league.commissioner_id == this.currentUserId
+    },
+  },
+
+  methods: {
+    async renewLeague() {
+      await renewLeague(this.league.id)
     },
   },
 

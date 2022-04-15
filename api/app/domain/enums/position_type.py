@@ -89,7 +89,7 @@ class PositionType(str, Enum):
         if abbreviation in ["DE", "DT"]:
             abbreviation = "DL"
 
-        if abbreviation in ["OL", "LS", "G", "T"]:
+        if abbreviation in ["OL", "LS", "G", "T", "OT"]:
             abbreviation = "ol"
 
         if abbreviation in ["P"]:

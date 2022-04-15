@@ -1,5 +1,6 @@
 
 from api.app.domain.entities.state import State
+from api.app.domain.repositories.league_config_repository import LeagueConfigRepository
 from api.app.domain.repositories.state_repository import StateRepository
 from api.app.domain.repositories.league_week_repository import LeagueWeekRepository
 from api.app.domain.entities.league_transaction import TransactionType
@@ -39,8 +40,9 @@ def get_target(rosters: List[Roster]) -> ProcessWaiversCommandExecutor:
     league_owned_player_repo = LeagueOwnedPlayerRepository(MockFirestoreProxy())
     transaction_repo = LeagueTransactionRepository(MockFirestoreProxy())
     league_week_repo = LeagueWeekRepository(MockFirestoreProxy())
+    league_config_repo = LeagueConfigRepository(MockFirestoreProxy())
 
-    roster_player_service = RosterPlayerService(league_owned_player_repo, league_roster_repo, transaction_repo)
+    roster_player_service = RosterPlayerService(league_owned_player_repo, league_roster_repo, transaction_repo, league_config_repo)
     waiver_service = WaiverService(roster_player_service)
 
     return ProcessWaiversCommandExecutor(

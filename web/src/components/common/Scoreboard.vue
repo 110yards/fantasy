@@ -123,6 +123,9 @@ export default {
         case eventStatus.PreGame:
           return `${shortTime(game.date_start.toDate())}`
 
+        case eventStatus.InProgress:
+          return `${game.event_status.minutes}:${String(game.event_status.seconds).padStart(2, "0")}`
+
         default:
           return ""
       }

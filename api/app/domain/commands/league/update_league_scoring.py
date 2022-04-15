@@ -87,11 +87,6 @@ class UpdateLeagueScoringCommandExecutor(BaseCommandExecutor[UpdateLeagueScoring
 
         if not league:
             return UpdateLeagueScoringResult(command=command, error="League not found")
-
-        # any_locks = self.state_repo.get().locks.any_locks()
-        # if any_locks:
-        #     return UpdateLeagueScoringResult(command=command, error="You can't update scoring after the week has started (try again when waivers begin).")
-
         scoring = self.league_config_repo.get_scoring_config(command.league_id)
 
         scoring.pass_attempts = command.pass_attempts
@@ -132,7 +127,7 @@ class UpdateLeagueScoringCommandExecutor(BaseCommandExecutor[UpdateLeagueScoring
         @firestore.transactional
         def update(transaction):
             self.league_repo.update(league, transaction)
-            self.league_config_repo.set_positions_config(league.id, scoring, transaction)
+            self.league_config_repo.set_scoring_config(league.id, scoring, transaction)
 
             league_transaction = LeagueTransaction.change_scoring(command.league_id)
             self.transaction_repo.create(command.league_id, league_transaction, transaction)

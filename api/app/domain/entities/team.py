@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pydantic.main import BaseModel
 from api.app.core.exceptions import ApiException
-from typing import Optional
+from typing import Dict, Optional
 
 
 class Team(BaseModel):
@@ -44,6 +44,14 @@ class Team(BaseModel):
             raise ApiException(f"Invalid team '{abbreviation}'")
 
         return team
+
+    @staticmethod
+    def from_cfl_api(input: Dict) -> Team:
+        if not input["is_set"]:
+            return Team.free_agent()
+        else:
+            abbreviation = input["abbreviation"]
+            return Team.by_abbreviation(abbreviation)
 
     @staticmethod
     def free_agent():

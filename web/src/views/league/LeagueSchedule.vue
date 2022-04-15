@@ -1,7 +1,5 @@
 <template>
   <div v-if="league && schedule">
-    <league-menu :league="league" />
-
     <v-card class="mt-4">
       <v-card-title>Playoff settings</v-card-title>
       <v-card-text>
@@ -18,7 +16,7 @@
       </v-card-text>
     </v-card>
 
-    <v-card class="mt-4">
+    <v-card class="mt-4" v-if="generated">
       <v-card-title>Schedule</v-card-title>
       <v-card-text>
         <v-simple-table>
@@ -42,22 +40,18 @@
         </v-simple-table>
       </v-card-text>
     </v-card>
-    <v-card class="mt-5">
-      <v-card-text></v-card-text>
-    </v-card>
+    <v-alert type="error" v-else>League schedule has not been set up by the commissioner yet.</v-alert>
   </div>
-  <div v-else>League schedule has not been set up by the commissioner yet.</div>
 </template>
 
 <script>
 import AppFormLabel from "../../components/inputs/AppFormLabel.vue"
-import LeagueMenu from "../../components/league/LeagueMenu.vue"
 import { firestore } from "../../modules/firebase"
 
 export default {
   name: "LeagueSchedule",
 
-  components: { LeagueMenu, AppFormLabel },
+  components: { AppFormLabel },
   props: {
     leagueId: { type: String, required: true },
   },
@@ -74,6 +68,10 @@ export default {
   computed: {
     matchupsPerWeek() {
       return this.rosters.length / 2
+    },
+
+    generated() {
+      return this.schedule && this.schedule.weeks.length > 0
     },
 
     playoffType() {

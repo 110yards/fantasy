@@ -8,6 +8,7 @@ from api.app.core.publisher import VirtualPubSubPublisher
 from api.app.domain.commands.user.register_email import RegisterCommandExecutor, RegisterEmailCommand
 from api.app.domain.entities.opponents import Opponents
 from api.app.domain.entities.schedule import get_playoff_type_config
+from api.app.domain.entities.scoring_info import ScoringInfo
 from api.app.domain.entities.state import State
 from api.app.domain.entities.switches import Switches
 from api.app.domain.enums.position_type import get_position_type_config
@@ -25,7 +26,7 @@ os.environ["FIREBASE_AUTH_EMULATOR_HOST"] = "localhost:9099"
 
 firebase_admin.initialize_app(options={"projectId": DEV_PROJECT_ID})
 
-publisher = VirtualPubSubPublisher(DEV_PROJECT_ID)
+publisher = VirtualPubSubPublisher(DEV_PROJECT_ID, None)
 
 public_repo = create_public_repository()
 user_repo = create_user_repository()
@@ -57,6 +58,10 @@ if result.success:
     user = user_repo.get(result.user_id)
     user.is_admin = True
     user_repo.update(user)
+else:
+    print("Failed (if you are running the script again, you must clear all firestore and auth data).")
+    exit(1)
+
 print("Done")
 
 count = 1
@@ -83,6 +88,11 @@ print("Setting up position types...")
 for item in get_position_type_config():
     ref = firestore.document(f"roster-positions/{item['id']}")
     ref.set(item)
+print("Done")
+
+print("Setting up scoring info...")
+ref = firestore.document("public/scoring_info")
+ref.set(ScoringInfo().dict())
 print("Done")
 
 print("Setup script complete")

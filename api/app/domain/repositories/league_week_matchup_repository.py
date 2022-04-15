@@ -36,3 +36,8 @@ class LeagueWeekMatchupRepository:
 
     def delete(self, league_id, week_number: int, matchup_id, transaction: Transaction = None):
         return self.firestore.delete(LeagueWeekMatchupRepository.path(league_id, week_number), matchup_id, transaction)
+
+    def delete_all(self, league_id):
+        longest_season = 22
+        for i in range(1, longest_season + 1):
+            self.firestore.delete_all(LeagueWeekMatchupRepository.path(league_id, i))

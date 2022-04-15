@@ -1,5 +1,8 @@
+from datetime import datetime
+from api.app.domain.entities.state import State
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository
 from api.app.domain.repositories.league_roster_repository import LeagueRosterRepository
+from api.app.domain.repositories.public_repository import PublicRepository
 from api.app.domain.repositories.user_league_repository import UserLeagueRepository
 from api.app.domain.repositories.league_repository import LeagueRepository
 from api.app.core.publisher import VirtualPubSubPublisher
@@ -40,6 +43,16 @@ def get_league_config_repo() -> LeagueConfigRepository:
     return LeagueConfigRepository(proxy)
 
 
+def get_public_repo() -> PublicRepository:
+    public_repo = PublicRepository(MockFirestoreProxy())
+    public_repo.set_state(State(current_week=1, current_season=datetime.now().year, season_weeks=21))
+    return public_repo
+
+
+def get_publisher() -> VirtualPubSubPublisher:
+    return VirtualPubSubPublisher("test_project", repo=None)
+
+
 def test_user_joins_league():
     commissioner = get_commissioner()
 
@@ -48,7 +61,7 @@ def test_user_joins_league():
     user_league_repo = get_user_league_repo()
     league_roster_repo = get_league_roster_repo()
     league_config_repo = get_league_config_repo()
-    publisher = VirtualPubSubPublisher("test_project")
+    publisher = get_publisher()
 
     command_executor = CreateLeagueCommandExecutor(
         user_repo,
@@ -56,7 +69,8 @@ def test_user_joins_league():
         user_league_repo,
         league_roster_repo,
         league_config_repo,
-        publisher)
+        publisher,
+        get_public_repo(),)
 
     command = CreateLeagueCommand(commissioner_id=commissioner.id, name="Test League", private=False)
     result = command_executor.execute(command)
@@ -77,7 +91,7 @@ def test_league_added_to_user():
     user_league_repo = get_user_league_repo()
     league_roster_repo = get_league_roster_repo()
     league_config_repo = get_league_config_repo()
-    publisher = VirtualPubSubPublisher("test_project")
+    publisher = get_publisher()
 
     command_executor = CreateLeagueCommandExecutor(
         user_repo,
@@ -85,7 +99,8 @@ def test_league_added_to_user():
         user_league_repo,
         league_roster_repo,
         league_config_repo,
-        publisher)
+        publisher,
+        get_public_repo(),)
 
     command = CreateLeagueCommand(commissioner_id=commissioner.id, name="Test League", private=False)
     result = command_executor.execute(command)
@@ -106,7 +121,7 @@ def test_league_preview_has_matchup():
     user_league_repo = get_user_league_repo()
     league_roster_repo = get_league_roster_repo()
     league_config_repo = get_league_config_repo()
-    publisher = VirtualPubSubPublisher("test_project")
+    publisher = get_publisher()
 
     command_executor = CreateLeagueCommandExecutor(
         user_repo,
@@ -114,7 +129,8 @@ def test_league_preview_has_matchup():
         user_league_repo,
         league_roster_repo,
         league_config_repo,
-        publisher)
+        publisher,
+        get_public_repo(),)
 
     command = CreateLeagueCommand(commissioner_id=commissioner.id, name="Test League", private=False)
     result = command_executor.execute(command)
@@ -137,7 +153,7 @@ def test_creator_is_commissioner():
     user_league_repo = get_user_league_repo()
     league_roster_repo = get_league_roster_repo()
     league_config_repo = get_league_config_repo()
-    publisher = VirtualPubSubPublisher("test_project")
+    publisher = get_publisher()
 
     command_executor = CreateLeagueCommandExecutor(
         user_repo,
@@ -145,7 +161,8 @@ def test_creator_is_commissioner():
         user_league_repo,
         league_roster_repo,
         league_config_repo,
-        publisher)
+        publisher,
+        get_public_repo(),)
 
     command = CreateLeagueCommand(commissioner_id=commissioner.id, name="Test League", private=False)
     result = command_executor.execute(command)
@@ -166,7 +183,7 @@ def test_private_config_initialized():
     user_league_repo = get_user_league_repo()
     league_roster_repo = get_league_roster_repo()
     league_config_repo = get_league_config_repo()
-    publisher = VirtualPubSubPublisher("test_project")
+    publisher = get_publisher()
 
     command_executor = CreateLeagueCommandExecutor(
         user_repo,
@@ -174,7 +191,8 @@ def test_private_config_initialized():
         user_league_repo,
         league_roster_repo,
         league_config_repo,
-        publisher)
+        publisher,
+        get_public_repo(),)
 
     command = CreateLeagueCommand(commissioner_id=commissioner.id, name="Test League", private=False)
     result = command_executor.execute(command)
@@ -192,7 +210,7 @@ def test_scoring_config_initialized():
     user_league_repo = get_user_league_repo()
     league_roster_repo = get_league_roster_repo()
     league_config_repo = get_league_config_repo()
-    publisher = VirtualPubSubPublisher("test_project")
+    publisher = get_publisher()
 
     command_executor = CreateLeagueCommandExecutor(
         user_repo,
@@ -200,7 +218,8 @@ def test_scoring_config_initialized():
         user_league_repo,
         league_roster_repo,
         league_config_repo,
-        publisher)
+        publisher,
+        get_public_repo(),)
 
     command = CreateLeagueCommand(commissioner_id=commissioner.id, name="Test League", private=False)
     result = command_executor.execute(command)
@@ -218,7 +237,7 @@ def test_positions_config_initialized():
     user_league_repo = get_user_league_repo()
     league_roster_repo = get_league_roster_repo()
     league_config_repo = get_league_config_repo()
-    publisher = VirtualPubSubPublisher("test_project")
+    publisher = get_publisher()
 
     command_executor = CreateLeagueCommandExecutor(
         user_repo,
@@ -226,7 +245,8 @@ def test_positions_config_initialized():
         user_league_repo,
         league_roster_repo,
         league_config_repo,
-        publisher)
+        publisher,
+        get_public_repo(),)
 
     command = CreateLeagueCommand(commissioner_id=commissioner.id, name="Test League", private=False)
     result = command_executor.execute(command)

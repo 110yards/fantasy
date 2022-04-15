@@ -1,12 +1,6 @@
 <template>
   <div v-if="isAdmin">
-    <v-row v-if="league" class="">
-      <v-btn v-if="page == 'waivers'" :text="page != 'waivers'"> Waiver Results </v-btn>
-    </v-row>
-
-    <v-row class="mt-8">
-      <waiver-results v-if="page == 'waivers'" :leagueId="leagueId" />
-    </v-row>
+    <waiver-results v-if="page == 'waivers'" :leagueId="leagueId" />
   </div>
 </template>
 

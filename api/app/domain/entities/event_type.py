@@ -6,6 +6,12 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
+EVENT_TYPE_PRESEASON = 0
+EVENT_TYPE_REGULAR = 1
+EVENT_TYPE_PLAYOFFS = 2
+EVENT_TYPE_GREY_CUP = 3
+EVENT_TYPE_EXHIBITION = 4
+
 
 class EventType(BaseModel):
     event_type_id: int

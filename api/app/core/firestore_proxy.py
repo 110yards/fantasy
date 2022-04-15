@@ -1,11 +1,13 @@
 from typing import Callable, Dict, Generic, List, TypeVar, Union
 
-from google.cloud.firestore_v1.base_document import BaseDocumentReference
+from google.cloud.firestore_v1.base_document import BaseDocumentReference, DocumentSnapshot
 
 from api.app.core.base_entity import BaseEntity
 from firebase_admin import firestore
 from google.cloud.firestore_v1.base_client import BaseClient
 from google.cloud.firestore_v1.transaction import Transaction
+
+from api.app.core.batching import create_batches
 
 T = TypeVar("T", bound=BaseEntity)
 
@@ -48,7 +50,7 @@ class FirestoreProxy(Generic[T]):
 
     def get(self, collection_path: str, id, transaction: Transaction = None) -> T:
         collection_ref = self.client.collection(collection_path)
-        document_ref = collection_ref.document(id)
+        document_ref = collection_ref.document(str(id))
 
         if transaction:
             doc = document_ref.get(transaction=transaction)
@@ -134,6 +136,20 @@ class FirestoreProxy(Generic[T]):
 
         return entity
 
+    def set_all(self, collection_path: str, entities: List[T]):
+        collection_ref = self.client.collection(collection_path)
+
+        batches = create_batches(entities, 500)
+
+        for batch in batches:
+            firestore_batch = self.client.batch()
+
+            for item in batch:
+                document_ref = collection_ref.document(str(item.id))
+                firestore_batch.set(document_ref, item.dict(exclude_none=True))
+
+            firestore_batch.commit()
+
     def partial_update(self, collection_path: str, entity_id: str, updates: Dict, transaction: Transaction = None):
         collection_ref = self.client.collection(collection_path)
         document_ref = collection_ref.document(entity_id)
@@ -151,3 +167,11 @@ class FirestoreProxy(Generic[T]):
             transaction.delete(document_ref)
         else:
             document_ref.delete()
+
+    def delete_all(self, collection_path: str):
+        collection_ref = self.client.collection(collection_path)
+
+        docs: List[DocumentSnapshot] = collection_ref.get()
+
+        for doc in docs:
+            doc.reference.delete()

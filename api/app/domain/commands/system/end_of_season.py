@@ -1,10 +1,12 @@
 
 
+from api.app.domain.entities.scoreboard import Scoreboard
 from api.app.domain.entities.season_summary import SeasonSummary
 from api.app.domain.enums.draft_state import DraftState
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
 from api.app.domain.repositories.season_summary_repository import SeasonSummaryRepository, create_season_summary_repository
 from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
 from typing import List, Optional
@@ -21,6 +23,7 @@ def create_end_of_season_command_executor(
     league_config_repo: LeagueConfigRepository = Depends(create_league_config_repository),
     league_roster_repo: LeagueRosterRepository = Depends(create_league_roster_repository),
     season_summary_repo: SeasonSummaryRepository = Depends(create_season_summary_repository),
+    public_repo: PublicRepository = Depends(create_public_repository),
 ):
     return EndOfSeasonCommandExecutor(
         publisher=publisher,
@@ -29,6 +32,7 @@ def create_end_of_season_command_executor(
         league_config_repo=league_config_repo,
         league_roster_repo=league_roster_repo,
         season_summary_repo=season_summary_repo,
+        public_repo=public_repo,
     )
 
 
@@ -52,6 +56,7 @@ class EndOfSeasonCommandExecutor(BaseCommandExecutor[EndOfSeasonCommand, EndOfSe
         league_config_repo: LeagueConfigRepository,
         league_roster_repo: LeagueRosterRepository,
         season_summary_repo: SeasonSummaryRepository,
+        public_repo: PublicRepository,
     ):
         self.publisher = publisher
         self.state_repo = state_repo
@@ -59,6 +64,7 @@ class EndOfSeasonCommandExecutor(BaseCommandExecutor[EndOfSeasonCommand, EndOfSe
         self.league_config_repo = league_config_repo
         self.league_roster_repo = league_roster_repo
         self.season_summary_repo = season_summary_repo
+        self.public_repo = public_repo
 
     def on_execute(self, command: EndOfSeasonCommand) -> EndOfSeasonResult:
 
@@ -89,6 +95,10 @@ class EndOfSeasonCommandExecutor(BaseCommandExecutor[EndOfSeasonCommand, EndOfSe
                 failed.append(league.id)
 
         state.is_offseason = True
+
+        scoreboard = Scoreboard(games={})
+        self.public_repo.set_scoreboard(scoreboard)
+
         self.state_repo.set(state)
 
         return EndOfSeasonResult(command=command, failed=failed, successful=successful)

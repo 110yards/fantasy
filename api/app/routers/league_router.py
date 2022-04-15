@@ -20,6 +20,7 @@ from api.app.domain.commands.league.open_league_registration import (
 from api.app.domain.commands.league.remove_roster import (
     RemoveRosterCommand, RemoveRosterCommandExecutor,
     create_remove_roster_command_executor)
+from api.app.domain.commands.league.renew_league import RenewLeagueCommand, RenewLeagueCommandExecutor, create_renew_league_command_executor
 from api.app.domain.commands.league.update_draft_order import (
     UpdateDraftOrderCommand, UpdateDraftOrderCommandExecutor,
     create_update_draft_order_command_executor)
@@ -38,6 +39,7 @@ from api.app.domain.repositories.repository_factory import get_league_repository
 from fastapi import Depends, Request
 
 from api.app.domain.services.discord_service import DiscordService, create_discord_service
+from api.app.domain.services.player_details_service import PlayerDetailsService, create_player_details_service
 
 from .api_router import APIRouter
 
@@ -177,3 +179,22 @@ async def test_discord(
     service: DiscordService = Depends(create_discord_service),
 ):
     service.send_test_notification(webhook_url)
+
+
+@router.get("/{league_id}/player/{player_id}/{season}")
+async def get_player_details(
+    league_id: str,
+    player_id: str,
+    season: int,
+    service: PlayerDetailsService = Depends(create_player_details_service),
+):
+    return service.get_player_details(season, league_id, player_id)
+
+
+@router.post("/{league_id}/renew")
+async def renew(
+    league_id: str,
+    command_executor: RenewLeagueCommandExecutor = Depends(create_renew_league_command_executor),
+):
+    command = RenewLeagueCommand(league_id=league_id)
+    return command_executor.execute(command)

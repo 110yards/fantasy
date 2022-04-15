@@ -1,42 +1,50 @@
 <template>
-  <div v-if="player">
+  <div v-if="details">
     <v-row>
       <v-col cols="12">
         <v-card>
           <v-card-title>
-            <div class="team-colors" :class="player.team.abbreviation">{{ player.uniform }}</div>
-            {{ player.display_name }}
+            <div class="team-colors" :class="details.player.team.abbreviation">{{ details.player.uniform }}</div>
+            {{ details.player.display_name }}
           </v-card-title>
           <v-card-subtitle>
-            <span>{{ player.position.toUpperCase() }}</span>
+            <span>{{ details.player.position.toUpperCase() }}</span>
             <span> - </span>
-            <span>{{ player.team.location }} {{ player.team.name }}</span>
+            <span>{{ details.player.team.location }} {{ details.player.team.name }}</span>
             <div v-if="statusText" :class="statusClass">{{ statusText }}</div>
           </v-card-subtitle>
 
           <v-card-subtitle>
-            <div v-if="scores"><label>Fantasy Rank:</label> {{ scores.rank }}</div>
+            <div v-if="details.season_score && details.season_score.rank">
+              <label>Fantasy Rank:</label> {{ details.season_score.rank }}
+            </div>
             <!-- Owner -->
             <!-- Add -->
           </v-card-subtitle>
 
           <v-card-subtitle>
-            <div><label>Height/Weight:</label> {{ height }} / {{ weight }}</div>
-            <div v-if="hometown"><label>Hometown:</label> {{ hometown }}</div>
-            <div v-if="college"><label>College:</label> {{ college }}</div>
+            <div v-if="details.player.age"><label>Age:</label> {{ details.player.age }}</div>
+            <div v-if="hasHeight && hasWeight">
+              <label>Height/Weight:</label> {{ details.player.formatted_height }} /
+              {{ details.player.formatted_weight }}
+            </div>
+            <div v-if="hasHeight && !hasWeight"><label>Height:</label> {{ details.player.formatted_height }}</div>
+            <div v-if="!hasHeight && hasWeight"><label>Weight:</label> {{ details.player.formatted_weight }}</div>
+            <div v-if="details.player.birth_place"><label>Hometown:</label> {{ details.player.birth_place }}</div>
+            <div v-if="details.player.college"><label>College:</label> {{ details.player.college }}</div>
           </v-card-subtitle>
 
           <v-card-text>
-            <a :href="cflLink" target="_blank">CFL Page</a>
+            <a :href="details.player.cfl_url" target="_blank">CFL Page</a>
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
 
-    <v-row>
+    <v-row v-if="details">
       <v-col cols="12">
         <h4>Game Log</h4>
-        <v-simple-table v-if="gameLog">
+        <v-simple-table v-if="details.game_log">
           <template>
             <thead>
               <tr>
@@ -127,10 +135,10 @@
             </thead>
 
             <tbody>
-              <template v-for="log in gameLog">
-                <tr :key="'stats' + log.id">
+              <template v-for="log in details.game_log">
+                <tr :key="'stats' + log.game_id">
                   <!-- <game-date :game="log.game" /> -->
-                  <game-result v-if="log.game" :game="log.game" :player="player" />
+                  <game-result v-if="log.game" :game="log.game" :playerTeam="log.team" />
                   <td class="text-no-wrap">
                     <span>{{ formatScore(log.score ? log.score.total_score : 0) }}</span>
                     <v-icon @click="detailedLog = log" v-if="!detailedLog" small color="grey" class="mt-n1 pl-1"
@@ -138,7 +146,7 @@
                     >
                     <v-icon
                       @click="detailedLog = null"
-                      v-if="detailedLog && detailedLog.id == log.id"
+                      v-if="detailedLog && detailedLog.game_id == log.game_id"
                       small
                       color="grey"
                       class="mt-n1 pl-1"
@@ -217,7 +225,7 @@
                   </template>
                 </tr>
 
-                <tr v-if="detailedLog && detailedLog.id == log.id" :key="'scoring' + log.id">
+                <tr v-if="detailedLog && detailedLog.game_id == log.game_id" :key="'scoring' + log.game_id">
                   <td>Score details:</td>
                   <td>
                     <span>{{ formatScore(log.score ? log.score.total_score : 0) }}</span>
@@ -297,6 +305,7 @@
             </tbody>
           </template>
         </v-simple-table>
+        <v-card-text v-else>No games</v-card-text>
       </v-col>
     </v-row>
   </div>
@@ -310,11 +319,11 @@ label {
 
 <script>
 import { playerStatus, positionType } from "../../api/110yards/constants"
+import { getPlayerDetails } from "../../api/110yards/league"
 import GameAverage from "../../components/player/stats/GameAverage.vue"
 import GamePercent from "../../components/player/stats/GamePercent.vue"
 import GameResult from "../../components/player/stats/GameResult.vue"
 import GameValue from "../../components/player/stats/GameValue.vue"
-import games from "../../mixins/games"
 import { firestore } from "../../modules/firebase"
 import * as formatter from "../../modules/formatter"
 
@@ -326,7 +335,6 @@ export default {
     GamePercent,
     GameValue,
   },
-  mixins: [games],
   props: {
     leagueId: { type: String, required: true },
     playerId: { type: String, required: true },
@@ -338,79 +346,29 @@ export default {
       scores: null,
       detailedLog: null,
       owner: null,
+      details: null,
     }
   },
 
   computed: {
     season() {
-      // TODO: 2022 - state
-      return process.env.VUE_APP_SEASON
-    },
-
-    gameLog() {
-      if (!this.player || !this.player.game_stats || !this.scores || !this.gamesById) return []
-
-      let log = []
-      for (let gameId in this.player.game_stats) {
-        log.push({
-          id: gameId,
-          game: this.getGame(gameId),
-          stats: this.player.game_stats[gameId],
-          score: this.getGameScore(gameId),
-        })
-      }
-
-      return log
+      return this.$root.state.current_season
     },
 
     statusClass() {
-      return this.player && this.player.status_current == playerStatus.Active ? "" : "red--text"
+      return this.details && this.details.player.status_current == playerStatus.Active ? "" : "red--text"
     },
 
     statusText() {
-      return this.player ? playerStatus.getFullText(this.player.status_current) : null
+      return this.details ? playerStatus.getFullText(this.details.player.status_current) : null
     },
 
-    cflLink() {
-      return `https://www.cfl.ca/players/player/${this.player.id}`
+    hasHeight() {
+      return this.details.player.formatted_height
     },
 
-    height() {
-      if (!this.player || !this.player.height_inches) return
-      let height = parseInt(this.player.height_inches)
-
-      if (!height) return
-
-      let ft = parseInt(height / 12)
-      let inches = height - ft * 12
-
-      return `${ft}'${inches}"`
-    },
-
-    weight() {
-      if (!this.player) return
-
-      return `${this.player.weight_pounds} lbs`
-    },
-
-    hometown() {
-      if (!this.player) return
-
-      let country = this.player.birth_country_name
-      let prov = this.player.birth_state_abbreviation
-      let city = this.player.birth_city
-
-      if (!city) return
-
-      if (country == "Canada" && prov) return `${city}, ${prov}`
-      if (country == "United States" && prov) return `${city}, ${prov}`
-      if (country) return `${city}, ${country}`
-
-      return city
-    },
-
-    college() {
-      return this.player && this.player.college_fullName ? this.player.college_fullName : null
+    hasWeight() {
+      return this.details.player.formatted_weight
     },
 
     showPassing() {
@@ -427,11 +385,11 @@ export default {
 
     showRushingFirst() {
       let positions = [positionType.QB, positionType.RB]
-      return this.player && positions.includes(this.player.position)
+      return this.details.player && positions.includes(this.details.player.position)
     },
 
     showKicking() {
-      return this.player && this.player.position == positionType.K
+      return this.details.player && this.details.player.position == positionType.K
     },
 
     showDefence() {
@@ -439,7 +397,7 @@ export default {
     },
 
     showConvert2() {
-      return this.hasStatKey("")
+      return this.hasStatKey("two_point_converts_made")
     },
 
     showFumbles() {
@@ -457,17 +415,11 @@ export default {
       return formatter.formatScore(score)
     },
     hasStatKey(key) {
-      if (this.scores && this.scores.game_scores) {
-        let gameIds = Object.keys(this.scores.game_scores)
-        let lastGameId = gameIds[gameIds.length - 1]
-        let inLastGameStats = key in this.scores.game_stats[lastGameId]
-        if (inLastGameStats) return true
+      if (this.details.season_stats) {
+        return key in this.details.season_stats && this.details.season_stats[key]
       }
 
-      if (!this.scores || !this.scores.season_stats) return false
-      let inSeasonStats = key in this.scores.season_stats && this.scores.season_stats[key] != 0
-
-      if (inSeasonStats) return true
+      return false
     },
 
     getGame(gameId) {
@@ -506,14 +458,9 @@ export default {
       return f1 + f2
     },
 
-    configureReferences() {
-      if (!this.leagueId || !this.playerId) return
-
-      let playerRef = firestore.doc(`season/${this.season}/player/${this.playerId}`)
-      this.$bind("player", playerRef)
-
-      let scoresRef = firestore.doc(`league/${this.leagueId}/player_score/${this.playerId}`)
-      this.$bind("scores", scoresRef)
+    async fetchDetails() {
+      if (!this.leagueId || !this.playerId || !this.season) return
+      this.details = await getPlayerDetails(this.season, this.leagueId, this.playerId)
     },
   },
 
@@ -522,7 +469,7 @@ export default {
       immediate: true,
       handler(leagueId) {
         if (!leagueId) return
-        this.configureReferences()
+        this.fetchDetails()
       },
     },
 
@@ -530,7 +477,15 @@ export default {
       immediate: true,
       handler(playerId) {
         if (!playerId) return
-        this.configureReferences()
+        this.fetchDetails()
+      },
+    },
+
+    season: {
+      immediate: true,
+      handler(season) {
+        if (!season) return
+        this.fetchDetails()
       },
     },
   },

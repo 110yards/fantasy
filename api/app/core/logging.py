@@ -70,6 +70,7 @@ class Logger:
 class DefaultLogger(Logger):
     def __init__(self):
         self.logger = logging.getLogger("uvicorn")
+        self.logger.setLevel("DEBUG")
 
     def __log(self, level: int, message: str, extra: Dict = None):
         trace = self.get_trace_id()

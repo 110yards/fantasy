@@ -1,3 +1,4 @@
+from typing import Dict, List
 from api.app.core.logging import Logger
 from api.app.core.exceptions import ApiException
 from api.app.config.settings import Settings, get_settings
@@ -18,7 +19,7 @@ class CflRosterProxy:
     def __init__(self, endpoint: str):
         self.endpoint = endpoint
 
-    def get_roster(self, roster_id):
+    def get_roster(self, roster_id) -> List[Dict]:
         Logger.info(f"[CFL API] Fetching roster id {roster_id}")
         url = f"{self.endpoint}{roster_id}"
         response = requests.get(url)

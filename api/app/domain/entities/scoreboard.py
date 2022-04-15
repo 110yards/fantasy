@@ -95,7 +95,7 @@ class Scoreboard(BaseEntity):
 
         return False
 
-    @ staticmethod
+    @staticmethod
     def create(games: List[Game]) -> Scoreboard:
         scoreboard_games: List[ScoreboardGame] = []
         for game in games:

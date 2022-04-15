@@ -37,6 +37,16 @@ class League(BaseEntity):
     notifications_end_of_week: bool = False
     notifications_transactions: bool = False
     notifications_waivers: bool = False
+    enable_qb_limit: bool = False
+    enable_k_limit: bool = False
+    enable_rb_limit: bool = False
+    season: int = 2021
+    has_completed_season: bool = False
+    renewed: Optional[datetime] = None
+
+    @property
+    def is_active(self) -> bool:
+        return self.draft_state == DraftState.COMPLETE
 
 
 @annotate_args

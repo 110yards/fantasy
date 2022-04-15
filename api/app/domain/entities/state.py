@@ -36,7 +36,9 @@ class Locks(BaseModel):
         return False
 
     @staticmethod
-    def create(locked_teams: List[str], all_games_active: bool) -> Locks:
+    def create(locked_teams: List[str] = None, all_games_active: bool = False) -> Locks:
+        if locked_teams is None:
+            locked_teams = []
 
         locks = Locks()
         if all_games_active:

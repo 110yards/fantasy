@@ -31,7 +31,7 @@ class LeagueConfigRepository:
 
     def get_scoring_config(self, league_id, transaction: Transaction = None) -> ScoringSettings:
         config = self.firestore.get(LeagueConfigRepository.path(league_id), "scoring", transaction)
-        return ScoringSettings.parse_obj(config)
+        return ScoringSettings.parse_obj(config) if config else None
 
     def set_scoring_config(self, league_id, config: ScoringSettings, transaction: Transaction = None) -> ScoringSettings:
         return self.firestore.set(LeagueConfigRepository.path(league_id), config, transaction)

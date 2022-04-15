@@ -1,7 +1,8 @@
 
-from api.app.domain.entities.league_player_score import LeaguePlayerScore
+# from api.app.domain.entities.league_player_score import LeaguePlayerScore
 from api.app.domain.entities.game_player_stats import GamePlayerStats
-from api.app.domain.repositories.league_player_score_repository import LeaguePlayerScoreRepository, create_league_player_score_repository
+from api.app.domain.entities.player import PlayerLeagueSeasonScore
+from api.app.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository, create_player_league_season_score_repository
 from typing import Optional
 from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
@@ -15,7 +16,7 @@ from firebase_admin import firestore
 def create_update_player_stats_command_executor(
     state_repo: StateRepository = Depends(create_state_repository),
     league_config_repo: LeagueConfigRepository = Depends(create_league_config_repository),
-    league_player_score_repo: LeaguePlayerScoreRepository = Depends(create_league_player_score_repository),
+    league_player_score_repo: PlayerLeagueSeasonScoreRepository = Depends(create_player_league_season_score_repository),
 ):
     return UpdatePlayerStatsCommandExecutor(
         state_repo=state_repo,
@@ -41,7 +42,7 @@ class UpdatePlayerStatsCommandExecutor(BaseCommandExecutor[UpdatePlayerStatsComm
         self,
         state_repo: StateRepository,
         league_config_repo: LeagueConfigRepository,
-        league_player_score_repo: LeaguePlayerScoreRepository,
+        league_player_score_repo: PlayerLeagueSeasonScoreRepository,
     ):
         self.state_repo = state_repo
         self.league_config_repo = league_config_repo
@@ -63,7 +64,7 @@ class UpdatePlayerStatsCommandExecutor(BaseCommandExecutor[UpdatePlayerStatsComm
             player_score = self.league_player_score_repo.get(command.league_id, player_id, transaction)
 
             if not player_score:
-                player_score = LeaguePlayerScore(id=player_id)
+                player_score = PlayerLeagueSeasonScore(id=player_id)
 
             player_score.game_scores[game_id] = new_score
             player_score.game_stats[game_id] = stats

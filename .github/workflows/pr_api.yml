@@ -34,7 +34,7 @@ jobs:
           project_id: ${{ secrets.REGISTRY }}
           service_account_key: ${{secrets.TEST_GCLOUD_CREDENTIALS}}
           export_default_credentials: true
-        uses: google-github-actions/setup-gcloud@master
+        uses: google-github-actions/setup-gcloud@v0
 
       - name: Archive and deploy
         working-directory: api
@@ -57,4 +57,3 @@ jobs:
           API_KEY: ${{ secrets.TEST_API_KEY }}
           CLIENT_ORIGIN: ${{ secrets.TEST_ORIGINS }}
         run: python smoke_test_script.py
-
