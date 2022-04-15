@@ -104,15 +104,12 @@ export default {
     isCommissioner: { required: true },
     hasLeague: { required: true },
     hasRoster: { required: true },
+    hasNotes: { required: true },
   },
 
   computed: {
     league() {
       return this.$root.currentLeague
-    },
-
-    hasNotes() {
-      return this.league && this.league.notes
     },
   },
 }
