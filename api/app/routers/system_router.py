@@ -24,6 +24,8 @@ from api.app.domain.services.league_command_service import (
 from api.app.domain.services.smoke_test_service import smoke_test
 from fastapi import Depends, Response, status
 
+from api.app.domain.services.start_next_season_service import StartNextSeasonService, create_start_next_season_service
+
 from .api_router import APIRouter
 
 router = APIRouter(prefix="/system")
@@ -133,3 +135,10 @@ async def update_schedule(
     command_executor: UpdateScheduleCommandExecutor = Depends(create_update_schedule_command_executor),
 ):
     return command_executor.execute(command)
+
+
+@router.post("/start_next_season")
+async def start_next_season(
+    service: StartNextSeasonService = Depends(create_start_next_season_service),
+):
+    return service.run_workflow()

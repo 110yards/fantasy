@@ -34,10 +34,11 @@ def create_update_schedule_command_executor(
 
 class UpdateScheduleCommand(BaseCommand):
     include_final: bool = False
+    season: Optional[int]
 
 
 class UpdateScheduleResult(BaseCommandResult):
-    updated_games: Optional[List[ScheduledGame]]
+    games: Optional[List[ScheduledGame]]
 
 
 class UpdateScheduleCommandExecutor(BaseCommandExecutor[UpdateScheduleCommand, UpdateScheduleResult]):
@@ -55,9 +56,11 @@ class UpdateScheduleCommandExecutor(BaseCommandExecutor[UpdateScheduleCommand, U
     def on_execute(self, command: UpdateScheduleCommand) -> UpdateScheduleResult:
         start = timer()
 
-        state = self.public_repo.get_state()
-
-        season = state.current_season
+        if not command.season:
+            state = self.public_repo.get_state()
+            season = state.current_season
+        else:
+            season = command.season
 
         Logger.info("Updating schedule")
 
@@ -77,7 +80,7 @@ class UpdateScheduleCommandExecutor(BaseCommandExecutor[UpdateScheduleCommand, U
         Logger.info(f"Schedule update complete ({timer() - start})")
         return UpdateScheduleResult(
             command=command,
-            updated_games=updated_games
+            games=future_games
         )
 
     def get_future_games(self, season: int, include_final: bool) -> List[ScheduledGame]:
