@@ -26,8 +26,6 @@
       </v-row>
     </v-card-text>
   </v-card>
-
-  <v-card v-else> The season has ended, hope to see you back next year!</v-card>
 </template>
 
 <script>

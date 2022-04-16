@@ -1,8 +1,14 @@
 <template>
   <div v-if="league">
+    <v-row class="mb-n16" dense>
+      <v-col cols="12" md="10">
+        <h2 class="brand">{{ league.name }}</h2>
+      </v-col>
+
+      <v-col cols="12" md="2"><season-list :league="league" /></v-col>
+    </v-row>
     <v-row>
       <v-col cols="12" md="8">
-        <h4 class="brand">{{ league.name }}</h4>
         <start-draft :league="league" />
 
         <app-primary-button v-if="canRenewLeague" @click="renewLeague"
@@ -47,6 +53,7 @@ import Scoreboard from "../../components/common/Scoreboard.vue"
 import SeasonSummary from "../../components/league/SeasonSummary.vue"
 import AppPrimaryButton from "../../components/buttons/AppPrimaryButton.vue"
 import { renewLeague } from "../../api/110yards/league"
+import SeasonList from "../../components/league/SeasonList.vue"
 
 export default {
   name: "league-index",
@@ -60,6 +67,7 @@ export default {
     Scoreboard,
     SeasonSummary,
     AppPrimaryButton,
+    SeasonList,
   },
   data() {
     return {
