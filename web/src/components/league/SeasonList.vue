@@ -10,9 +10,13 @@ export default {
   components: { AppSelect },
 
   props: {
-    league: {
-      type: Object,
+    leagueId: {
+      type: String,
       required: true,
+    },
+    season: {
+      type: String,
+      required: false,
     },
   },
 
@@ -44,24 +48,36 @@ export default {
 
   methods: {
     viewSeason() {
-      if (this.selectedSeason == this.currentSeason) return
-      this.$router.push(`/league/${this.league.id}/season/${this.selectedSeason}`)
+      if (this.selectedSeason == this.currentSeason) {
+        this.$router.push(`/league/${this.leagueId}`)
+      } else {
+        this.$router.push(`/league/${this.leagueId}/season/${this.selectedSeason}`)
+      }
     },
 
     configureReferences() {
-      if (!this.league) return
+      if (!this.leagueId) return
 
-      let path = `league/${this.league.id}/seasons`
+      let path = `league/${this.leagueId}/seasons`
       let ref = firestore.collection(path)
       this.$bind("seasons", ref)
     },
   },
 
   watch: {
-    league: {
+    leagueId: {
       immediate: true,
-      handler(league) {
+      handler(leagueId) {
         this.configureReferences()
+      },
+    },
+
+    season: {
+      immediate: true,
+      handler(season) {
+        if (season) {
+          this.selectedSeason = season
+        }
       },
     },
   },

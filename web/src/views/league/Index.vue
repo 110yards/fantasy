@@ -1,12 +1,6 @@
 <template>
   <div v-if="league">
-    <v-row class="mb-n16" dense>
-      <v-col cols="12" md="10">
-        <h2 class="brand">{{ league.name }}</h2>
-      </v-col>
-
-      <v-col cols="12" md="2"><season-list :league="league" /></v-col>
-    </v-row>
+    <league-header class="mb-n16" :leagueName="league.name" :leagueId="league.id" />
     <v-row>
       <v-col cols="12" md="8">
         <start-draft :league="league" />
@@ -54,6 +48,7 @@ import SeasonSummary from "../../components/league/SeasonSummary.vue"
 import AppPrimaryButton from "../../components/buttons/AppPrimaryButton.vue"
 import { renewLeague } from "../../api/110yards/league"
 import SeasonList from "../../components/league/SeasonList.vue"
+import LeagueHeader from "../../components/league/LeagueHeader.vue"
 
 export default {
   name: "league-index",
@@ -68,6 +63,7 @@ export default {
     SeasonSummary,
     AppPrimaryButton,
     SeasonList,
+    LeagueHeader,
   },
   data() {
     return {

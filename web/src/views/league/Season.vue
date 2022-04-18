@@ -1,5 +1,7 @@
 <template>
-  <season-summary :leagueId="leagueId" :season="seasonId" />
+  <div>
+    <season-summary :leagueId="leagueId" :season="seasonId" />
+  </div>
 </template>
 
 <script>
