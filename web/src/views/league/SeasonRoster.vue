@@ -83,10 +83,6 @@ export default {
     sortedSpots() {
       if (!this.roster) return null
 
-      //   let active = this.roster.positions.filter(spot => this.$root.isActivePositionType(spot.position_type))
-      //   let bench = this.roster.positions.filter(spot => this.$root.isBenchPositionType(spot.position_type))
-      //   let reserve = this.roster.positions.filter(spot => this.$root.isReservePositionType(spot.position_type))
-      //   return active.concat(bench).concat(reserve)
       return this.roster.positions.sort((a, b) => (a.position_id > b.position_id ? 1 : -1))
     },
   },
