@@ -8,7 +8,7 @@
     <v-card-text>
       <v-container>
         <v-row v-for="position in sortedSpots" :key="position.position_id">
-          <v-col cols="1"> {{ position.name }}</v-col>
+          <v-col cols="2" md="1"> {{ position.name }}</v-col>
 
           <v-col>
             <router-link :to="{ name: 'league-player', params: { leagueId: leagueId, playerId: position.player_id } }">
