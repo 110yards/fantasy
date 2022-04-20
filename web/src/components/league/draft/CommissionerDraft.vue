@@ -29,6 +29,7 @@
             :leagueId="leagueId"
             :showActions="isCommissioner && !draft.is_paused"
             :addFunction="addPlayer"
+            :isDraft="true"
           />
         </v-col>
         <v-col cols="12" md="3">

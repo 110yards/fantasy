@@ -114,8 +114,8 @@ export default {
 
   data() {
     return {
-      leaguePositions: {},
-      rosterPositions: [],
+      leaguePositions: null,
+      rosterPositions: null,
       saved: false,
     }
   },
@@ -160,9 +160,8 @@ export default {
     },
 
     async bindLeague(leagueId) {
-      this.leaguePositions = (
-        await firestore.collection("league").doc(leagueId).collection("config").doc("positions").get()
-      ).data()
+      let ref = firestore.collection("league").doc(leagueId).collection("config").doc("positions")
+      this.$bind("leaguePositions", ref)
     },
 
     async bindPositions() {

@@ -92,6 +92,10 @@
             <score :score="item.points" />
           </template>
 
+          <template v-slot:[`item.last_week_score`]="{ item }">
+            <score :score="item.last_week_score" />
+          </template>
+
           <template v-slot:[`item.position`]="{ item }">
             {{ item.position.toUpperCase() }}
           </template>
@@ -228,6 +232,7 @@ export default {
         player.average = playerScore != null ? playerScore.average_score : 0
         player.points = playerScore != null ? playerScore.total_score : 0
         player.games_played = playerScore != null ? playerScore.games_played : 0
+        player.last_week_score = playerScore != null ? playerScore.last_week_score : 0
 
         if (playerSeasonStats) {
           player.season_stats = playerSeasonStats.stats
@@ -298,6 +303,13 @@ export default {
           value: "average",
         },
       ]
+
+      if (!this.isDraft) {
+        headers.push({
+          text: "LW",
+          value: "last_week_score",
+        })
+      }
 
       headers = headers.concat(this.getPassingHeaders())
       headers = headers.concat(this.getRushingHeaders())

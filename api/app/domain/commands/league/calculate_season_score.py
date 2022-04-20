@@ -49,6 +49,7 @@ class CalculateSeasonScoreCommandExecutor(BaseCommandExecutor[CalculateSeasonSco
     def on_execute(self, command: CalculateSeasonScoreCommand) -> CalculateSeasonScoreResult:
 
         season = self.public_repo.get_state().current_season
+        completed_week = self.public_repo.get_state().current_week - 1
 
         players_seasons = self.player_season_repo.get_all(season)
 
@@ -60,7 +61,7 @@ class CalculateSeasonScoreCommandExecutor(BaseCommandExecutor[CalculateSeasonSco
         player_season_scores: List[PlayerLeagueSeasonScore] = list()
 
         for player_season in players_seasons:
-            player_season_score = PlayerLeagueSeasonScore.create(player_season.id, player_season, scoring)
+            player_season_score = PlayerLeagueSeasonScore.create(player_season.id, player_season, scoring, completed_week)
             player_season_scores.append(player_season_score)
 
         player_season_scores.sort(key=lambda x: x.total_score, reverse=True)

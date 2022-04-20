@@ -44,11 +44,16 @@ class RosterPlayerService:
         self.league_transaction_repo = league_transaction_repo
         self.league_config_repo = league_config_repo
 
-    def find_position_for(self, player: Player, roster: Roster) -> LeaguePosition:
+    def find_position_for(self, player: Player, roster: Roster) -> Optional[LeaguePosition]:
 
-        # this might just be for drafting - but I think we only want to auto-assign a position which is an active roster slot (eg: not bye, not ir)
         positions = list(roster.positions.values())
         positions.sort(key=lambda x: int(x.id))
+
+        # ensure there is a starting position for this player, even if it's occupied currently
+        eligible_starting_positions = [p for p in positions if p.is_starting_position_type() and p.position_type.is_eligible_for(player.position)]
+
+        if not eligible_starting_positions:
+            return None
 
         for position in positions:
             if not position.position_type.is_active_position_type():

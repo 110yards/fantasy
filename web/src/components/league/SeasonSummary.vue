@@ -66,7 +66,6 @@ export default {
       required: true,
     },
     season: {
-      type: String,
       required: false,
     },
   },

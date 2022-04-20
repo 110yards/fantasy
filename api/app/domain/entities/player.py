@@ -75,12 +75,15 @@ class PlayerLeagueSeasonScore(BaseEntity):
     average_score: float
     rank: Optional[int]
     game_scores: Dict[str, PlayerLeagueGameScore]
+    last_week_score: Optional[float] = 0.0
 
     @staticmethod
-    def create(id: str, player_season: PlayerSeason, scoring: ScoringSettings) -> PlayerLeagueSeasonScore:
+    def create(id: str, player_season: PlayerSeason, scoring: ScoringSettings, completed_week: int) -> PlayerLeagueSeasonScore:
         score = scoring.calculate_score(player_season.stats)
         average = score.total_score / player_season.games_played if player_season.games_played else 0
         game_scores = {}
+
+        last_week_score = 0.0
 
         for game in player_season.games:
             score = scoring.calculate_score(game.stats)
@@ -92,6 +95,8 @@ class PlayerLeagueSeasonScore(BaseEntity):
                 score=score,
             )
             game_scores[game.id] = game_score
+            if game.week_number == completed_week:
+                last_week_score = score.total_score
 
         return PlayerLeagueSeasonScore(
             id=id,
@@ -99,7 +104,8 @@ class PlayerLeagueSeasonScore(BaseEntity):
             season=player_season.season,
             total_score=score.total_score,
             average_score=average,
-            game_scores=game_scores
+            game_scores=game_scores,
+            last_week_score=last_week_score,
         )
 
 
