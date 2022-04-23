@@ -78,6 +78,15 @@ class UpdateLeaguePositionsCommandExecutor(BaseCommandExecutor[UpdateLeaguePosit
         positions.allow_bench_rb = command.allow_bench_rb
         positions.allow_bench_k = command.allow_bench_k
 
+        if not positions.allow_bench_qb and positions.qb > 1:
+            positions.qb = 1
+
+        if not positions.allow_bench_k and positions.k > 1:
+            positions.k = 1
+
+        if not positions.allow_bench_rb and positions.rb > 1:
+            positions.rb = 1
+
         league.positions = positions.create_positions()
 
         @firestore.transactional
