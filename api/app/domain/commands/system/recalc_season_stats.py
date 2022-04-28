@@ -1,7 +1,7 @@
 
 
 from api.app.core.firestore_proxy import Query
-from api.app.domain.entities.player import PlayerSeason
+from api.app.domain.entities.player_season import PlayerSeason
 from api.app.domain.repositories.player_game_repository import PlayerGameRepository, create_player_game_repository
 from api.app.domain.repositories.player_season_repository import PlayerSeasonRepository, create_player_season_repository
 from typing import List

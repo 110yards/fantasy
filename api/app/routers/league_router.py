@@ -40,6 +40,7 @@ from api.app.domain.repositories.repository_factory import get_league_repository
 from fastapi import Depends, Request
 
 from api.app.domain.services.discord_service import DiscordService, create_discord_service
+from api.app.domain.services.player_list_service import PlayerListService, create_player_list_service
 from api.app.domain.services.player_details_service import PlayerDetailsService, create_player_details_service
 
 from .api_router import APIRouter
@@ -209,3 +210,19 @@ async def set_notes(
 ):
     assert league_id == command.league_id
     command_executor.execute(command)
+
+
+@router.get("/{league_id}/players/draft")
+async def draft_players(
+    league_id: str,
+    service: PlayerListService = Depends(create_player_list_service),
+):
+    return service.get_draft_player_list(league_id)
+
+
+@router.get("/{league_id}/players/current")
+async def current_players(
+    league_id: str,
+    service: PlayerListService = Depends(create_player_list_service),
+):
+    return service.get_current_player_list(league_id)

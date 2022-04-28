@@ -2,6 +2,8 @@
   <v-sheet v-if="league && matchup">
     <matchup-header
       :matchup="matchup"
+      :away="awayRoster"
+      :home="homeRoster"
       :weekNumber="weekNumber"
       :enableProjections="enableProjections"
       :isCurrentWeek="isCurrentWeek"

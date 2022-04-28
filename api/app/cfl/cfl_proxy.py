@@ -1,9 +1,11 @@
-from api.app.core.logging import Logger
+import time
+from datetime import datetime
 
 import requests
 from api.app.config.settings import Settings, get_settings
+from api.app.core.logging import Logger
 from fastapi import Depends
-from datetime import datetime
+from ratelimiter import RateLimiter
 
 
 class CflApiException(BaseException):
@@ -15,12 +17,19 @@ def create_cfl_proxy(settings: Settings = Depends(get_settings)):
     return CflProxy(settings)
 
 
+def limited(until):
+    duration = int(round(until - time.time()))
+    Logger.info(f"Rated limit reached, pausing for {duration} seconds")
+
+
 class CflProxy:
     last_request_time: datetime = None
 
     def __init__(self, settings: Settings):
         self.settings = settings
 
+    # enforcing the 30/minute limit as a 30 second interval should make it less likely to accidentally hit the limit.
+    @RateLimiter(max_calls=15, period=30, callback=limited)
     def get(self, path: str) -> dict:
         if not self.settings.cfl_api_key:
             msg = "CFL API Key is not set. To enable CFL API requests, please add CFL_API_KEY=<key> to your .env file." \

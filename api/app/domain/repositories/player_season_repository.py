@@ -3,7 +3,7 @@
 from typing import List
 from google.cloud.firestore_v1.transaction import Transaction
 from api.app.core.firestore_proxy import FirestoreProxy
-from api.app.domain.entities.player import PlayerSeason
+from api.app.domain.entities.player_season import PlayerSeason
 
 
 def create_player_season_repository():
@@ -27,3 +27,6 @@ class PlayerSeasonRepository():
 
     def get_all(self, season: int, transaction: Transaction = None) -> List[PlayerSeason]:
         return self.firestore.get_all(PlayerSeasonRepository.path(season), transaction)
+
+    def set_all(self, season: int, player_seasons: List[PlayerSeason]):
+        return self.firestore.set_all(PlayerSeasonRepository.path(season), player_seasons)

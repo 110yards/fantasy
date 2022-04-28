@@ -24,18 +24,6 @@
         <draft-picks-list :rosters="rosters" :slots="upcomingPicks" title="Upcoming Picks" />
       </v-col>
 
-      <!-- <v-col cols="12" md="4">
-        <v-card>
-          <v-card-title>Last Pick</v-card-title>
-          <v-card-text v-if="previousSlot">
-            {{ previousSlot.result }}
-          </v-card-text>
-          <v-card-text v-else>
-            N/A
-          </v-card-text>
-        </v-card>
-      </v-col> -->
-
       <v-col cols="12" md="6">
         <draft-picks-list :rosters="rosters" :slots="completedPicks" title="Completed Picks" />
       </v-col>

@@ -13,6 +13,7 @@
 
     <v-card v-else class="player-list">
       <v-card-title>Players</v-card-title>
+      <v-card-subtitle v-if="showPreviousSeasonStats">Past season stats</v-card-subtitle>
       <v-card-actions>
         <v-row>
           <v-col cols="4" sm="1" class="mx-sm-2" v-for="(position, index) in positions" :key="index">
@@ -28,7 +29,7 @@
               {{ position.short }}
             </v-btn>
           </v-col>
-          <v-col v-if="!isDraft" cols="4" sm="1" class="mx-sm-2">
+          <v-col cols="4" sm="1" class="mx-sm-2">
             <v-btn
               type="button"
               class="position-toggle"
@@ -49,7 +50,7 @@
       <v-card-subtitle v-if="waiversActive">
         <v-alert dense color="warning">Waivers active until {{ waiversEnd }}</v-alert>
 
-        <router-link :to="{ name: 'faq', hash: '#waivers' }">How do waivers work?</router-link>
+        <a href="https://github.com/mdryden/110yards/wiki#waivers" target="_blank">How do waivers work?</a>
       </v-card-subtitle>
 
       <v-card-text>
@@ -83,7 +84,6 @@
           <template v-slot:[`item.display_name`]="{ item }">
             <player-link :player="item" :leagueId="leagueId" />
           </template>
-
           <template v-slot:[`item.points`]="{ item }">
             <score :score="item.points" />
           </template>
@@ -101,7 +101,7 @@
           </template>
 
           <template v-slot:[`item.owner`]="{ item }">
-            <league-roster-link v-if="item.owner" :leagueId="leagueId" :roster="item.owner" :trim="true" />
+            <league-roster-link v-if="isOwned(item)" :leagueId="leagueId" :roster="getOwner(item.id)" :trim="true" />
           </template>
         </v-data-table>
       </v-card-text>
@@ -130,7 +130,7 @@ import AppTextField from "../../components/inputs/AppTextField.vue"
 import PlayerLink from "../../components/player/PlayerLink.vue"
 import { firestore } from "../../modules/firebase"
 import LeagueRosterLink from "../league/LeagueRosterLink.vue"
-import { visiblePlayerPositions } from "../../api/110yards/constants"
+import { draftState, visiblePlayerPositions } from "../../api/110yards/constants"
 import * as headers from "./positionHeaders"
 import AppPrimaryButton from "../buttons/AppPrimaryButton.vue"
 import AppDefaultButton from "../buttons/AppDefaultButton.vue"
@@ -139,6 +139,7 @@ import { longDate } from "../../modules/formatter"
 import AddPlayer from "./AddPlayer.vue"
 import { formatScore } from "../../modules/formatter"
 import Score from "../Score.vue"
+import { getCurrentPlayers, getDraftPlayers } from "../../api/110yards/league"
 
 export default {
   name: "player-list",
@@ -200,9 +201,7 @@ export default {
       positions: [],
       ownedPlayers: [],
       rosters: null,
-      playerScores: [],
       playerToAdd: null,
-      seasonStats: [],
     }
   },
   computed: {
@@ -218,37 +217,11 @@ export default {
       return this.waiversActive ? longDate(this.$root.state.waivers_end.toDate()) : null
     },
 
-    playerData() {
-      let players = []
-
-      for (let player of this.players) {
-        let playerScore = this.getPlayerScore(player)
-        let playerSeasonStats = this.getPlayerStats(player)
-        player.owner = this.getOwner(player.id)
-        player.opponent = this.getNextOpponent(player)
-
-        player.score = playerScore
-        player.rank = playerScore != null ? playerScore.rank : ""
-        player.average = playerScore != null ? playerScore.average_score : 0
-        player.points = playerScore != null ? playerScore.total_score : 0
-        player.games_played = playerScore != null ? playerScore.games_played : 0
-        player.last_week_score = playerScore != null ? playerScore.last_week_score : 0
-
-        if (playerSeasonStats) {
-          player.season_stats = playerSeasonStats.stats
-        }
-
-        players.push(player)
-      }
-
-      return players
-    },
-
     filteredPlayers() {
-      let players = this.playerData
+      let players = this.players
 
       if (this.freeAgentsOnly) {
-        players = players.filter(p => p.owner == null)
+        players = players.filter(p => !this.isOwned(p))
       }
 
       players = players.filter(player => visiblePlayerPositions.includes(player.position))
@@ -329,8 +302,20 @@ export default {
     currentRoster() {
       return this.rosters != null && this.uid ? this.rosters.filter(r => r.id == this.uid)[0] : null
     },
+
+    currentLeague() {
+      return this.$root.currentLeague
+    },
+
+    showPreviousSeasonStats() {
+      return this.isDraft || (this.currentLeague && this.currentLeague.draft_state != draftState.Complete)
+    },
   },
   methods: {
+    isOwned(player) {
+      return player.id in this.playerOwners
+    },
+
     addPlayer(player) {
       // draft
       if (this.addFunction) {
@@ -450,11 +435,17 @@ export default {
       return !shouldInclude ? [] : headers.defense
     },
 
-    configureReferences() {
-      let path = `season/${this.$root.currentSeason}/player`
-      let playersRef = firestore.collection(path)
-      this.$bind("players", playersRef)
+    async loadPlayers() {
+      if (!this.currentLeague || !this.uid) return
 
+      if (this.showPreviousSeasonStats) {
+        this.players = await getDraftPlayers(this.currentLeague.id)
+      } else {
+        this.players = await getCurrentPlayers(this.currentLeague.id)
+      }
+    },
+
+    configureReferences() {
       let positionsRef = firestore
         .collection("roster-positions")
         .where("is_player_position", "==", true)
@@ -468,21 +459,31 @@ export default {
       let rostersPath = `league/${this.leagueId}/roster`
       let rostersRef = firestore.collection(rostersPath)
       this.$bind("rosters", rostersRef)
-
-      let scoresPath = `league/${this.leagueId}/player_score`
-      let scoresRef = firestore.collection(scoresPath)
-      this.$bind("playerScores", scoresRef)
-
-      let seasonStatspath = `season/${this.$root.currentSeason}/player_season`
-      let seasonStatsRef = firestore.collection(seasonStatspath)
-      this.$bind("seasonStats", seasonStatsRef)
     },
   },
   watch: {
     leagueId: {
       immediate: true,
-      handler(_) {
-        this.configureReferences()
+      handler(leagueId) {
+        if (leagueId) {
+          this.configureReferences()
+        }
+      },
+    },
+    currentLeague: {
+      immediate: true,
+      handler(currentLeague) {
+        if (currentLeague) {
+          this.loadPlayers()
+        }
+      },
+    },
+    uid: {
+      immediate: true,
+      handler(uid) {
+        if (uid) {
+          this.loadPlayers()
+        }
       },
     },
   },

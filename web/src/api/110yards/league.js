@@ -101,3 +101,11 @@ export const renewLeague = async leagueId => {
 export const setNotes = async (user, leagueId, command) => {
   return client.put(user, `/league/${leagueId}/notes`, command)
 }
+
+export const getCurrentPlayers = async leagueId => {
+  return client.get(null, `/league/${leagueId}/players/current`)
+}
+
+export const getDraftPlayers = async leagueId => {
+  return client.get(null, `/league/${leagueId}/players/draft`)
+}

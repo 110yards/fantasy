@@ -80,10 +80,11 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
 
         page = 1
         current_players = []
+        page_size = 20
         while True:
-            result = self.cfl_player_proxy.get_players_for_season(season, page_number=page, page_size=100)
+            result = self.cfl_player_proxy.get_players_for_season(season, page_number=page, page_size=page_size)
             current_players.extend(result["data"])
-            if len(result["data"]) < 100:
+            if len(result["data"]) < page_size:
                 break
             page += 1
 
@@ -160,7 +161,6 @@ def get_changed_players(current_players: Dict[str, Player], stored_players: Dict
         current.compute_hash()
 
         if stored:
-            current.season_stats = stored.season_stats  # don't lose the season stats!
             current.compute_hash()
             needs_update = stored.hash != current.hash
 

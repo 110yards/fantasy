@@ -6,7 +6,8 @@ from api.app.core.firestore_proxy import Query
 from api.app.domain.entities.opponents import Opponents
 from api.app.domain.entities.team import Team
 from api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
-from api.app.domain.entities.player import STATUS_ACTIVE, Player, PlayerLeagueSeasonScore
+from api.app.domain.entities.player import STATUS_ACTIVE, Player
+from api.app.domain.entities.player_league_season_score import PlayerLeagueSeasonScore
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
 
 from fastapi.param_functions import Depends
