@@ -11,9 +11,6 @@ from api.app.domain.commands.system.update_active_players import (
 from api.app.domain.commands.system.update_games import (
     SimState, UpdateGamesCommand, UpdateGamesCommandExecutor,
     create_update_games_command_executor)
-# from api.app.domain.commands.system.update_player_stats_for_week import (
-#     UpdatePlayerStatsForWeekCommand, UpdatePlayerStatsForWeekCommandExecutor,
-#     create_update_player_stats_for_week_command_executor)
 from api.app.domain.commands.system.update_schedule import UpdateScheduleCommand, UpdateScheduleCommandExecutor, create_update_schedule_command_executor
 from api.app.domain.events.configure_events import (ConfigureEvents,
                                                     create_configure_events)
@@ -114,14 +111,6 @@ async def league_command(
     league_command_service: LeagueCommandService = Depends(create_league_command_service)
 ):
     return league_command_service.execute_league_command(league_id, push)
-
-
-# @router.post("/update_player_stats_for_week")
-# async def update_player_stats_for_week(
-#     command: UpdatePlayerStatsForWeekCommand,
-#     command_executor: UpdatePlayerStatsForWeekCommandExecutor = Depends(create_update_player_stats_for_week_command_executor),
-# ):
-#     return command_executor.execute(command)
 
 
 @router.post("/set_end_of_season")
