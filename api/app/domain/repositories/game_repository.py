@@ -32,3 +32,6 @@ class GameRepository:
     def for_week(self, season: int, week: int) -> List[Game]:
         query = Query("week", "==", week)
         return self.firestore.where(GameRepository.path(season), query)
+
+    def delete_all(self, season: int):
+        self.firestore.delete_all(GameRepository.path(season))

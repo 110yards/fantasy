@@ -151,6 +151,7 @@ async def start_next_season(
 @router.post("/import_season")
 async def import_season(
     season: int,
+    clean: bool = False,
     service: ImportSeasonService = Depends(create_previous_season_stats_service),
 ):
-    return service.import_season(season)
+    return service.import_season(season, clean)

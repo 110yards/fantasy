@@ -7,6 +7,7 @@ from api.app.core.logging import Logger
 from api.app.domain.entities.event_type import EVENT_TYPE_REGULAR
 from api.app.domain.entities.player_season import PlayerSeason
 from api.app.domain.entities.player_game import PlayerGame
+from api.app.domain.repositories.game_repository import GameRepository, create_game_repository
 from api.app.domain.repositories.player_season_repository import PlayerSeasonRepository, create_player_season_repository
 from api.app.domain.services.game_changes_service import GameChangesService, create_game_changes_service
 
@@ -15,11 +16,13 @@ def create_previous_season_stats_service(
     cfl_game_proxy: CflGameProxy = Depends(create_cfl_game_proxy),
     game_changes_service: GameChangesService = Depends(create_game_changes_service),
     player_season_repo: PlayerSeasonRepository = Depends(create_player_season_repository),
+    game_repo: GameRepository = Depends(create_game_repository),
 ):
     return ImportSeasonService(
         cfl_game_proxy=cfl_game_proxy,
         game_changes_service=game_changes_service,
         player_season_repo=player_season_repo,
+        game_repo=game_repo,
     )
 
 
@@ -30,12 +33,17 @@ class ImportSeasonService:
         cfl_game_proxy: CflGameProxy,
         game_changes_service: GameChangesService,
         player_season_repo: PlayerSeasonRepository,
+        game_repo: GameRepository,
     ):
         self.cfl_game_proxy = cfl_game_proxy
         self.game_changes_service = game_changes_service
         self.player_season_repo = player_season_repo
+        self.game_repo = game_repo
 
-    def import_season(self, season: int) -> Any:
+    def import_season(self, season: int, clean: bool) -> Any:
+
+        if clean:
+            self.game_repo.delete_all(season)
 
         result = self.cfl_game_proxy.get_game_summaries_for_season(season)
         games: List[Dict] = result["data"]
