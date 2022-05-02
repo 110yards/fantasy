@@ -64,7 +64,7 @@
         </v-col>
       </v-row>
       <v-row v-if="playerScore && enableProjections">
-        <v-col class="py-0 caption grey--text">{{ formatScore(playerScore.average) }}</v-col>
+        <v-col class="py-0 caption grey--text"><score :score="projection" /></v-col>
       </v-row>
 
       <v-row v-if="playerToBeMoved">
@@ -79,7 +79,10 @@
     <v-col cols="3" md="0" class="text-right d-block d-md-none">
       <v-row>
         <v-col v-if="!playerToBeMoved" class="py-0">
-          {{ gameStarted ? formatScore(spot.game_score) : "--" }}
+          <span v-if="gameStarted">
+            <score :score="spot.game_score" />
+          </span>
+          <span v-else>--</span>
         </v-col>
 
         <v-col v-if="playerToBeMoved">
@@ -92,7 +95,7 @@
         </v-col>
       </v-row>
       <v-row v-if="!playerToBeMoved && playerScore && enableProjections">
-        <v-col class="py-0 caption grey--text">{{ formatScore(projection) }}</v-col>
+        <v-col class="py-0 caption grey--text"><score :score="projection" /></v-col>
       </v-row>
 
       <v-row v-if="playerToBeMoved">
@@ -117,13 +120,13 @@
 
 <script>
 import PlayerLink from "../../player/PlayerLink.vue"
-import * as formatter from "../../../modules/formatter"
 import Locked from "../../icons/Locked.vue"
 import { eventStatus, playerStatus, positionType, teamId } from "../../../api/110yards/constants"
 import NationalStatus from "../../player/NationalStatus.vue"
 import GameState from "../GameState.vue"
 import { firestore } from "../../../modules/firebase"
 import PositionScore from "../PositionScore.vue"
+import Score from "../../Score.vue"
 
 export default {
   name: "lineup-spot",
@@ -133,6 +136,7 @@ export default {
     NationalStatus,
     GameState,
     PositionScore,
+    Score,
   },
   props: {
     spot: {
@@ -177,7 +181,7 @@ export default {
 
       if (this.$root.getOpponent(this.spot.player.team.abbreviation) == "FA") return 0
 
-      return this.playerScore.average
+      return this.playerScore.average_score
     },
     name() {
       return positionType.spotName(this.spot.position_type)
@@ -229,12 +233,6 @@ export default {
   },
 
   methods: {
-    formatScore(score) {
-      if (score == null || score == undefined) score = 0
-
-      return formatter.formatScore(score)
-    },
-
     configureReferences() {
       if (!this.leagueId || !this.spot || !this.spot.player) return
 

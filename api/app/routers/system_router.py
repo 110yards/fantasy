@@ -11,9 +11,6 @@ from api.app.domain.commands.system.update_active_players import (
 from api.app.domain.commands.system.update_games import (
     SimState, UpdateGamesCommand, UpdateGamesCommandExecutor,
     create_update_games_command_executor)
-from api.app.domain.commands.system.update_player_stats_for_week import (
-    UpdatePlayerStatsForWeekCommand, UpdatePlayerStatsForWeekCommandExecutor,
-    create_update_player_stats_for_week_command_executor)
 from api.app.domain.commands.system.update_schedule import UpdateScheduleCommand, UpdateScheduleCommandExecutor, create_update_schedule_command_executor
 from api.app.domain.events.configure_events import (ConfigureEvents,
                                                     create_configure_events)
@@ -21,6 +18,7 @@ from api.app.domain.services.end_of_day_service import EndOfDayService, create_e
 from api.app.domain.services.end_of_week_service import EndOfWeekRequest, EndOfWeekService, create_end_of_week_service
 from api.app.domain.services.league_command_service import (
     LeagueCommandService, create_league_command_service)
+from api.app.domain.services.import_season_service import ImportSeasonService, create_previous_season_stats_service
 from api.app.domain.services.smoke_test_service import smoke_test
 from fastapi import Depends, Response, status
 
@@ -82,7 +80,9 @@ async def update_all_games(
 
 @router.post("/players", response_model=UpdateActivePlayersCommandResult)
 # Invoked by scheduled task - gets all players from CFL team rosters and updates player master data
-async def update_players(command_executor: UpdateActivePlayersCommandExecutor = Depends(update_active_players_command_executor)):
+async def update_players(
+    command_executor: UpdateActivePlayersCommandExecutor = Depends(update_active_players_command_executor)
+):
     command = UpdateActivePlayersCommand()
     return command_executor.execute(command)
 
@@ -113,14 +113,6 @@ async def league_command(
     return league_command_service.execute_league_command(league_id, push)
 
 
-@router.post("/update_player_stats_for_week")
-async def update_player_stats_for_week(
-    command: UpdatePlayerStatsForWeekCommand,
-    command_executor: UpdatePlayerStatsForWeekCommandExecutor = Depends(create_update_player_stats_for_week_command_executor),
-):
-    return command_executor.execute(command)
-
-
 @router.post("/set_end_of_season")
 async def set_end_of_season(
     command: EndOfSeasonCommand,
@@ -143,3 +135,12 @@ async def start_next_season(
     service: StartNextSeasonService = Depends(create_start_next_season_service),
 ):
     return service.run_workflow(season)
+
+
+@router.post("/import_season")
+async def import_season(
+    season: int,
+    clean: bool = False,
+    service: ImportSeasonService = Depends(create_previous_season_stats_service),
+):
+    return service.import_season(season, clean)

@@ -32,6 +32,7 @@ api_key_endpoints = [
     "/system/end_of_day",
     "/system/end_of_week",
     "/system/schedule",
+    "/system/import_season",
 ]
 
 

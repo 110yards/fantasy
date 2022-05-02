@@ -1,5 +1,6 @@
 
-from api.app.domain.entities.player import PlayerLeagueSeasonScore
+
+from api.app.domain.entities.player_league_season_score import PlayerLeagueSeasonScore, rank_player_seasons
 from api.app.domain.repositories.player_season_repository import PlayerSeasonRepository, create_player_season_repository
 from api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
@@ -24,6 +25,7 @@ def create_calculate_season_score_command_executor(
 @annotate_args
 class CalculateSeasonScoreCommand(BaseCommand):
     league_id: Optional[str]
+    season: Optional[int]
 
 
 @annotate_args
@@ -48,8 +50,9 @@ class CalculateSeasonScoreCommandExecutor(BaseCommandExecutor[CalculateSeasonSco
 
     def on_execute(self, command: CalculateSeasonScoreCommand) -> CalculateSeasonScoreResult:
 
-        season = self.public_repo.get_state().current_season
-        completed_week = self.public_repo.get_state().current_week - 1
+        state = self.public_repo.get_state()
+        season = command.season or state.current_season
+        completed_week = state.current_week - 1
 
         players_seasons = self.player_season_repo.get_all(season)
 
@@ -64,24 +67,7 @@ class CalculateSeasonScoreCommandExecutor(BaseCommandExecutor[CalculateSeasonSco
             player_season_score = PlayerLeagueSeasonScore.create(player_season.id, player_season, scoring, completed_week)
             player_season_scores.append(player_season_score)
 
-        player_season_scores.sort(key=lambda x: x.total_score, reverse=True)
-
-        rank = 0
-        skip_by = 1
-        last_player_score: PlayerLeagueSeasonScore = None
-
-        for player_score in player_season_scores:
-            tied = last_player_score and player_score.total_score == last_player_score.total_score
-
-            if tied:
-                player_score.rank = rank
-                skip_by += 1
-            else:
-                rank += skip_by
-                skip_by = 1
-                player_score.rank = rank
-
-            last_player_score = player_score
+        rank_player_seasons(player_season_scores)
 
         for player_score in player_season_scores:
             self.player_score_repo.set(command.league_id, player_score)

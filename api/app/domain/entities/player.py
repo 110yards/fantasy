@@ -1,112 +1,17 @@
 from __future__ import annotations
 from datetime import datetime
-from pydantic import BaseModel
 
 from pydantic.class_validators import root_validator
 from api.app.domain.entities.game_player import GamePlayer
-from api.app.domain.entities.player_score import PlayerScore
-from api.app.domain.entities.scoring_settings import ScoringSettings
 from api.app.domain.enums.position_type import PositionType
-from api.app.domain.entities.stats import Stats
 from api.app.core.hash_dict import hash_dict
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 from api.app.core.base_entity import BaseEntity
 from .team import Team
 from api.app.core.annotate_args import annotate_args
 
 STATUS_INACTIVE = 0
 STATUS_ACTIVE = 1
-
-
-@annotate_args
-class PlayerGame(BaseEntity):
-    player_id: str
-    game_id: int
-    week_number: int
-    team: Team
-    opponent: Team
-    stats: Stats
-
-
-@annotate_args
-class PlayerSeason(BaseEntity):
-    season: int
-    games_played: int
-    player_id: str
-    stats: Stats
-    games: List[PlayerGame] = []
-
-    @staticmethod
-    def create(season: int, player_id: str, player_games: List[PlayerGame]):
-        stats = Stats()
-
-        for player_game in player_games:
-            for key in player_game.stats.dict():
-                game_total = getattr(player_game.stats, key)
-                if game_total is None:
-                    continue
-
-                season_total = getattr(stats, key)
-
-                if season_total is None:
-                    season_total = 0
-
-                season_total += game_total
-                setattr(stats, key, season_total)
-
-        id = f"{player_id}"
-        games_played = len(player_games)
-        return PlayerSeason(id=id, player_id=player_id, season=season, stats=stats, games_played=games_played, games=player_games)
-
-
-class PlayerLeagueGameScore(BaseModel):
-    game_id: str
-    week_number: int
-    team: Team
-    opponent: Team
-    score: PlayerScore
-
-
-@annotate_args
-class PlayerLeagueSeasonScore(BaseEntity):
-    season: int
-    player_id: str
-    total_score: float
-    average_score: float
-    rank: Optional[int]
-    game_scores: Dict[str, PlayerLeagueGameScore]
-    last_week_score: Optional[float] = 0.0
-
-    @staticmethod
-    def create(id: str, player_season: PlayerSeason, scoring: ScoringSettings, completed_week: int) -> PlayerLeagueSeasonScore:
-        score = scoring.calculate_score(player_season.stats)
-        average = score.total_score / player_season.games_played if player_season.games_played else 0
-        game_scores = {}
-
-        last_week_score = 0.0
-
-        for game in player_season.games:
-            score = scoring.calculate_score(game.stats)
-            game_score = PlayerLeagueGameScore(
-                game_id=game.id,
-                week_number=game.week_number,
-                team=game.team,
-                opponent=game.opponent,
-                score=score,
-            )
-            game_scores[game.id] = game_score
-            if game.week_number == completed_week:
-                last_week_score = score.total_score
-
-        return PlayerLeagueSeasonScore(
-            id=id,
-            player_id=player_season.player_id,
-            season=player_season.season,
-            total_score=score.total_score,
-            average_score=average,
-            game_scores=game_scores,
-            last_week_score=last_week_score,
-        )
 
 
 @annotate_args

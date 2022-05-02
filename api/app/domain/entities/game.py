@@ -6,6 +6,7 @@ from __future__ import annotations
 from api.app.core.sim_state import SimState
 
 from api.app.domain.entities.game_player import GamePlayer
+from api.app.domain.entities.player_game import PlayerGame
 from api.app.domain.enums.position_type import PositionType
 
 from typing import Dict, List, Optional
@@ -16,7 +17,6 @@ from api.app.domain.entities.event_status import EventStatus
 from api.app.domain.entities.event_type import EventType
 from api.app.domain.entities.game_score import GameScore
 from api.app.domain.entities.game_teams import GameTeams
-from api.app.domain.entities.game_player_stats import GamePlayerStats
 
 
 class Game(BaseEntity):
@@ -29,7 +29,7 @@ class Game(BaseEntity):
     event_status: EventStatus
     score: GameScore
     teams: GameTeams
-    player_stats: Dict[str, GamePlayerStats]
+    player_stats: Dict[str, PlayerGame]
     hash: Optional[str]
     away_roster: Optional[Dict[str, GamePlayer]]
     home_roster: Optional[Dict[str, GamePlayer]]
@@ -62,6 +62,7 @@ def from_cfl(game: dict, count_away_players: bool, count_home_players: bool, sim
     if count_away_players:
         stats1 = get_team_player_stats(
             game["id"],
+            game["week"],
             game["boxscore"]["teams"]["team_1"],
             game["rosters"]["teams"]["team_1"]["roster"],
             game["teams"]["away"],
@@ -73,6 +74,7 @@ def from_cfl(game: dict, count_away_players: bool, count_home_players: bool, sim
     if count_home_players:
         stats2 = get_team_player_stats(
             game["id"],
+            game["week"],
             game["boxscore"]["teams"]["team_2"],
             game["rosters"]["teams"]["team_2"]["roster"],
             game["teams"]["home"],
@@ -82,7 +84,7 @@ def from_cfl(game: dict, count_away_players: bool, count_home_players: bool, sim
         stats2 = []
 
     all_stats = stats1 + stats2
-    game["player_stats"] = {stats["player"]["id"]: stats for stats in all_stats}
+    game["player_stats"] = {stats["player_id"]: stats for stats in all_stats}
 
     # More simulation code
     if sim_state:
@@ -118,21 +120,21 @@ def clean_team(team: dict):
     }
 
 
-def get_team_player_stats(game_id: str, boxscore: dict, roster: dict, team: dict, opponent: dict):
+def get_team_player_stats(game_id: str, week: int, boxscore: dict, roster: dict, team: dict, opponent: dict):
     team_stats = []
 
     for player in roster:
         if player["position"] == "OL" or player["position"] == "OT":
             continue
 
-        player_stats = get_player_stats(boxscore["players"], player, team, opponent)
+        player_stats = get_player_stats(game_id, week, boxscore["players"], player, team, opponent)
         player_stats["game_id"] = game_id
         team_stats.append(player_stats)
 
     return team_stats
 
 
-def get_player_stats(boxscore: dict, player: dict, team: dict, opponent: dict):
+def get_player_stats(game_id: int, week: int, boxscore: dict, player: dict, team: dict, opponent: dict):
     defence = get_player_stats_for_category(boxscore["defence"], player["cfl_central_id"])
     field_goals = get_player_stats_for_category(boxscore["field_goals"], player["cfl_central_id"])
     kick_returns = get_player_stats_for_category(boxscore["kick_returns"], player["cfl_central_id"])
@@ -167,8 +169,11 @@ def get_player_stats(boxscore: dict, player: dict, team: dict, opponent: dict):
     player["position"] = PositionType.from_cfl_roster(player["position"])
 
     combined = {
+        "id": PlayerGame.create_id(player["id"], game_id),
+        "game_id": game_id,
+        "week_number": week,
         "stats": stats,
-        "player": player,
+        "player_id": player["id"],
         "team": team,
         "opponent": opponent,
     }

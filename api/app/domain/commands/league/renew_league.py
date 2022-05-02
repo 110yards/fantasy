@@ -117,10 +117,10 @@ class RenewLeagueCommandExecutor(BaseCommandExecutor[RenewLeagueCommand, RenewLe
         self.league_config_repo.set_schedule_config(league.id, schedule)
 
         self.owned_player_repo.delete_all(league.id)
-        self.player_score_repo.delete_all(league.id)
         self.transaction_repo.delete_all(league.id)
         self.league_week_repo.delete_all(league.id)
         self.matchup_repo.delete_all(league.id)
+        self.player_score_repo.delete_all(league.id)
 
         for roster in self.league_roster_repo.get_all(league.id):
             roster.reset()

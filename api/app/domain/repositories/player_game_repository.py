@@ -4,7 +4,7 @@ from typing import List, Union
 from fastapi.param_functions import Query
 from google.cloud.firestore_v1.transaction import Transaction
 from api.app.core.firestore_proxy import FirestoreProxy
-from api.app.domain.entities.player import PlayerGame
+from api.app.domain.entities.player_game import PlayerGame
 
 
 def create_player_game_repository():
@@ -29,8 +29,8 @@ class PlayerGameRepository():
     def set(self, season: int, player_game: PlayerGame, transaction: Transaction = None):
         return self.firestore.set(PlayerGameRepository.path(season), player_game, transaction)
 
-    # def where(self, season: int, queries: Union[Query, List[Query]], transaction: Transaction = None) -> List[PlayerGame]:
-    #     return self.firestore.where(PlayerGameRepository.path(season, player_id), queries, transaction)
+    def set_all(self, season: int, player_games: List[PlayerGame]):
+        return self.firestore.set_all(PlayerGameRepository.path(season), player_games)
 
     def where(self, season: int, queries: Union[Query, List[Query]], transaction: Transaction = None) -> List[PlayerGame]:
         return self.firestore.where(PlayerGameRepository.path(season), queries, transaction)

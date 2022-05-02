@@ -1,9 +1,10 @@
 
 
-from typing import List
+from typing import List, Optional
 from fastapi import Depends
 from pydantic import BaseModel
-from api.app.domain.entities.player import Player, PlayerLeagueSeasonScore
+from api.app.domain.entities.player import Player
+from api.app.domain.entities.player_league_season_score import PlayerLeagueSeasonScore
 
 from api.app.domain.entities.player_score import PlayerScore
 from api.app.domain.entities.scoreboard import ScoreboardGame
@@ -30,8 +31,8 @@ class GameLog(BaseModel):
 
 class PlayerDetails(BaseModel):
     player: Player
-    season_stats: Stats
-    season_score: PlayerLeagueSeasonScore
+    season_stats: Optional[Stats]
+    season_score: Optional[PlayerLeagueSeasonScore]
     game_log: List[GameLog] = []
 
 
@@ -71,28 +72,32 @@ class PlayerDetailsService:
         player_season = self.player_season_repo.get(season, player_id)
         season_score = self.score_repo.get(league_id, player_id)
 
+        season_stats = None
+        if player_season:
+            season_stats = player_season.stats
+
         details = PlayerDetails(
             player=player,
-            season_stats=player_season.stats,
+            season_stats=season_stats,
             season_score=season_score,
         )
+        if season_score:
+            for game_score in season_score.game_scores.values():
+                player_game_id = game_score.game_id
+                player_game = self.player_game_repo.get(season, player_game_id)
+                game = self.game_repo.get(season, player_game.game_id)
 
-        for game_score in season_score.game_scores.values():
-            player_game_id = game_score.game_id
-            player_game = self.player_game_repo.get(season, player_game_id)
-            game = self.game_repo.get(season, player_game.game_id)
-
-            log = GameLog(
-                game_id=game.id,
-                game_number=game.game_number,
-                game=ScoreboardGame.create_from_game(game),
-                week=game.week,
-                season=season,
-                team=player_game.team,
-                opponent=player_game.opponent,
-                stats=player_game.stats,
-                score=game_score.score,
-            )
-            details.game_log.append(log)
+                log = GameLog(
+                    game_id=game.id,
+                    game_number=game.game_number,
+                    game=ScoreboardGame.create_from_game(game),
+                    week=game.week,
+                    season=season,
+                    team=player_game.team,
+                    opponent=player_game.opponent,
+                    stats=player_game.stats,
+                    score=game_score.score,
+                )
+                details.game_log.append(log)
 
         return details

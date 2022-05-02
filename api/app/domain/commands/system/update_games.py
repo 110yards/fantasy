@@ -12,11 +12,10 @@ from api.app.domain.repositories.scheduled_game_repository import ScheduledGameR
 from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
 
 
-from api.app.domain.entities.player import PlayerGame
+from api.app.domain.entities.player_game import PlayerGame
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
 from api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
 from api.app.core.logging import Logger
-from api.app.domain.commands.league.update_player_stats import UpdatePlayerStatsCommand
 from api.app.domain.topics import UPDATE_PLAYERS_TOPIC
 
 import time
@@ -27,7 +26,6 @@ from api.app.cfl.cfl_game_proxy import CflGameProxy, create_cfl_game_proxy
 from api.app.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
 from api.app.core.publisher import Publisher, create_publisher
 from api.app.domain.entities.game import Game, from_cfl
-from api.app.domain.entities.game_player_stats import GamePlayerStats
 from api.app.domain.repositories.game_repository import GameRepository, create_game_repository
 from fastapi.param_functions import Depends
 from firebase_admin import firestore
@@ -52,12 +50,14 @@ def create_update_games_command_executor(
 
 class UpdateGamesCommand(BaseCommand):
     week: Optional[int]
+    season: Optional[int]
     sim_state: Optional[SimState]
+    commit_changes: Optional[bool] = True
 
 
 class UpdateGamesResult(BaseCommandResult):
     changed_games: Optional[List[Game]]
-    changed_players: Optional[List[UpdatePlayerStatsCommand]]
+    changed_players: Optional[List[PlayerGame]]
 
 
 class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateGamesResult]):
@@ -87,8 +87,13 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
 
         state = self.public_repo.get_state()
 
-        season = state.current_season
+        season = command.season or state.current_season
         week = command.week or state.current_week
+
+        updating_current_season = season == state.current_season
+        updating_current_week = week == state.current_week
+
+        update_state = updating_current_season and updating_current_week
 
         Logger.info(f"Updating games for week {week}")
 
@@ -143,49 +148,46 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
         new_opponents = Opponents.create(opponents)
 
         @firestore.transactional
-        def update_games(transaction, games: Dict[str, Game], players: List[GamePlayerStats]):
-            state = self.state_repo.get()
+        def update_games(transaction, games: Dict[str, Game], players: List[PlayerGame]):
+            Logger.debug(f"Saving changes ({timer() - start})")
 
             new_state = state.copy()
             new_state.locks = new_locks_state
 
-            current_scoreboard = self.public_repo.get_scoreboard()
-            current_opponents = self.public_repo.get_opponents()
+            current_scoreboard = self.public_repo.get_scoreboard(transaction)
+            current_opponents = self.public_repo.get_opponents(transaction)
 
             pending_player_updates = []
 
-            for player_update in players:
-                player_game = PlayerGame(
-                    id=f"{player_update.player.id}_{player_update.game_id}",
-                    game_id=player_update.game_id,
-                    week_number=week,
-                    player_id=player_update.player.id,
-                    team=player_update.team,
-                    opponent=player_update.opponent,
-                    stats=player_update.stats
-                )
+            Logger.debug(f"Saving {len(players)} player changes ({timer() - start})")
+            for player_game in players:
                 self.player_game_repo.set(season, player_game, transaction)
 
+            Logger.debug(f"Saving game changes ({timer() - start})")
             for game_id in games:
                 game = game_updates[game_id]
                 self.game_repo.set(season, game, transaction)
 
-            if new_state.changed(state):
+            if new_state.changed(state) and update_state:
+                Logger.debug(f"Saving state ({timer() - start})")
                 self.state_repo.set(new_state, transaction)
 
-            if new_scoreboard.changed(current_scoreboard):
+            if new_scoreboard.changed(current_scoreboard) and update_state:
+                Logger.debug(f"Saving scoreboard ({timer() - start})")
                 self.public_repo.set_scoreboard(new_scoreboard, transaction)
 
-            if new_opponents.changed(current_opponents):
+            if new_opponents.changed(current_opponents) and update_state:
+                Logger.debug(f"Saving opponents ({timer() - start})")
                 self.public_repo.set_opponents(new_opponents, transaction)
 
             return pending_player_updates
 
-        Logger.debug(f"Saving changes ({timer() - start})")
-        transaction = self.game_repo.firestore.create_transaction()
-        update_games(transaction, game_updates, player_updates)
+        if command.commit_changes:
+            Logger.debug(f"Creating transaction ({timer() - start})")
+            transaction = self.game_repo.firestore.create_transaction()
+            update_games(transaction, game_updates, player_updates)
 
-        if roster_added:
+        if roster_added and command.commit_changes:
             Logger.debug(f"Sending UPDATE_PLAYERS event ({timer() - start})")
             self.publisher.publish(BaseModel(), UPDATE_PLAYERS_TOPIC)
 
@@ -193,6 +195,7 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
         return UpdateGamesResult(
             command=command,
             changed_games=[game_updates[game_id] for game_id in game_updates],
+            changed_players=player_updates,
         )
 
     def get_current_games(self, season: int, week: int, sim_state: Optional[SimState]) -> Dict[str, Game]:
@@ -256,7 +259,7 @@ def get_changed_games(current_games: Dict[str, Game], stored_games: Dict[str, Ga
     return {game.id: game for game in updates}
 
 
-def get_changed_players(updated_games: Dict[str, Game], stored_games: Dict[str, Game]) -> List[GamePlayerStats]:
+def get_changed_players(updated_games: Dict[str, Game], stored_games: Dict[str, Game]) -> List[PlayerGame]:
     changed_player_stats = []
 
     for game_id in updated_games:

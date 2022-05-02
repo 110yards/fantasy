@@ -1,5 +1,5 @@
 from typing import List, Union
-from api.app.domain.entities.player import PlayerLeagueSeasonScore
+from api.app.domain.entities.player_league_season_score import PlayerLeagueSeasonScore
 from api.app.domain.repositories.league_repository import LeagueRepository
 from google.cloud.firestore_v1.transaction import Transaction
 from api.app.core.firestore_proxy import FirestoreProxy, Query

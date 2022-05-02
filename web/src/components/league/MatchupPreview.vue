@@ -43,7 +43,6 @@
           <roster-score
             :roster="away"
             :weekNumber="weekNumber"
-            :scoring="scoring"
             v-on:update="updateAwayScore"
             :calculatedScore="matchup.away_score"
           />
@@ -70,7 +69,6 @@
           <roster-score
             :roster="home"
             :weekNumber="weekNumber"
-            :scoring="scoring"
             v-on:update="updateHomeScore"
             :calculatedScore="matchup.home_score"
           />
@@ -193,17 +191,6 @@ export default {
   },
 
   watch: {
-    leagueId: {
-      immediate: true,
-      handler(leagueId) {
-        if (leagueId) {
-          let path = `league/${leagueId}/config/scoring`
-          let ref = firestore.doc(path)
-          this.$bind("scoring", ref)
-        }
-      },
-    },
-
     matchup: {
       immediate: true,
       handler(matchup) {

@@ -1,4 +1,5 @@
 
+from api.app.core.publisher import Publisher, create_publisher
 from api.app.domain.entities.league_transaction import LeagueTransaction
 from api.app.domain.repositories.league_transaction_repository import LeagueTransactionRepository, create_league_transaction_repository
 from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
@@ -19,8 +20,9 @@ def create_update_league_scoring_command_executor(
     league_config_repo: LeagueConfigRepository = Depends(create_league_config_repository),
     state_repo: StateRepository = Depends(create_state_repository),
     transaction_repo: LeagueTransactionRepository = Depends(create_league_transaction_repository),
+    publisher: Publisher = Depends(create_publisher),
 ):
-    return UpdateLeagueScoringCommandExecutor(league_repo, league_config_repo, state_repo, transaction_repo)
+    return UpdateLeagueScoringCommandExecutor(league_repo, league_config_repo, state_repo, transaction_repo, publisher)
 
 
 @annotate_args
@@ -74,12 +76,14 @@ class UpdateLeagueScoringCommandExecutor(BaseCommandExecutor[UpdateLeagueScoring
         league_repo: LeagueRepository,
         league_config_repo: LeagueConfigRepository,
         state_repo: StateRepository,
-        transaction_repo: LeagueTransactionRepository
+        transaction_repo: LeagueTransactionRepository,
+        publisher: Publisher,
     ):
         self.league_repo = league_repo
         self.league_config_repo = league_config_repo
         self.state_repo = state_repo
         self.transaction_repo = transaction_repo
+        self.publisher = publisher
 
     def on_execute(self, command: UpdateLeagueScoringCommand) -> UpdateLeagueScoringResult:
 
@@ -87,6 +91,7 @@ class UpdateLeagueScoringCommandExecutor(BaseCommandExecutor[UpdateLeagueScoring
 
         if not league:
             return UpdateLeagueScoringResult(command=command, error="League not found")
+
         scoring = self.league_config_repo.get_scoring_config(command.league_id)
 
         scoring.pass_attempts = command.pass_attempts
