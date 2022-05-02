@@ -90,6 +90,8 @@ class PlayerListService:
 
         ranked_players: List[RankedPlayer] = []
 
+        last_rank = len(players)
+
         for player in players:
             ranked_player = RankedPlayer.parse_obj(player.dict())
 
@@ -102,6 +104,8 @@ class PlayerListService:
                 ranked_player.last_week_score = season_score.last_week_score
                 ranked_player.games_played = season.games_played
                 ranked_player.season_stats = season.stats
+            else:
+                ranked_player.rank = last_rank
 
             ranked_players.append(ranked_player)
 
