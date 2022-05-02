@@ -1,9 +1,6 @@
 
 from api.app.core.publisher import Publisher, create_publisher
-from api.app.domain.commands.league.calculate_season_score import CalculateSeasonScoreCommand
 from api.app.domain.entities.league_transaction import LeagueTransaction
-from api.app.domain.enums.draft_state import DraftState
-from api.app.domain.enums.league_command_type import LeagueCommandType
 from api.app.domain.repositories.league_transaction_repository import LeagueTransactionRepository, create_league_transaction_repository
 from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
 from typing import Optional
@@ -16,9 +13,6 @@ from api.app.domain.repositories.league_config_repository import (
 from api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from fastapi import Depends
 from firebase_admin import firestore
-
-from api.app.domain.services.league_command_push_data import LeagueCommandPushData
-from api.app.domain.topics import LEAGUE_COMMAND_TOPIC
 
 
 def create_update_league_scoring_command_executor(
@@ -145,17 +139,5 @@ class UpdateLeagueScoringCommandExecutor(BaseCommandExecutor[UpdateLeagueScoring
 
         transaction = self.league_repo.firestore.create_transaction()
         update(transaction)
-
-        if league.draft_state != DraftState.COMPLETE:  # don't bother if they've already drafted
-            state = self.state_repo.get()
-            last_season = state.current_season - 1
-            # 2020 :(
-            if last_season == 2020:
-                last_season = 2019
-
-            # PICKLE - inactive leagues don't have league command subscriptions.
-            league_command = CalculateSeasonScoreCommand(league_id=league.id, season=last_season)
-            payload = LeagueCommandPushData(command_type=LeagueCommandType.CALCULATE_SEASON_SCORE, command_data=league_command)
-            self.publisher.publish(payload, LEAGUE_COMMAND_TOPIC)
 
         return UpdateLeagueScoringResult(command=command)

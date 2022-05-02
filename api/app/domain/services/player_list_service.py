@@ -110,11 +110,6 @@ class PlayerListService:
             ranked_players.append(ranked_player)
 
         return ranked_players
-        # player.rank = playerScore != null ? playerScore.rank : ""
-        # player.average = playerScore != null ? playerScore.average_score : 0
-        # player.points = playerScore != null ? playerScore.total_score : 0
-        # player.games_played = playerSeasonStats != null ? playerSeasonStats.games_played : 0
-        # player.last_week_score = playerScore != null ? playerScore.last_week_score : 0
 
     def _get_player_seasons(self, score_season: int) -> Dict[str, PlayerSeason]:
         player_seasons = self.player_season_repo.get_all(score_season)

@@ -128,6 +128,4 @@ class CreateLeagueCommandExecutor(BaseCommandExecutor[CreateLeagueCommand, Creat
 
         self.publisher.publish(league, LEAGUE_CREATED_TOPIC)
 
-        # TODO: publish update previous season scores command
-
         return CreateLeagueResult(command=command, league=league)

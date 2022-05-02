@@ -32,8 +32,5 @@ class PlayerGameRepository():
     def set_all(self, season: int, player_games: List[PlayerGame]):
         return self.firestore.set_all(PlayerGameRepository.path(season), player_games)
 
-    # def where(self, season: int, queries: Union[Query, List[Query]], transaction: Transaction = None) -> List[PlayerGame]:
-    #     return self.firestore.where(PlayerGameRepository.path(season, player_id), queries, transaction)
-
     def where(self, season: int, queries: Union[Query, List[Query]], transaction: Transaction = None) -> List[PlayerGame]:
         return self.firestore.where(PlayerGameRepository.path(season), queries, transaction)
