@@ -7,4 +7,4 @@ COPY ./app /api/app
 
 RUN python -m compileall /api/app
 
-CMD uvicorn api.app.main:app --host 0.0.0.0 --port $PORT
+CMD uvicorn api.app.main:app --host 0.0.0.0 --port $PORT --workers 8
