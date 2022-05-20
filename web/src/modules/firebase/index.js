@@ -11,18 +11,29 @@ const firebaseProject = process.env.VUE_APP_FIREBASE_PROJECT
 
 console.log(`project: ${firebaseProject}`)
 
+const appId = process.env.VUE_APP_FIREBASE_APP_ID
+const measurementId = process.env.VUE_APP_FIREBASE_MEASUREMENT_ID
+
 const config = {
   apiKey: firebaseApiKey,
   authDomain: `${firebaseProject}.firebaseapp.com`,
   projectId: firebaseProject,
   storageBucket: "",
   messagingSenderId: "",
-  appId: "",
+  appId: appId,
+  measurementId: measurementId,
 }
 
 export const app = firebase.initializeApp(config)
 export const firestore = firebase.firestore()
 export const auth = firebase.auth()
+
+let analyticsInstance = null
+if (measurementId) {
+  analyticsInstance = firebase.analytics()
+}
+
+export const analytics = analyticsInstance
 
 if (firestoreEmulatorPort) {
   console.warn("Firestore Emulator enabled")
