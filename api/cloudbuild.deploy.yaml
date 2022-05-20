@@ -7,8 +7,8 @@ steps:
             "--project", "$_TARGET_PROJECT_ID",
             "--platform", "managed",
             "--allow-unauthenticated",
-            "--memory", "512Mi",
-            "--concurrency", "8",
+            "--memory", "1Gi",
+            "--concurrency", "4",
             "--timeout", "$_TIMEOUT",
             # GUNICORN CONFIG            
             "--set-env-vars", "TIMEOUT=$_TIMEOUT",
