@@ -27,7 +27,13 @@ const config = {
 export const app = firebase.initializeApp(config)
 export const firestore = firebase.firestore()
 export const auth = firebase.auth()
-export const analytics = firebase.analytics()
+
+let analyticsInstance = null
+if (measurementId) {
+  analyticsInstance = firebase.analytics()
+}
+
+export const analytics = analyticsInstance
 
 if (firestoreEmulatorPort) {
   console.warn("Firestore Emulator enabled")
