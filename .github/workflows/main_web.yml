@@ -38,8 +38,6 @@ jobs:
           VUE_APP_FIREBASE_PROJECT: ${{ secrets.TEST_GCLOUD_PROJECT }}
           VUE_APP_WEB_URL: "https://test.110yards.ca"
           VUE_APP_API_110_YARDS_URL: "https://api.test.110yards.ca"
-          VUE_APP_FIREBASE_APP_ID: ${{ secrets.TEST_FIREBASE_APP_ID }}
-          VUE_APP_FIREBASE_MEASUREMENT_ID: ${{ secrets.TEST_FIREBASE_MEASUREMENT_ID }}
         run: npm run build:test
 
       - name: Deploy (test)
@@ -58,9 +56,7 @@ jobs:
           VUE_APP_FIREBASE_PROJECT: ${{ secrets.LIVE_GCLOUD_PROJECT }}
           VUE_APP_WEB_URL: "https://110yards.ca"
           VUE_APP_API_110_YARDS_URL: "https://api.110yards.ca"
-          VUE_APP_FIREBASE_APP_ID: ${{ secrets.LIVE_FIREBASE_APP_ID }}
-          VUE_APP_FIREBASE_MEASUREMENT_ID: ${{ secrets.LIVE_FIREBASE_MEASUREMENT_ID }}
-        run: npm run build:live
+        run: npm run build:test
 
       - name: Deploy (live)
         working-directory: web

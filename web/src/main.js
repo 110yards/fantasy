@@ -7,7 +7,6 @@ import { firestorePlugin } from "vuefire"
 import "firebase/database"
 import "firebase/auth"
 import "firebase/firestore"
-import "firebase/analytics"
 import switches from "./mixins/switches"
 
 import "./assets/css/site.css"
