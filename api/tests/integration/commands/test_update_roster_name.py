@@ -9,7 +9,6 @@ from api.app.domain.entities.league import League
 from api.app.domain.commands.roster.update_roster_name import UpdateRosterNameCommand, UpdateRosterNameCommandExecutor
 from api.app.domain.repositories.league_roster_repository import LeagueRosterRepository
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository
-from api.app.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository
 from api.app.domain.repositories.user_league_repository import UserLeagueRepository
 from api.app.domain.repositories.league_repository import LeagueRepository
 from api.tests.asserts import are_equal
@@ -32,11 +31,6 @@ def get_league_roster_repo(roster) -> LeagueRosterRepository:
 def get_league_config_repo() -> LeagueConfigRepository:
     proxy = MockFirestoreProxy()
     return LeagueConfigRepository(proxy)
-
-
-def get_league_week_matchup_repo() -> LeagueWeekMatchupRepository:
-    proxy = MockFirestoreProxy()
-    return LeagueWeekMatchupRepository(proxy)
 
 
 def get_user_league_repo(user_league) -> UserLeagueRepository:
@@ -78,7 +72,6 @@ def test_update_roster_name():
         league_config_repo=get_league_config_repo,
         league_repo=league_repo,
         league_roster_repo=roster_repo,
-        league_week_matchup_repo=get_league_week_matchup_repo(),
         user_league_repo=user_league_repo,
         publisher=get_publisher(),
         league_transaction_repo=get_league_transaction_repo())
@@ -97,49 +90,6 @@ def test_update_roster_name():
     are_equal(expected, actual)
 
 
-def test_update_roster_name_updates_away_matchups():
-    week_number = 1
-
-    league = League.construct(id="league1", draft_state=DraftState.NOT_STARTED, name="Test League", schedule_generated=True, commissioner_id="commish")
-    roster = Roster(id="roster1", name="Mock Roster")
-    user_league = UserLeaguePreview.create(roster, league)
-    schedule = create_mock_schedule(week_number)
-
-    roster_repo = get_league_roster_repo(roster)
-    league_repo = get_league_repo(league)
-    user_league_repo = get_user_league_repo(user_league)
-    matchup_repo = get_league_week_matchup_repo()
-    config_repo = get_league_config_repo()
-
-    matchup = Matchup(id="1", away=roster, type=MatchupType.REGULAR)
-    matchup_repo.set(league.id, week_number, matchup)
-    schedule.weeks[0].matchups.append(matchup)
-
-    config_repo.set_schedule_config(league.id, schedule)
-
-    command_executor = UpdateRosterNameCommandExecutor(
-        league_config_repo=config_repo,
-        league_repo=league_repo,
-        league_roster_repo=roster_repo,
-        league_week_matchup_repo=matchup_repo,
-        user_league_repo=user_league_repo,
-        publisher=get_publisher(),
-        league_transaction_repo=get_league_transaction_repo())
-
-    new_name = "Update Roster Name"
-
-    command = UpdateRosterNameCommand(league_id=league.id, roster_id=roster.id, roster_name=new_name, current_user_id=roster.id)
-
-    result = command_executor.execute(command)
-
-    assert result.success
-
-    expected = new_name
-    actual = matchup_repo.get(league.id, week_number, matchup.id).away.name
-
-    are_equal(expected, actual)
-
-
 def test_update_roster_name_updates_schedule_config_away():
     week_number = 1
 
@@ -151,11 +101,9 @@ def test_update_roster_name_updates_schedule_config_away():
     roster_repo = get_league_roster_repo(roster)
     league_repo = get_league_repo(league)
     user_league_repo = get_user_league_repo(user_league)
-    matchup_repo = get_league_week_matchup_repo()
     config_repo = get_league_config_repo()
 
     matchup = Matchup(id="1", away=roster, type=MatchupType.REGULAR)
-    matchup_repo.set(league.id, week_number, matchup)
     schedule.weeks[0].matchups.append(matchup)
 
     config_repo.set_schedule_config(league.id, schedule)
@@ -164,7 +112,6 @@ def test_update_roster_name_updates_schedule_config_away():
         league_config_repo=config_repo,
         league_repo=league_repo,
         league_roster_repo=roster_repo,
-        league_week_matchup_repo=matchup_repo,
         user_league_repo=user_league_repo,
         publisher=get_publisher(),
         league_transaction_repo=get_league_transaction_repo())
@@ -184,49 +131,6 @@ def test_update_roster_name_updates_schedule_config_away():
     are_equal(expected, actual)
 
 
-def test_update_roster_name_updates_home_matchups():
-    week_number = 1
-
-    league = League.construct(id="league1", draft_state=DraftState.NOT_STARTED, name="Test League", schedule_generated=True, commissioner_id="commish")
-    roster = Roster(id="roster1", name="Mock Roster")
-    user_league = UserLeaguePreview.create(roster, league)
-    schedule = create_mock_schedule(week_number)
-
-    roster_repo = get_league_roster_repo(roster)
-    league_repo = get_league_repo(league)
-    user_league_repo = get_user_league_repo(user_league)
-    matchup_repo = get_league_week_matchup_repo()
-    config_repo = get_league_config_repo()
-
-    matchup = Matchup(id="1", home=roster, type=MatchupType.REGULAR)
-    matchup_repo.set(league.id, week_number, matchup)
-    schedule.weeks[0].matchups.append(matchup)
-
-    config_repo.set_schedule_config(league.id, schedule)
-
-    command_executor = UpdateRosterNameCommandExecutor(
-        league_config_repo=config_repo,
-        league_repo=league_repo,
-        league_roster_repo=roster_repo,
-        league_week_matchup_repo=matchup_repo,
-        user_league_repo=user_league_repo,
-        publisher=get_publisher(),
-        league_transaction_repo=get_league_transaction_repo())
-
-    new_name = "Update Roster Name"
-
-    command = UpdateRosterNameCommand(league_id=league.id, roster_id=roster.id, roster_name=new_name, current_user_id=roster.id)
-
-    result = command_executor.execute(command)
-
-    assert result.success
-
-    expected = new_name
-    actual = matchup_repo.get(league.id, week_number, matchup.id).home.name
-
-    are_equal(expected, actual)
-
-
 def test_update_roster_name_updates_schedule_config_home():
     week_number = 1
 
@@ -238,11 +142,9 @@ def test_update_roster_name_updates_schedule_config_home():
     roster_repo = get_league_roster_repo(roster)
     league_repo = get_league_repo(league)
     user_league_repo = get_user_league_repo(user_league)
-    matchup_repo = get_league_week_matchup_repo()
     config_repo = get_league_config_repo()
 
     matchup = Matchup(id="1", home=roster, type=MatchupType.REGULAR)
-    matchup_repo.set(league.id, week_number, matchup)
     schedule.weeks[0].matchups.append(matchup)
 
     config_repo.set_schedule_config(league.id, schedule)
@@ -251,7 +153,6 @@ def test_update_roster_name_updates_schedule_config_home():
         league_config_repo=config_repo,
         league_repo=league_repo,
         league_roster_repo=roster_repo,
-        league_week_matchup_repo=matchup_repo,
         user_league_repo=user_league_repo,
         publisher=get_publisher(),
         league_transaction_repo=get_league_transaction_repo())
@@ -284,7 +185,6 @@ def test_update_roster_name_updates_user_leagues_home():
         league_config_repo=get_league_config_repo,
         league_repo=league_repo,
         league_roster_repo=roster_repo,
-        league_week_matchup_repo=get_league_week_matchup_repo(),
         user_league_repo=user_league_repo,
         publisher=get_publisher(),
         league_transaction_repo=get_league_transaction_repo())
@@ -316,7 +216,6 @@ def test_update_another_user_should_fail():
         league_config_repo=get_league_config_repo,
         league_repo=league_repo,
         league_roster_repo=roster_repo,
-        league_week_matchup_repo=get_league_week_matchup_repo(),
         user_league_repo=user_league_repo,
         publisher=get_publisher(),
         league_transaction_repo=get_league_transaction_repo())
@@ -343,7 +242,6 @@ def test_cannot_change_while_drafting():
         league_config_repo=get_league_config_repo,
         league_repo=league_repo,
         league_roster_repo=roster_repo,
-        league_week_matchup_repo=get_league_week_matchup_repo(),
         user_league_repo=user_league_repo,
         publisher=get_publisher(),
         league_transaction_repo=get_league_transaction_repo())
@@ -370,7 +268,6 @@ def test_update_by_commisssioner():
         league_config_repo=get_league_config_repo,
         league_repo=league_repo,
         league_roster_repo=roster_repo,
-        league_week_matchup_repo=get_league_week_matchup_repo(),
         user_league_repo=user_league_repo,
         publisher=get_publisher(),
         league_transaction_repo=get_league_transaction_repo())
@@ -401,7 +298,6 @@ def test_update_by_other_user():
         league_config_repo=get_league_config_repo,
         league_repo=league_repo,
         league_roster_repo=roster_repo,
-        league_week_matchup_repo=get_league_week_matchup_repo(),
         user_league_repo=user_league_repo,
         publisher=get_publisher(),
         league_transaction_repo=get_league_transaction_repo())
