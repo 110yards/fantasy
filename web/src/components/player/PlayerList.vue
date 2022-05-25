@@ -89,7 +89,7 @@
           </template>
 
           <template v-slot:[`item.average`]="{ item }">
-            <score :score="item.points" />
+            <score :score="item.average" />
           </template>
 
           <template v-slot:[`item.last_week_score`]="{ item }">
