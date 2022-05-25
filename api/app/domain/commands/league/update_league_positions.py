@@ -34,9 +34,9 @@ class UpdateLeaguePositionsCommand(BaseCommand):
     ir: int
     bye: int
     bench: int
-    allow_bench_qb: bool
-    allow_bench_rb: bool
-    allow_bench_k: bool
+    allow_bench_qb: bool = False
+    allow_bench_rb: bool = False
+    allow_bench_k: bool = False
 
 
 @annotate_args

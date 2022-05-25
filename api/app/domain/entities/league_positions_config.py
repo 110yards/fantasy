@@ -1,5 +1,4 @@
 from __future__ import annotations
-from typing import Optional
 from api.app.domain.entities.league_position import LeaguePosition
 
 
@@ -24,9 +23,9 @@ class LeaguePositionsConfig(BaseEntity):
     ir: int = 1
     bye: int = 1
     bench: int = 2
-    allow_bench_qb: Optional[bool] = False
-    allow_bench_rb: Optional[bool] = False
-    allow_bench_k: Optional[bool] = False
+    allow_bench_qb: bool = False
+    allow_bench_rb: bool = False
+    allow_bench_k: bool = False
 
     def active_position_count(self):
         return self.qb + self.rb + self.wr + self.k + self.lb + self.dl + self.db + self.o_flex + self.d_flex + self.flex + self.bench
