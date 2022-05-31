@@ -107,7 +107,7 @@ export default {
     currentRoster: { type: Object, required: true },
     leagueId: { type: String, required: true },
     player: { type: Object, required: true },
-    playerScores: { type: Array, required: true },
+    players: { type: Array, required: true },
   },
 
   data() {
@@ -150,7 +150,7 @@ export default {
     },
 
     getSeasonPoints(player) {
-      let filterResults = this.playerScores.filter(p => p.id == player.id)
+      let filterResults = this.players.filter(p => p.id == player.id)
 
       let playerScore = filterResults && filterResults.length == 1 ? filterResults[0] : null
 
