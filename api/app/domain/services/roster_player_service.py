@@ -47,7 +47,23 @@ class RosterPlayerService:
     def find_position_for(self, player: Player, roster: Roster) -> Optional[LeaguePosition]:
 
         positions = list(roster.positions.values())
-        positions.sort(key=lambda x: int(x.id))
+
+        def sort_key(item: LeaguePosition):
+            adjustment = 0
+            # prioritize all 3 flex positions after natural positions to avoid impossible draft situations
+            # prioritize flex after more specific flex positions too
+            if item.position_type in (PositionType.o_flex, PositionType.d_flex):
+                adjustment = 1000
+            elif item.position_type == PositionType.flex:
+                adjustment = 2000
+
+            # finally, prioritize bench last
+            if item.position_type == PositionType.bench:
+                adjustment = 10000
+
+            return adjustment + item.id
+
+        positions.sort(key=sort_key)
 
         # ensure there is a starting position for this player, even if it's occupied currently
         eligible_starting_positions = [p for p in positions if p.is_starting_position_type() and p.position_type.is_eligible_for(player.position)]
