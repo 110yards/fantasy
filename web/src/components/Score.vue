@@ -17,9 +17,9 @@ export default {
 
   computed: {
     formattedScore() {
-      if (this.score == null || this.score == undefined) this.score = 0
+      let score = this.score == null || this.score == undefined ? 0 : this.score
 
-      return formatScore(this.score)
+      return formatScore(score)
     },
   },
 }

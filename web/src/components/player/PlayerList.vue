@@ -6,7 +6,7 @@
         :player="playerToAdd"
         :currentRoster="currentRoster"
         :leagueId="leagueId"
-        :playerScores="playerScores"
+        :players="players"
         v-on:cancel="playerToAdd = null"
       />
     </v-col>

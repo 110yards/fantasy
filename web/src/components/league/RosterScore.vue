@@ -41,13 +41,13 @@ export default {
       let season = this.$root.currentSeason
 
       let positions = Object.values(this.roster.positions)
-      console.log(positions)
+      // console.log(positions)
 
       let activePlayers = positions
         .filter(x => x.player && this.$root.isActivePositionType(x.position_type))
         .map(x => x.player)
 
-      console.log(activePlayers)
+      // console.log(activePlayers)
 
       let playerIds = activePlayers.map(x => x.id)
 
@@ -86,7 +86,7 @@ export default {
         totalScore += gameScore
       }
 
-      console.debug(calcDetails)
+      // console.debug(calcDetails)
 
       this.liveScore = totalScore
     },
