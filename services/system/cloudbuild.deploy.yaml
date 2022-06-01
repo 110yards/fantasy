@@ -1,0 +1,33 @@
+steps:  
+
+  - name: "gcr.io/cloud-builders/gcloud"
+    args: ["beta", "run", "deploy", "$_SERVICE_NAME", 
+            "--image", "gcr.io/$_REGISTRY/$_IMAGE_NAME:$_TAG", 
+            "--region", "$_REGION",
+            "--project", "$_TARGET_PROJECT_ID",
+            "--platform", "managed",
+            "--allow-unauthenticated",
+            "--memory", "512Mi",
+            "--concurrency", "20",
+            "--timeout", "$_TIMEOUT",
+            # GUNICORN CONFIG            
+            "--set-env-vars", "TIMEOUT=$_TIMEOUT",
+            "--set-env-vars", "GRACEFUL_TIMEOUT=$_TIMEOUT",
+            # ENVIRONMENT
+            "--set-env-vars", "ENDPOINT=$_ENDPOINT", # injected
+            "--set-env-vars", "VERSION=$_TAG", # injected
+            # GCP
+            "--set-env-vars", "GCLOUD_PROJECT=$_TARGET_PROJECT_ID", # injected
+            "--set-env-vars", "SERVICE_NAME=$_SERVICE_NAME",
+            "--set-env-vars", "REGION=$_REGION",
+            # SECRETS
+            "--update-secrets=CFL_API_KEY=CFL_API_KEY:latest",
+            "--update-secrets=FIREBASE_API_KEY=FIREBASE_API_KEY:latest",
+            "--update-secrets=API_KEY=PUSH_API_KEY:latest"
+  ]
+
+substitutions:
+  _IMAGE_NAME: system-110yards
+  _TIMEOUT: '600'
+  _SERVICE_NAME: system-110yards
+  _REGION: us-central1

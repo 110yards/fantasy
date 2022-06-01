@@ -2,7 +2,8 @@
   "license": "MIT",
   "scripts": {
     "start": "run-pty run-pty.json",
-    "start:api": "uvicorn api.app.main:app --reload --reload-dir api --port 8000 --env-file ./api/.env",
+    "start:api": "(cd services && uvicorn api.app.main:app --reload --reload-dir api --port 8000 --env-file ./api/.env)",
+    "start:system": "services/system/run.sh",
     "start:emulators": "firebase emulators:start --only auth,firestore,pubsub --import=./.data --export-on-exit --project yards-dev",
     "start:web": "(cd web && npm run serve)",
     "config:dependencies": "npm install && .scripts/common/install-dependencies.sh",

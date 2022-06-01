@@ -11,7 +11,19 @@
     },
     "defaultStatus": ["⚪", "L"]
   },
-
+  {
+    "command": ["npm", "run", "start:emulators"],
+    "title": "Firestore Emulators\thttp://localhost:4000",
+    "status": {
+      "emulators: Starting emulators": ["⚪", "L"],
+      "✔": ["🟢", "U"],
+      "WARNING": ["🟡", "W"],
+      "error:": ["🔴", "E"],
+      "ERROR": ["🔴", "E"],
+      "firestore: Change detected": ["⚪", "R"]
+    },
+    "defaultStatus": ["⚪", "S"]
+  },
   {
     "command": ["npm", "run", "start:api"],
     "title": "API\t\t\thttp://localhost:8000",
@@ -24,18 +36,17 @@
       "StatReload": ["⚪", "R"]
     },
     "defaultStatus": ["⚪", "S"]
-  },
-
+  },  
   {
-    "command": ["npm", "run", "start:emulators"],
-    "title": "Firestore Emulators\thttp://localhost:4000",
+    "command": ["npm", "run", "start:system"],
+    "title": "API\t\t\thttp://localhost:8000",
     "status": {
-      "emulators: Starting emulators": ["⚪", "L"],
-      "✔": ["🟢", "U"],
-      "WARNING": ["🟡", "W"],
-      "error:": ["🔴", "E"],
-      "ERROR": ["🔴", "E"],
-      "firestore: Change detected": ["⚪", "R"]
+      "Loading": ["⚪", "L"],
+      "startup complete": ["🟢", "U"],
+      "INFO:": ["🟢", "U"],
+      "DEBUG:": ["🟢", "U"],
+      "Error:": ["🔴", "E"],
+      "StatReload": ["⚪", "R"]
     },
     "defaultStatus": ["⚪", "S"]
   }
