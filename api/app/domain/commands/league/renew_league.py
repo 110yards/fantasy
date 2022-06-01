@@ -1,3 +1,4 @@
+from typing import Optional
 from api.app.core.publisher import Publisher, create_publisher
 from api.app.domain.entities.league_transaction import LeagueTransaction
 from api.app.domain.entities.user_league_preview import UserLeaguePreview
@@ -20,6 +21,7 @@ from api.app.domain.entities.league import (DraftState, League)
 from api.app.domain.repositories.league_repository import (
     LeagueRepository, create_league_repository)
 from fastapi.param_functions import Depends
+from api.app.domain.repositories.user_repository import UserRepository, create_user_repository
 from api.app.domain.topics import LEAGUE_RENEWED_TOPIC
 
 
@@ -36,6 +38,7 @@ def create_renew_league_command_executor(
     transaction_repo: LeagueTransactionRepository = Depends(create_league_transaction_repository),
     publisher: Publisher = Depends(create_publisher),
     matchup_repo: LeagueWeekMatchupRepository = Depends(create_league_week_matchup_repository),
+    user_repo: UserRepository = Depends(create_user_repository),
 ):
     return RenewLeagueCommandExecutor(
         archive_league_repo=archive_league_repo,
@@ -50,6 +53,7 @@ def create_renew_league_command_executor(
         public_repo=public_repo,
         publisher=publisher,
         matchup_repo=matchup_repo,
+        user_repo=user_repo,
     )
 
 
@@ -60,7 +64,7 @@ class RenewLeagueCommand(BaseCommand):
 
 @annotate_args
 class RenewLeagueResult(BaseCommandResult):
-    league: League
+    league: Optional[League]
 
 
 class RenewLeagueCommandExecutor(BaseCommandExecutor[RenewLeagueCommand, RenewLeagueResult]):
@@ -79,6 +83,7 @@ class RenewLeagueCommandExecutor(BaseCommandExecutor[RenewLeagueCommand, RenewLe
         archive_league_repo: UserArchiveLeagueRepository,
         publisher: Publisher,
         matchup_repo: LeagueWeekMatchupRepository,
+        user_repo: UserRepository,
     ):
         self.league_repo = league_repo
         self.user_league_repo = user_league_repo
@@ -92,6 +97,7 @@ class RenewLeagueCommandExecutor(BaseCommandExecutor[RenewLeagueCommand, RenewLe
         self.archive_league_repo = archive_league_repo
         self.publisher = publisher
         self.matchup_repo = matchup_repo
+        self.user_repo = user_repo
 
     def on_execute(self, command: RenewLeagueCommand) -> RenewLeagueResult:
 
@@ -101,7 +107,9 @@ class RenewLeagueCommandExecutor(BaseCommandExecutor[RenewLeagueCommand, RenewLe
             return RenewLeagueResult(command=command, error="League not found")
 
         if not league.commissioner_id == command.request_user_id:
-            return RenewLeagueResult(command=command, error="You are not the commissioner")
+            user = self.user_repo.get(command.request_user_id)
+            if not user.is_admin:
+                return RenewLeagueResult(command=command, error="You are not the commissioner or admin")
 
         state = self.public_repo.get_state()
 
