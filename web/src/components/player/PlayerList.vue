@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="!showTable">
     <v-col v-if="playerToAdd" cols="12">
       <add-player
         :waiversActive="waiversActive"
@@ -12,7 +12,10 @@
     </v-col>
 
     <v-card v-else class="player-list">
-      <v-card-title>Players</v-card-title>
+      <v-card-title>
+        Players
+        <v-btn v-if="!isDraft" icon title="Export players" @click="showTable = true"><v-icon>mdi-table</v-icon></v-btn>
+      </v-card-title>
       <v-card-subtitle v-if="showPreviousSeasonStats">Past season stats</v-card-subtitle>
       <v-card-actions>
         <v-row>
@@ -107,6 +110,10 @@
       </v-card-text>
     </v-card>
   </div>
+
+  <div v-else>
+    <data-table :data="players" v-on:close="showTable = false" />
+  </div>
 </template>
 
 <style scoped>
@@ -140,6 +147,7 @@ import AddPlayer from "./AddPlayer.vue"
 import { formatScore } from "../../modules/formatter"
 import Score from "../Score.vue"
 import { getCurrentPlayers, getDraftPlayers } from "../../api/110yards/league"
+import DataTable from "./DataTable.vue"
 
 export default {
   name: "player-list",
@@ -153,6 +161,7 @@ export default {
     Locked,
     AddPlayer,
     Score,
+    DataTable,
   },
   props: {
     leagueId: null,
@@ -202,6 +211,7 @@ export default {
       ownedPlayers: [],
       rosters: null,
       playerToAdd: null,
+      showTable: false,
     }
   },
   computed: {
