@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-btn @click="$emit('close')" class="mr-2">Close</v-btn>
+    <v-btn @click="$emit('close')" class="mb-2">Close</v-btn>
     <pre id="dataTable">
 {{ headers }}
 <template v-for="player in data"><template v-for="key in keys">{{getValue(player, key)}},</template><br :key="player.id" /></template>
