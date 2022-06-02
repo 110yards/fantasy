@@ -1,8 +1,8 @@
 from __future__ import annotations
-from api.app.domain.enums.position_type import PositionType
+from yards_py.domain.enums.position_type import PositionType
 
-from api.app.core.base_entity import BaseEntity
-from api.app.core.annotate_args import annotate_args
+from yards_py.core.base_entity import BaseEntity
+from yards_py.core.annotate_args import annotate_args
 # remember, the game player stats object contains a game player, not the other way around
 
 

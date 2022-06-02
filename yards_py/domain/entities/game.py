@@ -3,20 +3,20 @@
 #   timestamp: 2021-03-19T11:38:10+00:00
 
 from __future__ import annotations
-from api.app.core.sim_state import SimState
+from yards_py.core.sim_state import SimState
 
-from api.app.domain.entities.game_player import GamePlayer
-from api.app.domain.entities.player_game import PlayerGame
-from api.app.domain.enums.position_type import PositionType
+from yards_py.domain.entities.game_player import GamePlayer
+from yards_py.domain.entities.player_game import PlayerGame
+from yards_py.domain.enums.position_type import PositionType
 
 from typing import Dict, List, Optional
 
-from api.app.core.base_entity import BaseEntity
-from api.app.core.hash_dict import hash_dict
-from api.app.domain.entities.event_status import EventStatus
-from api.app.domain.entities.event_type import EventType
-from api.app.domain.entities.game_score import GameScore
-from api.app.domain.entities.game_teams import GameTeams
+from yards_py.core.base_entity import BaseEntity
+from yards_py.core.hash_dict import hash_dict
+from yards_py.domain.entities.event_status import EventStatus
+from yards_py.domain.entities.event_type import EventType
+from yards_py.domain.entities.game_score import GameScore
+from yards_py.domain.entities.game_teams import GameTeams
 
 
 class Game(BaseEntity):

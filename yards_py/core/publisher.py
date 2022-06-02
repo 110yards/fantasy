@@ -4,10 +4,8 @@ from datetime import datetime
 import json
 from typing import Dict, Optional
 
-from api.app.config.settings import Settings, get_settings
-from api.app.core.exceptions import InvalidPushException
-from api.app.core.logging import Logger
-from fastapi import Depends
+from yards_py.core.exceptions import InvalidPushException
+from yards_py.core.logging import Logger
 from google.cloud.pubsub_v1 import PublisherClient
 from google.cloud.pubsub_v1 import SubscriberClient
 from google.pubsub_v1.services.publisher.client import PublisherClient as PublisherWrapper
@@ -16,16 +14,8 @@ from google.api_core.exceptions import NotFound
 from google.pubsub_v1.types.pubsub import ExpirationPolicy, PushConfig, RetryPolicy, Subscription
 from pydantic.main import BaseModel
 from google.protobuf.duration_pb2 import Duration
-from api.app.core.annotate_args import annotate_args
-from api.app.domain.repositories.virtual_pubsub_repository import VirtualPubSubPayload, VirtualPubsubRepository, create_virtual_pubsub_repository
-
-
-def create_publisher(
-    settings: Settings = Depends(get_settings),
-    virtual_pubsub_repo: VirtualPubsubRepository = Depends(create_virtual_pubsub_repository),
-):
-    project_id = settings.gcloud_project
-    return VirtualPubSubPublisher(project_id, virtual_pubsub_repo) if settings.is_dev() else PubSubPublisher(project_id)
+from yards_py.core.annotate_args import annotate_args
+from yards_py.domain.repositories.virtual_pubsub_repository import VirtualPubSubPayload, VirtualPubsubRepository
 
 
 @annotate_args

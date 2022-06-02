@@ -1,6 +1,6 @@
 from typing import Dict, List
-from api.app.core.firestore_proxy import FirestoreProxy, Query
-from api.app.domain.entities.user import User
+from yards_py.core.firestore_proxy import FirestoreProxy, Query
+from yards_py.domain.entities.user import User
 from google.cloud.firestore_v1.transaction import Transaction
 
 

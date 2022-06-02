@@ -1,11 +1,11 @@
-from api.app.domain.entities.state import State
-from api.app.domain.entities.scoreboard import Scoreboard
-from api.app.domain.entities.opponents import Opponents
-from api.app.domain.entities.switches import Switches
-from api.app.domain.entities.scoring_info import ScoringInfo
-from api.app.core.firestore_proxy import FirestoreProxy
+from yards_py.domain.entities.state import State
+from yards_py.domain.entities.scoreboard import Scoreboard
+from yards_py.domain.entities.opponents import Opponents
+from yards_py.domain.entities.switches import Switches
+from yards_py.domain.entities.scoring_info import ScoringInfo
+from yards_py.core.firestore_proxy import FirestoreProxy
 from google.cloud.firestore_v1.transaction import Transaction
-from api.app.domain.entities.league import PrivateConfig
+from yards_py.domain.entities.league import PrivateConfig
 
 
 def create_public_repository():

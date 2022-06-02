@@ -1,4 +1,4 @@
-from api.app.domain.entities.league import League
+from yards_py.domain.entities.league import League
 
 
 class MockNotificationService:

@@ -1,9 +1,9 @@
 from __future__ import annotations
-from api.app.domain.entities.stats import Stats
+from yards_py.domain.entities.stats import Stats
 
 from decimal import getcontext
 
-from api.app.domain.entities.player_score import PlayerScore
+from yards_py.domain.entities.player_score import PlayerScore
 from pydantic.main import BaseModel
 
 

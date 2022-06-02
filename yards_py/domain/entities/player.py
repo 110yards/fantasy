@@ -2,13 +2,13 @@ from __future__ import annotations
 from datetime import datetime
 
 from pydantic.class_validators import root_validator
-from api.app.domain.entities.game_player import GamePlayer
-from api.app.domain.enums.position_type import PositionType
-from api.app.core.hash_dict import hash_dict
+from yards_py.domain.entities.game_player import GamePlayer
+from yards_py.domain.enums.position_type import PositionType
+from yards_py.core.hash_dict import hash_dict
 from typing import Dict, Optional
-from api.app.core.base_entity import BaseEntity
+from yards_py.core.base_entity import BaseEntity
 from .team import Team
-from api.app.core.annotate_args import annotate_args
+from yards_py.core.annotate_args import annotate_args
 
 STATUS_INACTIVE = 0
 STATUS_ACTIVE = 1

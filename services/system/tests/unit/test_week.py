@@ -1,11 +1,11 @@
 import pytest
 from api.tests.asserts import are_equal
-from api.app.domain.entities.roster import Roster
+from yards_py.domain.entities.roster import Roster
 
-from api.app.domain.entities.schedule import Matchup, PlayoffType, ScheduleWeek
-from api.app.domain.enums.matchup_type import MatchupType
-from api.app.domain.enums.week_type import WeekType
-from api.app.domain.services.schedule_service import generate_playoffs
+from yards_py.domain.entities.schedule import Matchup, PlayoffType, ScheduleWeek
+from yards_py.domain.enums.matchup_type import MatchupType
+from yards_py.domain.enums.week_type import WeekType
+from services.system.app.domain.services.schedule_service import generate_playoffs
 
 # MANAGERS
 team_1 = Roster(id=1, name="team 1", rank=1)

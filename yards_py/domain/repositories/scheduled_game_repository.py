@@ -1,6 +1,6 @@
 from typing import List
-from api.app.domain.entities.scheduled_game import ScheduledGame
-from api.app.core.firestore_proxy import FirestoreProxy, Query
+from yards_py.domain.entities.scheduled_game import ScheduledGame
+from yards_py.core.firestore_proxy import FirestoreProxy, Query
 from google.cloud.firestore_v1.transaction import Transaction
 
 

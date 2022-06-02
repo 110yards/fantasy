@@ -1,5 +1,5 @@
-from api.app.core.base_entity import BaseEntity
-from api.app.core.annotate_args import annotate_args
+from yards_py.core.base_entity import BaseEntity
+from yards_py.core.annotate_args import annotate_args
 # this class does not need all switches, only the ones the API cares about
 # a set (replace doc) should never be done from the API, or it will override UI switches
 

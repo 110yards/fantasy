@@ -1,7 +1,7 @@
 from __future__ import annotations
 from pydantic import BaseModel
 
-from api.app.domain.entities.player_score import PlayerScore
+from yards_py.domain.entities.player_score import PlayerScore
 from .team import Team
 
 

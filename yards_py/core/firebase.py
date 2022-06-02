@@ -1,5 +1,5 @@
 import requests
-from api.app.config.settings import Settings
+from yards_py.config.settings import Settings
 
 LIVE_TOKEN_URL = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword"
 LOCAL_TOKEN_URL = "http://localhost:9099/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword"

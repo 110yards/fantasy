@@ -14,7 +14,6 @@ from yards_py.middleware.logging_middleware import LoggingMiddleware
 from services.system.app.routers import (
     logging_router,
     system_router,
-    dev_router,
 )
 
 settings = get_settings()
@@ -38,13 +37,12 @@ app = FastAPI(middleware=[
 )
 Logger.initialize(settings.is_dev, settings.gcloud_project, settings.service_name, settings.region)
 
-
 app.include_router(system_router.router)
 app.include_router(logging_router.router)
-if settings.is_dev():
-    app.include_router(dev_router.router)
 
 firebase_admin.initialize_app(options={"projectId": settings.gcloud_project})
+
+Logger.info("System service started")
 
 
 @app.get("/")

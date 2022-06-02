@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import Callable, Generic, List, TypeVar, Union
 
-from api.app.core.base_entity import BaseEntity
+from yards_py.core.base_entity import BaseEntity
 from firebase_admin import firestore
 from google.cloud.firestore_v1.base_client import BaseClient
 from google.cloud.firestore_v1.transaction import Transaction

@@ -1,10 +1,10 @@
 from __future__ import annotations
-from api.app.domain.entities.league_position import LeaguePosition
+from yards_py.domain.entities.league_position import LeaguePosition
 
 
-from api.app.core.annotate_args import annotate_args
-from api.app.core.base_entity import BaseEntity
-from api.app.domain.enums.position_type import PositionType
+from yards_py.core.annotate_args import annotate_args
+from yards_py.core.base_entity import BaseEntity
+from yards_py.domain.enums.position_type import PositionType
 
 
 @annotate_args

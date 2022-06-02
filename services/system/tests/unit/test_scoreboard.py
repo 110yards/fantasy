@@ -4,10 +4,10 @@ from datetime import datetime, timedelta
 
 import pytest
 import pytz
-from api.app.domain.entities.scoreboard import (Scoreboard,
-                                                ScoreboardGame)
+from yards_py.domain.entities.scoreboard import (Scoreboard,
+                                                 ScoreboardGame)
 from api.tests.asserts import are_equal
-from api.app.domain.entities.event_status import (
+from yards_py.domain.entities.event_status import (
     EVENT_STATUS_CANCELLED, EVENT_STATUS_FINAL, EVENT_STATUS_IN_PROGRESS,
     EVENT_STATUS_POSTPONED, EVENT_STATUS_PRE_GAME, EventStatus)
 

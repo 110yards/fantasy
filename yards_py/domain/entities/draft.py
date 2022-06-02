@@ -1,13 +1,13 @@
 
-from api.app.domain.entities.league_position import LeaguePosition
-from api.app.domain.entities.league_positions_config import LeaguePositionsConfig
-from api.app.domain.entities.roster import Roster
+from yards_py.domain.entities.league_position import LeaguePosition
+from yards_py.domain.entities.league_positions_config import LeaguePositionsConfig
+from yards_py.domain.entities.roster import Roster
 from typing import Dict, List, Optional, Union
-from api.app.domain.entities.player import Player
+from yards_py.domain.entities.player import Player
 from pydantic.main import BaseModel
-from api.app.domain.enums.draft_type import DraftType
-from api.app.core.base_entity import BaseEntity
-from api.app.core.annotate_args import annotate_args
+from yards_py.domain.enums.draft_type import DraftType
+from yards_py.core.base_entity import BaseEntity
+from yards_py.core.annotate_args import annotate_args
 
 
 @annotate_args

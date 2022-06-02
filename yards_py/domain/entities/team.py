@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pydantic.main import BaseModel
-from api.app.core.exceptions import ApiException
+from yards_py.core.exceptions import ApiException
 from typing import Dict, Optional
 
 

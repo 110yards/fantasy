@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from api.app.domain.entities.player_league_game_score import PlayerLeagueGameScore
-from api.app.domain.entities.player_season import PlayerSeason
-from api.app.domain.entities.scoring_settings import ScoringSettings
+from yards_py.domain.entities.player_league_game_score import PlayerLeagueGameScore
+from yards_py.domain.entities.player_season import PlayerSeason
+from yards_py.domain.entities.scoring_settings import ScoringSettings
 from typing import Dict, List, Optional
-from api.app.core.base_entity import BaseEntity
-from api.app.core.annotate_args import annotate_args
+from yards_py.core.base_entity import BaseEntity
+from yards_py.core.annotate_args import annotate_args
 
 
 @annotate_args

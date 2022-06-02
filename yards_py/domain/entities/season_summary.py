@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from typing import List, Optional
 from pydantic.main import BaseModel
-from api.app.core.base_entity import BaseEntity
-from api.app.domain.entities.draft import Draft, DraftSlot
-from api.app.domain.entities.league_position import LeaguePosition
-from api.app.domain.entities.roster import Roster
-from api.app.domain.entities.schedule import Matchup, PlayoffType, Schedule, ScheduleWeek
-from api.app.domain.enums.position_type import PositionType
-from api.app.domain.enums.week_type import WeekType
-from api.app.core.annotate_args import annotate_args
+from yards_py.core.base_entity import BaseEntity
+from yards_py.domain.entities.draft import Draft, DraftSlot
+from yards_py.domain.entities.league_position import LeaguePosition
+from yards_py.domain.entities.roster import Roster
+from yards_py.domain.entities.schedule import Matchup, PlayoffType, Schedule, ScheduleWeek
+from yards_py.domain.enums.position_type import PositionType
+from yards_py.domain.enums.week_type import WeekType
+from yards_py.core.annotate_args import annotate_args
 
 
 @annotate_args

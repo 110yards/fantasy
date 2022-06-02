@@ -1,7 +1,7 @@
-from api.app.domain.enums.login_type import LoginType
+from yards_py.domain.enums.login_type import LoginType
 from typing import List, Optional
-from api.app.core.base_entity import BaseEntity
-from api.app.core.annotate_args import annotate_args
+from yards_py.core.base_entity import BaseEntity
+from yards_py.core.annotate_args import annotate_args
 from datetime import datetime
 
 

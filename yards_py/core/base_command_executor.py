@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from api.app.core.logging import Logger
-from api.app.core.annotate_args import annotate_args
+from yards_py.core.logging import Logger
+from yards_py.core.annotate_args import annotate_args
 
 import logging
 from abc import ABCMeta, abstractmethod

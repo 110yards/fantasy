@@ -1,10 +1,10 @@
 
 
-from api.app.domain.entities.roster import Roster
-from api.app.domain.entities.schedule import Matchup
+from yards_py.domain.entities.roster import Roster
+from yards_py.domain.entities.schedule import Matchup
 from typing import Optional
 from pydantic.main import BaseModel
-from api.app.core.annotate_args import annotate_args
+from yards_py.core.annotate_args import annotate_args
 
 
 @annotate_args

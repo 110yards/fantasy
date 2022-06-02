@@ -3,7 +3,7 @@ import hashlib
 import json
 from typing import Optional
 from pydantic import BaseModel
-from api.app.core.annotate_args import annotate_args
+from yards_py.core.annotate_args import annotate_args
 
 
 @annotate_args

@@ -1,8 +1,8 @@
 from typing import Optional
 from pydantic import BaseModel
-from api.app.domain.entities.player import Player
+from yards_py.domain.entities.player import Player
 from datetime import datetime
-from api.app.core.annotate_args import annotate_args
+from yards_py.core.annotate_args import annotate_args
 from enum import Enum
 
 

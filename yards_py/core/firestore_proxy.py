@@ -2,12 +2,12 @@ from typing import Callable, Dict, Generic, List, TypeVar, Union
 
 from google.cloud.firestore_v1.base_document import BaseDocumentReference, DocumentSnapshot
 
-from api.app.core.base_entity import BaseEntity
+from yards_py.core.base_entity import BaseEntity
 from firebase_admin import firestore
 from google.cloud.firestore_v1.base_client import BaseClient
 from google.cloud.firestore_v1.transaction import Transaction
 
-from api.app.core.batching import create_batches
+from yards_py.core.batching import create_batches
 
 T = TypeVar("T", bound=BaseEntity)
 

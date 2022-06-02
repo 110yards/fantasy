@@ -1,11 +1,11 @@
 from datetime import datetime
-from api.app.core.base_entity import BaseEntity
-from api.app.domain.entities.league import League
+from yards_py.core.base_entity import BaseEntity
+from yards_py.domain.entities.league import League
 from typing import Optional
 
-from api.app.core.annotate_args import annotate_args
-from api.app.domain.entities.matchup_preview import MatchupPreview, MatchupPreviewTeam
-from api.app.domain.entities.roster import Roster
+from yards_py.core.annotate_args import annotate_args
+from yards_py.domain.entities.matchup_preview import MatchupPreview, MatchupPreviewTeam
+from yards_py.domain.entities.roster import Roster
 
 
 @annotate_args

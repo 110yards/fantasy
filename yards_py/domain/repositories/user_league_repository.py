@@ -1,8 +1,8 @@
 from google.cloud.firestore_v1.transaction import Transaction
-from api.app.domain.repositories.user_repository import UserRepository
-from api.app.domain.entities.user_league_preview import UserLeaguePreview
+from yards_py.domain.repositories.user_repository import UserRepository
+from yards_py.domain.entities.user_league_preview import UserLeaguePreview
 from typing import Dict, List
-from api.app.core.firestore_proxy import FirestoreProxy
+from yards_py.core.firestore_proxy import FirestoreProxy
 
 
 def create_user_league_repository():

@@ -2,15 +2,15 @@ from __future__ import annotations
 
 import pytz
 
-from api.app.domain.entities.game import Game
+from yards_py.domain.entities.game import Game
 from typing import Dict, List, Optional
-from api.app.domain.entities.game_teams import GameTeams
-from api.app.domain.entities.event_type import EventType
-from api.app.domain.entities.game_score import GameScore
-from api.app.domain.entities.event_status import EVENT_STATUS_CANCELLED, EVENT_STATUS_FINAL, EVENT_STATUS_POSTPONED, EventStatus
+from yards_py.domain.entities.game_teams import GameTeams
+from yards_py.domain.entities.event_type import EventType
+from yards_py.domain.entities.game_score import GameScore
+from yards_py.domain.entities.event_status import EVENT_STATUS_CANCELLED, EVENT_STATUS_FINAL, EVENT_STATUS_POSTPONED, EventStatus
 from pydantic.main import BaseModel
-from api.app.core.base_entity import BaseEntity
-from api.app.core.annotate_args import annotate_args
+from yards_py.core.base_entity import BaseEntity
+from yards_py.core.annotate_args import annotate_args
 from datetime import datetime
 
 POSTPONED_IS_CANCELLED_AFTER_HOURS = 24

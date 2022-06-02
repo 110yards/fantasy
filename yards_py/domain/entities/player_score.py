@@ -1,6 +1,6 @@
 
 
-from api.app.core.base_entity import BaseEntity
+from yards_py.core.base_entity import BaseEntity
 
 
 class PlayerScore(BaseEntity):

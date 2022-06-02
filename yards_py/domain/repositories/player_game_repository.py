@@ -3,8 +3,8 @@
 from typing import List, Union
 from fastapi.param_functions import Query
 from google.cloud.firestore_v1.transaction import Transaction
-from api.app.core.firestore_proxy import FirestoreProxy
-from api.app.domain.entities.player_game import PlayerGame
+from yards_py.core.firestore_proxy import FirestoreProxy
+from yards_py.domain.entities.player_game import PlayerGame
 
 
 def create_player_game_repository():

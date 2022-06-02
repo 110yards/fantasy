@@ -2,11 +2,11 @@
 from __future__ import annotations
 
 from typing import Optional
-from api.app.core.base_entity import BaseEntity
-from api.app.domain.entities.event_status import EventStatus
-from api.app.domain.entities.event_type import EventType
-from api.app.domain.entities.game_score import GameScore
-from api.app.domain.entities.game_teams import GameTeams
+from yards_py.core.base_entity import BaseEntity
+from yards_py.domain.entities.event_status import EventStatus
+from yards_py.domain.entities.event_type import EventType
+from yards_py.domain.entities.game_score import GameScore
+from yards_py.domain.entities.game_teams import GameTeams
 
 
 class ScheduledGame(BaseEntity):

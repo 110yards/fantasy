@@ -1,6 +1,6 @@
 
-from api.app.routers.api_router import APIRouter
-from api.app.core.logging import Logger
+from .api_router import APIRouter
+from yards_py.core.logging import Logger
 
 router = APIRouter(prefix="/log")
 

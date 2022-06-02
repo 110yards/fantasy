@@ -1,16 +1,16 @@
-from api.app.domain.repositories.league_config_repository import LeagueConfigRepository
-from api.app.domain.repositories.league_transaction_repository import LeagueTransactionRepository
-from api.app.domain.repositories.league_roster_repository import LeagueRosterRepository
+from yards_py.domain.repositories.league_config_repository import LeagueConfigRepository
+from yards_py.domain.repositories.league_transaction_repository import LeagueTransactionRepository
+from yards_py.domain.repositories.league_roster_repository import LeagueRosterRepository
 from api.tests.mocks.mock_firestore_proxy import MockFirestoreProxy
-from api.app.domain.repositories.league_owned_player_repository import LeagueOwnedPlayerRepository
-from api.app.domain.services.roster_player_service import RosterPlayerService
-from api.app.domain.entities.league_positions_config import LeaguePositionsConfig
-from api.app.domain.services.waiver_service import WaiverService
-from api.app.domain.entities.team import Team
-from api.app.domain.enums.position_type import PositionType
-from api.app.domain.entities.player import Player
-from api.app.domain.entities.waiver_bid import WaiverBid, WaiverBidResult
-from api.app.domain.entities.roster import Roster
+from yards_py.domain.repositories.league_owned_player_repository import LeagueOwnedPlayerRepository
+from services.system.app.domain.services.roster_player_service import RosterPlayerService
+from yards_py.domain.entities.league_positions_config import LeaguePositionsConfig
+from services.system.app.domain.services.waiver_service import WaiverService
+from yards_py.domain.entities.team import Team
+from yards_py.domain.enums.position_type import PositionType
+from yards_py.domain.entities.player import Player
+from yards_py.domain.entities.waiver_bid import WaiverBid, WaiverBidResult
+from yards_py.domain.entities.roster import Roster
 from copy import deepcopy
 
 player1 = Player(id="1", cfl_central_id=1, first_name="Player", last_name="One", position=PositionType.rb, team=Team.bc(), status_current=1)

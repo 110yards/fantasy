@@ -1,8 +1,8 @@
 from typing import List
-from api.app.domain.entities.league_week import LeagueWeek
-from api.app.domain.repositories.league_repository import LeagueRepository
+from yards_py.domain.entities.league_week import LeagueWeek
+from yards_py.domain.repositories.league_repository import LeagueRepository
 from google.cloud.firestore_v1.transaction import Transaction
-from api.app.core.firestore_proxy import FirestoreProxy
+from yards_py.core.firestore_proxy import FirestoreProxy
 
 
 def create_league_week_repository():

@@ -1,10 +1,10 @@
 from __future__ import annotations
 from datetime import datetime
-from api.app.domain.entities.team import Team
-from api.app.core.base_entity import BaseEntity
+from yards_py.domain.entities.team import Team
+from yards_py.core.base_entity import BaseEntity
 from typing import List, Optional, Union
 from pydantic import BaseModel
-from api.app.core.annotate_args import annotate_args
+from yards_py.core.annotate_args import annotate_args
 
 
 @annotate_args

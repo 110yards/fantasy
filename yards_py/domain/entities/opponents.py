@@ -1,11 +1,11 @@
 from __future__ import annotations
-from api.app.domain.entities.event_status import EVENT_STATUS_POSTPONED
-from api.app.domain.entities.scheduled_game import ScheduledGame
+from yards_py.domain.entities.event_status import EVENT_STATUS_POSTPONED
+from yards_py.domain.entities.scheduled_game import ScheduledGame
 
-from api.app.domain.entities.team import Team
+from yards_py.domain.entities.team import Team
 from typing import Dict, List, Union
-from api.app.core.base_entity import BaseEntity
-from api.app.core.annotate_args import annotate_args
+from yards_py.core.base_entity import BaseEntity
+from yards_py.core.annotate_args import annotate_args
 
 BYE = "BYE"
 

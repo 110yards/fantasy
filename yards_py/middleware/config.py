@@ -1,5 +1,5 @@
-from api.app.middleware.auth_middleware import AuthMiddleware
-from api.app.middleware.logging_middleware import LoggingMiddleware
+from yards_py.middleware.auth_middleware import AuthMiddleware
+from yards_py.middleware.logging_middleware import LoggingMiddleware
 
 from starlette.middleware import Middleware
 from starlette_context.plugins.request_id import RequestIdPlugin
