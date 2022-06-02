@@ -39,3 +39,4 @@ firebase-debug.log
 *.sln
 *.sw?
 
+.tmp/

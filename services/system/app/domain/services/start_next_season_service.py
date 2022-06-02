@@ -1,22 +1,27 @@
 from typing import Any, Optional
-from yards_py.core.logging import Logger
 
-from services.system.app.domain.commands.system.update_schedule import UpdateScheduleCommand, UpdateScheduleCommandExecutor, create_update_schedule_command_executor
+from fastapi import Depends
+from pydantic.main import BaseModel
+from yards_py.core.logging import Logger
 from yards_py.domain.entities.event_type import EVENT_TYPE_REGULAR
 from yards_py.domain.entities.league import League
 from yards_py.domain.entities.opponents import Opponents
 from yards_py.domain.entities.scoreboard import Scoreboard
 from yards_py.domain.entities.state import Locks, State
-from yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from yards_py.domain.repositories.league_repository import (
+    LeagueRepository, create_league_repository)
 from yards_py.domain.repositories.public_repository import (
     PublicRepository, create_public_repository)
+from yards_py.domain.repositories.user_archive_league_repository import (
+    UserArchiveLeagueRepository, create_user_archive_league_repository)
+from yards_py.domain.repositories.user_league_repository import (
+    UserLeagueRepository, create_user_league_repository)
+from yards_py.domain.repositories.user_repository import (
+    UserRepository, create_user_repository)
 
-from fastapi import Depends
-from pydantic.main import BaseModel
-from yards_py.domain.repositories.user_archive_league_repository import UserArchiveLeagueRepository, create_user_archive_league_repository
-
-from yards_py.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
-from yards_py.domain.repositories.user_repository import UserRepository, create_user_repository
+from services.system.app.domain.commands.system.update_schedule import (
+    UpdateScheduleCommand, UpdateScheduleCommandExecutor,
+    create_update_schedule_command_executor)
 
 
 def create_start_next_season_service(

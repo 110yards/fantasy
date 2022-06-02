@@ -1,5 +1,6 @@
 from __future__ import annotations
 from yards_py.domain.entities.event_status import EVENT_STATUS_FINAL
+from yards_py.domain.entities.event_type import EVENT_TYPE_REGULAR
 from yards_py.domain.entities.scheduled_game import ScheduledGame
 
 
@@ -87,6 +88,7 @@ class UpdateScheduleCommandExecutor(BaseCommandExecutor[UpdateScheduleCommand, U
         response = self.cfl_proxy.get_game_summaries_for_season(season)
 
         games = [ScheduledGame.from_cfl(game) for game in response["data"]]
+        games = [game for game in games if game.event_type.event_type_id == EVENT_TYPE_REGULAR]
 
         if not include_final:
             games = [game for game in games if game.event_status.event_status_id != EVENT_STATUS_FINAL]
