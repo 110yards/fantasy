@@ -48,7 +48,7 @@ jobs:
           REGISTRY: ${{ secrets.REGISTRY }}
           TAG: ${{ github.sha }}
           TARGET_PROJECT: ${{ secrets.TEST_GCLOUD_PROJECT }}
-          ENDPOINT: ${{ secrets.TEST_ENDPOINT }}
+          ENDPOINT: ${{ secrets.TEST_SYSTEM_ENDPOINT }}
         run: |
           ./archive.sh $TAG $REGISTRY
           ./deploy.sh $TAG $REGISTRY $TARGET_PROJECT $ENDPOINT
@@ -57,6 +57,6 @@ jobs:
         working-directory: .tmp
         env:
           TAG: ${{ github.sha }}
-          ENDPOINT: ${{ secrets.TEST_ENDPOINT }}
+          ENDPOINT: ${{ secrets.TEST_SYSTEM_ENDPOINT }}
           API_KEY: ${{ secrets.TEST_API_KEY }}
         run: python smoke_test_script.py
