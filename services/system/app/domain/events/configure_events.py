@@ -28,11 +28,12 @@ class ConfigureEvents:
         self.publisher.create_push_subscription("push_create_league_subscriptions", topics.LEAGUE_CREATED_TOPIC, create_league_subscriptions, config)
         self.publisher.create_push_subscription("push_renew_league_subscriptions", topics.LEAGUE_RENEWED_TOPIC, create_league_subscriptions, config)
 
+        long_ack_config = SubscriptionConfig(expiration_days=None, ack_deadline=600)
         update_games = f"{self.endpoint}/system/games?key={self.api_key}"
-        self.publisher.create_push_subscription("push_system_update_games", topics.UPDATE_GAMES_TOPIC, update_games, config)
+        self.publisher.create_push_subscription("push_system_update_games", topics.UPDATE_GAMES_TOPIC, update_games, long_ack_config)
 
         update_players = f"{self.endpoint}/system/players?key={self.api_key}"
-        self.publisher.create_push_subscription("push_system_update_players", topics.UPDATE_PLAYERS_TOPIC, update_players, config)
+        self.publisher.create_push_subscription("push_system_update_players", topics.UPDATE_PLAYERS_TOPIC, update_players, long_ack_config)
 
         end_of_day = f"{self.endpoint}/system/end_of_day?key={self.api_key}"
         self.publisher.create_push_subscription("push_system_end_of_day", topics.END_OF_DAY_TOPIC, end_of_day, config)

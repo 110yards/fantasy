@@ -22,6 +22,7 @@ from yards_py.domain.repositories.virtual_pubsub_repository import VirtualPubSub
 class SubscriptionConfig(BaseModel):
     expiration_days: Optional[int] = 31
     retention_days: int = 7
+    ack_deadline: int = 60
 
 
 class Publisher:
@@ -98,7 +99,7 @@ class PubSubPublisher(Publisher):
                         name=subcription_path,
                         topic=topic_path,
                         push_config=PushConfig(push_endpoint=endpoint),
-                        ack_deadline_seconds=60,
+                        ack_deadline_seconds=config.ack_deadline,
                         expiration_policy=ExpirationPolicy(ttl=Duration(seconds=config.expiration_days * 86400) if config.expiration_days else None),
                         retry_policy=RetryPolicy(),
                         message_retention_duration=Duration(seconds=config.retention_days * 86400)
