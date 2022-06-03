@@ -7,7 +7,7 @@ steps:
             "--project", "$_TARGET_PROJECT_ID",
             "--platform", "managed",
             "--allow-unauthenticated",
-            "--memory", "1Gi",
+            "--memory", "512Mi",
             "--concurrency", "4",
             "--timeout", "$_TIMEOUT",
             # GUNICORN CONFIG            
@@ -36,6 +36,4 @@ substitutions:
   _TIMEOUT: '600'
   _SERVICE_NAME: api-110yards
   _REGION: us-central1
-  _CURRENT_SEASON: '2021'
-  _SEASON_WEEKS: '16'
   _MIN_STAT_CORRECTION_HOURS: '24'
