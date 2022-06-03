@@ -1,0 +1,91 @@
+name: "Main Branch: System"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "system/**"
+      - ".python-version"
+      - ".github/workflows/main_system.yml"
+      - ".scripts/python/**"
+      - "yards-py/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: .scripts/common/install-dependencies-api.sh
+
+      - name: Run checks
+        run: .scripts/python/checks.sh
+
+      # Deploy to test
+      - name: Setup gcloud
+        env:
+          CLOUDSDK_PYTHON: /usr/bin/python3
+        with:
+          project_id: ${{ secrets.REGISTRY }}
+          service_account_key: ${{secrets.TEST_GCLOUD_CREDENTIALS}}
+          export_default_credentials: true
+        uses: google-github-actions/setup-gcloud@v0
+
+      - name: Prepare deployment directory
+        run: |
+          ./prepare-run.sh services/system
+
+      - name: Archive
+        working-directory: .tmp
+        env:
+          CLOUDSDK_PYTHON: /usr/bin/python3
+          REGISTRY: ${{ secrets.REGISTRY }}
+          TAG: ${{ github.sha }}
+        run: |
+          ./archive.sh $TAG $REGISTRY
+
+      - name: Deploy
+        working-directory: .tmp
+        env:
+          CLOUDSDK_PYTHON: /usr/bin/python3
+          REGISTRY: ${{ secrets.REGISTRY }}
+          TAG: ${{ github.sha }}
+          TARGET_PROJECT: ${{ secrets.TEST_GCLOUD_PROJECT }}
+          ENDPOINT: ${{ secrets.TEST_SYSTEM_ENDPOINT }}
+        run: |
+          ./deploy.sh $TAG $REGISTRY $TARGET_PROJECT $ENDPOINT
+
+      - name: Smoke test (test)
+        working-directory: .tmp
+        env:
+          TAG: ${{ github.sha }}
+          ENDPOINT: ${{ secrets.TEST_SYSTEM_ENDPOINT }}
+          API_KEY: ${{ secrets.TEST_API_KEY }}
+        run: python smoke_test_script.py
+
+      - name: Deploy (live)
+        working-directory: .tmp
+        env:
+          CLOUDSDK_PYTHON: /usr/bin/python3
+          REGISTRY: ${{ secrets.REGISTRY }}
+          TAG: ${{ github.sha }}
+          TARGET_PROJECT: ${{ secrets.LIVE_GCLOUD_PROJECT }}
+          ENDPOINT: ${{ secrets.LIVE_SYSTEM_ENDPOINT }}
+        run: |
+          ./deploy.sh $TAG $REGISTRY $TARGET_PROJECT $ENDPOINT
+
+      - name: Smoke test (live)
+        working-directory: .tmp
+        env:
+          TAG: ${{ github.sha }}
+          ENDPOINT: ${{ secrets.LIVE_SYSTEM_ENDPOINT }}
+          API_KEY: ${{ secrets.LIVE_API_KEY }}
+        run: python smoke_test_script.py

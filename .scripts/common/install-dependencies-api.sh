@@ -7,3 +7,4 @@ pip install pytest==6.2.4
 pip install pytest-mock==3.5.1
 
 pip install -r api/requirements.txt
+pip install -e .

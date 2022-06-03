@@ -21,6 +21,26 @@
         "./api/.env"
       ],
       "jinja": true
+    },
+    {
+      "name": "System",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "console": "internalConsole",
+      "args": [
+        "services.system.app.main:app",
+        "--app-dir",
+        "..",
+        "--reload",
+        "--reload-dir",
+        "services/system",
+        "--port",
+        "8001",
+        "--env-file",
+        "./services/system/.env"
+      ],
+      "jinja": true
     }
   ]
 }
