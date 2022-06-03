@@ -51,6 +51,13 @@ class RemoveRosterCommandExecutor(BaseCommandExecutor[RemoveRosterCommand, Remov
 
             league.schedule_generated = False
 
+            if not league.roster_count:
+                # added for #164 - if it's not set, it's an old league as we need to count
+                rosters = self.league_roster_repo.get_all(command.league_id)
+                league.roster_count = len(rosters)
+
+            league.roster_count -= 1
+
             league.draft_order = [item for item in league.draft_order if item.roster_id != command.roster_id]
 
             self.league_repo.update(league, transaction)

@@ -39,6 +39,7 @@
               <td class="text-right" v-if="canRemove(roster)">
                 <app-primary-button @click="confirmRemoval(roster)"> Remove </app-primary-button>
               </td>
+              <td v-else></td>
             </tr>
           </tbody>
         </template>

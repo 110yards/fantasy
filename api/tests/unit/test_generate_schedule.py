@@ -17,9 +17,11 @@ teams = [
     Roster(id=6, name="team 6"),
     Roster(id=7, name="team 7"),
     Roster(id=8, name="team 8"),
+    Roster(id=9, name="team 9"),
+    Roster(id=10, name="team 10"),
 ]
 
-teamCounts = [2, 4, 6, 8]
+teamCounts = [2, 4, 6, 8, 10]
 playoffTypes = [
     {"type": PlayoffType.TOP_2, "weeks": 1},
     {"type": PlayoffType.TOP_3, "weeks": 2},
@@ -47,6 +49,11 @@ combinations = [
     (teamCounts[3], playoffTypes[1]),
     (teamCounts[3], playoffTypes[2]),
     (teamCounts[3], playoffTypes[3]),
+
+    (teamCounts[4], playoffTypes[0]),
+    (teamCounts[4], playoffTypes[1]),
+    (teamCounts[4], playoffTypes[2]),
+    (teamCounts[4], playoffTypes[3]),
 ]
 
 
