@@ -54,7 +54,7 @@ jobs:
           ./deploy.sh $TAG $REGISTRY $TARGET_PROJECT $ENDPOINT
 
       - name: Smoke test
-        working-directory: ./tmp
+        working-directory: .tmp
         env:
           TAG: ${{ github.sha }}
           ENDPOINT: ${{ secrets.TEST_ENDPOINT }}

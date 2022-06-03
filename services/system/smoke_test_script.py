@@ -4,7 +4,7 @@ import sys
 
 from requests.models import Response
 
-endpoint = os.environ.get("ENDPOINT", "http://0.0.0.0:8000")
+endpoint = os.environ.get("ENDPOINT", "http://0.0.0.0:8001")
 api_key = os.environ.get("API_KEY", "000000")
 
 
@@ -28,16 +28,6 @@ def api_smoke_test():
     check_response(response, "api_smoke_test")
 
 
-def cors_smoke_test():
-    url = f"{endpoint}/"
-    headers = {
-        "Origin": os.environ.get("CLIENT_ORIGIN", "http://localhost"),
-        "Access-Control-Request-Method": "GET"
-    }
-    response = requests.options(url, headers=headers)
-    check_response(response, "cors_smoke_test")
-
-
 #############
 # Smoke tests
 #############
@@ -45,7 +35,6 @@ print("Smoke test started")
 
 configure_api()
 api_smoke_test()
-cors_smoke_test()
 
 print("Smoke test completed successfully")
 sys.exit(0)
