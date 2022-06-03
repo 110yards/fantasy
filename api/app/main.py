@@ -1,9 +1,9 @@
-import firebase_admin
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.param_functions import Depends
 
 from api.app.config.settings import Settings, get_settings
+from api.app.core.initialize_firebase import initialize_firebase
 from api.app.core.logging import Logger
 from api.app.middleware.config import app_middleware
 from api.app.routers import (
@@ -45,7 +45,7 @@ app.include_router(projection_router.router)
 if settings.is_dev():
     app.include_router(dev_router.router)
 
-firebase_admin.initialize_app(options={"projectId": settings.gcloud_project})
+initialize_firebase(settings.rtdb_emulator_host, settings.gcloud_project)
 
 
 @app.get("/")

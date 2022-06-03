@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     api_key: str
     version: str = "dev"
     min_stat_correction_hours: int = 24
+    rtdb_emulator_host: Optional[str] = None
 
     class Config:
         env_file = ".env"

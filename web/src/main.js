@@ -3,7 +3,7 @@ import App from "./App.vue"
 import router from "./modules/router"
 import store from "./modules/store"
 import eventBus from "./modules/eventBus"
-import { firestorePlugin } from "vuefire"
+import { firestorePlugin, rtdbPlugin } from "vuefire"
 import "firebase/database"
 import "firebase/auth"
 import "firebase/firestore"
@@ -24,6 +24,7 @@ import teamGames from "./mixins/teamGames"
 Vue.config.productionTip = false
 
 Vue.use(firestorePlugin)
+Vue.use(rtdbPlugin)
 Vue.use(appConfig)
 
 Vue.prototype.$eventBus = eventBus
