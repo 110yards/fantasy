@@ -7,6 +7,7 @@
       "request": "launch",
       "module": "uvicorn",
       "console": "internalConsole",
+      "justMyCode": false,
       "args": [
         "api.app.main:app",
         "--app-dir",

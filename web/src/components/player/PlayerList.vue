@@ -135,7 +135,7 @@
 import AppCheckBox from "../../components/inputs/AppCheckBox.vue"
 import AppTextField from "../../components/inputs/AppTextField.vue"
 import PlayerLink from "../../components/player/PlayerLink.vue"
-import { firestore } from "../../modules/firebase"
+import { firestore, rtdb } from "../../modules/firebase"
 import LeagueRosterLink from "../league/LeagueRosterLink.vue"
 import { draftState, visiblePlayerPositions } from "../../api/110yards/constants"
 import * as headers from "./positionHeaders"
@@ -146,7 +146,7 @@ import { longDate } from "../../modules/formatter"
 import AddPlayer from "./AddPlayer.vue"
 import { formatScore } from "../../modules/formatter"
 import Score from "../Score.vue"
-import { getCurrentPlayers, getDraftPlayers } from "../../api/110yards/league"
+import { getCurrentPlayers, getDraftPlayers, getPlayersRef } from "../../api/110yards/league"
 import DataTable from "./DataTable.vue"
 
 export default {
@@ -445,14 +445,13 @@ export default {
       return !shouldInclude ? [] : headers.defense
     },
 
-    async loadPlayers() {
-      if (!this.currentLeague || !this.uid) return
+    async getPlayersRef() {
+      if (!this.leagueId || !this.uid) return
 
-      if (this.showPreviousSeasonStats) {
-        this.players = await getDraftPlayers(this.currentLeague.id)
-      } else {
-        this.players = await getCurrentPlayers(this.currentLeague.id)
-      }
+      let path = await getPlayersRef(this.leagueId) // todo change name
+      let ref = rtdb.ref(path)
+
+      this.$rtdbBind("players", ref)
     },
 
     configureReferences() {
@@ -476,23 +475,17 @@ export default {
       immediate: true,
       handler(leagueId) {
         if (leagueId) {
+          this.getPlayersRef()
           this.configureReferences()
         }
       },
     },
-    currentLeague: {
-      immediate: true,
-      handler(currentLeague) {
-        if (currentLeague) {
-          this.loadPlayers()
-        }
-      },
-    },
+
     uid: {
       immediate: true,
       handler(uid) {
         if (uid) {
-          this.loadPlayers()
+          this.getPlayersRef()
         }
       },
     },
