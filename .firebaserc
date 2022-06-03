@@ -1,0 +1,14 @@
+{
+    "projects": {
+        "default": "yards-dev"
+    },
+    "targets": {
+        "yards-dev": {
+            "database": {
+                "default": [
+                    "yards-dev"
+                ]
+            }
+        }
+    }
+}

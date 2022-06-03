@@ -212,17 +212,9 @@ async def set_notes(
     command_executor.execute(command)
 
 
-@router.get("/{league_id}/players/draft")
-async def draft_players(
+@router.get("/{league_id}/players")
+async def get_players_ref(
     league_id: str,
     service: PlayerListService = Depends(create_player_list_service),
 ):
-    return service.get_draft_player_list(league_id)
-
-
-@router.get("/{league_id}/players/current")
-async def current_players(
-    league_id: str,
-    service: PlayerListService = Depends(create_player_list_service),
-):
-    return service.get_current_player_list(league_id)
+    return service.get_players_ref(league_id)
