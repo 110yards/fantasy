@@ -8,7 +8,7 @@ steps:
             "--platform", "managed",
             "--allow-unauthenticated",
             "--memory", "512Mi",
-            "--concurrency", "4",
+            "--concurrency", "20",
             "--timeout", "$_TIMEOUT",
             # GUNICORN CONFIG            
             "--set-env-vars", "TIMEOUT=$_TIMEOUT",
@@ -22,9 +22,6 @@ steps:
             "--set-env-vars", "SERVICE_NAME=$_SERVICE_NAME",
             "--set-env-vars", "REGION=$_REGION",
             # API CONFIG
-            "--set-env-vars", "CURRENT_SEASON=$_CURRENT_SEASON", # eventually in db
-            "--set-env-vars", "SEASON_WEEKS=$_SEASON_WEEKS", # eventually in db
-            "--set-env-vars", "MIN_STAT_CORRECTION_HOURS=$_MIN_STAT_CORRECTION_HOURS",
             # SECRETS
             "--update-secrets=CFL_API_KEY=CFL_API_KEY:latest",
             "--update-secrets=FIREBASE_API_KEY=FIREBASE_API_KEY:latest",
@@ -36,4 +33,3 @@ substitutions:
   _TIMEOUT: '600'
   _SERVICE_NAME: api-110yards
   _REGION: us-central1
-  _MIN_STAT_CORRECTION_HOURS: '24'
