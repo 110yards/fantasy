@@ -12,8 +12,6 @@ from api.app.domain.commands.system.update_games import (
     SimState, UpdateGamesCommand, UpdateGamesCommandExecutor,
     create_update_games_command_executor)
 from api.app.domain.commands.system.update_schedule import UpdateScheduleCommand, UpdateScheduleCommandExecutor, create_update_schedule_command_executor
-from api.app.domain.events.configure_events import (ConfigureEvents,
-                                                    create_configure_events)
 from api.app.domain.services.end_of_day_service import EndOfDayService, create_end_of_day_service
 from api.app.domain.services.end_of_week_service import EndOfWeekRequest, EndOfWeekService, create_end_of_week_service
 from api.app.domain.services.league_command_service import (
@@ -32,11 +30,8 @@ router = APIRouter(prefix="/system")
 @router.post("/configure")
 async def configure(
     public_config_command_executor: InsertPublicConfigCommandExecutor = Depends(create_insert_public_config_command_executor),
-    events_service: ConfigureEvents = Depends(create_configure_events)
 ):
-
     return {
-        "events_configured": events_service.configure_events(),
         "public_info": public_config_command_executor.execute(InsertPublicConfigCommand()).success
     }
 
