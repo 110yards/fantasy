@@ -5,7 +5,8 @@ from yards_py.core.annotate_args import annotate_args
 from yards_py.core.base_command_executor import (BaseCommand, BaseCommandExecutor,
                                                  BaseCommandResult)
 from yards_py.core.logging import Logger
-from yards_py.core.publisher import Publisher, create_publisher
+from yards_py.core.publisher import Publisher
+from services.system.app.di import create_publisher
 from yards_py.domain.entities.league import League
 from yards_py.domain.repositories.league_repository import (
     LeagueRepository, create_league_repository)

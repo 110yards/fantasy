@@ -61,10 +61,29 @@ jobs:
         run: |
           ./deploy.sh $TAG $REGISTRY $TARGET_PROJECT $ENDPOINT
 
-      - name: Smoke test
+      - name: Smoke test (test)
         working-directory: .tmp
         env:
           TAG: ${{ github.sha }}
           ENDPOINT: ${{ secrets.TEST_SYSTEM_ENDPOINT }}
           API_KEY: ${{ secrets.TEST_API_KEY }}
+        run: python smoke_test_script.py
+
+      - name: Deploy (live)
+        working-directory: .tmp
+        env:
+          CLOUDSDK_PYTHON: /usr/bin/python3
+          REGISTRY: ${{ secrets.REGISTRY }}
+          TAG: ${{ github.sha }}
+          TARGET_PROJECT: ${{ secrets.LIVE_GCLOUD_PROJECT }}
+          ENDPOINT: ${{ secrets.LIVE_SYSTEM_ENDPOINT }}
+        run: |
+          ./deploy.sh $TAG $REGISTRY $TARGET_PROJECT $ENDPOINT
+
+      - name: Smoke test (live)
+        working-directory: .tmp
+        env:
+          TAG: ${{ github.sha }}
+          ENDPOINT: ${{ secrets.LIVE_SYSTEM_ENDPOINT }}
+          API_KEY: ${{ secrets.LIVE_API_KEY }}
         run: python smoke_test_script.py
