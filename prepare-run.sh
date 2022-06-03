@@ -2,7 +2,7 @@
 
 set -e
 
-usage_tip="usage: deploy.sh 'service_path'"
+usage_tip="usage: prepare-run.sh 'service_path'"
 
 usage_tip="$usage_tip\n\n Options:"
 usage_tip="$usage_tip\n   service_path\t\t\t The path to the cloud run service"
@@ -25,7 +25,7 @@ cp -a $service_path/. .tmp
 cp -r yards_py .tmp/yards_py
 cp setup.py .tmp/yards_py
 
-cd .tmp
-
-./archive.sh "${@:2}"
-./deploy.sh "${@:2}"
+echo "Next steps if running manually:"
+echo "$ cd .tmp"
+echo "$ ./archive.sh <args>"
+echo "$ ./deploy.sh <args>"

@@ -37,24 +37,26 @@ jobs:
           export_default_credentials: true
         uses: google-github-actions/setup-gcloud@v0
 
+      - name: Prepare deployment directory
+        run: |
+          ./prepare-run.sh services/system
+
       - name: Archive and deploy
-        working-directory: api
+        working-directory: .tmp
         env:
           CLOUDSDK_PYTHON: /usr/bin/python3
           REGISTRY: ${{ secrets.REGISTRY }}
           TAG: ${{ github.sha }}
           TARGET_PROJECT: ${{ secrets.TEST_GCLOUD_PROJECT }}
           ENDPOINT: ${{ secrets.TEST_ENDPOINT }}
-          ORIGINS: ${{ secrets.TEST_ORIGINS }}
         run: |
           ./archive.sh $TAG $REGISTRY
-          ./deploy.sh $TAG $REGISTRY $TARGET_PROJECT $ENDPOINT $ORIGINS
+          ./deploy.sh $TAG $REGISTRY $TARGET_PROJECT $ENDPOINT
 
       - name: Smoke test
-        working-directory: api
+        working-directory: ./tmp
         env:
           TAG: ${{ github.sha }}
           ENDPOINT: ${{ secrets.TEST_ENDPOINT }}
           API_KEY: ${{ secrets.TEST_API_KEY }}
-          CLIENT_ORIGIN: ${{ secrets.TEST_ORIGINS }}
         run: python smoke_test_script.py
