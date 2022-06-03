@@ -13,6 +13,7 @@ from yards_py.middleware.logging_middleware import LoggingMiddleware
 
 from services.system.app.routers import (
     logging_router,
+    migration_router,
     system_router,
 )
 
@@ -37,6 +38,7 @@ app = FastAPI(middleware=[
 )
 Logger.initialize(settings.is_dev, settings.gcloud_project, settings.service_name, settings.region)
 
+app.include_router(migration_router.router)
 app.include_router(system_router.router)
 app.include_router(logging_router.router)
 
