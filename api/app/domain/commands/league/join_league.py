@@ -13,6 +13,8 @@ from api.app.core.annotate_args import annotate_args
 from api.app.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
 from firebase_admin import firestore
 
+MAX_ROSTER_COUNT = 10
+
 
 def create_join_league_command_executor(
         league_repo: LeagueRepository = Depends(create_league_repository),
@@ -71,6 +73,15 @@ class JoinLeagueCommandExecutor(BaseCommandExecutor[JoinLeagueCommand, BaseComma
 
             manager = self.user_repo.get(command.user_id, transaction)
 
+            if not league.roster_count:
+                # added for #164 - if it's not set, it's an old league as we need to count
+                rosters = self.league_roster_repo.get_all(command.league_id)
+                league.roster_count = len(rosters)
+
+            if league.roster_count > MAX_ROSTER_COUNT:
+                return JoinLeagueResult(command=command, error=f"Sorry, but this league is full (max = {MAX_ROSTER_COUNT} teams)")
+
+            league.roster_count += 1
             roster = create_roster(manager.id, manager.display_name)
             user_league_preview = UserLeaguePreview.create(roster, league)
             league.draft_order.append(DraftOrder(roster_id=manager.id))

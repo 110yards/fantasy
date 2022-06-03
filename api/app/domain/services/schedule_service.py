@@ -70,6 +70,30 @@ def eight_teams() -> List[List[ScheduledMatchup]]:
     ]
 
 
+def ten_teams() -> List[List[ScheduledMatchup]]:
+    return [
+        [matchup(0, 9), matchup(1, 8), matchup(2, 7), matchup(3, 6), matchup(4, 5)],
+        [matchup(8, 0), matchup(7, 9), matchup(6, 1), matchup(5, 2), matchup(4, 3)],
+        [matchup(0, 7), matchup(8, 6), matchup(9, 5), matchup(1, 4), matchup(2, 3)],
+        [matchup(6, 0), matchup(5, 7), matchup(4, 8), matchup(3, 9), matchup(2, 1)],
+        [matchup(0, 5), matchup(6, 4), matchup(7, 3), matchup(8, 2), matchup(9, 1)],
+        [matchup(4, 0), matchup(3, 5), matchup(2, 6), matchup(1, 7), matchup(9, 8)],
+        [matchup(0, 3), matchup(2, 4), matchup(5, 1), matchup(6, 9), matchup(7, 8)],
+        [matchup(2, 0), matchup(1, 3), matchup(9, 4), matchup(8, 5), matchup(7, 6)],
+        [matchup(0, 1), matchup(9, 2), matchup(3, 8), matchup(4, 7), matchup(5, 6)],
+        # reverse
+        [matchup(9, 0), matchup(8, 1), matchup(7, 2), matchup(6, 3), matchup(5, 4)],
+        [matchup(0, 8), matchup(9, 7), matchup(1, 6), matchup(2, 5), matchup(3, 4)],
+        [matchup(7, 0), matchup(6, 8), matchup(5, 9), matchup(4, 1), matchup(3, 2)],
+        [matchup(0, 6), matchup(7, 5), matchup(8, 4), matchup(9, 3), matchup(1, 2)],
+        [matchup(5, 0), matchup(4, 6), matchup(3, 7), matchup(2, 8), matchup(1, 9)],
+        [matchup(0, 4), matchup(5, 3), matchup(6, 2), matchup(7, 1), matchup(8, 9)],
+        [matchup(3, 0), matchup(4, 2), matchup(1, 5), matchup(9, 6), matchup(8, 7)],
+        [matchup(0, 2), matchup(3, 1), matchup(4, 9), matchup(5, 8), matchup(6, 7)],
+        [matchup(1, 0), matchup(2, 9), matchup(8, 3), matchup(7, 4), matchup(6, 5)],
+    ]
+
+
 def get_sequence_for_count(teams: int):
     if teams == 2:
         return two_teams()
@@ -79,6 +103,8 @@ def get_sequence_for_count(teams: int):
         return six_teams()
     elif teams == 8:
         return eight_teams()
+    elif teams == 10:
+        return ten_teams()
     else:
         raise NotSupportedException(f"Schedule for {teams} teams is not supported")
 
