@@ -96,7 +96,7 @@ class PlayerListService:
 
         scoring = self.league_config_repo.get_scoring_config(league_id)
 
-        valid_cache = self._check_cache_scoring_hash(league_id, score_season)
+        valid_cache = self._check_cache_scoring_hash(league_id, score_season, scoring)
 
         if valid_cache:
             return self._get_players_path(league_id, score_season)
