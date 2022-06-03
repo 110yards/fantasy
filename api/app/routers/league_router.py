@@ -1,13 +1,9 @@
-from api.app.core.pubsub.pubsub_push import PubSubPush
 from api.app.domain.commands.league.close_league_registration import (
     CloseLeagueRegistrationCommand, CloseLeagueRegistrationCommandExecutor,
     create_close_league_registration_command_executor)
 from api.app.domain.commands.league.create_league import (
     CreateLeagueCommand, CreateLeagueCommandExecutor,
     create_league_command_executor)
-from api.app.domain.commands.league.create_league_subscriptions import (
-    CreateLeagueSubscriptionsCommand, CreateLeagueSubscriptionsCommandExecutor,
-    create_league_subscriptions_command_executor)
 from api.app.domain.commands.league.generate_schedule import (
     GenerateScheduleCommand, GenerateScheduleCommandExecutor,
     create_generate_schedule_command_executor)
@@ -60,24 +56,6 @@ async def create_league(
         command_executor: CreateLeagueCommandExecutor = Depends(create_league_command_executor)):
     uid = request.state.uid
     command.commissioner_id = uid
-    return command_executor.execute(command)
-
-
-@router.post("/subscriptions")
-async def configure_subscriptions(
-    push: PubSubPush,
-    command_executor: CreateLeagueSubscriptionsCommandExecutor = Depends(create_league_subscriptions_command_executor)
-):
-    league = push.get_data()
-    command = CreateLeagueSubscriptionsCommand(league=league)
-    return command_executor.execute(command)
-
-
-@router.post("/fix_subscriptions")
-async def fix_subscriptions(
-    command: CreateLeagueSubscriptionsCommand,
-    command_executor: CreateLeagueSubscriptionsCommandExecutor = Depends(create_league_subscriptions_command_executor)
-):
     return command_executor.execute(command)
 
 

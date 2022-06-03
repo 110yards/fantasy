@@ -15,6 +15,7 @@ from services.system.app.routers import (
     logging_router,
     migration_router,
     system_router,
+    league_router
 )
 
 settings = get_settings()
@@ -41,6 +42,7 @@ Logger.initialize(settings.is_dev, settings.gcloud_project, settings.service_nam
 app.include_router(migration_router.router)
 app.include_router(system_router.router)
 app.include_router(logging_router.router)
+app.include_router(league_router.router)
 
 firebase_admin.initialize_app(options={"projectId": settings.gcloud_project})
 
