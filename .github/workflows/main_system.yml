@@ -1,11 +1,13 @@
-name: "Pull Request: System"
+name: "Main Branch: System"
 
 on:
-  pull_request:
+  push:
+    branches:
+      - main
     paths:
       - "system/**"
       - ".python-version"
-      - ".github/workflows/pr_system.yml"
+      - ".github/workflows/main_system.yml"
       - ".scripts/python/**"
       - "yards-py/**"
 
