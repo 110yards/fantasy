@@ -28,8 +28,8 @@ class CflProxy:
     def __init__(self, settings: Settings):
         self.settings = settings
 
-    # enforcing the 30/minute limit as a 30 second interval should make it less likely to accidentally hit the limit.
-    @RateLimiter(max_calls=15, period=30, callback=limited)
+    # enforcing the 30/minute limit as a 40 second interval should make it less likely to accidentally hit the limit.
+    @RateLimiter(max_calls=15, period=40, callback=limited)
     def get(self, path: str) -> dict:
         if not self.settings.cfl_api_key:
             msg = "CFL API Key is not set. To enable CFL API requests, please add CFL_API_KEY=<key> to your .env file." \
