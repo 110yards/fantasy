@@ -8,7 +8,7 @@ steps:
             "--platform", "managed",
             "--allow-unauthenticated",
             "--memory", "1Gi",
-            "--concurrency", "20",
+            "--concurrency", "10",
             "--timeout", "$_TIMEOUT",
             # GUNICORN CONFIG            
             "--set-env-vars", "TIMEOUT=$_TIMEOUT",

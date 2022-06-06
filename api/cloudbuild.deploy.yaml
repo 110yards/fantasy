@@ -7,7 +7,7 @@ steps:
             "--project", "$_TARGET_PROJECT_ID",
             "--platform", "managed",
             "--allow-unauthenticated",
-            "--memory", "512Mi",
+            "--memory", "1Gi",
             "--concurrency", "20",
             "--timeout", "$_TIMEOUT",
             # GUNICORN CONFIG            

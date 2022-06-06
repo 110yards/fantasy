@@ -1,3 +1,4 @@
+from api.app.core.abort import abort_not_found
 from api.app.domain.commands.league.close_league_registration import (
     CloseLeagueRegistrationCommand, CloseLeagueRegistrationCommandExecutor,
     create_close_league_registration_command_executor)
@@ -195,4 +196,9 @@ async def get_players_ref(
     league_id: str,
     service: PlayerListService = Depends(create_player_list_service),
 ):
-    return service.get_players_ref(league_id)
+    ref = service.get_players_ref(league_id)
+
+    if not ref:
+        abort_not_found()
+    else:
+        return ref

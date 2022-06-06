@@ -76,8 +76,12 @@ class PlayerListService:
         self.player_season_score_repo = player_season_score_repo
         self.rtdb_client = rtdb_client
 
-    def get_players_ref(self, league_id: str) -> str:
+    def get_players_ref(self, league_id: str) -> Optional[str]:
         league = self.league_repo.get(league_id)
+
+        if not league:
+            return None
+
         state = self.public_repo.get_state()
 
         if league.draft_state == DraftState.COMPLETE and league.season == state.current_season:
