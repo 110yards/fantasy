@@ -52,7 +52,7 @@ class RegisterCommandExecutor(BaseCommandExecutor[RegisterEmailCommand, Register
             return RegisterEmailResult(command=command, error="A user with that email already exists")
         except ValueError as ex:
             message = ex.args[0] if hasattr(ex, "args") and len(ex.args) > 0 else "Unable to create user account"
-            Logger.error(message, exc_info=ex)
+            Logger.warn(message, exc_info=ex)
             return RegisterEmailResult(command=command, error=message)
         except Exception as ex:
             Logger.error("Create user call failed", exc_info=ex)
