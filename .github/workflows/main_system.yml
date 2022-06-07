@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "system/**"
+      - "services/system/**"
       - ".python-version"
       - ".github/workflows/main_system.yml"
       - ".scripts/python/**"

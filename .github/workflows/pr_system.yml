@@ -3,7 +3,7 @@ name: "Pull Request: System"
 on:
   pull_request:
     paths:
-      - "system/**"
+      - "services/system/**"
       - ".python-version"
       - ".github/workflows/pr_system.yml"
       - ".scripts/python/**"
