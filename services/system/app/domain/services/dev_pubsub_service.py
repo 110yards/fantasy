@@ -7,14 +7,14 @@ from yards_py.core.logging import Logger
 from yards_py.core.pubsub.pubsub_message import PubSubMessage
 from yards_py.core.pubsub.pubsub_push import PubSubPush
 from yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from api.app.domain.repositories.virtual_pubsub_repository import VirtualPubSubPayload, VirtualPubsubRepository, create_virtual_pubsub_repository
+from services.api.app.domain.repositories.virtual_pubsub_repository import VirtualPubSubPayload, VirtualPubsubRepository, create_virtual_pubsub_repository
 from services.system.app.domain.services.end_of_week_service import EndOfWeekService, create_end_of_week_service
 from services.system.app.domain.services.league_command_service import LeagueCommandService, create_league_command_service
 from services.system.app.domain.services.waiver_service import WaiverService, create_waiver_service
 
-from api.app.domain.topics import (END_OF_WAIVERS_TOPIC, END_OF_WEEK_TOPIC,
-                                   LEAGUE_COMMAND_TOPIC, LEAGUE_CREATED_TOPIC,
-                                   LEAGUE_RENEWED_TOPIC, UPDATE_PLAYERS_TOPIC)
+from services.api.app.domain.topics import (END_OF_WAIVERS_TOPIC, END_OF_WEEK_TOPIC,
+                                            LEAGUE_COMMAND_TOPIC, LEAGUE_CREATED_TOPIC,
+                                            LEAGUE_RENEWED_TOPIC, UPDATE_PLAYERS_TOPIC)
 
 
 def create_dev_pubsub_service(

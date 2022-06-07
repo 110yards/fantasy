@@ -5,10 +5,11 @@ on:
     branches:
       - main
     paths:
-      - "api/**"
+      - "services/api/**"
       - ".python-version"
       - ".github/workflows/main_api.yml"
       - ".scripts/python/**"
+      - "yards_py/**"
 
 jobs:
   build:
@@ -37,6 +38,10 @@ jobs:
           service_account_key: ${{secrets.TEST_GCLOUD_CREDENTIALS}}
           export_default_credentials: true
         uses: google-github-actions/setup-gcloud@v0
+
+      - name: Prepare deployment directory
+        run: |
+          ./prepare-run.sh services/api
 
       - name: Archive and deploy (test)
         working-directory: api

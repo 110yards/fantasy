@@ -3,10 +3,11 @@ name: "Pull Request: API"
 on:
   pull_request:
     paths:
-      - "api/**"
+      - "services/api/**"
       - ".python-version"
       - ".github/workflows/pr_api.yml"
       - ".scripts/python/**"
+      - "yards-py/**"
 
 jobs:
   build:
@@ -36,8 +37,12 @@ jobs:
           export_default_credentials: true
         uses: google-github-actions/setup-gcloud@v0
 
+      - name: Prepare deployment directory
+        run: |
+          ./prepare-run.sh services/api
+
       - name: Archive and deploy
-        working-directory: api
+        working-directory: .tmp
         env:
           CLOUDSDK_PYTHON: /usr/bin/python3
           REGISTRY: ${{ secrets.REGISTRY }}
@@ -50,7 +55,7 @@ jobs:
           ./deploy.sh $TAG $REGISTRY $TARGET_PROJECT $ENDPOINT $ORIGINS
 
       - name: Smoke test
-        working-directory: api
+        working-directory: .tmp
         env:
           TAG: ${{ github.sha }}
           ENDPOINT: ${{ secrets.TEST_ENDPOINT }}
