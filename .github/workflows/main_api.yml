@@ -1,5 +1,8 @@
 name: "Main Branch: API"
 
+env:
+  SERVICE_DIR: services/api
+
 on:
   push:
     branches:
@@ -10,6 +13,9 @@ on:
       - ".github/workflows/main_api.yml"
       - ".scripts/python/**"
       - "yards_py/**"
+
+env:
+  SERVICE_DIR=
 
 jobs:
   build:
@@ -24,10 +30,10 @@ jobs:
           python-version: "3.10"
 
       - name: Install dependencies
-        run: .scripts/common/install-dependencies-api.sh
+        run: .scripts/common/install-dependencies-service.sh ${{ env.SERVICE_DIR }}
 
       - name: Run checks
-        run: .scripts/python/checks.sh services/api
+        run: .scripts/python/checks.sh ${{ env.SERVICE_DIR }}
 
       # Deploy to test
       - name: Setup gcloud
@@ -41,7 +47,7 @@ jobs:
 
       - name: Prepare deployment directory
         run: |
-          ./prepare-run.sh services/api
+          ./prepare-run.sh ${{ env.SERVICE_DIR }}
 
       - name: Archive and deploy (test)
         working-directory: .tmp

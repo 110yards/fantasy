@@ -6,7 +6,7 @@
     "start:system": "services/system/run.sh",
     "start:emulators": "firebase emulators:start --only auth,firestore,pubsub,database --import=./.data --export-on-exit --project yards-dev",
     "start:web": "(cd web && npm run serve)",
-    "config:dependencies": "npm install && .scripts/common/install-dependencies.sh",
+    "config:dependencies": "npm install && .scripts/common/install-dependencies-service.sh services/api && .scripts/common/install-dependencies-service.sh services/system",
     "config:switches": "python setup-dev.py"
   },
   "devDependencies": {
