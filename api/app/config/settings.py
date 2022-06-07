@@ -16,16 +16,11 @@ class Settings(BaseSettings):
     dev: bool = False
     firebase_api_key: str
     endpoint: str
-    cfl_api_key: Optional[str]
-    cfl_api_endpoint: str = "https://api.cfl.ca/v1"
-    cfl_roster_endpoint: str = "http://www.cfl.ca/wp-content/themes/cfl.ca/inc/admin-ajax.php?action=get_roster&teamId="
     gcloud_project: str
     service_name: Optional[str]
     region: Optional[str]
     origins: str
-    api_key: str
     version: str = "dev"
-    min_stat_correction_hours: int = 24
     rtdb_emulator_host: Optional[str] = None
 
     class Config:

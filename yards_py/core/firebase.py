@@ -1,12 +1,10 @@
 import requests
-from yards_py.config.settings import Settings
 
 LIVE_TOKEN_URL = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword"
 LOCAL_TOKEN_URL = "http://localhost:9099/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword"
 
 
-def login(email, password, settings: Settings):
-    key = settings.firebase_api_key
+def login(email, password, firebase_api_key: str, is_dev: bool):
 
     payload = {
         "email": email,
@@ -16,11 +14,11 @@ def login(email, password, settings: Settings):
 
     # payload = json.dumps(payload)
 
-    url = LOCAL_TOKEN_URL if settings.is_dev() else LIVE_TOKEN_URL
+    url = LOCAL_TOKEN_URL if is_dev else LIVE_TOKEN_URL
 
     headers = {
         "Content-Type": "application/json"
     }
-    response = requests.post(url, headers=headers, params={"key": key}, json=payload)
+    response = requests.post(url, headers=headers, params={"key": firebase_api_key}, json=payload)
 
     return response.json()
