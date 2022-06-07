@@ -1,10 +1,10 @@
 
-from api.app.domain.entities.league import League
+from yards_py.domain.entities.league import League
 from api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from typing import Optional
 from fastapi import Depends
-from api.app.core.annotate_args import annotate_args
-from api.app.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
+from yards_py.core.annotate_args import annotate_args
+from yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
 from firebase_admin import firestore
 
 

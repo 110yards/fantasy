@@ -1,15 +1,15 @@
 
-from api.app.domain.entities.league_transaction import LeagueTransaction
+from yards_py.domain.entities.league_transaction import LeagueTransaction
 from api.app.domain.repositories.league_transaction_repository import LeagueTransactionRepository, create_league_transaction_repository
 from api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
-from api.app.domain.entities.player import Player, STATUS_ACTIVE
+from yards_py.domain.entities.player import Player, STATUS_ACTIVE
 from api.app.domain.enums.position_type import PositionType
 from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
 from api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
 from fastapi import Depends
-from api.app.core.annotate_args import annotate_args
-from api.app.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
+from yards_py.core.annotate_args import annotate_args
+from yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
 from firebase_admin import firestore
 
 

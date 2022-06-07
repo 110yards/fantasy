@@ -1,11 +1,10 @@
 from api.app.domain.repositories.user_repository import create_user_repository
 from typing import List, Union
-from api.app.config.settings import get_settings
 from api.app.core.role import Role
-from api.app.core.abort import abort_unauthorized
+from yards_py.core.abort import abort_unauthorized
 from fastapi import Request
 from firebase_admin import auth
-from api.app.core.logging import Logger
+from yards_py.core.logging import Logger
 from functools import wraps
 from starlette_context import context
 
@@ -21,31 +20,13 @@ anonymous_prefixes = [
     "/score",
 ]
 
-api_key_endpoints = [
-    "/league/subscriptions",
-    "/system/games",
-    "/system/games/all",
-    "/system/players",
-    "/system/league_command",
-    "/system/smoke_test",
-    "/system/configure",
-    "/system/end_of_day",
-    "/system/end_of_week",
-    "/system/schedule",
-    "/system/import_season",
-]
-
 
 def check_token(req: Request):
     if req.method == "OPTIONS":  # don't check auth for CORS requests
         return
 
-    if requires_key(req):
-        if __check_api_key(req):
-            return
-    else:
-        if __get_token(req):
-            return
+    if __get_token(req):
+        return
 
     if anonymous_allowed(req):
         return
@@ -67,15 +48,6 @@ def anonymous_allowed(req: Request):
             return True
 
     return False
-
-
-def requires_key(req: Request):
-    path = req.scope.get("path", "")
-
-    if path.endswith("/"):
-        path = path[:-1]
-
-    return path in api_key_endpoints
 
 
 def __get_token(request: Request):
@@ -109,17 +81,6 @@ def __get_token(request: Request):
 
 def get_current_user_id(request: Request) -> str:
     return request.state.uid
-
-
-def __check_api_key(request: Request) -> dict:
-    key = request.query_params.get("key", None)
-
-    try:
-        config = get_settings()
-        return key == config.api_key
-    except Exception as ex:
-        Logger.error("Error occurred while checking api key for request", exc_info=ex)
-        return None
 
 
 def require_role(roles: Union[str, List[Role]], **kwargs):

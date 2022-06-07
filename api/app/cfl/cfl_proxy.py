@@ -3,7 +3,7 @@ from datetime import datetime
 
 import requests
 from api.app.config.settings import Settings, get_settings
-from api.app.core.logging import Logger
+from yards_py.core.logging import Logger
 from fastapi import Depends
 from ratelimiter import RateLimiter
 

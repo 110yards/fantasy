@@ -1,13 +1,13 @@
 
 
 from typing import Dict, List
-from api.app.core.batch import create_batches
-from api.app.core.firestore_proxy import Query
-from api.app.domain.entities.opponents import Opponents
-from api.app.domain.entities.team import Team
+from yards_py.core.batch import create_batches
+from yards_py.core.firestore_proxy import Query
+from yards_py.domain.entities.opponents import Opponents
+from yards_py.domain.entities.team import Team
 from api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
-from api.app.domain.entities.player import STATUS_ACTIVE, Player
-from api.app.domain.entities.player_league_season_score import PlayerLeagueSeasonScore
+from yards_py.domain.entities.player import STATUS_ACTIVE, Player
+from yards_py.domain.entities.player_league_season_score import PlayerLeagueSeasonScore
 from api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
 
 from fastapi.param_functions import Depends

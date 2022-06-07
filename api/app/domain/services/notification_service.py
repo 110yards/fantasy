@@ -1,5 +1,5 @@
 from fastapi.param_functions import Depends
-from api.app.domain.entities.league import League
+from yards_py.domain.entities.league import League
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from api.app.domain.services.discord_service import DiscordService, create_discord_service
 

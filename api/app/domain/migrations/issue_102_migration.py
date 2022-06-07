@@ -1,6 +1,6 @@
 
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
-from api.app.core.logging import Logger
+from yards_py.core.logging import Logger
 from fastapi.param_functions import Depends
 from api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from firebase_admin.firestore import firestore

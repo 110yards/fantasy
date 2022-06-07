@@ -1,5 +1,5 @@
 from api.tests.asserts import are_equal
-from api.app.core.date_utils import hours_since
+from yards_py.core.date_utils import hours_since
 import pytest
 from datetime import datetime
 import pytz

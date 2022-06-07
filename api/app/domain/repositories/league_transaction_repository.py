@@ -1,7 +1,7 @@
 from typing import List
 from google.cloud.firestore_v1.transaction import Transaction
-from api.app.domain.entities.league_transaction import LeagueTransaction
-from api.app.core.firestore_proxy import FirestoreProxy
+from yards_py.domain.entities.league_transaction import LeagueTransaction
+from yards_py.core.firestore_proxy import FirestoreProxy
 
 
 def create_league_transaction_repository():

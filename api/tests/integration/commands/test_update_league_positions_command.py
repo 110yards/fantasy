@@ -2,12 +2,12 @@ from api.tests.asserts import are_equal
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository
 from api.tests.mocks.mock_firestore_proxy import MockFirestoreProxy
 from api.app.domain.repositories.league_repository import LeagueRepository
-from api.app.domain.entities.draft import DraftOrder
-from api.app.domain.entities.league_positions_config import LeaguePositionsConfig
+from yards_py.domain.entities.draft import DraftOrder
+from yards_py.domain.entities.league_positions_config import LeaguePositionsConfig
 from api.app.domain.enums.draft_state import DraftState
 from api.app.domain.enums.draft_type import DraftType
 from datetime import datetime
-from api.app.domain.entities.league import League
+from yards_py.domain.entities.league import League
 from api.app.domain.commands.league.update_league_positions import UpdateLeaguePositionsCommand, UpdateLeaguePositionsCommandExecutor
 from api.app.domain.enums.position_type import PositionType
 import pytest

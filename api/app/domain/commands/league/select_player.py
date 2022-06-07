@@ -1,7 +1,7 @@
 
 from typing import Optional
-from api.app.domain.entities.draft import DraftSlot
-from api.app.domain.entities.league import League
+from yards_py.domain.entities.draft import DraftSlot
+from yards_py.domain.entities.league import League
 from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
 from api.app.domain.services.draft_service import DraftService, create_draft_service
 from api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
@@ -13,8 +13,8 @@ from api.app.domain.repositories.player_repository import PlayerRepository, crea
 from api.app.domain.repositories.league_owned_player_repository import LeagueOwnedPlayerRepository, create_league_owned_player_repository
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from fastapi import Depends
-from api.app.core.annotate_args import annotate_args
-from api.app.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
+from yards_py.core.annotate_args import annotate_args
+from yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
 from firebase_admin import firestore
 
 

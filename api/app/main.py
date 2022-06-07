@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.param_functions import Depends
 
 from api.app.config.settings import Settings, get_settings
-from api.app.core.initialize_firebase import initialize_firebase
-from api.app.core.logging import Logger
+from yards_py.core.initialize_firebase import initialize_firebase
+from yards_py.core.logging import Logger
 from api.app.middleware.config import app_middleware
 from api.app.routers import (
     admin_router,
@@ -15,7 +15,6 @@ from api.app.routers import (
     migration_router,
     projection_router,
     roster_router,
-    system_router,
     user_router,
     dev_router,
 )
@@ -23,7 +22,7 @@ from api.app.routers import (
 app = FastAPI(middleware=app_middleware)
 
 settings = get_settings()
-Logger.initialize(settings)
+Logger.initialize(settings.is_dev(), settings.gcloud_project, settings.service_name, settings.region)
 
 origins = settings.origins.split(";")
 app.add_middleware(CORSMiddleware,
@@ -32,7 +31,6 @@ app.add_middleware(CORSMiddleware,
                    allow_credentials=True,
                    allow_methods=["*"])
 
-app.include_router(system_router.router)
 app.include_router(league_router.router)
 app.include_router(league_draft_router.router)
 app.include_router(login_router.router)

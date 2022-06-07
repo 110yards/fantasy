@@ -1,5 +1,5 @@
 from api.app.config import settings
-from api.app.core import firebase
+from yards_py.core import firebase
 from fastapi import Depends
 
 from api.app.domain.repositories.user_repository import create_user_repository

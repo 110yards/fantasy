@@ -1,5 +1,5 @@
 from typing import List
-from api.app.domain.entities.roster import Roster
+from yards_py.domain.entities.roster import Roster
 import pytest
 from time import sleep
 

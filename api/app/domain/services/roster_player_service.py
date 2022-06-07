@@ -1,16 +1,16 @@
 
 
 from api.app.domain.enums.position_type import PositionType
-from api.app.domain.entities.league_transaction import LeagueTransaction
+from yards_py.domain.entities.league_transaction import LeagueTransaction
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from api.app.domain.repositories.league_transaction_repository import LeagueTransactionRepository, create_league_transaction_repository
 from api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from api.app.domain.entities.roster import Roster
+from yards_py.domain.entities.roster import Roster
 from typing import List, Optional, Tuple, Union
 
-from api.app.domain.entities.league_position import LeaguePosition
-from api.app.domain.entities.owned_player import OwnedPlayer
-from api.app.domain.entities.player import Player
+from yards_py.domain.entities.league_position import LeaguePosition
+from yards_py.domain.entities.owned_player import OwnedPlayer
+from yards_py.domain.entities.player import Player
 from api.app.domain.repositories.league_owned_player_repository import (
     LeagueOwnedPlayerRepository, create_league_owned_player_repository)
 from fastapi.param_functions import Depends

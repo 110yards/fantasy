@@ -1,6 +1,6 @@
 from fastapi import Depends
 
-from api.app.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
 from api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
 
 

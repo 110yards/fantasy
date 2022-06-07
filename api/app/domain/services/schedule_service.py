@@ -1,7 +1,7 @@
-from api.app.domain.entities.roster import Roster
+from yards_py.domain.entities.roster import Roster
 from pydantic.main import BaseModel
-from api.app.domain.entities.schedule import Matchup, MatchupType, PlayoffType, ScheduleWeek, WeekType
-from api.app.core.exceptions import NotSupportedException
+from yards_py.domain.entities.schedule import Matchup, MatchupType, PlayoffType, ScheduleWeek, WeekType
+from yards_py.core.exceptions import NotSupportedException
 from typing import List
 
 

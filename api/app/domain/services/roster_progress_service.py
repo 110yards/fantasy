@@ -1,6 +1,6 @@
 
 
-from api.app.domain.entities.event_status import EVENT_STATUS_FINAL, EVENT_STATUS_IN_PROGRESS, EVENT_STATUS_PRE_GAME
+from yards_py.domain.entities.event_status import EVENT_STATUS_FINAL, EVENT_STATUS_IN_PROGRESS, EVENT_STATUS_PRE_GAME
 from api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
 
 from fastapi.param_functions import Depends

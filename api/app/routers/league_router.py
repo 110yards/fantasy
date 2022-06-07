@@ -1,4 +1,4 @@
-from api.app.core.abort import abort_not_found
+from yards_py.core.abort import abort_not_found
 from api.app.domain.commands.league.close_league_registration import (
     CloseLeagueRegistrationCommand, CloseLeagueRegistrationCommandExecutor,
     create_close_league_registration_command_executor)
@@ -31,7 +31,7 @@ from api.app.domain.commands.league.update_league_positions import (
 from api.app.domain.commands.league.update_league_scoring import (
     UpdateLeagueScoringCommand, UpdateLeagueScoringCommandExecutor,
     create_update_league_scoring_command_executor)
-from api.app.domain.entities.league import League
+from yards_py.domain.entities.league import League
 from api.app.domain.repositories.league_repository import LeagueRepository
 from api.app.domain.repositories.repository_factory import get_league_repository
 from fastapi import Depends, Request

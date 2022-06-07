@@ -2,7 +2,7 @@
 from typing import Dict, List
 from api.app.cfl.cfl_game_proxy import CflGameProxy, create_cfl_game_proxy
 from api.app.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository, create_player_league_season_score_repository
-from api.app.domain.entities.roster import Roster
+from yards_py.domain.entities.roster import Roster
 from api.app.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository, create_league_week_matchup_repository
 from api.app.domain.enums.draft_state import DraftState
 from fastapi.param_functions import Depends

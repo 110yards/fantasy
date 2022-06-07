@@ -1,5 +1,5 @@
 import pytest
-from api.app.domain.entities.team import Team
+from yards_py.domain.entities.team import Team
 
 from api.tests.asserts import are_equal
 

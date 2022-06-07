@@ -1,8 +1,8 @@
 
-from api.app.core.logging import Logger
-from api.app.domain.entities.schedule import ScheduleWeek
-from api.app.domain.entities.matchup_preview import MatchupPreview
-from api.app.domain.entities.user_league_preview import UserLeaguePreview
+from yards_py.core.logging import Logger
+from yards_py.domain.entities.schedule import ScheduleWeek
+from yards_py.domain.entities.matchup_preview import MatchupPreview
+from yards_py.domain.entities.user_league_preview import UserLeaguePreview
 from typing import Dict
 from api.app.domain.repositories.state_repository import StateRepository, create_state_repository
 from api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository

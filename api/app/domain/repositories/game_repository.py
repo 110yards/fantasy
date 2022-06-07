@@ -1,10 +1,10 @@
 
 
-from api.app.core.base_repository import Query
+from yards_py.core.base_repository import Query
 from typing import List
 from google.cloud.firestore_v1.transaction import Transaction
-from api.app.core.firestore_proxy import FirestoreProxy
-from api.app.domain.entities.game import Game
+from yards_py.core.firestore_proxy import FirestoreProxy
+from yards_py.domain.entities.game import Game
 
 
 def create_game_repository():

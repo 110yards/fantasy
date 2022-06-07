@@ -1,6 +1,6 @@
 from google.cloud.firestore_v1.transaction import Transaction
-from api.app.core.firestore_proxy import FirestoreProxy
-from api.app.domain.entities.state import State
+from yards_py.core.firestore_proxy import FirestoreProxy
+from yards_py.domain.entities.state import State
 
 
 def create_state_repository():

@@ -1,4 +1,4 @@
-# from api.app.core.auth import require_role
+# from yards_py.core.auth import require_role
 from api.app.domain.commands.league.end_draft import EndDraftCommand, EndDraftCommandExecutor, create_end_draft_command_executor
 from api.app.domain.commands.league.reset_draft import ResetDraftCommand, ResetDraftCommandExecutor, create_reset_draft_command_executor
 from api.app.domain.commands.league.select_player import SelectPlayerCommand, SelectPlayerCommandExecutor, create_select_player_command_executor

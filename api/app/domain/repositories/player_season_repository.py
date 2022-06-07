@@ -2,8 +2,8 @@
 
 from typing import List
 from google.cloud.firestore_v1.transaction import Transaction
-from api.app.core.firestore_proxy import FirestoreProxy
-from api.app.domain.entities.player_season import PlayerSeason
+from yards_py.core.firestore_proxy import FirestoreProxy
+from yards_py.domain.entities.player_season import PlayerSeason
 
 
 def create_player_season_repository():

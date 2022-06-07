@@ -3,10 +3,10 @@
 from api.tests.asserts import are_equal
 from api.app.domain.enums.login_type import LoginType
 from api.tests.mocks.mock_firestore_proxy import MockFirestoreProxy
-from api.app.domain.entities.user import User
+from yards_py.domain.entities.user import User
 from api.app.domain.repositories.user_repository import UserRepository
 from api.app.domain.commands.user.update_profile import UpdateProfileCommand, UpdateProfileCommandExecutor
-from api.app.core.publisher import VirtualPubSubPublisher
+from yards_py.core.publisher import VirtualPubSubPublisher
 
 
 def get_user_repo(user: User) -> UserRepository:

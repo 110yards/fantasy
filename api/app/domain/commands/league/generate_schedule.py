@@ -5,11 +5,11 @@ from api.app.domain.services.schedule_service import generate_schedule
 from api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from api.app.domain.entities.schedule import PlayoffType, Schedule
+from yards_py.domain.entities.schedule import PlayoffType, Schedule
 from typing import Optional
 from fastapi import Depends
-from api.app.core.annotate_args import annotate_args
-from api.app.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
+from yards_py.core.annotate_args import annotate_args
+from yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
 from firebase_admin import firestore
 
 

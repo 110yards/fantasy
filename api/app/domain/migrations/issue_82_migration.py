@@ -1,5 +1,5 @@
 
-from api.app.core.logging import Logger
+from yards_py.core.logging import Logger
 from api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
 from api.app.domain.enums.draft_state import DraftState
 from fastapi.param_functions import Depends

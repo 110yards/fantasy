@@ -1,5 +1,5 @@
 
-from api.app.core.logging import Logger
+from yards_py.core.logging import Logger
 from fastapi import Request, Response
 from fastapi.exceptions import HTTPException
 from starlette import status

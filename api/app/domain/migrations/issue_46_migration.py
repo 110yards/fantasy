@@ -1,7 +1,7 @@
 
 
 from fastapi.param_functions import Depends
-from api.app.domain.entities.scoring_settings import ScoringSettings
+from yards_py.domain.entities.scoring_settings import ScoringSettings
 from api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from firebase_admin.firestore import firestore

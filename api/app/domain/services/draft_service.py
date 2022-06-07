@@ -2,8 +2,8 @@ from api.app.domain.repositories.public_repository import PublicRepository, crea
 from api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from google.cloud.firestore_v1.transaction import Transaction
 from api.app.domain.enums.draft_state import DraftState
-from api.app.domain.entities.league import League
-from api.app.domain.entities.draft import Draft
+from yards_py.domain.entities.league import League
+from yards_py.domain.entities.draft import Draft
 from api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from fastapi import Depends
 

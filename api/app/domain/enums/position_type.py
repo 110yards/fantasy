@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from enum import Enum
 
-from api.app.core.logging import Logger
+from yards_py.core.logging import Logger
 
 
 class PositionType(str, Enum):

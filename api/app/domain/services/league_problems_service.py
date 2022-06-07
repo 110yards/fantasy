@@ -1,6 +1,6 @@
-from api.app.core.firestore_proxy import Query
+from yards_py.core.firestore_proxy import Query
 from typing import List
-from api.app.domain.entities.league import League
+from yards_py.domain.entities.league import League
 from api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from fastapi import Depends
 
