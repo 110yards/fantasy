@@ -25,7 +25,7 @@ jobs:
         run: .scripts/common/install-dependencies-api.sh
 
       - name: Run checks
-        run: .scripts/python/checks.sh
+        run: .scripts/python/checks.sh services/api
 
       # Deploy to test
       - name: Setup gcloud

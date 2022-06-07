@@ -7,7 +7,7 @@ from yards_py.domain.repositories.league_week_repository import LeagueWeekReposi
 from yards_py.domain.entities.league_transaction import TransactionType
 from yards_py.domain.repositories.league_transaction_repository import LeagueTransactionRepository
 from yards_py.domain.repositories.league_owned_player_repository import LeagueOwnedPlayerRepository
-from services.system.app.domain.services.roster_player_service import RosterPlayerService
+from yards_py.domain.services.roster_player_service import RosterPlayerService
 from services.system.app.domain.services.waiver_service import WaiverService
 from yards_py.domain.repositories.league_repository import LeagueRepository
 from yards_py.domain.entities.league import League

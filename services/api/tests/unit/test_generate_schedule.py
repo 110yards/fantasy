@@ -2,7 +2,7 @@ from typing import List
 from yards_py.domain.entities.roster import Roster
 from yards_py.domain.entities.schedule import MatchupType, PlayoffType
 import pytest
-from services.api.app.domain.services.schedule_service import ScheduledMatchup, combine_schedule, generate_schedule, get_sequence_for_count
+from yards_py.domain.services.schedule_service import ScheduledMatchup, combine_schedule, generate_schedule, get_sequence_for_count
 from api.tests.asserts import are_equal
 
 SEASON_WEEKS = 21

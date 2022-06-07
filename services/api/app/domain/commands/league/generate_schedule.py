@@ -1,7 +1,7 @@
 
 from services.api.app.domain.enums.draft_state import DraftState
 from services.api.app.domain.repositories.state_repository import StateRepository, create_state_repository
-from services.api.app.domain.services.schedule_service import generate_schedule
+from yards_py.domain.services.schedule_service import generate_schedule
 from services.api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
 from services.api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from services.api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository

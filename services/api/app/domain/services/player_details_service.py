@@ -1,20 +1,28 @@
 
 
 from typing import List, Optional
+
 from fastapi import Depends
 from pydantic import BaseModel
 from yards_py.domain.entities.player import Player
-from yards_py.domain.entities.player_league_season_score import PlayerLeagueSeasonScore
-
+from yards_py.domain.entities.player_league_season_score import \
+    PlayerLeagueSeasonScore
 from yards_py.domain.entities.player_score import PlayerScore
 from yards_py.domain.entities.scoreboard import ScoreboardGame
 from yards_py.domain.entities.stats import Stats
 from yards_py.domain.entities.team import Team
-from services.api.app.domain.repositories.game_repository import GameRepository, create_game_repository
-from services.api.app.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository, create_player_league_season_score_repository
-from services.api.app.domain.repositories.player_game_repository import PlayerGameRepository, create_player_game_repository
-from services.api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
-from services.api.app.domain.repositories.player_season_repository import PlayerSeasonRepository, create_player_season_repository
+
+from services.api.app.domain.repositories.game_repository import (
+    GameRepository, create_game_repository)
+from services.api.app.domain.repositories.player_game_repository import (
+    PlayerGameRepository, create_player_game_repository)
+from services.api.app.domain.repositories.player_league_season_score_repository import (
+    PlayerLeagueSeasonScoreRepository,
+    create_player_league_season_score_repository)
+from services.api.app.domain.repositories.player_repository import (
+    PlayerRepository, create_player_repository)
+from services.api.app.domain.repositories.player_season_repository import (
+    PlayerSeasonRepository, create_player_season_repository)
 
 
 class GameLog(BaseModel):

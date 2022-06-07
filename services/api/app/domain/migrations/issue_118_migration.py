@@ -1,12 +1,18 @@
 
 from typing import Dict, List
-from services.api.app.cfl.cfl_game_proxy import CflGameProxy, create_cfl_game_proxy
-from services.api.app.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository, create_player_league_season_score_repository
-from yards_py.domain.entities.roster import Roster
-from services.api.app.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository, create_league_week_matchup_repository
-from services.api.app.domain.enums.draft_state import DraftState
+
 from fastapi.param_functions import Depends
-from services.api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from services.api.app.cfl.cfl_game_proxy import (CflGameProxy,
+                                                 create_cfl_game_proxy)
+from services.api.app.domain.enums.draft_state import DraftState
+from services.api.app.domain.repositories.league_repository import (
+    LeagueRepository, create_league_repository)
+from services.api.app.domain.repositories.league_week_matchup_repository import (
+    LeagueWeekMatchupRepository, create_league_week_matchup_repository)
+from services.api.app.domain.repositories.player_league_season_score_repository import (
+    PlayerLeagueSeasonScoreRepository,
+    create_player_league_season_score_repository)
+from yards_py.domain.entities.roster import Roster
 
 
 def create_issue_118_migration(

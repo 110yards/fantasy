@@ -1,18 +1,25 @@
 
 
 from typing import Dict, List
+
+from fastapi.param_functions import Depends
 from yards_py.core.batch import create_batches
 from yards_py.core.firestore_proxy import Query
 from yards_py.domain.entities.opponents import Opponents
-from yards_py.domain.entities.team import Team
-from services.api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
 from yards_py.domain.entities.player import STATUS_ACTIVE, Player
-from yards_py.domain.entities.player_league_season_score import PlayerLeagueSeasonScore
-from services.api.app.domain.repositories.player_repository import PlayerRepository, create_player_repository
+from yards_py.domain.entities.player_league_season_score import \
+    PlayerLeagueSeasonScore
+from yards_py.domain.entities.team import Team
 
-from fastapi.param_functions import Depends
-from services.api.app.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository, create_player_league_season_score_repository
-from services.api.app.domain.repositories.state_repository import StateRepository, create_state_repository
+from services.api.app.domain.repositories.player_league_season_score_repository import (
+    PlayerLeagueSeasonScoreRepository,
+    create_player_league_season_score_repository)
+from services.api.app.domain.repositories.player_repository import (
+    PlayerRepository, create_player_repository)
+from services.api.app.domain.repositories.public_repository import (
+    PublicRepository, create_public_repository)
+from services.api.app.domain.repositories.state_repository import (
+    StateRepository, create_state_repository)
 
 
 def create_player_projection_service(

@@ -1,7 +1,7 @@
 
 from yards_py.domain.entities.league import League
 from services.api.app.domain.services.notification_service import NotificationService, create_notification_service
-from services.api.app.domain.services.schedule_service import ScheduledMatchup
+from yards_py.domain.services.schedule_service import ScheduledMatchup
 from typing import Dict
 from yards_py.domain.entities.user_league_preview import UserLeaguePreview
 from yards_py.domain.entities.matchup_preview import MatchupPreview

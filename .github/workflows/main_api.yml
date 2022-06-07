@@ -27,7 +27,7 @@ jobs:
         run: .scripts/common/install-dependencies-api.sh
 
       - name: Run checks
-        run: .scripts/python/checks.sh
+        run: .scripts/python/checks.sh services/api
 
       # Deploy to test
       - name: Setup gcloud
@@ -44,7 +44,7 @@ jobs:
           ./prepare-run.sh services/api
 
       - name: Archive and deploy (test)
-        working-directory: api
+        working-directory: .tmp
         env:
           CLOUDSDK_PYTHON: /usr/bin/python3
           REGISTRY: ${{ secrets.REGISTRY }}
@@ -58,7 +58,7 @@ jobs:
           ./deploy.sh $TAG $REGISTRY $TARGET_PROJECT $ENDPOINT $ORIGINS
 
       - name: Smoke test (test)
-        working-directory: api
+        working-directory: .tmp
         env:
           TAG: ${{ github.sha }}
           ENDPOINT: ${{ secrets.TEST_ENDPOINT }}
@@ -68,7 +68,7 @@ jobs:
 
       # Deploy to live
       - name: Deploy (live)
-        working-directory: api
+        working-directory: .tmp
         env:
           CLOUDSDK_PYTHON: /usr/bin/python3
           REGISTRY: ${{ secrets.REGISTRY }}
@@ -80,7 +80,7 @@ jobs:
           ./deploy.sh $TAG $REGISTRY $TARGET_PROJECT $ENDPOINT $ORIGINS
 
       - name: Smoke test (live)
-        working-directory: api
+        working-directory: .tmp
         env:
           TAG: ${{ github.sha }}
           ENDPOINT: ${{ secrets.LIVE_ENDPOINT }}
