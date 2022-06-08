@@ -1,3 +1,3 @@
 #!/bin/bash
 
-flake8 api --count --show-source --statistics
+flake8 $1 --count --show-source --statistics

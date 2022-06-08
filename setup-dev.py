@@ -2,18 +2,18 @@
 import os
 
 import firebase_admin
-from api.app.core.firestore_proxy import FirestoreProxy
+from yards_py.core.firestore_proxy import FirestoreProxy
 
-from api.app.core.publisher import VirtualPubSubPublisher
-from api.app.domain.commands.user.register_email import RegisterCommandExecutor, RegisterEmailCommand
-from api.app.domain.entities.opponents import Opponents
-from api.app.domain.entities.schedule import get_playoff_type_config
-from api.app.domain.entities.scoring_info import ScoringInfo
-from api.app.domain.entities.state import State
-from api.app.domain.entities.switches import Switches
-from api.app.domain.enums.position_type import get_position_type_config
-from api.app.domain.repositories.public_repository import create_public_repository
-from api.app.domain.repositories.user_repository import create_user_repository
+from yards_py.core.publisher import VirtualPubSubPublisher
+from services.api.app.domain.commands.user.register_email import RegisterCommandExecutor, RegisterEmailCommand
+from yards_py.domain.entities.opponents import Opponents
+from yards_py.domain.entities.schedule import get_playoff_type_config
+from yards_py.domain.entities.scoring_info import ScoringInfo
+from yards_py.domain.entities.state import State
+from yards_py.domain.entities.switches import Switches
+from services.api.app.domain.enums.position_type import get_position_type_config
+from services.api.app.domain.repositories.public_repository import create_public_repository
+from services.api.app.domain.repositories.user_repository import create_user_repository
 
 DEV_PROJECT_ID = "yards-dev"
 

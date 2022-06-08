@@ -1,4 +1,6 @@
 from __future__ import annotations
+import hashlib
+import json
 from yards_py.domain.entities.stats import Stats
 
 from decimal import getcontext
@@ -43,6 +45,10 @@ class ScoringSettings(BaseModel):
     fumbles_recovered: float
     passes_knocked_down: float
     id: str = "scoring"
+
+    @property
+    def hash(self) -> str:
+        return hashlib.md5(json.dumps(self.dict()).encode("utf-8")).hexdigest()
 
     @staticmethod
     def create_default() -> ScoringSettings:

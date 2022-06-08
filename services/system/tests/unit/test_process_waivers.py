@@ -3,7 +3,7 @@ from yards_py.domain.repositories.league_transaction_repository import LeagueTra
 from yards_py.domain.repositories.league_roster_repository import LeagueRosterRepository
 from api.tests.mocks.mock_firestore_proxy import MockFirestoreProxy
 from yards_py.domain.repositories.league_owned_player_repository import LeagueOwnedPlayerRepository
-from services.system.app.domain.services.roster_player_service import RosterPlayerService
+from yards_py.domain.services.roster_player_service import RosterPlayerService
 from yards_py.domain.entities.league_positions_config import LeaguePositionsConfig
 from services.system.app.domain.services.waiver_service import WaiverService
 from yards_py.domain.entities.team import Team

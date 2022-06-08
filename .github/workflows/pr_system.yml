@@ -1,5 +1,8 @@
 name: "Pull Request: System"
 
+env:
+  SERVICE_DIR: services/system
+
 on:
   pull_request:
     paths:
@@ -22,10 +25,10 @@ jobs:
           python-version: "3.10"
 
       - name: Install dependencies
-        run: .scripts/common/install-dependencies-api.sh
+        run: .scripts/common/install-dependencies-service.sh ${{ env.SERVICE_DIR }}
 
       - name: Run checks
-        run: .scripts/python/checks.sh
+        run: .scripts/python/checks.sh ${{ env.SERVICE_DIR }}
 
       # Deploy to test
       - name: Setup gcloud
@@ -39,7 +42,7 @@ jobs:
 
       - name: Prepare deployment directory
         run: |
-          ./prepare-run.sh services/system
+          ./prepare-run.sh ${{ env.SERVICE_DIR }}
 
       - name: Archive
         working-directory: .tmp

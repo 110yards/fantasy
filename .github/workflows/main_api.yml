@@ -1,14 +1,21 @@
 name: "Main Branch: API"
 
+env:
+  SERVICE_DIR: services/api
+
 on:
   push:
     branches:
       - main
     paths:
-      - "api/**"
+      - "services/api/**"
       - ".python-version"
       - ".github/workflows/main_api.yml"
       - ".scripts/python/**"
+      - "yards_py/**"
+
+env:
+  SERVICE_DIR=
 
 jobs:
   build:
@@ -23,10 +30,10 @@ jobs:
           python-version: "3.10"
 
       - name: Install dependencies
-        run: .scripts/common/install-dependencies-api.sh
+        run: .scripts/common/install-dependencies-service.sh ${{ env.SERVICE_DIR }}
 
       - name: Run checks
-        run: .scripts/python/checks.sh
+        run: .scripts/python/checks.sh ${{ env.SERVICE_DIR }}
 
       # Deploy to test
       - name: Setup gcloud
@@ -38,8 +45,12 @@ jobs:
           export_default_credentials: true
         uses: google-github-actions/setup-gcloud@v0
 
+      - name: Prepare deployment directory
+        run: |
+          ./prepare-run.sh ${{ env.SERVICE_DIR }}
+
       - name: Archive and deploy (test)
-        working-directory: api
+        working-directory: .tmp
         env:
           CLOUDSDK_PYTHON: /usr/bin/python3
           REGISTRY: ${{ secrets.REGISTRY }}
@@ -53,7 +64,7 @@ jobs:
           ./deploy.sh $TAG $REGISTRY $TARGET_PROJECT $ENDPOINT $ORIGINS
 
       - name: Smoke test (test)
-        working-directory: api
+        working-directory: .tmp
         env:
           TAG: ${{ github.sha }}
           ENDPOINT: ${{ secrets.TEST_ENDPOINT }}
@@ -63,7 +74,7 @@ jobs:
 
       # Deploy to live
       - name: Deploy (live)
-        working-directory: api
+        working-directory: .tmp
         env:
           CLOUDSDK_PYTHON: /usr/bin/python3
           REGISTRY: ${{ secrets.REGISTRY }}
@@ -75,7 +86,7 @@ jobs:
           ./deploy.sh $TAG $REGISTRY $TARGET_PROJECT $ENDPOINT $ORIGINS
 
       - name: Smoke test (live)
-        working-directory: api
+        working-directory: .tmp
         env:
           TAG: ${{ github.sha }}
           ENDPOINT: ${{ secrets.LIVE_ENDPOINT }}
