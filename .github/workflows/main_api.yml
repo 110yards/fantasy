@@ -14,9 +14,6 @@ on:
       - ".scripts/python/**"
       - "yards_py/**"
 
-env:
-  SERVICE_DIR=
-
 jobs:
   build:
     runs-on: ubuntu-latest
