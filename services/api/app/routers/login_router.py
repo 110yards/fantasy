@@ -17,4 +17,4 @@ class LoginRequest(BaseModel):
 @router.post("/")
 async def login(request: LoginRequest, settings: settings.Settings = Depends(settings.get_settings)):
     create_user_repository()
-    return firebase.login(request.email, request.password, settings)
+    return firebase.login(request.email, request.password, settings.firebase_api_key, settings.is_dev())

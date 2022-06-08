@@ -5,7 +5,6 @@ import sys
 from requests.models import Response
 
 endpoint = os.environ.get("ENDPOINT", "http://0.0.0.0:8000")
-api_key = os.environ.get("API_KEY", "000000")
 
 
 def check_response(response: Response, test_name: str):
@@ -16,15 +15,9 @@ def check_response(response: Response, test_name: str):
         sys.exit(1)
 
 
-def configure_api():
-    url = f"{endpoint}/system/configure?key={api_key}"
-    response = requests.post(url)
-    check_response(response, "configure_api")
-
-
 def api_smoke_test():
-    url = f"{endpoint}/system/smoke_test?key={api_key}"
-    response = requests.post(url)
+    url = f"{endpoint}/"
+    response = requests.get(url)
     check_response(response, "api_smoke_test")
 
 
@@ -43,7 +36,6 @@ def cors_smoke_test():
 #############
 print("Smoke test started")
 
-configure_api()
 api_smoke_test()
 cors_smoke_test()
 
