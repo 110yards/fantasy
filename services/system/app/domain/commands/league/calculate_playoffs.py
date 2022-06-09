@@ -1,7 +1,7 @@
 from yards_py.domain.entities.matchup_preview import MatchupPreview
-from yards_py.domain.enums.draft_state import DraftState
 from yards_py.domain.enums.week_type import WeekType
 from yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
 from yards_py.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
 from yards_py.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository, create_league_week_matchup_repository
 from yards_py.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
@@ -18,8 +18,9 @@ def create_calculate_playoffs_command_executor(
     league_roster_repo: LeagueRosterRepository = Depends(create_league_roster_repository),
     matchup_repo: LeagueWeekMatchupRepository = Depends(create_league_week_matchup_repository),
     user_league_repo: UserLeagueRepository = Depends(create_user_league_repository),
+    public_repo: PublicRepository = Depends(create_public_repository),
 ):
-    return CalculatePlayoffsCommandExecutor(league_repo, league_config_repo, league_roster_repo, matchup_repo, user_league_repo)
+    return CalculatePlayoffsCommandExecutor(league_repo, league_config_repo, league_roster_repo, matchup_repo, user_league_repo, public_repo)
 
 
 @annotate_args
@@ -42,22 +43,25 @@ class CalculatePlayoffsCommandExecutor(BaseCommandExecutor[CalculatePlayoffsComm
         roster_repo: LeagueRosterRepository,
         matchup_repo: LeagueWeekMatchupRepository,
         user_league_repo: UserLeagueRepository,
+        public_repo: PublicRepository,
     ):
         self.league_repo = league_repo
         self.league_config_repo = league_config_repo
         self.roster_repo = roster_repo
         self.matchup_repo = matchup_repo
         self.user_league_repo = user_league_repo
+        self.public_repo = public_repo
 
     def on_execute(self, command: CalculatePlayoffsCommand) -> CalculatePlayoffsResult:
 
         week_index = command.week_number - 1
+        state = self.public_repo.get_state()
 
         @firestore.transactional
         def calculate(transaction):
             league = self.league_repo.get(command.league_id, transaction=transaction)
 
-            if not league or league.draft_state != DraftState.COMPLETE:
+            if not league or not league.is_active_for_season(state.current_season):
                 return CalculatePlayoffsResult(command=command)
 
             schedule = self.league_config_repo.get_schedule_config(command.league_id, transaction=transaction)

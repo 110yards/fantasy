@@ -74,6 +74,10 @@ class ProcessWaiversCommandExecutor(BaseCommandExecutor[ProcessWaiversCommand, P
         @firestore.transactional
         def process(transaction) -> ProcessWaiversResult:
             league = self.league_repo.get(command.league_id, transaction)
+
+            if not league or not league.is_active_for_season(state.current_season):
+                return ProcessWaiversResult(command=command)
+
             rosters = self.league_roster_repo.get_all(command.league_id, transaction)
 
             bids = self.waiver_service.process_bids(rosters)
