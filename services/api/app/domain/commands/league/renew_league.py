@@ -133,6 +133,7 @@ class RenewLeagueCommandExecutor(BaseCommandExecutor[RenewLeagueCommand, RenewLe
         league.first_playoff_week = None
         league.renewed = datetime.now()
         league.schedule_generated = False
+        league.is_complete = False
 
         schedule = self.league_config_repo.get_schedule_config(league.id)
         schedule.reset()

@@ -50,6 +50,9 @@ class League(BaseEntity):
     def is_active(self) -> bool:
         return self.draft_state == DraftState.COMPLETE
 
+    def is_active_for_season(self, season: int) -> bool:
+        return self.is_active and self.season == season
+
 
 @annotate_args
 class PrivateConfig(BaseEntity):

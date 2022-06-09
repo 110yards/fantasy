@@ -7,7 +7,6 @@ from yards_py.domain.enums.league_command_type import LeagueCommandType
 from yards_py.domain.enums.matchup_type import MatchupType
 from yards_py.domain.repositories.game_repository import GameRepository, create_game_repository
 from yards_py.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository, create_player_league_season_score_repository
-from yards_py.domain.enums.draft_state import DraftState
 from yards_py.domain.entities.matchup_preview import MatchupPreview
 from yards_py.domain.repositories.state_repository import StateRepository, create_state_repository
 from yards_py.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
@@ -111,10 +110,7 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
         def mark_league_waivers_active(transaction):
             league = self.league_repo.get(command.league_id, transaction)
 
-            if league.draft_state != DraftState.COMPLETE:
-                return True
-
-            if league.is_complete:
+            if not league.is_active_for_season(state.current_season):
                 return True
 
             league.waivers_active = True

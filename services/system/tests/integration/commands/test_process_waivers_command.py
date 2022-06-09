@@ -1,6 +1,7 @@
 
 from yards_py.domain.entities.schedule import PlayoffType, Schedule
 from yards_py.domain.entities.state import State
+from yards_py.domain.enums.draft_state import DraftState
 from yards_py.domain.repositories.league_config_repository import LeagueConfigRepository
 from yards_py.domain.repositories.state_repository import StateRepository
 from yards_py.domain.repositories.league_week_repository import LeagueWeekRepository
@@ -31,7 +32,7 @@ rb3 = Player(id="3", cfl_central_id=3, first_name="Player", last_name="Three", p
 wr1 = Player(id="4", cfl_central_id=4, first_name="Player", last_name="Four", position=PositionType.wr, team=Team.ssk(), status_current=1)
 
 league_positions = LeaguePositionsConfig().create_positions()
-league = League.construct(id="test_league", name="Test League", waivers_active=True)
+league = League.construct(id="test_league", name="Test League", waivers_active=True, draft_state=DraftState.COMPLETE)
 state = State.default(with_current_week=2)
 
 
