@@ -75,8 +75,12 @@ class PlayerDetailsService:
         self.player_game_repo = player_game_repo
         self.player_season_repo = player_season_repo
 
-    def get_player_details(self, season: int, league_id: str, player_id: str) -> PlayerDetails:
+    def get_player_details(self, season: int, league_id: str, player_id: str) -> Optional[PlayerDetails]:
         player = self.player_repo.get(season, player_id)
+
+        if not player:
+            return None
+
         player_season = self.player_season_repo.get(season, player_id)
         season_score = self.score_repo.get(league_id, player_id)
 
