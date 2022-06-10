@@ -53,6 +53,20 @@ export default {
         this.update()
       },
     },
+
+    currentUser: {
+      immediate: true,
+      handler(_) {
+        this.update()
+      },
+    },
+
+    roster: {
+      immediate: true,
+      handler(_) {
+        this.update()
+      },
+    },
   },
 
   mounted() {
