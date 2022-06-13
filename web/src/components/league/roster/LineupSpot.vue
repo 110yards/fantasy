@@ -80,7 +80,7 @@
       <v-row>
         <v-col v-if="!playerToBeMoved" class="py-0">
           <span v-if="gameStarted">
-            <score :score="spot.game_score" />
+            <position-score :leagueId="leagueId" :position="spot" :scoreboard="scoreboard" :weekNumber="weekNumber" />
           </span>
           <span v-else>--</span>
         </v-col>
