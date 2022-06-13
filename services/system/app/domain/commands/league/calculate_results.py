@@ -101,7 +101,7 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
 
         schedule_config = self.league_config_repo.get_schedule_config(command.league_id)
 
-        if not schedule_config:
+        if not schedule_config or not schedule_config.first_playoff_week:
             return CalculateResultsResult(command=command)
 
         last_playoff_week = schedule_config.first_playoff_week + schedule_config.playoff_type.weeks
