@@ -87,6 +87,11 @@
           <template v-slot:[`item.display_name`]="{ item }">
             <player-link :player="item" :leagueId="leagueId" />
           </template>
+
+          <template v-slot:[`item.opponent`]="{ item }">
+            <span>{{ getNextOpponent(item) }}</span>
+          </template>
+
           <template v-slot:[`item.points`]="{ item }">
             <score :score="item.points" />
           </template>
