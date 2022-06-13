@@ -1,5 +1,6 @@
 
 
+from datetime import datetime
 from typing import Dict, List, Optional
 
 from fastapi import Depends
@@ -61,9 +62,9 @@ class RankedPlayer(Player):
 class CacheData(BaseModel):
     league_id: str
     season: int
-    week: Optional[int]
     scoring_settings_hash: str
     players: List[RankedPlayer]
+    recalc_date: Optional[int]
 
 
 class PlayerListService:
@@ -94,7 +95,7 @@ class PlayerListService:
         state = self.public_repo.get_state()
 
         if league.draft_state == DraftState.COMPLETE and league.season == state.current_season:
-            return self.setup_current_ref(league_id, state.current_season, state.current_week)
+            return self.setup_current_ref(league_id, state.current_season, league.last_season_recalc)
         else:
             # last year, or old league
             return self.setup_draft_reference(league_id, state.current_season)
@@ -121,10 +122,14 @@ class PlayerListService:
 
         return self._save_result(league_id, score_season, None, ranked_players, scoring.hash)
 
-    def setup_current_ref(self, league_id: str, current_season: int, current_week: int) -> List[PlayerLeagueSeasonScore]:
+    def setup_current_ref(self, league_id: str, current_season: int, last_recalc_date: Optional[int]) -> List[PlayerLeagueSeasonScore]:
+
+        # weird bug from pydantic causes the recalc to be deserialized as a datetime instead of an int
+        if isinstance(last_recalc_date, datetime):
+            last_recalc_date = last_recalc_date.timestamp()
 
         # check cache for week first, it's going to change more often.
-        valid_week_cache = self._check_cache_week(league_id, current_season, current_week)
+        valid_week_cache = self._check_current_cache(league_id, current_season, last_recalc_date)
         valid_scoring_cache = False
         scoring: ScoringSettings = None
 
@@ -144,7 +149,7 @@ class PlayerListService:
         if not scoring:
             scoring = self.league_config_repo.get_scoring_config(league_id)
 
-        return self._save_result(league_id, current_season, current_week, ranked_players, scoring.hash)
+        return self._save_result(league_id, current_season, last_recalc_date, ranked_players, scoring.hash)
 
     def _check_cache_scoring_hash(self, league_id: str, season: int, scoring: ScoringSettings) -> bool:
         path = f"{self._get_data_path(league_id, season)}/scoring_settings_hash"
@@ -162,17 +167,17 @@ class PlayerListService:
 
         return False
 
-    def _check_cache_week(self, league_id: str, season: int, current_week: int) -> bool:
-        path = f"{self._get_data_path(league_id, season)}/week"
-        cache_week = self.rtdb_client.get(path)
+    def _check_current_cache(self, league_id: str, season: int, last_league_recalc: Optional[int]) -> bool:
+        path = f"{self._get_data_path(league_id, season)}/recalc_date"
+        recalc_date = self.rtdb_client.get(path)
 
-        if cache_week:
-            Logger.debug(f"Cache found for week {cache_week}")
-            if cache_week == current_week:
-                Logger.debug("Cache is valid for week")
+        if recalc_date:
+            Logger.debug(f"Cache found with recalc date {recalc_date}")
+            if not last_league_recalc or last_league_recalc <= recalc_date:
+                Logger.debug("Valid cache hit")
                 return True
             else:
-                Logger.debug("Week has changed, cache is invalid")
+                Logger.debug("Scores have been recalced, cache is invalid")
         else:
             Logger.debug("No player cache for league")
 
@@ -188,11 +193,13 @@ class PlayerListService:
             self,
             league_id: str,
             season: int,
-            week: Optional[int],
+            last_recalc_date: Optional[datetime],
             ranked_players: List[RankedPlayer],
             scoring_hash: str,
     ) -> str:
-        data = CacheData(league_id=league_id, season=season, week=week, players=ranked_players, scoring_settings_hash=scoring_hash)
+        if not last_recalc_date:
+            last_recalc_date = datetime.now().timestamp()
+        data = CacheData(league_id=league_id, season=season, players=ranked_players, scoring_settings_hash=scoring_hash, recalc_date=last_recalc_date)
 
         path = self._get_data_path(league_id, season)
         self.rtdb_client.set(path, data.dict())

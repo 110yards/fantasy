@@ -45,6 +45,7 @@ class League(BaseEntity):
     renewed: Optional[datetime] = None
     notes: Optional[str] = None
     roster_count: Optional[int] = None
+    last_season_recalc: Optional[int] = None
 
     @property
     def is_active(self) -> bool:

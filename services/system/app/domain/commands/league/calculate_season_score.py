@@ -1,6 +1,8 @@
 
 
+from datetime import datetime
 from yards_py.domain.entities.player_league_season_score import PlayerLeagueSeasonScore, rank_player_seasons
+from yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from yards_py.domain.repositories.player_season_repository import PlayerSeasonRepository, create_player_season_repository
 from yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
 from yards_py.domain.repositories.player_repository import PlayerRepository, create_player_repository
@@ -18,8 +20,9 @@ def create_calculate_season_score_command_executor(
     player_repo: PlayerRepository = Depends(create_player_repository),
     public_repo: PublicRepository = Depends(create_public_repository),
     player_season_repo: PlayerSeasonRepository = Depends(create_player_season_repository),
+    league_repo: LeagueRepository = Depends(create_league_repository),
 ):
-    return CalculateSeasonScoreCommandExecutor(league_config_repo, player_score_repo, player_repo, public_repo, player_season_repo)
+    return CalculateSeasonScoreCommandExecutor(league_config_repo, player_score_repo, player_repo, public_repo, player_season_repo, league_repo)
 
 
 @annotate_args
@@ -41,14 +44,20 @@ class CalculateSeasonScoreCommandExecutor(BaseCommandExecutor[CalculateSeasonSco
         player_repo: PlayerRepository,
         public_repo: PublicRepository,
         player_season_repo: PlayerSeasonRepository,
+        league_repo: LeagueRepository,
     ):
         self.league_config_repo = league_config_repo
         self.player_score_repo = player_score_repo
         self.player_repo = player_repo
         self.public_repo = public_repo
         self.player_season_repo = player_season_repo
+        self.league_repo = league_repo
 
     def on_execute(self, command: CalculateSeasonScoreCommand) -> CalculateSeasonScoreResult:
+
+        league = self.league_repo.get(command.league_id)
+        if not league:
+            return CalculateSeasonScoreResult(command=command)
 
         state = self.public_repo.get_state()
         season = command.season or state.current_season
@@ -71,5 +80,9 @@ class CalculateSeasonScoreCommandExecutor(BaseCommandExecutor[CalculateSeasonSco
 
         for player_score in player_season_scores:
             self.player_score_repo.set(command.league_id, player_score)
+
+        self.league_repo.partial_update(league.id, {
+            "last_season_recalc": int(datetime.now().timestamp())
+        })
 
         return CalculateSeasonScoreResult(command=command)
