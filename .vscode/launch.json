@@ -9,16 +9,16 @@
       "console": "internalConsole",
       "justMyCode": false,
       "args": [
-        "api.app.main:app",
+        "services.api.app.main:app",
         "--app-dir",
         "..",
         "--reload",
         "--reload-dir",
-        "api",
+        "services/api",
         "--port",
         "8000",
         "--env-file",
-        "./api/.env"
+        "./services/api/.env"
       ],
       "jinja": true
     },

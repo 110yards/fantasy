@@ -99,11 +99,15 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
 
         state = self.state_repo.get()
 
-        league_config = self.league_config_repo.get_schedule_config(command.league_id)
-        last_playoff_week = league_config.first_playoff_week + league_config.playoff_type.weeks
+        schedule_config = self.league_config_repo.get_schedule_config(command.league_id)
+
+        if not schedule_config:
+            return CalculateResultsResult(command=command)
+
+        last_playoff_week = schedule_config.first_playoff_week + schedule_config.playoff_type.weeks
 
         if state.current_week > last_playoff_week:
-            return
+            return CalculateResultsResult(command=command)
 
         #  This happens first, to block users from adding players in the event that the next part fails.
         @firestore.transactional

@@ -1,3 +1,4 @@
+from typing import Optional
 from yards_py.domain.entities.draft import Draft
 from yards_py.domain.entities.league_positions_config import LeaguePositionsConfig
 from yards_py.domain.entities.schedule import Schedule
@@ -43,9 +44,9 @@ class LeagueConfigRepository:
     def set_positions_config(self, league_id, config: LeaguePositionsConfig, transaction: Transaction = None) -> LeaguePositionsConfig:
         return self.firestore.set(LeagueConfigRepository.path(league_id), config, transaction)
 
-    def get_schedule_config(self, league_id, transaction: Transaction = None) -> Schedule:
+    def get_schedule_config(self, league_id, transaction: Transaction = None) -> Optional[Schedule]:
         config = self.firestore.get(LeagueConfigRepository.path(league_id), "schedule", transaction)
-        return Schedule.parse_obj(config)
+        return Schedule.parse_obj(config) if config else None
 
     def set_schedule_config(self, league_id, config: Schedule, transaction: Transaction = None) -> Schedule:
         return self.firestore.set(LeagueConfigRepository.path(league_id), config, transaction)
