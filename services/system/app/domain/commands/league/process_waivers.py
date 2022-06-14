@@ -76,7 +76,7 @@ class ProcessWaiversCommandExecutor(BaseCommandExecutor[ProcessWaiversCommand, P
             league = self.league_repo.get(command.league_id, transaction)
 
             if not league or not league.is_active_for_season(state.current_season):
-                return ProcessWaiversResult(command=command)
+                return ProcessWaiversResult(command=command, error="League is not active")
 
             rosters = self.league_roster_repo.get_all(command.league_id, transaction)
 
