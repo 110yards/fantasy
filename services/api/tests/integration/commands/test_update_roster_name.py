@@ -1,6 +1,7 @@
 
 
 from services.api.app.domain.repositories.league_transaction_repository import LeagueTransactionRepository
+from services.api.app.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository
 from yards_py.domain.entities.user_league_preview import UserLeaguePreview
 from yards_py.domain.entities.schedule import Matchup, MatchupType, PlayoffType, Schedule, ScheduleWeek, WeekType
 from yards_py.domain.entities.roster import Roster
@@ -44,6 +45,11 @@ def get_league_transaction_repo() -> LeagueTransactionRepository:
     return LeagueTransactionRepository(proxy)
 
 
+def get_league_week_matchup_repo() -> LeagueWeekMatchupRepository:
+    proxy = MockFirestoreProxy()
+    return LeagueWeekMatchupRepository(proxy)
+
+
 def get_publisher() -> VirtualPubSubPublisher:
     return VirtualPubSubPublisher("test_project")
 
@@ -74,7 +80,9 @@ def test_update_roster_name():
         league_roster_repo=roster_repo,
         user_league_repo=user_league_repo,
         publisher=get_publisher(),
-        league_transaction_repo=get_league_transaction_repo())
+        league_transaction_repo=get_league_transaction_repo(),
+        league_week_matchup_repo=get_league_week_matchup_repo(),
+    )
 
     new_name = "Update Roster Name"
 
@@ -114,7 +122,9 @@ def test_update_roster_name_updates_schedule_config_away():
         league_roster_repo=roster_repo,
         user_league_repo=user_league_repo,
         publisher=get_publisher(),
-        league_transaction_repo=get_league_transaction_repo())
+        league_transaction_repo=get_league_transaction_repo(),
+        league_week_matchup_repo=get_league_week_matchup_repo(),
+    )
 
     new_name = "Update Roster Name"
 
@@ -155,7 +165,9 @@ def test_update_roster_name_updates_schedule_config_home():
         league_roster_repo=roster_repo,
         user_league_repo=user_league_repo,
         publisher=get_publisher(),
-        league_transaction_repo=get_league_transaction_repo())
+        league_transaction_repo=get_league_transaction_repo(),
+        league_week_matchup_repo=get_league_week_matchup_repo(),
+    )
 
     new_name = "Update Roster Name"
 
@@ -187,7 +199,9 @@ def test_update_roster_name_updates_user_leagues_home():
         league_roster_repo=roster_repo,
         user_league_repo=user_league_repo,
         publisher=get_publisher(),
-        league_transaction_repo=get_league_transaction_repo())
+        league_transaction_repo=get_league_transaction_repo(),
+        league_week_matchup_repo=get_league_week_matchup_repo(),
+    )
 
     new_name = "Update Roster Name"
 
@@ -218,7 +232,9 @@ def test_update_another_user_should_fail():
         league_roster_repo=roster_repo,
         user_league_repo=user_league_repo,
         publisher=get_publisher(),
-        league_transaction_repo=get_league_transaction_repo())
+        league_transaction_repo=get_league_transaction_repo(),
+        league_week_matchup_repo=get_league_week_matchup_repo(),
+    )
 
     new_name = "Update Roster Name"
 
@@ -244,7 +260,9 @@ def test_cannot_change_while_drafting():
         league_roster_repo=roster_repo,
         user_league_repo=user_league_repo,
         publisher=get_publisher(),
-        league_transaction_repo=get_league_transaction_repo())
+        league_transaction_repo=get_league_transaction_repo(),
+        league_week_matchup_repo=get_league_week_matchup_repo(),
+    )
 
     new_name = "Update Roster Name"
 
@@ -270,7 +288,9 @@ def test_update_by_commisssioner():
         league_roster_repo=roster_repo,
         user_league_repo=user_league_repo,
         publisher=get_publisher(),
-        league_transaction_repo=get_league_transaction_repo())
+        league_transaction_repo=get_league_transaction_repo(),
+        league_week_matchup_repo=get_league_week_matchup_repo(),
+    )
 
     new_name = "Update Roster Name"
     command = UpdateRosterNameCommand(league_id=league.id, roster_id=roster.id, roster_name=new_name, current_user_id=league.commissioner_id)
@@ -300,7 +320,9 @@ def test_update_by_other_user():
         league_roster_repo=roster_repo,
         user_league_repo=user_league_repo,
         publisher=get_publisher(),
-        league_transaction_repo=get_league_transaction_repo())
+        league_transaction_repo=get_league_transaction_repo(),
+        league_week_matchup_repo=get_league_week_matchup_repo(),
+    )
 
     new_name = "Update Roster Name"
 
