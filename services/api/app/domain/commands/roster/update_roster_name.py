@@ -1,5 +1,6 @@
 
 from services.api.app.domain.repositories.league_transaction_repository import LeagueTransactionRepository, create_league_transaction_repository
+from services.api.app.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository, create_league_week_matchup_repository
 from yards_py.domain.entities.league_transaction import LeagueTransaction
 from services.api.app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
 from services.api.app.domain.enums.draft_state import DraftState
@@ -22,6 +23,7 @@ def create_update_roster_name_command_executor(
     user_league_repo: UserLeagueRepository = Depends(create_user_league_repository),
     publisher: Publisher = Depends(create_publisher),
     league_transaction_repo: LeagueTransactionRepository = Depends(create_league_transaction_repository),
+    league_week_matchup_repo: LeagueWeekMatchupRepository = Depends(create_league_week_matchup_repository),
 ):
     return UpdateRosterNameCommandExecutor(
         league_config_repo=league_config_repo,
@@ -30,6 +32,7 @@ def create_update_roster_name_command_executor(
         user_league_repo=user_league_repo,
         publisher=publisher,
         league_transaction_repo=league_transaction_repo,
+        league_week_matchup_repo=league_week_matchup_repo,
     )
 
 
@@ -56,6 +59,7 @@ class UpdateRosterNameCommandExecutor(BaseCommandExecutor[UpdateRosterNameComman
         user_league_repo: UserLeagueRepository,
         publisher: Publisher,
         league_transaction_repo: LeagueTransactionRepository,
+        league_week_matchup_repo: LeagueWeekMatchupRepository,
     ):
         self.league_repo = league_repo
         self.league_roster_repo = league_roster_repo
@@ -63,6 +67,7 @@ class UpdateRosterNameCommandExecutor(BaseCommandExecutor[UpdateRosterNameComman
         self.user_league_repo = user_league_repo
         self.publisher = publisher
         self.league_transaction_repo = league_transaction_repo
+        self.league_week_matchup_repo = league_week_matchup_repo
 
     def on_execute(self, command: UpdateRosterNameCommand) -> UpdateRosterNameResult:
 
@@ -105,14 +110,20 @@ class UpdateRosterNameCommandExecutor(BaseCommandExecutor[UpdateRosterNameComman
                         if matchup.away and matchup.away.id == command.roster_id:
                             matchup.away.name = command.roster_name
                             # Issue #151 - weeks aren't created until after waivers are processed and only matter for waiver bids now
-                            # updates = {"away.name": command.roster_name}
-                            # self.league_week_matchup_repo.partial_update(command.league_id, week.week_number, matchup.id, updates, transaction)
+
+                            exists = self.league_week_matchup_repo.get(command.league_id, week.week_number, matchup.id) is not None
+                            if exists:
+                                updates = {"away.name": command.roster_name}
+                                self.league_week_matchup_repo.partial_update(command.league_id, week.week_number, matchup.id, updates, transaction)
 
                         if matchup.home and matchup.home.id == command.roster_id:
                             matchup.home.name = command.roster_name
                             # Issue #151 - weeks aren't created until after waivers are processed and only matter for waiver bids now
-                            # updates = {"home.name": command.roster_name}
-                            # self.league_week_matchup_repo.partial_update(command.league_id, week.week_number, matchup.id, updates, transaction)
+
+                            exists = self.league_week_matchup_repo.get(command.league_id, week.week_number, matchup.id) is not None
+                            if exists:
+                                updates = {"home.name": command.roster_name}
+                                self.league_week_matchup_repo.partial_update(command.league_id, week.week_number, matchup.id, updates, transaction)
 
                 self.league_config_repo.set_schedule_config(command.league_id, schedule, transaction)
 
