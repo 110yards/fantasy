@@ -7,7 +7,7 @@ from yards_py.core.logging import Logger
 from yards_py.core.pubsub.pubsub_message import PubSubMessage
 from yards_py.core.pubsub.pubsub_push import PubSubPush
 from yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from services.api.app.domain.repositories.virtual_pubsub_repository import VirtualPubSubPayload, VirtualPubsubRepository, create_virtual_pubsub_repository
+from yards_py.domain.repositories.virtual_pubsub_repository import VirtualPubSubPayload, VirtualPubsubRepository, create_virtual_pubsub_repository
 from services.system.app.domain.services.end_of_week_service import EndOfWeekService, create_end_of_week_service
 from services.system.app.domain.services.league_command_service import LeagueCommandService, create_league_command_service
 from services.system.app.domain.services.waiver_service import WaiverService, create_waiver_service
