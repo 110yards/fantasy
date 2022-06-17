@@ -19,7 +19,7 @@ from yards_py.domain.entities.league import (DraftState, DraftType, League,
 from yards_py.domain.entities.scoring_settings import ScoringSettings
 from services.api.app.domain.repositories.league_repository import (
     LeagueRepository, create_league_repository)
-from services.api.app.domain.topics import LEAGUE_CREATED_TOPIC
+from yards_py.domain.topics import LEAGUE_CREATED_TOPIC
 from fastapi.param_functions import Depends
 from firebase_admin import firestore
 from services.api.app.domain.repositories.user_repository import UserRepository, create_user_repository
