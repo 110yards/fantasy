@@ -10,7 +10,7 @@ from services.api.app.di import create_publisher
 from yards_py.domain.entities.league import League
 from services.api.app.domain.repositories.league_repository import (
     LeagueRepository, create_league_repository)
-from services.api.app.domain.topics import LEAGUE_COMMAND_TOPIC
+from yards_py.domain.topics import LEAGUE_COMMAND_TOPIC
 from fastapi.param_functions import Depends
 from firebase_admin import firestore
 

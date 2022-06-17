@@ -26,6 +26,7 @@ from services.system.app.domain.services.import_season_service import (
     ImportSeasonService, create_previous_season_stats_service)
 from services.system.app.domain.services.league_command_service import (
     LeagueCommandService, create_league_command_service)
+from services.system.app.domain.services.recalc_waiver_budgets_service import RecalcWaiverBudgetsService, create_recalc_waiver_budgets_service
 from services.system.app.domain.services.smoke_test_service import smoke_test
 from services.system.app.domain.services.start_next_season_service import (
     StartNextSeasonService, create_start_next_season_service)
@@ -151,3 +152,10 @@ async def import_season(
     service: ImportSeasonService = Depends(create_previous_season_stats_service),
 ):
     return service.import_season(season, clean)
+
+
+@router.post("/recalc_waiver_budgets")
+async def recalc_waiver_budgets(
+    service: RecalcWaiverBudgetsService = Depends(create_recalc_waiver_budgets_service),
+):
+    return service.recalc()

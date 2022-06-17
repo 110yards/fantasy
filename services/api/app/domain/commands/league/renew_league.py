@@ -28,7 +28,7 @@ from services.api.app.domain.repositories.user_league_repository import (
     UserLeagueRepository, create_user_league_repository)
 from services.api.app.domain.repositories.user_repository import (
     UserRepository, create_user_repository)
-from services.api.app.domain.topics import LEAGUE_RENEWED_TOPIC
+from yards_py.domain.topics import LEAGUE_RENEWED_TOPIC
 from yards_py.core.annotate_args import annotate_args
 from yards_py.core.base_command_executor import (BaseCommand,
                                                  BaseCommandExecutor,

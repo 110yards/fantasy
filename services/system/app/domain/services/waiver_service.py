@@ -134,4 +134,6 @@ class WaiverService:
                 bid.result = WaiverBidResult.Success
                 return trx_or_error
             else:
+                # give the money back if we ended up here somehow. (eg mismatched add/drop with limited position)
+                roster.waiver_budget += bid.amount
                 bid.result = WaiverBidResult.FailedNoRosterSpace
