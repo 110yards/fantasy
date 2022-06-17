@@ -61,7 +61,7 @@ class RecalcWaiverBudgetsService:
 
             for week in range(1, current_week):
                 league_week = self.league_week_repo.get(league.id, week)
-                if not league_week.waiver_bids:
+                if not league_week or not league_week.waiver_bids:
                     continue  # no bids for week, nothing to count
 
                 for bid in league_week.waiver_bids:
