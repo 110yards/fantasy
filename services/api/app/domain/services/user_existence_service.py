@@ -25,3 +25,5 @@ class UserExistenceService():
             return user is not None
         except auth.UserNotFoundError:
             return False
+        except ValueError:
+            return False

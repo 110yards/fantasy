@@ -112,8 +112,6 @@ class WaiverService:
         waiver_priority.pop(index)
         waiver_priority.append(winning_bid.roster_id)
 
-        rosters[winning_bid.roster_id].waiver_budget -= winning_bid.amount
-
         if winning_bid.drop_player:
             dropped_players_for_roster[winning_bid.roster_id].append(winning_bid.drop_player.id)
 
@@ -132,6 +130,7 @@ class WaiverService:
 
             if success:
                 bid.result = WaiverBidResult.Success
+                roster.waiver_budget -= bid.amount
                 return trx_or_error
             else:
                 bid.result = WaiverBidResult.FailedNoRosterSpace
