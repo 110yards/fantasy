@@ -13,9 +13,12 @@ from yards_py.domain.entities.waiver_bid import WaiverBid, WaiverBidResult
 from yards_py.domain.entities.roster import Roster
 from copy import deepcopy
 
+MOCK_LEAGUE_ID = "0"
+
 player1 = Player(id="1", cfl_central_id=1, first_name="Player", last_name="One", position=PositionType.rb, team=Team.bc(), status_current=1)
 player2 = Player(id="2", cfl_central_id=2, first_name="Player", last_name="Two", position=PositionType.rb, team=Team.cgy(), status_current=1)
 player3 = Player(id="3", cfl_central_id=3, first_name="Player", last_name="Three", position=PositionType.rb, team=Team.ssk(), status_current=1)
+player4wr = Player(id="4", cfl_central_id=4, first_name="Player", last_name="Four", position=PositionType.wr, team=Team.mtl(), status_current=1)
 
 league_positions = LeaguePositionsConfig().create_positions()
 
@@ -25,6 +28,8 @@ def get_roster_player_service() -> RosterPlayerService:
     roster_repo = LeagueRosterRepository(MockFirestoreProxy())
     league_transaction_repo = LeagueTransactionRepository(MockFirestoreProxy())
     league_config_repo = LeagueConfigRepository(MockFirestoreProxy())
+
+    league_config_repo.set_positions_config(MOCK_LEAGUE_ID, LeaguePositionsConfig())
 
     return RosterPlayerService(league_owned_player_repo, roster_repo, league_transaction_repo, league_config_repo)
 
@@ -222,3 +227,22 @@ def test_roster_budget_not_updated_failed_bids():
     target.process_bids([roster1, roster2])
 
     assert roster2.waiver_budget == 100
+
+
+def test_roster_budget_not_updated_failed_bid_due_to_player_not_on_roster():
+    roster1 = Roster(id="1", name="team 1", rank=1, positions=deepcopy(league_positions))
+
+    # bug 187 - waiver budget is reduced when attempting to add a player and there is no space on roster (wrong add/drop combo)
+    # roster already has a RB
+    roster1.positions["2"].player = player3
+    # drop player is a WR
+    roster1.positions["3"].player = player4wr
+    # add player is a RB
+    roster1.waiver_bids.append(WaiverBid(roster_id=roster1.id, player=player1, drop_player=player4wr, amount=5))
+
+    target = WaiverService(get_roster_player_service())
+
+    bids = target.process_bids([roster1])
+    target.apply_winning_bid(MOCK_LEAGUE_ID, bids[0], roster1, None)
+
+    assert roster1.waiver_budget == 100
