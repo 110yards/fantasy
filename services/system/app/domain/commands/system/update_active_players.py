@@ -157,9 +157,6 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
     def get_unrostered_players(self, rostered_players: Dict[str, Player], stored_players: Dict[str, Player]) -> List[Player]:
         unrostered = []
 
-        # TEMP!
-        rostered_players.pop("148680")
-
         for player in stored_players.values():
             rostered = player.id in rostered_players
 
