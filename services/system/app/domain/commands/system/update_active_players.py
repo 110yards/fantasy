@@ -22,6 +22,7 @@ from yards_py.core.publisher import Publisher
 
 class UpdateActivePlayersCommand(BaseCommand):
     team_id: Optional[int]
+    force: Optional[bool] = False
 
     @root_validator
     def validate_all_teams(cls, values: dict):
@@ -112,7 +113,7 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
         if self.public_repo.get_switches().enable_game_roster_status:
             self.update_status_from_game_rosters(season, current_players)
 
-        changed_players = get_changed_players(current_players, stored_players)
+        changed_players = get_changed_players(current_players, stored_players, command.force)
         unrostered_players = get_unrostered_players(current_players, stored_players)
         updates = changed_players + unrostered_players
 
@@ -152,7 +153,7 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
             self.publisher.publish(payload, LEAGUE_COMMAND_TOPIC)
 
 
-def get_changed_players(current_players: Dict[str, Player], stored_players: Dict[str, Player]) -> List[Player]:
+def get_changed_players(current_players: Dict[str, Player], stored_players: Dict[str, Player], force: bool) -> List[Player]:
     updates = []
 
     for current in current_players.values():
@@ -165,7 +166,7 @@ def get_changed_players(current_players: Dict[str, Player], stored_players: Dict
             current.compute_hash()
             needs_update = stored.hash != current.hash
 
-        if not stored or needs_update:
+        if not stored or needs_update or force:
             updates.append(current)
 
     return updates

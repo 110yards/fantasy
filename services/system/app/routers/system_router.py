@@ -89,9 +89,10 @@ async def update_all_games(
 @router.post("/players", response_model=UpdateActivePlayersCommandResult)
 # Invoked by scheduled task - gets all players from CFL team rosters and updates player master data
 async def update_players(
+    command: Optional[UpdateActivePlayersCommand] = None,
     command_executor: UpdateActivePlayersCommandExecutor = Depends(update_active_players_command_executor)
 ):
-    command = UpdateActivePlayersCommand()
+    command = command or UpdateActivePlayersCommand()
     return command_executor.execute(command)
 
 
