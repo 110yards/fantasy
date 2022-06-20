@@ -1,6 +1,5 @@
 
 
-from services.api.app.domain.migrations.issue_118_migration import Issue118Migration, create_issue_118_migration
 from services.api.app.domain.migrations.issue_102_migration import Issue102Migration, create_issue_102_migration
 from services.api.app.domain.migrations.issue_121_migration import Issue121Migration, create_issue_121_migration
 from services.api.app.domain.migrations.issue_84_migration import Issue84Migration, create_issue_84_migration
@@ -75,18 +74,6 @@ async def issue_102(
     migration: Issue102Migration = Depends(create_issue_102_migration),
 ):
     return migration.run(league_id)
-
-
-@router.post("/issue_118")
-@require_role(Role.admin)
-async def issue_118(
-    request: Request,
-    start: int,
-    end: int,
-    league_id: Optional[str] = None,
-    migration: Issue118Migration = Depends(create_issue_118_migration),
-):
-    return migration.run(league_id, start, end)
 
 
 @router.post("/issue_121")
