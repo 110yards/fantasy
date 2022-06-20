@@ -1,6 +1,7 @@
 
 from services.system.app.di import create_publisher
 from yards_py.core.annotate_args import annotate_args
+from yards_py.core.logging import Logger
 from yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
 from yards_py.domain.repositories.state_repository import StateRepository, create_state_repository
 from yards_py.domain.repositories.game_repository import GameRepository, create_game_repository
@@ -79,6 +80,7 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
 
     def on_execute(self, command: UpdateActivePlayersCommand) -> UpdateActivePlayersCommandResult:
         season = self.state_repo.get().current_season
+        self.current_season = season
 
         page = 1
         current_players = []
@@ -114,7 +116,7 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
             self.update_status_from_game_rosters(season, current_players)
 
         changed_players = get_changed_players(current_players, stored_players, command.force)
-        unrostered_players = get_unrostered_players(current_players, stored_players)
+        unrostered_players = self.get_unrostered_players(current_players, stored_players)
         updates = changed_players + unrostered_players
 
         if updates:
@@ -152,6 +154,45 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
             payload = LeagueCommandPushData(command_type=LeagueCommandType.UPDATE_PLAYER, command_data=command.dict())
             self.publisher.publish(payload, LEAGUE_COMMAND_TOPIC)
 
+    def get_unrostered_players(self, rostered_players: Dict[str, Player], stored_players: Dict[str, Player]) -> List[Player]:
+        unrostered = []
+
+        # TEMP!
+        rostered_players.pop("148680")
+
+        for player in stored_players.values():
+            rostered = player.id in rostered_players
+
+            if not rostered and player.team.id != Team.free_agent().id:
+                official_details = self.cfl_player_proxy.get_player(player.id)
+                team_details: dict = official_details["data"][0].get("team")
+                is_set: bool = team_details.get("is_set")
+                season: int = team_details.get("season")
+
+                false_positive = is_set and season >= self.current_season
+                if false_positive:
+                    Logger.debug("False positive free agent detected", extra={
+                        "player": {
+                            "player_id": player.id,
+                            "first_name": player.first_name,
+                            "last_name": player.last_name,
+                        }
+                    })
+                    continue
+
+                player.team = Team.free_agent()
+                player.compute_hash()
+                unrostered.append(player)
+                Logger.debug("Player not found in CFL data, setting to free agent", extra={
+                    "player": {
+                        "player_id": player.id,
+                        "first_name": player.first_name,
+                        "last_name": player.last_name,
+                    }
+                })
+
+        return unrostered
+
 
 def get_changed_players(current_players: Dict[str, Player], stored_players: Dict[str, Player], force: bool) -> List[Player]:
     updates = []
@@ -163,23 +204,9 @@ def get_changed_players(current_players: Dict[str, Player], stored_players: Dict
         current.compute_hash()
 
         if stored:
-            current.compute_hash()
             needs_update = stored.hash != current.hash
 
         if not stored or needs_update or force:
             updates.append(current)
 
     return updates
-
-
-def get_unrostered_players(rostered_players: Dict[str, Player], stored_players: Dict[str, Player]) -> List[Player]:
-    unrostered = []
-
-    for player in stored_players.values():
-        rostered = player.id in rostered_players
-
-        if not rostered and player.team.id != Team.free_agent().id:
-            player.team = Team.free_agent()
-            unrostered.append(player)
-
-    return unrostered
