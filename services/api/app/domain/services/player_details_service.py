@@ -112,4 +112,7 @@ class PlayerDetailsService:
                 )
                 details.game_log.append(log)
 
+        if details.game_log:
+            details.game_log.sort(key=lambda x: x.game_number)
+
         return details
