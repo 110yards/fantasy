@@ -23,6 +23,7 @@ from services.api.app.domain.repositories.player_repository import (
     PlayerRepository, create_player_repository)
 from services.api.app.domain.repositories.player_season_repository import (
     PlayerSeasonRepository, create_player_season_repository)
+from yards_py.domain.repositories.scheduled_game_repository import ScheduledGameRepository, create_scheduled_game_repository
 
 
 class GameLog(BaseModel):
@@ -111,5 +112,8 @@ class PlayerDetailsService:
                     score=game_score.score,
                 )
                 details.game_log.append(log)
+
+        if details.game_log:
+            details.game_log.sort(key=lambda x: x.game_number)
 
         return details
