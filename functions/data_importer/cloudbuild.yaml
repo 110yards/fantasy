@@ -5,8 +5,8 @@ steps:
       [
         "functions",
         "deploy",
-        "--gen2"
         "data_importer",
+        "--gen2"
         "--trigger-topic",
         "topic_import_data",
         "--runtime",
