@@ -1,0 +1,14 @@
+name: "functions / data_importer - Deploy"
+
+inputs:
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Deploy function
+      working-directory: functions/data_importer
+      env:
+        CLOUDSDK_PYTHON: /usr/bin/python3
+        TARGET_PROJECT: ${{ secrets.TEST_GCLOUD_PROJECT }}
+      run: ./deploy.sh $TARGET_PROJECT

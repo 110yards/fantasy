@@ -1,0 +1,4 @@
+cflpy @ git+https://github.com/mdryden/cfl-py
+firebase_admin==5.1.0
+functions-framework==3.*
+pytz==2021.*
