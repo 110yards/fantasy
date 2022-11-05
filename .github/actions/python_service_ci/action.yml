@@ -1,0 +1,23 @@
+name: "Python Service - CI"
+
+inputs:
+  WORKING_DIRECTORY:
+    required: true
+
+runs:
+  using: composite
+
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: "3.10"
+
+    - name: Install dependencies
+      run: .scripts/common/install-dependencies-service.sh ${{ inputs.WORKING_DIRECTORY }}
+
+    - name: Run checks
+      run: .scripts/python/checks.sh ${{ inputs.WORKING_DIRECTORY }}
