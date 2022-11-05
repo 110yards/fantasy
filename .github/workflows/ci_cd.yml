@@ -12,10 +12,6 @@ on:
     paths-ignore:
       - "**/*.md"
 
-env:
-  OCTOPUS_PROJECT: "110 Yards"
-  # OCTOPUS_DEPLOYMENT_TARGET: "Test"
-
 jobs:
   setup:
     name: setup
@@ -98,7 +94,7 @@ jobs:
         with:
           OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_KEY }}
           OCTOPUS_SERVER: ${{ secrets.OCTOPUS_API_SERVER }}
-          OCTOPUS_PROJECT: ${{ env.OCTOPUS_PROJECT }}
+          OCTOPUS_PROJECT: "API"
           OCTOPUS_CONTAINER_NAME: "api"
           VERSION: ${{ needs.setup.outputs.image_tag }}
           # TARGET: ${{ needs.setup.outputs.target }}
