@@ -1,0 +1,41 @@
+name: "Create Octopus Release"
+description: "Create a release in Octopus Deploy. Assumes a process exists named 'Deploy' which deploys the container"
+
+inputs:
+  OCTOPUS_API_KEY:
+    required: true
+
+  OCTOPUS_SERVER:
+    required: true
+
+  OCTOPUS_PROJECT:
+    required: true
+
+  OCTOPUS_CONTAINER_NAME:
+    required: true
+
+  VERSION:
+    required: true
+
+  TARGET:
+    required: true
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Install Octopus CLI 🐙
+      uses: OctopusDeploy/install-octopus-cli-action@v1.1.2
+      with:
+        version: latest
+
+    - name: Create a release in Octopus Deploy 🐙
+      uses: OctopusDeploy/create-release-action@v1.1.2
+      with:
+        api_key: ${{ inputs.OCTOPUS_API_KEY }}
+        project: ${{ inputs.OCTOPUS_PROJECT }}
+        server: ${{ inputs.OCTOPUS_SERVER }}
+        packages: |
+          Deploy:${{ inputs.OCTOPUS_CONTAINER_NAME }}:${{ inputs.VERSION }}
+        release_number: ${{ inputs.VERSION }}
+        # deploy_to: "110 Yards ${{ inputs.TARGET }}"

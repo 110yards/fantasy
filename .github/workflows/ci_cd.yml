@@ -12,6 +12,10 @@ on:
     paths-ignore:
       - "**/*.md"
 
+env:
+  OCTOPUS_PROJECT: "110 Yards"
+  # OCTOPUS_DEPLOYMENT_TARGET: "Test"
+
 jobs:
   setup:
     name: setup
@@ -88,6 +92,16 @@ jobs:
           REGISTRY_PROJECT: ${{ secrets.REGISTRY }}
           GCP_CREDENTIALS: ${{ secrets.TEST_GCLOUD_CREDENTIALS }}
           IMAGE_TAG: ${{ needs.setup.outputs.image_tag }}
+
+      - name: Create Octopus release
+        uses: ./.github/actions/octopus_deploy
+        with:
+          OCTOPUS_API_KEY: ${{secrets.OCTOPUS_API_KEY}}
+          OCTOPUS_SERVER: ${{secrets.OCTOPUS_SERVER}}
+          OCTOPUS_PROJECT: ${{ env.OCTOPUS_PROJECT }}
+          OCTOPUS_CONTAINER_NAME: "api"
+          VERSION: ${{ needs.setup.outputs.version }}
+          # TARGET: ${{ needs.setup.outputs.target }}
 
   services_system:
     name: "services / system"
