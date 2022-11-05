@@ -3,7 +3,7 @@
 set -e
 
 runNumber=$1
-ref=$1
+ref=$2
 
 if [ -z "$runNumber" ]; then
     echo "Run number is required"
