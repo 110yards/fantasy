@@ -49,7 +49,7 @@ jobs:
               - ".github/actions/python_service_ci/**"
 
       - name: Configure version
-        run: ./configure-version.sh ${{ github.run_number }} "test"
+        run: ./version.sh ${{ github.run_number }} "test"
 
   # Clients
   web:
