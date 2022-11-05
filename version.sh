@@ -3,6 +3,7 @@
 set -e
 
 runNumber=$1
+ref=$1
 
 if [ -z "$runNumber" ]; then
     echo "Run number is required"
@@ -11,7 +12,6 @@ if [ -z "$runNumber" ]; then
     exit 1
 fi
 
-ref="$(git rev-parse --abbrev-ref HEAD)"
 echo "On branch $ref"
 
 dateVer="$(date +'%Y.%m.%d')"
