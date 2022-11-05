@@ -43,7 +43,7 @@ jobs:
               - "services/api/**"
               - "yards_py/**"
               - ".github/actions/python_service_ci/**"
-            services_system: ["changes"]
+            services_system:
               - "services/system/**"
               - "yards_py/**"
               - ".github/actions/python_service_ci/**"
