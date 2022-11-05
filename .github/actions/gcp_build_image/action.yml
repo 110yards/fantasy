@@ -28,8 +28,7 @@ runs:
 
     - name: Prepare deployment directory
       shell: bash
-      run: |
-        ./prepare-run.sh ${{ inputs.WORKING_DIRECTORY }}
+      run: ./prepare-run.sh ${{ inputs.WORKING_DIRECTORY }}
 
     - name: Archive and deploy (test)
       working-directory: .tmp
@@ -38,5 +37,4 @@ runs:
         REGISTRY: ${{ inputs.REGISTRY_PROJECT }}
         TAG: { { $inputs.IMAGE_TAG } }
       shell: bash
-      run: |
-        ./archive.sh $TAG $REGISTRY
+      run: ./archive.sh $TAG $REGISTRY
