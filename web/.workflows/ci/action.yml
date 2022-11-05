@@ -16,10 +16,12 @@ runs:
 
     - name: Install dependencies
       working-directory: web
+      shell: bash
       run: npm install
 
     - name: Lint check
       working-directory: web
+      shell: bash
       run: npm run format-check
 
     - name: Build
@@ -29,4 +31,5 @@ runs:
         VUE_APP_FIREBASE_PROJECT: ${{ secrets.TEST_GCLOUD_PROJECT }}
         VUE_APP_WEB_URL: "https://test.110yards.ca"
         VUE_APP_API_110_YARDS_URL: "https://api.test.110yards.ca"
+      shell: bash
       run: npm run build:test
