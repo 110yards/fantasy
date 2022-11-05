@@ -14,7 +14,7 @@ on:
 
 jobs:
   setup:
-    name: Calculate changes
+    name: Setup
     runs-on: ubuntu-latest
 
     outputs:
@@ -49,7 +49,7 @@ jobs:
               - ".github/actions/python_service_ci/**"
 
       - name: Configure version
-        run: ./version.sh ${{ github.run_number }} "test"
+        run: ./version.sh ${{ github.run_number }}
 
   # Clients
   web:

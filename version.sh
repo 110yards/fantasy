@@ -3,7 +3,6 @@
 set -e
 
 runNumber=$1
-suffix=$2
 
 if [ -z "$runNumber" ]; then
     echo "Run number is required"
@@ -18,7 +17,7 @@ echo "On branch $ref"
 dateVer="$(date +'%Y.%m.%d')"
 version=""
 
-if [ "$suffix" == "" ]; then
+if [ "$ref" == "main" ]; then
     echo "Versioning for production"
     version="$dateVer.$runNumber"
 else
