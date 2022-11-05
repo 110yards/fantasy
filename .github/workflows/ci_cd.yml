@@ -96,7 +96,7 @@ jobs:
       - name: Create Octopus release
         uses: ./.github/actions/octopus_deploy
         with:
-          OCTOPUS_API_KEY: ${ {secrets.OCTOPUS_API_KEY }}
+          OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_KEY }}
           OCTOPUS_SERVER: ${{ secrets.OCTOPUS_API_SERVER }}
           OCTOPUS_PROJECT: ${{ env.OCTOPUS_PROJECT }}
           OCTOPUS_CONTAINER_NAME: "api"
