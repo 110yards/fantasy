@@ -35,6 +35,6 @@ runs:
       env:
         CLOUDSDK_PYTHON: /usr/bin/python3
         REGISTRY: ${{ inputs.REGISTRY_PROJECT }}
-        TAG: { { $inputs.IMAGE_TAG } }
+        TAG: ${{ inputs.IMAGE_TAG }}
       shell: bash
       run: ./archive.sh $TAG $REGISTRY
