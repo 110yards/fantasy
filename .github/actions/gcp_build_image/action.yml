@@ -27,6 +27,7 @@ runs:
       uses: google-github-actions/setup-gcloud@v0
 
     - name: Prepare deployment directory
+      shell: bash
       run: |
         ./prepare-run.sh ${{ inputs.WORKING_DIRECTORY }}
 
@@ -36,5 +37,6 @@ runs:
         CLOUDSDK_PYTHON: /usr/bin/python3
         REGISTRY: ${{ inputs.REGISTRY_PROJECT }}
         TAG: { { $inputs.IMAGE_TAG } }
+      shell: bash
       run: |
         ./archive.sh $TAG $REGISTRY
