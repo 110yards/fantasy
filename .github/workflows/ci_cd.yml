@@ -100,7 +100,7 @@ jobs:
           OCTOPUS_SERVER: ${{secrets.OCTOPUS_SERVER}}
           OCTOPUS_PROJECT: ${{ env.OCTOPUS_PROJECT }}
           OCTOPUS_CONTAINER_NAME: "api"
-          VERSION: ${{ needs.setup.outputs.version }}
+          VERSION: ${{ needs.setup.outputs.image_tag }}
           # TARGET: ${{ needs.setup.outputs.target }}
 
   services_system:
