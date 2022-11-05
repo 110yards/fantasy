@@ -1,0 +1,40 @@
+name: "GCP Build Image"
+
+inputs:
+  WORKING_DIRECTORY:
+    required: true
+
+  REGISTRY_PROJECT:
+    required: true
+
+  GCP_CREDENTIALS:
+    required: true
+
+  IMAGE_TAG:
+    required: true
+
+runs:
+  using: composite
+
+  steps:
+    - name: Setup gcloud
+      env:
+        CLOUDSDK_PYTHON: /usr/bin/python3
+      with:
+        project_id: ${{ inputs.REGISTRY_PROJECT }}
+        service_account_key: ${{ inputs.GCP_CREDENTIALS }}
+        export_default_credentials: true
+      uses: google-github-actions/setup-gcloud@v0
+
+    - name: Prepare deployment directory
+      run: |
+        ./prepare-run.sh ${{ inputs.WORKING_DIRECTORY }}
+
+    - name: Archive and deploy (test)
+      working-directory: .tmp
+      env:
+        CLOUDSDK_PYTHON: /usr/bin/python3
+        REGISTRY: ${{ inputs.REGISTRY_PROJECT }}
+        TAG: { { $inputs.IMAGE_TAG } }
+      run: |
+        ./archive.sh $TAG $REGISTRY
