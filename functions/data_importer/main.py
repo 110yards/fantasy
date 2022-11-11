@@ -43,8 +43,9 @@ def data_importer(event: dict):
     date_end = date_end + timedelta(days=1)
 
     # filter = GamesFilter(field="date_start", operator="gt", value=date_start.isoformat())
-
+    print("Fetching games")
     games = CflPy.v1().games(season).get(page_size=100)
+    print(f"Found {len(games)} games")
 
     for game in [g for g in games if date_start < g.date_start < date_end]:
         game = CflPy.v1().games(season).game(game.game_id).with_boxscore().with_rosters().get()
