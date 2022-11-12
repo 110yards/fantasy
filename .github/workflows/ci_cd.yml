@@ -1,0 +1,97 @@
+name: "CI/CD"
+
+on:
+  pull_request:
+    paths-ignore:
+      - "**/*.md"
+
+  push:
+    branches:
+      - develop
+
+    paths-ignore:
+      - "**/*.md"
+
+jobs:
+  setup:
+    name: setup
+    runs-on: ubuntu-latest
+
+    outputs:
+      image_tag: ${{ env.version }}
+
+      # Clients
+      web: ${{ steps.changes.outputs.web }}
+
+      # Services
+      services_api: ${{ steps.changes.outputs.services_api }}
+
+      services_system: ${{ steps.changes.outputs.services_system }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.1.0
+
+      - name: Calculate path changes
+        uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            web:
+              - "web/**"
+            services_api:
+              - "services/api/**"
+              - "yards_py/**"
+            services_system:
+              - "services/system/**"
+              - "yards_py/**"
+            functions_game_importer:
+              - "functions/game_importer/**"
+
+      - name: Configure version
+        run: ./version.sh ${{ github.run_number }} ${{ github.ref_name }}
+
+  # Clients
+  web:
+    name: "web"
+    runs-on: ubuntu-latest
+    needs: ["setup"]
+    if: ${{ needs.setup.outputs.web == 'true' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.1.0
+
+      - name: Build and test
+        uses: ./web/.workflows/ci
+
+  # Services
+  services_api:
+    name: "services / api"
+    runs-on: ubuntu-latest
+    needs: ["setup"]
+    if: ${{ needs.setup.outputs.services_api == 'true' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.1.0
+
+      - name: Run checks
+        uses: ./.github/actions/python_service_ci
+        with:
+          WORKING_DIRECTORY: "services/api"
+
+  services_system:
+    name: "services / system"
+    runs-on: ubuntu-latest
+    needs: ["setup"]
+    if: ${{ needs.setup.outputs.services_system == 'true' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.1.0
+
+      - name: Run checks
+        uses: ./.github/actions/python_service_ci
+        with:
+          WORKING_DIRECTORY: "services/system"
