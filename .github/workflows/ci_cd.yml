@@ -60,11 +60,11 @@ jobs:
 
       - name: Configure environment test
         if: ${{ github.ref_name != 'main' }}
-        run: echo "target_project=${{ secrets.TEST_GCLOUD_PROJECT }}" >> $GITHUB_ENV        
+        run: echo "target_project=tired-lemur" >> $GITHUB_ENV        
 
       - name: Configure environment live
         if: ${{ github.ref_name == 'main' }}
-        run: echo "target_project=${{ secrets.LIVE_GCLOUD_PROJECT }}" >> $GITHUB_ENV
+        run: echo "target_project=angry-panda >> $GITHUB_ENV
 
   # Clients
   web:
