@@ -82,6 +82,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3.1.0
 
+      - name: Setup environment
+        run: |
+          echo "CFL_API_KEY=${{ secrets.CFL_API_KEY }}" >> $GITHUB_ENV
+
       - name: Build and test
         uses: ./.github/actions/go_ci
         with:
