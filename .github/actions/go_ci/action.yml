@@ -22,10 +22,10 @@ runs:
 
     - name: Build
       working-directory: ${{ inputs.WORKING_DIRECTORY }}
-      run: go build -a -o /tmp/app ./cmd
+      run: go build .
       shell: bash
 
     - name: Test
       working-directory: ${{ inputs.WORKING_DIRECTORY }}
-      run: go test ./internal/tests/...
+      run: go test ./tests/...
       shell: bash
