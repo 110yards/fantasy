@@ -22,6 +22,7 @@ jobs:
 
     outputs:
       image_tag: ${{ env.version }}
+      target_project: ${{ env.target_project }}
 
       # Clients
       web: ${{ steps.changes.outputs.web }}
@@ -57,6 +58,14 @@ jobs:
       - name: Configure version
         run: ./version.sh ${{ github.run_number }} ${{ github.ref_name }}
 
+      - name: Configure environment test
+        if: ${{ github.ref_name != 'main' }}
+        run: echo "target_project=${{ secrets.TEST_GCLOUD_PROJECT }}" >> $GITHUB_ENV        
+
+      - name: Configure environment live
+        if: ${{ github.ref_name == 'main' }}
+        run: echo "target_project=${{ secrets.LIVE_GCLOUD_PROJECT }}" >> $GITHUB_ENV
+
   # Clients
   web:
     name: "web"
@@ -91,6 +100,13 @@ jobs:
         with:
           GO_VERSION: ${{ env.GO_VERSION }}
           WORKING_DIRECTORY: "functions/game_importer"
+      
+      - name: Deploy function
+        uses: ./.github/actions/deploy_function
+        with:
+          WORKING_DIRECTORY: "functions/game_importer"
+          GCP_CREDENTIALS: ${{ secrets.TEST_GCLOUD_CREDENTIALS }}
+          TARGET_PROJECT: ${{ needs.setup.outputs.target_project }}
 
   # Services
   services_api:

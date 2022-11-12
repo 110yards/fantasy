@@ -1,0 +1,34 @@
+name: "Go - CI"
+
+inputs:
+  WORKING_DIRECTORY:
+    required: true
+  
+  GCP_CREDENTIALS:
+    required: true
+  
+  TARGET_PROJECT:
+    required: true
+
+runs:
+  using: "composite"
+
+  steps:
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ${{ inputs.GO_VERSION }}
+
+    - name: Setup gcloud
+      env:
+        CLOUDSDK_PYTHON: /usr/bin/python3
+      with:
+        project_id: ${{ inputs.REGISTRY_PROJECT }}
+        service_account_key: ${{ inputs.GCP_CREDENTIALS }}
+        export_default_credentials: true
+      uses: google-github-actions/setup-gcloud@v0
+
+
+    - name: Deploy function
+      working-directory: ${{ inputs.WORKING_DIRECTORY }}
+      run: ./deploy.sh ${{ inputs.TARGET_PROJECT }}
+      shell: bash
