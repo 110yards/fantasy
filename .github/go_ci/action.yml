@@ -1,0 +1,31 @@
+name: "Go - CI"
+
+inputs:
+  WORKING_DIRECTORY:
+    required: true
+
+  GO_VERSION:
+    required: true
+
+runs:
+  using: "composite"
+
+  steps:
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ${{ inputs.GO_VERSION }}
+
+    - name: Setup
+      working-directory: ${{ inputs.WORKING_DIRECTORY }}
+      run: go mod download
+      shell: bash
+
+    - name: Build
+      working-directory: ${{ inputs.WORKING_DIRECTORY }}
+      run: go build -a -o /tmp/app ./cmd
+      shell: bash
+
+    - name: Test
+      working-directory: ${{ inputs.WORKING_DIRECTORY }}
+      run: go test ./internal/tests/...
+      shell: bash
