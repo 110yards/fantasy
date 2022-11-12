@@ -26,6 +26,9 @@ jobs:
       # Clients
       web: ${{ steps.changes.outputs.web }}
 
+      # Functions
+      functions_game_importer: ${{ steps.changes.outputs.functions_game_importer }}
+
       # Services
       services_api: ${{ steps.changes.outputs.services_api }}
 
