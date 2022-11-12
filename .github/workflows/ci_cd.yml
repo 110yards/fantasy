@@ -104,9 +104,10 @@ jobs:
       - name: Deploy function
         uses: ./.github/actions/deploy_function
         with:
-          WORKING_DIRECTORY: "functions/game_importer"
+          REGISTRY_PROJECT: ${{ secrets.REGISTRY }}
           GCP_CREDENTIALS: ${{ secrets.TEST_GCLOUD_CREDENTIALS }}
           TARGET_PROJECT: ${{ needs.setup.outputs.target_project }}
+          WORKING_DIRECTORY: "functions/game_importer"
 
   # Services
   services_api:
