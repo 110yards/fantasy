@@ -17,7 +17,7 @@ import (
 func init() {
 	environment.Setup()
 	store.Initialize(environment.RtdbEmulatorHost, environment.ProjectId)
-	publisher.Initialize(environment.IsDev)
+	publisher.Initialize(environment.IsDev, environment.ProjectId)
 
 	functions.CloudEvent("game-importer", importGamesHandler)
 }
