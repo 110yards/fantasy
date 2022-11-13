@@ -36,4 +36,6 @@ func (g googlePublisher) Publish(ctx context.Context, topicName string, data int
 	if err != nil {
 		return fmt.Errorf("publish.Get error: %v", err)
 	}
+
+	return nil
 }
