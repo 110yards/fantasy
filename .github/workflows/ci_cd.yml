@@ -29,6 +29,7 @@ jobs:
 
       # Functions
       functions_game_importer: ${{ steps.changes.outputs.functions_game_importer }}
+      functions_scoreboard_updater: ${{ steps.changes.outputs.functions_scoreboard_updater }}
 
       # Services
       services_api: ${{ steps.changes.outputs.services_api }}
@@ -54,6 +55,8 @@ jobs:
               - "yards_py/**"
             functions_game_importer:
               - "functions/game_importer/**"
+            functions_scoreboard_updater:
+              - "functions/scoreboard_updater/**"
 
       - name: Configure version
         run: ./version.sh ${{ github.run_number }} ${{ github.ref_name }}
@@ -110,6 +113,37 @@ jobs:
           GCP_CREDENTIALS: ${{ secrets.TEST_GCLOUD_CREDENTIALS }}
           TARGET_PROJECT: ${{ needs.setup.outputs.target_project }}
           WORKING_DIRECTORY: "functions/game_importer"
+
+  # Functions
+  functions_scoreboard_updater:
+    name: "functions / scoreboard_updater"
+    runs-on: ubuntu-latest
+    needs: ["setup"]
+    if: ${{ needs.setup.outputs.functions_scoreboard_updater == 'true' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.1.0
+
+      - name: Setup environment
+        run: |
+          echo "CFL_API_KEY=${{ secrets.CFL_API_KEY }}" >> $GITHUB_ENV
+          echo "IS_DEV=true" >> $GITHUB_ENV
+          echo "GCLOUD_PROJECT=github_ci_run" >> $GITHUB_ENV
+
+      - name: Build and test
+        uses: ./.github/actions/go_ci
+        with:
+          GO_VERSION: ${{ env.GO_VERSION }}
+          WORKING_DIRECTORY: "functions/scoreboard_updater"
+
+      - name: Deploy function
+        uses: ./.github/actions/deploy_function
+        with:
+          REGISTRY_PROJECT: ${{ secrets.REGISTRY }}
+          GCP_CREDENTIALS: ${{ secrets.TEST_GCLOUD_CREDENTIALS }}
+          TARGET_PROJECT: ${{ needs.setup.outputs.target_project }}
+          WORKING_DIRECTORY: "functions/scoreboard_updater"
 
   # Services
   services_api:

@@ -1,0 +1,15 @@
+steps:
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "functions deploy scoreboard-updater"
+    args:
+      [
+        "functions",
+        "deploy",
+        "game-importer",
+        "--project=$_TARGET_PROJECT_ID",
+        "--gen2",
+        "--trigger-topic=topic_update_scoreboard",
+        "--runtime=go119",
+        "--update-env-vars=GCLOUD_PROJECT=$_TARGET_PROJECT_ID",
+        "--region=us-central1",
+      ]
