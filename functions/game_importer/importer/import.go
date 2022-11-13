@@ -36,14 +36,14 @@ func ImportGames(key string, year int, currentDate time.Time, daysBack, daysForw
 
 	for _, g := range changed {
 		if err := PublishGame(g); err != nil {
-			return fmt.Errorf("Failed to publish game %d/%d: %v", year, g.Hash.GameId, err)
+			return fmt.Errorf("Failed to publish game %d/%d: %v", year, g.GameId, err)
 		}
-		log.Printf("Published %d/%d", year, g.Hash.GameId)
+		log.Printf("Published %d/%d", year, g.GameId)
 
-		if err := SaveGameHash(year, g.Hash); err != nil {
-			return fmt.Errorf("Failed to save game hash %d/%d: %v", year, g.Hash.GameId, err)
+		if err := SaveGame(year, g); err != nil {
+			return fmt.Errorf("Failed to save game hash %d/%d: %v", year, g.GameId, err)
 		}
-		log.Printf("Saved hash for %d/%d", year, g.Hash.GameId)
+		log.Printf("Saved hash for %d/%d", year, g.GameId)
 	}
 
 	return nil
@@ -85,48 +85,62 @@ func getChangedGames(key string, year int, recentGames JsonArray) ([]ChangedGame
 			return nil, err
 		}
 
-		if previousHash.Hash != hash {
-			game["hash"] = hash
-			game["timestamp"] = timestamp
-
-			cg := ChangedGame{
-				Data: game,
-				Hash: GameHash{
-					GameId:    gameId,
-					Hash:      hash,
-					Timestamp: timestamp,
-				},
-			}
-
-			changed = append(changed, cg)
+		if previousHash == hash {
+			continue
 		}
+
+		game["hash"] = hash
+		game["timestamp"] = timestamp
+
+		cg := ChangedGame{
+			GameId: gameId,
+			Data:   game,
+		}
+
+		changed = append(changed, cg)
+
 	}
 
 	return changed, nil
 }
 
-func getGameHashPath(year, gameId int) string {
+func getGamePath(year, gameId int) string {
 	return fmt.Sprintf("game_importer/games/%d/game/%d", year, gameId)
 }
 
-func ReadGameHash(year int, gameId int) (*GameHash, error) {
-	path := getGameHashPath(year, gameId)
+func ReadGameHash(year int, gameId int) (string, error) {
+	gamePath := getGamePath(year, gameId)
+	hashPath := fmt.Sprintf("%s/hash", gamePath)
 
-	var gameHash GameHash
-	err := store.ReadPath(context.Background(), path, &gameHash)
+	var hash string
+	err := store.ReadPath(context.Background(), hashPath, &hash)
+
+	if err != nil {
+		return "", err
+	}
+
+	return hash, nil
+}
+
+func ReadGame(year int, gameId int) (JsonObject, error) {
+	gamePath := getGamePath(year, gameId)
+	hashPath := fmt.Sprintf("%s/hash", gamePath)
+
+	var game JsonObject
+	err := store.ReadPath(context.Background(), hashPath, &game)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &gameHash, nil
+	return game, nil
 }
 
 func PublishGame(game ChangedGame) error {
 	return publisher.Instance.Publish(context.Background(), "topic_game_updated", game.Data)
 }
 
-func SaveGameHash(year int, gameHash GameHash) error {
-	path := getGameHashPath(year, gameHash.GameId)
-	return store.SetPath(context.Background(), path, gameHash)
+func SaveGame(year int, game ChangedGame) error {
+	path := getGamePath(year, game.GameId)
+	return store.SetPath(context.Background(), path, game.Data)
 }

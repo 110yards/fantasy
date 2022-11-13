@@ -3,8 +3,12 @@ module github.com/mdryden/110yards/functions/gameimporter
 go 1.19
 
 require (
+	cloud.google.com/go/pubsub v1.26.0
+	firebase.google.com/go/v4 v4.10.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/cloudevents/sdk-go/v2 v2.12.0
+	github.com/joho/godotenv v1.4.0
+	github.com/stretchr/testify v1.8.1
 )
 
 require (
@@ -13,9 +17,7 @@ require (
 	cloud.google.com/go/firestore v1.6.1 // indirect
 	cloud.google.com/go/functions v1.7.0 // indirect
 	cloud.google.com/go/iam v0.5.0 // indirect
-	cloud.google.com/go/pubsub v1.26.0 // indirect
 	cloud.google.com/go/storage v1.26.0 // indirect
-	firebase.google.com/go/v4 v4.10.0 // indirect
 	github.com/MicahParks/keyfunc v1.5.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
@@ -25,12 +27,10 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.6.0 // indirect
-	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect
 	github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/stretchr/testify v1.8.1 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	go.uber.org/atomic v1.4.0 // indirect
 	go.uber.org/multierr v1.1.0 // indirect
