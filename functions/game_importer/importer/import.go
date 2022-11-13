@@ -22,25 +22,27 @@ func ImportGames(key string, year int, currentDate time.Time, daysBack, daysForw
 
 	recent, err := FilterRecentGames(allGames, currentDate, daysBack, daysForward)
 	if err != nil {
-		return err
+		return fmt.Errorf("Failed to filter recent games %v", err)
 	}
 
 	log.Printf("Found %d recent games", len(recent))
 
 	changed, err := getChangedGames(key, year, recent)
 	if err != nil {
-		return err
+		return fmt.Errorf("Failed to get changed games %v", err)
 	}
 
 	log.Printf("Found %d updated games", len(changed))
 
 	for _, g := range changed {
 		if err := PublishGame(g); err != nil {
-			return err
+			return fmt.Errorf("Failed to publish game %d/%d: %v", year, g.Hash.GameId, err)
 		}
 		log.Printf("Published %d/%d", year, g.Hash.GameId)
 
-		SaveGameHash(year, g.Hash)
+		if err := SaveGameHash(year, g.Hash); err != nil {
+			return fmt.Errorf("Failed to save game hash %d/%d: %v", year, g.Hash.GameId, err)
+		}
 		log.Printf("Saved hash for %d/%d", year, g.Hash.GameId)
 	}
 

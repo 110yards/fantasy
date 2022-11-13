@@ -37,6 +37,3 @@ func FilterRecentGames(games JsonArray, currentDate time.Time, daysBack, daysFor
 
 	return recentGames, nil
 }
-
-// func FindChangedGames(games []Game) ([]Game, error) {
-// }
