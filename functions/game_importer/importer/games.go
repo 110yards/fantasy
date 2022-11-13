@@ -5,7 +5,7 @@ import (
 )
 
 func GetGamesForSeason(key string, year int) (JsonArray, error) {
-	path := fmt.Sprintf("games/%d?page[size]=100&filter[event_type_id][eq]=%d", year, eventTypeRegularSeason)
+	path := fmt.Sprintf("games/%d?page[size]=100", year)
 
 	games, err := getArray(key, path)
 
