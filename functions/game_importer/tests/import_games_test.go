@@ -24,7 +24,7 @@ func TestGetGamesForSeason(t *testing.T) {
 	setupEnvironment()
 
 	const year = 2022
-	const gameCount = 81
+	const gameCount = 95
 
 	games, err := importer.GetGamesForSeason(environment.CflKey, year)
 
