@@ -7,6 +7,9 @@ import (
 )
 
 var CflKey string
+var RtdbEmulatorHost string
+var ProjectId string
+var IsDev bool
 
 func Setup() {
 
@@ -17,5 +20,8 @@ func Setup() {
 	}
 
 	log.Print("Loaded environment")
-	CflKey = GetVariable("CFL_API_KEY")
+	CflKey = getRequired("CFL_API_KEY")
+	ProjectId = getRequired("GCLOUD_PROJECT")
+	RtdbEmulatorHost = getOptional("RTDB_EMULATOR_HOST", "")
+	IsDev = getOptionalBool("IS_DEV", false)
 }

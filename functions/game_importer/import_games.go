@@ -10,10 +10,14 @@ import (
 	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/mdryden/110yards/functions/gameimporter/environment"
 	"github.com/mdryden/110yards/functions/gameimporter/importer"
+	"github.com/mdryden/110yards/functions/gameimporter/publisher"
+	"github.com/mdryden/110yards/functions/gameimporter/store"
 )
 
 func init() {
 	environment.Setup()
+	store.Initialize(environment.RtdbEmulatorHost, environment.ProjectId)
+	publisher.Initialize(environment.IsDev)
 
 	functions.CloudEvent("game-importer", importGamesHandler)
 }
@@ -38,6 +42,7 @@ func importGamesHandler(ctx context.Context, e event.Event) error {
 		DaysForward    int       `json:"daysForward"`
 	}
 
+	log.Printf("data: %v", string(msg.Message.Data))
 	var data importMessage
 	err := json.Unmarshal(msg.Message.Data, &data)
 
