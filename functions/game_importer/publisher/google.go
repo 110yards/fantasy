@@ -3,6 +3,7 @@ package publisher
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"cloud.google.com/go/pubsub"
 )
@@ -15,7 +16,7 @@ func (g googlePublisher) Publish(ctx context.Context, topicName string, data int
 	client, err := pubsub.NewClient(ctx, g.projectId)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("pubsub NewClient error: %v", err)
 	}
 	defer client.Close()
 
@@ -32,5 +33,7 @@ func (g googlePublisher) Publish(ctx context.Context, topicName string, data int
 	})
 
 	_, err = result.Get(ctx)
-	return err
+	if err != nil {
+		return fmt.Errorf("publish.Get error: %v", err)
+	}
 }
