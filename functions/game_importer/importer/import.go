@@ -40,7 +40,7 @@ func ImportGames(key string, year int, currentDate time.Time, daysBack, daysForw
 		}
 		log.Printf("Published %d/%d", year, g.GameId)
 
-		if err := SaveGame(year, g); err != nil {
+		if err := SaveGameHash(year, g); err != nil {
 			return fmt.Errorf("Failed to save game hash %d/%d: %v", year, g.GameId, err)
 		}
 		log.Printf("Saved hash for %d/%d", year, g.GameId)
@@ -89,12 +89,11 @@ func getChangedGames(key string, year int, recentGames JsonArray) ([]ChangedGame
 			continue
 		}
 
-		game["hash"] = hash
-		game["timestamp"] = timestamp
-
 		cg := ChangedGame{
-			GameId: gameId,
-			Data:   game,
+			GameId:    gameId,
+			Hash:      hash,
+			Timestamp: timestamp,
+			Data:      game,
 		}
 
 		changed = append(changed, cg)
@@ -122,25 +121,11 @@ func ReadGameHash(year int, gameId int) (string, error) {
 	return hash, nil
 }
 
-func ReadGame(year int, gameId int) (JsonObject, error) {
-	gamePath := getGamePath(year, gameId)
-	hashPath := fmt.Sprintf("%s/hash", gamePath)
-
-	var game JsonObject
-	err := store.ReadPath(context.Background(), hashPath, &game)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return game, nil
-}
-
 func PublishGame(game ChangedGame) error {
 	return publisher.Instance.Publish(context.Background(), "topic_game_updated", game.Data)
 }
 
-func SaveGame(year int, game ChangedGame) error {
+func SaveGameHash(year int, game ChangedGame) error {
 	path := getGamePath(year, game.GameId)
-	return store.SetPath(context.Background(), path, game.Data)
+	return store.SetPath(context.Background(), path, game)
 }
