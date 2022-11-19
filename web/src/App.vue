@@ -23,6 +23,7 @@
       </v-container>
     </v-main>
     <snack-bar ref="snackBar" />
+    <a style="display:none" rel="me" href="https://fosstodon.org/@mdryden">@mdryden</a>
   </v-app>
 </template>
 
