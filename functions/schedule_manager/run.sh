@@ -1,3 +1,3 @@
 #!/bin/bash
 
-FUNCTION_TARGET=schedule-manager go run cmd/main.go
+functions-framework --target=update_schedule_handler --signature-type=event --debug

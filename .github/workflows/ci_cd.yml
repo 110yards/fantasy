@@ -134,9 +134,8 @@ jobs:
           echo "GCLOUD_PROJECT=github_ci_run" >> $GITHUB_ENV
 
       - name: Build and test
-        uses: ./.github/actions/go_ci
+        uses: ./.github/actions/python_function_ci
         with:
-          GO_VERSION: ${{ env.GO_VERSION }}
           WORKING_DIRECTORY: "functions/score_manager"
 
       - name: Deploy function
