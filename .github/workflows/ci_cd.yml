@@ -56,7 +56,7 @@ jobs:
               - "yards_py/**"
             functions_game_importer:
               - "functions/game_importer/**"
-            functions_score_manager
+            functions_score_manager:
               - "functions/score_manager/**"
             functions_scoreboard_updater:
               - "functions/scoreboard_updater/**"
