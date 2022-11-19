@@ -65,25 +65,41 @@ class Schedule(BaseModel):
         return json.loads(self.json())
 
     def set_state(self):
-        now = datetime.now().replace(tzinfo=pytz.timezone("America/Toronto"))
+        now = cfl_time(datetime.now())
 
-        if self.preseason.date_start <= now < self.preseason.date_end:
-            self.is_preseason = True
-            self.current_week = get_current_week(self.preseason, now)
+        self.is_preseason = is_active_segment(now, self.preseason)
+        self.is_regular_season = is_active_segment(now, self.regular_season)
+        self.is_playoffs = is_active_segment(now, self.playoffs.date_start)
+        self.is_offseason = is_offseason(self)
 
-        if self.regular_season.date_start <= now < self.regular_season.date_end:
-            self.is_regular_season = True
-            self.current_week = get_current_week(self.regular_season, now)
-
-        if self.playoffs.date_start <= now < self.playoffs.date_end:
-            self.is_playoffs = True
+        if not self.is_offseason:
             self.current_week = get_current_week(self.playoffs, now)
 
-        if now > self.playoffs.date_end or now < self.preseason.date_start:
-            self.is_offseason = True
+
+def cfl_time(from_time: datetime) -> datetime:
+    return from_time.replace(tzinfo=pytz.timezone("America/Toronto"))
 
 
-def get_current_week(current_segment: Segment, now: datetime) -> Week:
+def is_offseason(schedule: Schedule) -> bool:
+    return not schedule.is_preseason and not schedule.is_regular_season and not schedule.is_playoffs
+
+
+def is_active_segment(now: datetime, segment: Segment) -> bool:
+    return segment.date_start <= now < segment.date_end
+
+
+def get_current_week(schedule: Schedule, now: datetime) -> Week:
+    if schedule.is_preseason:
+        return get_week_from_segment(schedule.preseason, now)
+
+    if schedule.is_regular_season:
+        return get_week_from_segment(schedule.regular_season, now)
+
+    if schedule.is_playoffs:
+        return get_week_from_segment(schedule.playoffs, now)
+
+
+def get_week_from_segment(current_segment: Segment, now: datetime) -> Week:
     for week in current_segment.weeks.values():
         if week.date_start <= now < week.date_end:
             return week
