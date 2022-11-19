@@ -2,5 +2,6 @@ go 1.19
 
 use (
 	./functions/game_importer
+	./functions/schedule_manager
 	./functions/scoreboard_updater
 )
