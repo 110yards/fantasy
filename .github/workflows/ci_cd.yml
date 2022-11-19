@@ -102,7 +102,9 @@ jobs:
         working-directory: topics
         env:
           GCLOUD_PROJECT: ${{ needs.setup.outputs.target_project }}
-        run: python create.py
+        run: |
+          pip install -r requirements.txt
+          python create.py
 
   # Clients
   web:
