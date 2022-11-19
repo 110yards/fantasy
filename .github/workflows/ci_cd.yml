@@ -24,6 +24,8 @@ jobs:
       image_tag: ${{ env.version }}
       target_project: ${{ env.target_project }}
 
+      topics: ${{ steps.changes.outputs.topics }}
+
       # Clients
       web: ${{ steps.changes.outputs.web }}
 
@@ -46,6 +48,8 @@ jobs:
         id: changes
         with:
           filters: |
+            topics:
+              - "topics/**"
             web:
               - "web/**"
             services_api:
@@ -71,6 +75,34 @@ jobs:
       - name: Configure environment live
         if: ${{ github.ref_name == 'main' }}
         run: echo "target_project=angry-panda >> $GITHUB_ENV
+
+  topics:
+    name: "topics"
+    runs-on: ubuntu-latest
+    needs: ["setup"]
+    if: ${{ needs.setup.outputs.topics == 'true' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.1.0
+
+      - name: Setup python
+        uses: actions/setup-python@v2
+
+      - name: Setup gcloud
+        env:
+          CLOUDSDK_PYTHON: /usr/bin/python3
+        with:
+          project_id: ${{ needs.setup.outputs.target_project }}
+          service_account_key: ${{ inputs.GCP_CREDENTIALS }}
+          export_default_credentials: true
+        uses: google-github-actions/setup-gcloud@v0
+
+      - name: Create topics
+        working-directory: topics
+        env:
+          GCLOUD_PROJECT: ${{ needs.setup.outputs.target_project }}
+        run: python create.py
 
   # Clients
   web:
