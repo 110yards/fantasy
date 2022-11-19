@@ -94,7 +94,7 @@ jobs:
           CLOUDSDK_PYTHON: /usr/bin/python3
         with:
           project_id: ${{ needs.setup.outputs.target_project }}
-          service_account_key: ${{ inputs.GCP_CREDENTIALS }}
+          service_account_key: ${{ secrets.TEST_GCLOUD_CREDENTIALS }}
           export_default_credentials: true
         uses: google-github-actions/setup-gcloud@v0
 
