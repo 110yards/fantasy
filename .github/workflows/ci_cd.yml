@@ -134,7 +134,7 @@ jobs:
           echo "GCLOUD_PROJECT=github_ci_run" >> $GITHUB_ENV
 
       - name: Build and test
-        uses: ./.github/actions/python_function_ci
+        uses: ./.github/actions/python_ci
         with:
           WORKING_DIRECTORY: "functions/schedule_manager"
 
@@ -188,7 +188,7 @@ jobs:
         uses: actions/checkout@v3.1.0
 
       - name: Run checks
-        uses: ./.github/actions/python_service_ci
+        uses: ./.github/actions/python_ci
         with:
           WORKING_DIRECTORY: "services/api"
 
@@ -203,6 +203,6 @@ jobs:
         uses: actions/checkout@v3.1.0
 
       - name: Run checks
-        uses: ./.github/actions/python_service_ci
+        uses: ./.github/actions/python_ci
         with:
           WORKING_DIRECTORY: "services/system"

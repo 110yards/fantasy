@@ -3,7 +3,7 @@
 from datetime import datetime
 import hashlib
 import json
-from typing import Dict, List, Literal
+from typing import Dict, List, Literal, Optional
 from pydantic import BaseModel
 import pytz
 
@@ -49,7 +49,7 @@ class Segment(BaseModel):
 class Schedule(BaseModel):
     season: int
     hash: str = ""
-    current_week: int = 0
+    current_week: Optional[Week] = None
     is_preseason: bool = False
     is_regular_season: bool = False
     is_playoffs: bool = False
@@ -83,7 +83,7 @@ class Schedule(BaseModel):
             self.is_offseason = True
 
 
-def get_current_week(current_segment: Segment, now: datetime) -> int:
+def get_current_week(current_segment: Segment, now: datetime) -> Week:
     for week in current_segment.weeks.values():
         if week.date_start <= now < week.date_end:
-            return week.week_number
+            return week

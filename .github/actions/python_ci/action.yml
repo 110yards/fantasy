@@ -1,4 +1,4 @@
-name: "Python Service - CI"
+name: "Python - CI"
 
 inputs:
   WORKING_DIRECTORY:
