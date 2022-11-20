@@ -6,6 +6,7 @@ steps:
         "functions",
         "deploy",
         "schedule-manager",
+        "--entry-point=update_schedule",
         "--project=$_TARGET_PROJECT_ID",
         "--gen2",
         "--trigger-topic=topic_update_schedule",
