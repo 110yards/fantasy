@@ -4,7 +4,7 @@
 /.data/**
 /.data.*
 accounts.json
-
+.venv
 **/node_modules/
 .pytest_cache/
 

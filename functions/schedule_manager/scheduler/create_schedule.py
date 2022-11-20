@@ -1,6 +1,6 @@
 from datetime import timedelta
 from typing import Dict, Iterable, List, Optional
-from .schedule import Schedule, Game, Segment, Week
+from .schedule import Schedule, Game, Segment, Week, WeekType
 
 PRESEASON = 0
 REGULAR_SEASON = 1
@@ -8,7 +8,7 @@ PLAYOFFS = 2
 GREY_CUP = 3
 
 
-def create_schedule(year: int, games: List[Game], post_week_buffer_hours: int) -> Schedule:
+def create_schedule(year: int, games: List[Game], post_week_buffer_hours: int, sim_segment: WeekType = None, sim_week: int = None) -> Schedule:
     schedule = Schedule(season=year)
 
     games = sorted(games, key=lambda x: x.date_start)
@@ -17,17 +17,17 @@ def create_schedule(year: int, games: List[Game], post_week_buffer_hours: int) -
     regular_season_games = [g for g in games if g.event_type.event_type_id == REGULAR_SEASON]
     playoff_games = [g for g in games if g.event_type.event_type_id in (PLAYOFFS, GREY_CUP)]
 
-    schedule.preseason = create_segment("preseason", preseason_games, post_week_buffer_hours)
-    schedule.regular_season = create_segment("regular_season", regular_season_games, post_week_buffer_hours)
-    schedule.playoffs = create_segment("playoffs", playoff_games, post_week_buffer_hours)
+    schedule.preseason = create_segment(WeekType.preseason, preseason_games, post_week_buffer_hours)
+    schedule.regular_season = create_segment(WeekType.regular_season, regular_season_games, post_week_buffer_hours)
+    schedule.playoffs = create_segment(WeekType.playoffs, playoff_games, post_week_buffer_hours)
 
-    schedule.set_state()
+    schedule.set_state(sim_segment, sim_week)
     schedule.calculate_hash()
 
     return schedule
 
 
-def create_segment(type: str, games: Iterable[Game], post_week_buffer_hours: int) -> Segment:
+def create_segment(week_type: WeekType, games: Iterable[Game], post_week_buffer_hours: int) -> Segment:
     weeks: Dict[int, Week] = {}
 
     first_week = 99
@@ -35,7 +35,7 @@ def create_segment(type: str, games: Iterable[Game], post_week_buffer_hours: int
 
     for game in games:
         if game.week not in weeks:
-            weeks[game.week] = Week(week_number=game.week, date_start=game.date_start, date_end=game.date_start)
+            weeks[game.week] = Week(week_number=game.week, date_start=game.date_start, date_end=game.date_start, week_type=week_type)
 
         if game.week < first_week:
             first_week = game.week
@@ -49,7 +49,7 @@ def create_segment(type: str, games: Iterable[Game], post_week_buffer_hours: int
         previous_week = weeks.get(week.week_number - 1)
         set_week_dates(week, previous_week, post_week_buffer_hours)
 
-    segment = Segment(type=type, weeks=weeks)
+    segment = Segment(type=week_type, weeks=weeks)
 
     segment.date_start = weeks[first_week].date_start
     segment.date_end = weeks[last_week].date_end

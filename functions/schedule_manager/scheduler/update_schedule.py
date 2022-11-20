@@ -1,18 +1,18 @@
 
 from .store import get_path
 from .store import set_path
-from .schedule import Schedule
+from .schedule import Schedule, WeekType
 from .create_schedule import create_schedule
 from .get_games import get_all_games
 
 
-def update_schedule(key: str, year: int, post_week_buffer_hours: int):
+def update_schedule(key: str, year: int, post_week_buffer_hours: int, sim_segment: WeekType = None, sim_week: int = None):
     games = get_all_games(key, year)
     print(f"Fetched {year} data")
 
     previous_hash = read_schedule_hash(year)
 
-    schedule = create_schedule(year, games, post_week_buffer_hours)
+    schedule = create_schedule(year, games, post_week_buffer_hours, sim_segment, sim_week)
 
     if schedule.hash == previous_hash:
         print("No changes to schedule detected")

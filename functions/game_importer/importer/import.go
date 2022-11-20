@@ -2,32 +2,33 @@ package importer
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"time"
 
 	"github.com/mdryden/110yards/functions/gameimporter/publisher"
+	"github.com/mdryden/110yards/functions/gameimporter/state"
 	"github.com/mdryden/110yards/functions/gameimporter/store"
 )
 
-func ImportGames(key string, year int, currentDate time.Time, daysBack, daysForward int) error {
-	log.Printf("Importing %d games using date %v", year, currentDate)
+func ImportGames(key string, year int) error {
+	log.Printf("Fetching %d state", year)
 
-	allGames, err := GetGamesForSeason(key, year)
-
+	currentWeek, err := state.GetCurrentWeek(year)
 	if err != nil {
-		return fmt.Errorf("failed to fetch games for %d: %v", year, err)
+		return fmt.Errorf("failed to fetch season state: %v", err)
 	}
 
-	recent, err := FilterRecentGames(allGames, currentDate, daysBack, daysForward)
-	if err != nil {
-		return fmt.Errorf("Failed to filter recent games %v", err)
+	log.Printf("Importing %d %s week %d", year, currentWeek.WeekType, currentWeek.WeekNumber)
+
+	log.Printf("Found %d games this week", len(currentWeek.Games))
+
+	gameIds := make([]int, len(currentWeek.Games))
+	for i, v := range currentWeek.Games {
+		gameIds[i] = v.GameId
 	}
 
-	log.Printf("Found %d recent games", len(recent))
-
-	changed, err := getChangedGames(key, year, recent)
+	changed, err := getChangedGames(key, year, gameIds)
 	if err != nil {
 		return fmt.Errorf("Failed to get changed games %v", err)
 	}
@@ -49,23 +50,12 @@ func ImportGames(key string, year int, currentDate time.Time, daysBack, daysForw
 	return nil
 }
 
-func getChangedGames(key string, year int, recentGames JsonArray) ([]ChangedGame, error) {
+func getChangedGames(key string, year int, gameIds []int) ([]ChangedGame, error) {
 
 	changed := make([]ChangedGame, 0)
 	timestamp := time.Now()
 
-	for _, g := range recentGames {
-		v, exists := g["game_id"]
-		if !exists {
-			return nil, errors.New("game_id not found in game data")
-		}
-
-		f, ok := v.(float64)
-		if !ok {
-			return nil, fmt.Errorf("expected game_id to be an float, but it was: %T\n", v)
-		}
-
-		gameId := int(f)
+	for _, gameId := range gameIds {
 		log.Printf("Fetching game %d/%d", year, gameId)
 		game, err := GetFullGame(key, year, gameId)
 

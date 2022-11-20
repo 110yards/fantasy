@@ -36,10 +36,7 @@ func importGamesHandler(ctx context.Context, e event.Event) error {
 	}
 
 	type importMessage struct {
-		Year           int       `json:"year"`
-		SimulationDate time.Time `json:"simulationDate"`
-		DaysBack       int       `json:"daysBack"`
-		DaysForward    int       `json:"daysForward"`
+		SimulationYear int `json:"year"`
 	}
 
 	var data importMessage
@@ -50,20 +47,13 @@ func importGamesHandler(ctx context.Context, e event.Event) error {
 		return nil // always ack
 	}
 
-	year := data.Year
+	year := data.SimulationYear
 	if year == 0 {
 		year = time.Now().Year()
 	}
 
-	currentDate := data.SimulationDate
-	if currentDate.IsZero() {
-		currentDate = time.Now()
-	}
-
-	daysBack := data.DaysBack
-	daysForward := data.DaysForward
-
-	err = importer.ImportGames(environment.CflKey, year, currentDate, daysBack, daysForward)
+	// TODO: drop days back and forward.  Use current week instead.  Accept year and week number in the payload, default to current year + week from state
+	err = importer.ImportGames(environment.CflKey, year)
 
 	if err != nil {
 		log.Printf("failed to import games: %v", err)

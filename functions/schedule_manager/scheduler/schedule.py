@@ -1,9 +1,10 @@
 
 
 from datetime import datetime
+import enum
 import hashlib
 import json
-from typing import Dict, List, Literal, Optional
+from typing import Dict, List
 from pydantic import BaseModel
 import pytz
 
@@ -32,15 +33,23 @@ class Game(BaseModel):
     team_2: Team
 
 
+class WeekType(str, enum.Enum):
+    preseason = "preseason"
+    regular_season = "regular_season"
+    playoffs = "playoffs"
+    offseason = "offseason"
+
+
 class Week(BaseModel):
     week_number: int
-    date_start: datetime
-    date_end: datetime
+    week_type: WeekType
+    date_start: datetime = None
+    date_end: datetime = None
     games: List[Game] = []
 
 
 class Segment(BaseModel):
-    type: Literal["preseason", "regular_season", "playoffs"]
+    type: WeekType
     weeks: Dict[int, Week] = {}
     date_start: datetime = None
     date_end: datetime = None
@@ -49,7 +58,7 @@ class Segment(BaseModel):
 class Schedule(BaseModel):
     season: int
     hash: str = ""
-    current_week: Optional[Week] = None
+    current_week: Week = None
     is_preseason: bool = False
     is_regular_season: bool = False
     is_playoffs: bool = False
@@ -64,16 +73,22 @@ class Schedule(BaseModel):
     def serialize(self) -> dict:
         return json.loads(self.json())
 
-    def set_state(self):
+    def set_state(self, sim_segment: WeekType, sim_week: int):
         now = cfl_time(datetime.now())
 
-        self.is_preseason = is_active_segment(now, self.preseason)
-        self.is_regular_season = is_active_segment(now, self.regular_season)
-        self.is_playoffs = is_active_segment(now, self.playoffs.date_start)
+        if sim_segment:
+            print(f"Simulating {sim_segment} week {sim_week}")
+            self.is_preseason = sim_segment == WeekType.preseason
+            self.is_regular_season = sim_segment == WeekType.regular_season
+            self.is_playoffs = sim_segment == WeekType.playoffs
+        else:
+            self.is_preseason = is_active_segment(now, self.preseason)
+            self.is_regular_season = is_active_segment(now, self.regular_season)
+            self.is_playoffs = is_active_segment(now, self.playoffs)
+
         self.is_offseason = is_offseason(self)
 
-        if not self.is_offseason:
-            self.current_week = get_current_week(self.playoffs, now)
+        self.current_week = get_current_week(self, now, sim_week)
 
 
 def cfl_time(from_time: datetime) -> datetime:
@@ -88,15 +103,18 @@ def is_active_segment(now: datetime, segment: Segment) -> bool:
     return segment.date_start <= now < segment.date_end
 
 
-def get_current_week(schedule: Schedule, now: datetime) -> Week:
+def get_current_week(schedule: Schedule, now: datetime, sim_week: int) -> Week:
+
     if schedule.is_preseason:
-        return get_week_from_segment(schedule.preseason, now)
+        return schedule.preseason.weeks[sim_week] if sim_week else get_week_from_segment(schedule.preseason, now)
 
     if schedule.is_regular_season:
-        return get_week_from_segment(schedule.regular_season, now)
+        return schedule.regular_season.weeks[sim_week] if sim_week else get_week_from_segment(schedule.regular_season, now)
 
     if schedule.is_playoffs:
-        return get_week_from_segment(schedule.playoffs, now)
+        return schedule.playoffs.weeks[sim_week] if sim_week else get_week_from_segment(schedule.playoffs, now)
+
+    return Week(week_number=0, week_type=WeekType.offseason)
 
 
 def get_week_from_segment(current_segment: Segment, now: datetime) -> Week:
