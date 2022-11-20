@@ -1,10 +1,12 @@
+import base64
 from datetime import datetime
+import json
 from typing import Optional
 import functions_framework
 from pydantic import BaseSettings
 from scheduler.store import initialize_firebase
 from scheduler.update_schedule import update_schedule
-from cloudevents.http import CloudEvent
+from cloudevents.http.event import CloudEvent
 
 
 class Settings(BaseSettings):
@@ -25,16 +27,24 @@ initialize_firebase(
 )
 
 
+def upwrap_event_data(event: CloudEvent) -> dict:
+    event_data: dict = event.data.get("data")
+    message: dict = event_data.get("message")
+    data: str = message.get("data") if message else None
+    b = base64.b64decode(data) if data else None
+    return json.loads(b) if b else {}
+
+
 @functions_framework.cloud_event
 def update_schedule_handler(event: CloudEvent):
 
-    print(f"event data: {event}")
-    data: dict = event.data.get("data")
-
     try:
+        data = upwrap_event_data(event)
+
         if not data:  # default
             year = datetime.now().year
             return update_schedule(settings.cfl_api_key, year, settings.post_week_buffer_hours)
+
         else:  # sim
             print("Running simulated update")
             print(data)
