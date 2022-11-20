@@ -17,7 +17,6 @@ env:
 
 jobs:
   setup:
-    if: github.event.pull_request.draft == false
     name: setup
     runs-on: ubuntu-latest
 
@@ -104,6 +103,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Create topics
+        if: github.event.pull_request.draft == false
         working-directory: topics
         env:
           GCLOUD_PROJECT: ${{ needs.setup.outputs.target_project }}
@@ -147,6 +147,7 @@ jobs:
           WORKING_DIRECTORY: "functions/game_importer"
 
       - name: Deploy function
+        if: github.event.pull_request.draft == false
         uses: ./.github/actions/deploy_function
         with:
           REGISTRY_PROJECT: ${{ secrets.REGISTRY }}
@@ -176,6 +177,7 @@ jobs:
           WORKING_DIRECTORY: "functions/schedule_manager"
 
       - name: Deploy function
+        if: github.event.pull_request.draft == false
         uses: ./.github/actions/deploy_function
         with:
           REGISTRY_PROJECT: ${{ secrets.REGISTRY }}
@@ -200,6 +202,7 @@ jobs:
           echo "GCLOUD_PROJECT=github_ci_run" >> $GITHUB_ENV
 
       - name: Build and test
+        if: github.event.pull_request.draft == false
         uses: ./.github/actions/go_ci
         with:
           GO_VERSION: ${{ env.GO_VERSION }}
