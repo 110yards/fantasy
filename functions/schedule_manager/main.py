@@ -5,6 +5,7 @@ from pydantic import BaseSettings
 from scheduler.store import initialize_firebase
 from scheduler.update_schedule import update_schedule
 
+
 class Settings(BaseSettings):
     cfl_api_key: str
     gcloud_project: str

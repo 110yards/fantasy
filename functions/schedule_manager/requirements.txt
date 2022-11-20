@@ -3,5 +3,4 @@ functions-framework==3.2.0
 requests==2.26.0
 pydantic==1.9.2
 python-dotenv==0.21.0
-pytest
 pytz==2021.3
