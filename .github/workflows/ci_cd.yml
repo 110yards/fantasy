@@ -17,6 +17,7 @@ env:
 
 jobs:
   setup:
+    if: github.event.pull_request.draft == false
     name: setup
     runs-on: ubuntu-latest
 

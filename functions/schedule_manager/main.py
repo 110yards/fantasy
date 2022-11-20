@@ -28,10 +28,11 @@ initialize_firebase(
 
 
 def upwrap_event_data(event: CloudEvent) -> dict:
-    event_data: dict = event.data.get("data")
-    message: dict = event_data.get("message")
+    event_data: dict = event.data if event.data else None
+    message: dict = event_data.get("message") if event_data else None
     data: str = message.get("data") if message else None
     b = base64.b64decode(data) if data else None
+
     return json.loads(b) if b else {}
 
 
