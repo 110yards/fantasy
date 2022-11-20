@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 import functions_framework
 from pydantic import BaseSettings
 from scheduler.store import initialize_firebase
@@ -6,10 +7,10 @@ from scheduler.update_schedule import update_schedule
 
 
 class Settings(BaseSettings):
-    is_dev: bool
     cfl_api_key: str
     gcloud_project: str
-    rtdb_emulator_host: str
+    is_dev: bool = False
+    rtdb_emulator_host: Optional[str] = None
     post_week_buffer_hours: int = 24
 
     class Config:
