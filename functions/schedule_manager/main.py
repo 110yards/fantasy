@@ -24,7 +24,7 @@ initialize_firebase(
 
 
 @functions_framework.cloud_event
-def update_schedule(event_data: functions_framework.BackgroundEvent):
+def update_schedule_handler(event_data: functions_framework.BackgroundEvent):
 
     # TODO: get year from event data
     year = datetime.now().year
