@@ -9,7 +9,7 @@ steps:
         "--project=$_TARGET_PROJECT_ID",
         "--gen2",
         "--trigger-topic=topic_update_schedule",
-        "--runtime=go119",
+        "--runtime=python310",
         "--update-env-vars=GCLOUD_PROJECT=$_TARGET_PROJECT_ID",
         "--update-secrets=CFL_API_KEY=CFL_API_KEY:latest",
         "--region=us-central1",

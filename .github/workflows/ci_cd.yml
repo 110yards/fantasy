@@ -86,9 +86,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3.1.0
 
-      - name: Setup python
-        uses: actions/setup-python@v2
-
       - name: Setup gcloud
         env:
           CLOUDSDK_PYTHON: /usr/bin/python3
@@ -98,13 +95,17 @@ jobs:
           export_default_credentials: true
         uses: google-github-actions/setup-gcloud@v0
 
+      - name: Setup python
+        uses: actions/setup-python@v2
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
       - name: Create topics
         working-directory: topics
         env:
           GCLOUD_PROJECT: ${{ needs.setup.outputs.target_project }}
-        run: |
-          pip install -r requirements.txt
-          python create.py
+        run: python create.py
 
   # Clients
   web:
