@@ -1,7 +1,7 @@
 from datetime import datetime
 import functions_framework
 from pydantic import BaseSettings
-from functions.schedule_manager.scheduler.store import initialize_firebase
+from scheduler.store import initialize_firebase
 from scheduler.update_schedule import update_schedule
 
 
@@ -23,7 +23,7 @@ initialize_firebase(
 )
 
 
-@ functions_framework.cloud_event
+@functions_framework.cloud_event
 def update_schedule_handler(event_data: functions_framework.BackgroundEvent):
 
     # TODO: get year from event data
