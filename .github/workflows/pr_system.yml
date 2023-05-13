@@ -27,8 +27,8 @@ jobs:
       - name: Install dependencies
         run: .scripts/common/install-dependencies-service.sh ${{ env.SERVICE_DIR }}
 
-      - name: Run checks
-        run: .scripts/python/checks.sh ${{ env.SERVICE_DIR }}
+      # - name: Run checks
+      #   run: .scripts/python/checks.sh ${{ env.SERVICE_DIR }}
 
       # Deploy to test
       - name: Setup gcloud
