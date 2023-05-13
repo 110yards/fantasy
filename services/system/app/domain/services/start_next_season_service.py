@@ -71,12 +71,15 @@ class StartNextSeasonService:
         Logger.info("Start next season workflow started")
 
         # update season / week (state)
+        Logger.info("Fetching state")
         state = self.public_repo.get_state()
 
         if target_season:
             state.current_season = target_season
         else:
             state.current_season += 1
+
+        completed_season = target_season - 1
 
         state.current_week = 1
         state.season_weeks = 21
@@ -87,6 +90,7 @@ class StartNextSeasonService:
 
         # update schedule
         # not strictly necessary to include final, but maybe helpful for testing with old seasons
+        Logger.info("Updating schedule")
         command = UpdateScheduleCommand(include_final=True, season=state.current_season)
         schedule_result = self.update_schedule_command_executor.execute(command)
 
@@ -94,6 +98,7 @@ class StartNextSeasonService:
             return StartNextSeasonResult(success=False, error=schedule_result.error)
 
         # update scoreboard
+        Logger.info("Updating scoreboard")
         week_one_games = [game for game in schedule_result.games if game.week == 1 and game.event_type.event_type_id == EVENT_TYPE_REGULAR]
         scoreboard = Scoreboard.create(week_one_games)  # kinda sketchy, relies on ScheduledGame being similar enough to Game
 
@@ -101,18 +106,21 @@ class StartNextSeasonService:
         opponents = Opponents.from_scheduled_games(week_one_games)
 
         # save state new state
+        Logger.info("Saving state")
         self.public_repo.set_state(state)
         self.public_repo.set_scoreboard(scoreboard)
         self.public_repo.set_opponents(opponents)
 
         leagues = self.league_repo.get_all()
+        Logger.info("Archiving leagues")
         for league in leagues:
-            if league.is_active or league.has_completed_season:
+            if (league.is_active or league.has_completed_season) and league.season == completed_season:
                 self.archive_league(league)
             else:
                 self.cleanup_league(league)
 
         # Erase all league previews
+        Logger.info("Erasing league previews")
         for user in self.user_repo.get_all():
             for league in self.user_league_repo.get_leagues(user.id):
                 self.user_league_repo.delete(user.id, league.id)
