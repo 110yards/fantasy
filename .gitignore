@@ -9,6 +9,7 @@ accounts.json
 .pytest_cache/
 
 .env
+.venv
 *.pyc
 **/__pycache__/**
 

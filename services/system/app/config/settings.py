@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     firebase_api_key: str
     endpoint: str
     cfl_api_key: Optional[str]
-    cfl_api_endpoint: str = "https://api.cfl.ca/v1"
+    cfl_api_endpoint: str = "http://api.cfl.ca/v1"
     cfl_roster_endpoint: str = "http://www.cfl.ca/wp-content/themes/cfl.ca/inc/admin-ajax.php?action=get_roster&teamId="
     gcloud_project: str
     service_name: Optional[str]
