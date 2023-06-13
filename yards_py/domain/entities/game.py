@@ -21,7 +21,7 @@ from yards_py.domain.entities.game_teams import GameTeams
 
 class Game(BaseEntity):
     date_start: str
-    game_number: int
+    # game_number: int
     week: int
     season: int
     game_duration: Optional[int]
@@ -90,7 +90,7 @@ def from_cfl(game: dict, count_away_players: bool, count_home_players: bool, sim
     if sim_state:
         sim_state.apply_to_stats(game)
 
-    game_entity = Game.parse_obj(game)
+    game_entity = Game(**game)
     game_entity.away_roster = get_roster(game["rosters"]["teams"]["team_1"]["roster"])
     game_entity.home_roster = get_roster(game["rosters"]["teams"]["team_2"]["roster"])
 
@@ -103,8 +103,8 @@ def get_roster(roster: List[Dict]) -> Dict[str, GamePlayer]:
     game_roster = {}
     for player in roster:
         player["position"] = PositionType.from_cfl_roster(player["position"])
-        player["id"] = str(player["cfl_central_id"])
-        game_player = GamePlayer.parse_obj(player)
+        player["id"] = str(player["player_id"])
+        game_player = GamePlayer(**player)
 
         game_roster[game_player.id] = game_player
 
@@ -135,37 +135,37 @@ def get_team_player_stats(game_id: str, week: int, boxscore: dict, roster: dict,
 
 
 def get_player_stats(game_id: int, week: int, boxscore: dict, player: dict, team: dict, opponent: dict):
-    defence = get_player_stats_for_category(boxscore["defence"], player["cfl_central_id"])
-    field_goals = get_player_stats_for_category(boxscore["field_goals"], player["cfl_central_id"])
-    kick_returns = get_player_stats_for_category(boxscore["kick_returns"], player["cfl_central_id"])
-    kicking = get_player_stats_for_category(boxscore["kicking"], player["cfl_central_id"])
-    one_point_converts = get_player_stats_for_category(boxscore["one_point_converts"], player["cfl_central_id"])
-    passing = get_player_stats_for_category(boxscore["passing"], player["cfl_central_id"])
-    punt_returns = get_player_stats_for_category(boxscore["punt_returns"], player["cfl_central_id"])
-    punts = get_player_stats_for_category(boxscore["punts"], player["cfl_central_id"])
-    receiving = get_player_stats_for_category(boxscore["receiving"], player["cfl_central_id"])
-    rushing = get_player_stats_for_category(boxscore["rushing"], player["cfl_central_id"])
-    two_point_converts = get_player_stats_for_category(boxscore["two_point_converts"], player["cfl_central_id"])
-    field_goal_returns = get_player_stats_for_category(boxscore["field_goal_returns"], player["cfl_central_id"])
+    defence = get_player_stats_for_category(boxscore["defence"], player["player_id"])
+    field_goals = get_player_stats_for_category(boxscore["field_goals"], player["player_id"])
+    kick_returns = get_player_stats_for_category(boxscore["kick_returns"], player["player_id"])
+    # kicking = get_player_stats_for_category(boxscore["kicking"], player["player_id"])
+    one_point_converts = get_player_stats_for_category(boxscore["one_point_converts"], player["player_id"])
+    passing = get_player_stats_for_category(boxscore["passing"], player["player_id"])
+    punt_returns = get_player_stats_for_category(boxscore["punt_returns"], player["player_id"])
+    punts = get_player_stats_for_category(boxscore["punts"], player["player_id"])
+    receiving = get_player_stats_for_category(boxscore["receiving"], player["player_id"])
+    rushing = get_player_stats_for_category(boxscore["rushing"], player["player_id"])
+    # two_point_converts = get_player_stats_for_category(boxscore["two_point_converts"], player["player_id"])
+    # field_goal_returns = get_player_stats_for_category(boxscore["field_goal_returns"], player["player_id"])
 
     stats = {}
     stats.update(defence)
     stats.update(field_goals)
     stats.update(kick_returns)
-    stats.update(kicking)
+    # stats.update(kicking)
     stats.update(one_point_converts)
     stats.update(passing)
     stats.update(punt_returns)
     stats.update(punts)
     stats.update(receiving)
     stats.update(rushing)
-    stats.update(two_point_converts)
-    stats.update(field_goal_returns)
+    # stats.update(two_point_converts)
+    # stats.update(field_goal_returns)
 
     if "field_goal_made" in stats:
         stats["field_goal_misses"] = stats["field_goal_attempts"] - stats["field_goal_made"]
 
-    player["id"] = str(player["cfl_central_id"])
+    player["id"] = str(player["player_id"])
     player["position"] = PositionType.from_cfl_roster(player["position"])
 
     combined = {
@@ -186,7 +186,7 @@ def get_player_stats_for_category(stats: dict, player_id: int):
         return []
 
     for item in stats:
-        if item["player"]["cfl_central_id"] == player_id:
+        if item["player"]["player_id"] == player_id:
             return item
 
     return []

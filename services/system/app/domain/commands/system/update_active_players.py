@@ -82,17 +82,19 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
         season = self.state_repo.get().current_season
         self.current_season = season
 
+        using_official_api = "api.cfl.ca" in self.cfl_player_proxy.proxy.settings.cfl_api_endpoint
+
         page = 1
         current_players = []
         page_size = 20
         while True:
             result = self.cfl_player_proxy.get_players_for_season(season, page_number=page, page_size=page_size)
             current_players.extend(result["data"])
-            if len(result["data"]) < page_size:
+            if len(result["data"]) < page_size or not using_official_api:
                 break
             page += 1
 
-        current_players = [Player.from_cfl_api(p) for p in current_players]
+        current_players = [Player.from_cfl_api(p, using_official_api) for p in current_players]
 
         rostered_players2 = []
 
@@ -116,7 +118,7 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
             self.update_status_from_game_rosters(season, current_players)
 
         changed_players = get_changed_players(current_players, stored_players, command.force)
-        unrostered_players = self.get_unrostered_players(current_players, stored_players)
+        unrostered_players = self.get_unrostered_players(current_players, stored_players, using_official_api)
         updates = changed_players + unrostered_players
 
         if updates:
@@ -154,28 +156,29 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
             payload = LeagueCommandPushData(command_type=LeagueCommandType.UPDATE_PLAYER, command_data=command.dict())
             self.publisher.publish(payload, LEAGUE_COMMAND_TOPIC)
 
-    def get_unrostered_players(self, rostered_players: Dict[str, Player], stored_players: Dict[str, Player]) -> List[Player]:
+    def get_unrostered_players(self, rostered_players: Dict[str, Player], stored_players: Dict[str, Player], official_api: bool) -> List[Player]:
         unrostered = []
 
         for player in stored_players.values():
             rostered = player.id in rostered_players
 
             if not rostered and player.team.id != Team.free_agent().id:
-                official_details = self.cfl_player_proxy.get_player(player.id)
-                team_details: dict = official_details["data"][0].get("team")
-                is_set: bool = team_details.get("is_set")
-                season: int = team_details.get("season")
+                if official_api:
+                    official_details = self.cfl_player_proxy.get_player(player.id)
+                    team_details: dict = official_details["data"][0].get("team")
+                    is_set: bool = team_details.get("is_set")
+                    season: int = team_details.get("season")
 
-                false_positive = is_set and season >= self.current_season
-                if false_positive:
-                    Logger.debug("False positive free agent detected", extra={
-                        "player": {
-                            "player_id": player.id,
-                            "first_name": player.first_name,
-                            "last_name": player.last_name,
-                        }
-                    })
-                    continue
+                    false_positive = is_set and season >= self.current_season
+                    if false_positive:
+                        Logger.debug("False positive free agent detected", extra={
+                            "player": {
+                                "player_id": player.id,
+                                "first_name": player.first_name,
+                                "last_name": player.last_name,
+                            }
+                        })
+                        continue
 
                 player.team = Team.free_agent()
                 player.compute_hash()

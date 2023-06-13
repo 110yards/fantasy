@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi.param_functions import Depends
 
 from .cfl_proxy import CflProxy, create_cfl_proxy

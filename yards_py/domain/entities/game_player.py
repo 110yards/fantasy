@@ -12,7 +12,7 @@ class GamePlayer(BaseEntity):
     middle_name: str
     last_name: str
     birth_date: str
-    uniform: int
+    # uniform: int
     position: PositionType
     is_national: bool
     is_starter: bool

@@ -11,7 +11,7 @@ from yards_py.domain.entities.game_teams import GameTeams
 
 class ScheduledGame(BaseEntity):
     date_start: str
-    game_number: int
+    # game_number: int
     week: int
     season: int
     game_duration: Optional[int]
@@ -45,7 +45,7 @@ class ScheduledGame(BaseEntity):
             },
         }
 
-        game_entity = ScheduledGame.parse_obj(game)
+        game_entity = ScheduledGame(**game)
         game_entity.calculate_hash()
 
         return game_entity
