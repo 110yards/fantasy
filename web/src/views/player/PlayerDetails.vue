@@ -37,9 +37,9 @@
               <div v-if="details.player.college"><label>College:</label> {{ details.player.college }}</div>
             </v-card-subtitle>
 
-            <v-card-text>
+            <!-- <v-card-text>
               <a :href="details.player.cfl_url" target="_blank">CFL Page</a>
-            </v-card-text>
+            </v-card-text> -->
           </v-card>
         </v-col>
       </v-row>
