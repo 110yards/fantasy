@@ -59,7 +59,8 @@ def from_cfl(game: dict, count_away_players: bool, count_home_players: bool, sim
         "home": clean_team(game["team_2"]),
     }
 
-    if count_away_players:
+    has_boxscore = "boxscore" in game 
+    if count_away_players and has_boxscore:
         stats1 = get_team_player_stats(
             game["id"],
             game["week"],
@@ -71,7 +72,7 @@ def from_cfl(game: dict, count_away_players: bool, count_home_players: bool, sim
     else:
         stats1 = []
 
-    if count_home_players:
+    if count_home_players and has_boxscore:
         stats2 = get_team_player_stats(
             game["id"],
             game["week"],
@@ -91,8 +92,8 @@ def from_cfl(game: dict, count_away_players: bool, count_home_players: bool, sim
         sim_state.apply_to_stats(game)
 
     game_entity = Game(**game)
-    game_entity.away_roster = get_roster(game["rosters"]["teams"]["team_1"]["roster"])
-    game_entity.home_roster = get_roster(game["rosters"]["teams"]["team_2"]["roster"])
+    game_entity.away_roster = get_roster(game["rosters"]["teams"]["team_1"]["roster"]) if has_boxscore else None
+    game_entity.home_roster = get_roster(game["rosters"]["teams"]["team_2"]["roster"]) if has_boxscore else None
 
     game_entity.calculate_hash()
 
@@ -123,10 +124,11 @@ def clean_team(team: dict):
 def get_team_player_stats(game_id: str, week: int, boxscore: dict, roster: dict, team: dict, opponent: dict):
     team_stats = []
 
+
     for player in roster:
         if player["position"] == "OL" or player["position"] == "OT":
             continue
-
+        
         player_stats = get_player_stats(game_id, week, boxscore["players"], player, team, opponent)
         player_stats["game_id"] = game_id
         team_stats.append(player_stats)
