@@ -117,7 +117,6 @@ export const playerStatus = {
         return "Not Active"
     }
   },
-   
 }
 
 export const teamId = {
