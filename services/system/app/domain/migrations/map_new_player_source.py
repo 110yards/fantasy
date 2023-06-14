@@ -72,6 +72,7 @@ class MapNewPlayerSourceMigration:
         roster_players_fixed = 0
         roster_players_failed = 0
         owned_players_fixed = 0
+        failed_players = {}
 
         for league in leagues:
             if not league.is_active_for_season(2023):
@@ -107,6 +108,7 @@ class MapNewPlayerSourceMigration:
                             roster_players_fixed += 1
                         else:
                             Logger.info(f"Could not match player {position.player.display_name} in league {league.id}")
+                            failed_players[position.player.cfl_central_id] = f"{position.player.team.abbreviation} - {position.player.display_name} - {position.player.cfl_central_id}"
                             position.player.team = Team.free_agent()
                             roster_players_failed += 1
                         
@@ -122,6 +124,7 @@ class MapNewPlayerSourceMigration:
             "roster_players_fixed": roster_players_fixed,
             "roster_players_failed": roster_players_failed,
             "owned_players_fixed": owned_players_fixed,
+            "failed_players": [failed_players.values()],
         }
 
 def slug(p: Player) -> str:
