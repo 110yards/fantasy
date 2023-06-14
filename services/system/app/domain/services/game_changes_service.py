@@ -3,7 +3,7 @@
 from typing import List, Optional
 from fastapi import Depends
 from pydantic import BaseModel
-from services.system.app.cfl.cfl_game_proxy import CflGameProxy, create_cfl_game_proxy
+from services.system.app.api_proxies.cfl_game_proxy import CflGameProxy, create_cfl_game_proxy
 from yards_py.core.sim_state import SimState
 from yards_py.domain.entities.game import from_cfl
 from yards_py.domain.entities.player_game import PlayerGame

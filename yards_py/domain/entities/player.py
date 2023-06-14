@@ -3,6 +3,7 @@ from datetime import datetime
 
 from pydantic.class_validators import root_validator
 from yards_py.domain.entities.game_player import GamePlayer
+from yards_py.domain.entities.injury_status import InjuryStatus
 from yards_py.domain.enums.position_type import PositionType
 from yards_py.core.hash_dict import hash_dict
 from typing import Dict, Optional
@@ -33,6 +34,7 @@ class Player(BaseEntity):
     foreign_player: Optional[bool]
     image_url: Optional[str]
     status_current: int = 1
+    injury_status: Optional[InjuryStatus] = None
 
     hash: str = ""
 

@@ -1,6 +1,6 @@
 
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
 from fastapi import Depends
@@ -28,6 +28,7 @@ from services.api.app.domain.repositories.player_season_repository import (
     PlayerSeasonRepository, create_player_season_repository)
 from services.api.app.domain.repositories.public_repository import (
     PublicRepository, create_public_repository)
+from yards_py.domain.repositories.state_repository import StateRepository, create_state_repository
 
 
 def create_player_list_service(
@@ -37,7 +38,8 @@ def create_player_list_service(
     public_repo: PublicRepository = Depends(create_public_repository),
     player_repo: PlayerRepository = Depends(create_player_repository),
     player_season_score_repo: PlayerLeagueSeasonScoreRepository = Depends(create_player_league_season_score_repository),
-    rtdb_client: RTDBClient = Depends(create_rtdb_client)
+    rtdb_client: RTDBClient = Depends(create_rtdb_client),
+    state_repo: StateRepository = Depends(create_state_repository),
 ):
     return PlayerListService(
         league_repo=league_repo,
@@ -47,6 +49,7 @@ def create_player_list_service(
         player_repo=player_repo,
         player_season_score_repo=player_season_score_repo,
         rtdb_client=rtdb_client,
+        state_repo=state_repo,
     )
 
 
@@ -65,6 +68,8 @@ class CacheData(BaseModel):
     scoring_settings_hash: str
     players: List[RankedPlayer]
     recalc_date: Optional[int]
+    last_player_update: Optional[datetime]
+    generated_at: int = 0
 
 
 class PlayerListService:
@@ -77,6 +82,7 @@ class PlayerListService:
         player_repo: PlayerRepository,
         player_season_score_repo: PlayerLeagueSeasonScoreRepository,
         rtdb_client: RTDBClient,
+        state_repo: StateRepository,
     ):
         self.league_repo = league_repo
         self.player_season_repo = player_season_repo
@@ -85,6 +91,7 @@ class PlayerListService:
         self.player_repo = player_repo
         self.player_season_score_repo = player_season_score_repo
         self.rtdb_client = rtdb_client
+        self.state_repo = state_repo
 
     def get_players_ref(self, league_id: str) -> Optional[str]:
         league = self.league_repo.get(league_id)
@@ -110,7 +117,7 @@ class PlayerListService:
 
         scoring = self.league_config_repo.get_scoring_config(league_id)
 
-        valid_cache = self._check_cache_scoring_hash(league_id, score_season, scoring)
+        valid_cache = self._check_cache_validity(league_id, score_season, scoring)
 
         if valid_cache:
             return self._get_players_path(league_id, score_season)
@@ -128,16 +135,10 @@ class PlayerListService:
         if isinstance(last_recalc_date, datetime):
             last_recalc_date = last_recalc_date.timestamp()
 
-        # check cache for week first, it's going to change more often.
-        valid_week_cache = self._check_current_cache(league_id, current_season, last_recalc_date)
-        valid_scoring_cache = False
-        scoring: ScoringSettings = None
+        scoring = self.league_config_repo.get_scoring_config(league_id)
+        valid_cache = self._check_cache_validity(league_id, current_season, scoring)
 
-        if valid_week_cache:
-            scoring = self.league_config_repo.get_scoring_config(league_id)
-            valid_scoring_cache = self._check_cache_scoring_hash(league_id, current_season, scoring)
-
-        if valid_week_cache and valid_scoring_cache:
+        if valid_cache:
             return self._get_players_path(league_id, current_season)
 
         player_seasons = self._get_player_seasons(current_season)
@@ -151,7 +152,15 @@ class PlayerListService:
 
         return self._save_result(league_id, current_season, last_recalc_date, ranked_players, scoring.hash)
 
-    def _check_cache_scoring_hash(self, league_id: str, season: int, scoring: ScoringSettings) -> bool:
+    def _check_cache_validity(self, league_id: str, season: int, scoring: ScoringSettings) -> bool:
+        path = f"{self._get_data_path(league_id, season)}/generated_at"
+        generated_at = self.rtdb_client.get(path)
+        last_player_update = self.state_repo.get().last_player_update.timestamp()
+
+        if generated_at is None or last_player_update > generated_at:
+            Logger.debug("Cache is out of date")
+            return False
+
         path = f"{self._get_data_path(league_id, season)}/scoring_settings_hash"
         cache_hash = self.rtdb_client.get(path)
 
@@ -195,11 +204,13 @@ class PlayerListService:
             season: int,
             last_recalc_date: Optional[datetime],
             ranked_players: List[RankedPlayer],
-            scoring_hash: str,
+            scoring_hash: str
     ) -> str:
         if not last_recalc_date:
             last_recalc_date = datetime.now().timestamp()
-        data = CacheData(league_id=league_id, season=season, players=ranked_players, scoring_settings_hash=scoring_hash, recalc_date=last_recalc_date)
+
+        data = CacheData(league_id=league_id, season=season, players=ranked_players, scoring_settings_hash=scoring_hash,
+                         recalc_date=last_recalc_date, generated_at=datetime.now().astimezone(tz=timezone.utc).timestamp())
 
         path = self._get_data_path(league_id, season)
         self.rtdb_client.set(path, data.dict())
