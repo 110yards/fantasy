@@ -124,7 +124,7 @@ class MapNewPlayerSourceMigration:
             "roster_players_fixed": roster_players_fixed,
             "roster_players_failed": roster_players_failed,
             "owned_players_fixed": owned_players_fixed,
-            "failed_players": [failed_players.values()],
+            "failed_players": list(failed_players.values()),
         }
 
 def slug(p: Player) -> str:
