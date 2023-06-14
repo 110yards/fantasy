@@ -18,7 +18,7 @@ class EventStatus(BaseModel):
     event_status_id: int
     name: str
     is_active: bool
-    quarter: int
+    quarter: Optional[int]
     minutes: Optional[int]
     seconds: Optional[int]
     down: Optional[int]

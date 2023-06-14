@@ -27,7 +27,7 @@ from services.api.app.domain.repositories.player_season_repository import (
 
 class GameLog(BaseModel):
     game_id: int
-    game_number: int
+    # game_number: int
     game: ScoreboardGame
     week: int
     season: int
@@ -101,7 +101,7 @@ class PlayerDetailsService:
 
                 log = GameLog(
                     game_id=game.id,
-                    game_number=game.game_number,
+                    # game_number=game.game_number,
                     game=ScoreboardGame.create_from_game(game),
                     week=game.week,
                     season=season,

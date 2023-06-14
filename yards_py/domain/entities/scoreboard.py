@@ -20,7 +20,7 @@ POSTPONED_IS_CANCELLED_AFTER_HOURS = 24
 class ScoreboardGame(BaseModel):
     id: str
     date_start: datetime
-    game_number: int
+    # game_number: int
     week: int
     season: int
     event_type: EventType
@@ -34,7 +34,7 @@ class ScoreboardGame(BaseModel):
         return ScoreboardGame(
             id=str(game.id),
             date_start=game.date_start,
-            game_number=game.game_number,
+            # game_number=game.game_number,
             week=game.week,
             season=game.season,
             event_type=game.event_type,

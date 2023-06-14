@@ -16,8 +16,9 @@ STATUS_ACTIVE = 1
 
 @annotate_args
 class Player(BaseEntity):
+    player_id: Optional[str]
     stats_inc_id: Optional[str]
-    cfl_central_id: int
+    cfl_central_id: Optional[int]
     first_name: str
     last_name: str
     display_name: Optional[str]
@@ -78,14 +79,15 @@ class Player(BaseEntity):
         self.hash = hash_dict(self.dict())
 
     @staticmethod
-    def from_cfl_api(input: Dict) -> Player:
+    def from_cfl_api(input: Dict, official_api: bool) -> Player:
         uniform = input["team"].get("uniform", None)
         input["team"] = Team.from_cfl_api(input["team"])
         input["position"] = PositionType.from_cfl_roster(input["position"]["abbreviation"])
         input["last_name"] = input["last_name"].title()
 
-        player = Player.parse_obj(input)
-        player.id = str(player.cfl_central_id)
+        player = Player(**input)
+        player.id = str(player.cfl_central_id) if official_api else player.player_id
+        assert player.id is not None, "Player id is none"
         player.college = input.get("school", {}).get("name", None)
         player.uniform = uniform
         return player

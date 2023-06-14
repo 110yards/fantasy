@@ -5,7 +5,9 @@
         <v-col cols="12">
           <v-card>
             <v-card-title>
-              <div class="team-colors" :class="details.player.team.abbreviation">{{ details.player.uniform }}</div>
+              <div class="team-colors" :class="details.player.team.abbreviation">
+                {{ details.player.uniform || "-" }}
+              </div>
               {{ details.player.display_name }}
             </v-card-title>
             <v-card-subtitle>
@@ -35,9 +37,9 @@
               <div v-if="details.player.college"><label>College:</label> {{ details.player.college }}</div>
             </v-card-subtitle>
 
-            <v-card-text>
+            <!-- <v-card-text>
               <a :href="details.player.cfl_url" target="_blank">CFL Page</a>
-            </v-card-text>
+            </v-card-text> -->
           </v-card>
         </v-col>
       </v-row>
