@@ -10,6 +10,7 @@
     "config:switches": "python setup-dev.py"
   },
   "devDependencies": {
+    "prettier": "^2.4.1",
     "run-pty": "^2.3.2",
     "selenium-webdriver": "^4.0.0"
   },

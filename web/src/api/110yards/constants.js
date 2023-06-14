@@ -78,6 +78,7 @@ export const playerStatus = {
   PracticeSquad: 4,
   Suspended: 5,
   Disabled: 7,
+  Questionable: 8,
 
   getText: status => {
     switch (status) {
@@ -91,6 +92,8 @@ export const playerStatus = {
         return "SUSP"
       case playerStatus.PracticeSquad:
         return "PS"
+      case playerStatus.Questionable:
+        return "Q"
       default:
         return "OUT"
     }
@@ -108,6 +111,8 @@ export const playerStatus = {
         return "Suspended"
       case playerStatus.PracticeSquad:
         return "Practice Squad"
+      case playerStatus.Questionable:
+        return "Questionable"
       default:
         return "Not Active"
     }
