@@ -366,12 +366,22 @@ export default {
       return this.$root.state.current_season
     },
 
+    isInjured() {
+      return this.details.player.injury_status != null
+    },
+
     statusClass() {
-      return this.details && this.details.player.status_current == playerStatus.Active ? "" : "red--text"
+      return this.details && this.isInjured ? "red--text" : ""
     },
 
     statusText() {
-      return this.details ? playerStatus.getFullText(this.details.player.status_current) : null
+      if (!this.details || !this.isInjured) {
+        return null
+      }
+
+      return `${playerStatus.getFullText(this.details.player.injury_status.status_id)} - ${
+        this.details.player.injury_status.injury
+      }`
     },
 
     hasHeight() {

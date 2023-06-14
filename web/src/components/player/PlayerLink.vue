@@ -16,8 +16,8 @@
       <span v-if="showTeamName" class="pl-1">{{ player.team.abbreviation }}</span>
       <span v-if="showPosition" class="pl-1">&nbsp;- {{ player.position.toUpperCase() }}</span>
 
-      <span class="red--text pl-1" v-if="showPlayerStatus">
-        {{ statusText }}
+      <span class="red--text pl-1" v-if="showPlayerStatus && !showShortPlayerStatus" :title="injuryDetails">
+        {{ injuryReport }}
       </span>
 
       <v-icon v-if="showShortPlayerStatus && isInjured" color="red" small>mdi-hospital-box-outline</v-icon>
@@ -30,8 +30,8 @@
       <national-status v-if="showNational" :national_status="player.national_status" />
 
       <v-icon v-if="showShortPlayerStatus && isInjured" color="red" small>mdi-hospital-box-outline</v-icon>
-      <span class="red--text" v-if="showPlayerStatus">
-        {{ statusText }}
+      <span class="red--text" v-if="showPlayerStatus && !showShortPlayerStatus" :title="injuryDetails">
+        {{ injuryReport }}
       </span>
 
       <router-link
@@ -119,17 +119,33 @@ export default {
       return this.player.team != null ? this.player.team.abbreviation : "FA"
     },
     showPlayerStatus() {
-      return this.showStatus && this.status != playerStatus.Active
+      return this.isInjured
     },
     isInjured() {
-      return this.status != playerStatus.Active
+      return this.player.injury_status != null
     },
-    status() {
-      return this.player.status_current
+    injuryStatus() {
+      return this.player.injury_status
     },
     statusText() {
-      return playerStatus.getText(this.status)
+      if (!this.isInjured) {
+        return null
+      }
+      return playerStatus.getText(this.player.injury_status.status_id)
     },
+    injuryReport() {
+      if (!this.isInjured) {
+        return null
+      }
+
+      return this.statusText
+    },
+    injuryDetails() {
+      return this.isInjured
+        ? `${playerStatus.getFullText(this.injuryStatus.status_id)} - ${this.injuryStatus.injury}`
+        : null
+    },
+
     enablePlayerLinks() {
       return this.$root.enablePlayerLinks
     },
