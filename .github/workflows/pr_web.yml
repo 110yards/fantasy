@@ -40,7 +40,7 @@ jobs:
 
       - name: Setup firebase
         run: |
-          echo ${{secrets.TEST_GCLOUD_CREDENTIALS}} >> $HOME/gcloud.json
+          echo "${{secrets.TEST_GCLOUD_CREDENTIALS}}" >> $HOME/gcloud.json
 
       - name: Deploy
         working-directory: web
