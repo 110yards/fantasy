@@ -2,7 +2,7 @@
 from typing import Any, Dict, List
 
 from fastapi import Depends
-from services.system.app.cfl.cfl_game_proxy import CflGameProxy, create_cfl_game_proxy
+from services.system.app.api_proxies.cfl_game_proxy import CflGameProxy, create_cfl_game_proxy
 from yards_py.core.logging import Logger
 from yards_py.domain.entities.event_type import EVENT_TYPE_REGULAR
 from yards_py.domain.entities.player_season import PlayerSeason

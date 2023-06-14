@@ -22,7 +22,7 @@ import time
 import logging
 from typing import Dict, List, Optional
 
-from services.system.app.cfl.cfl_game_proxy import CflGameProxy, create_cfl_game_proxy
+from services.system.app.api_proxies.cfl_game_proxy import CflGameProxy, create_cfl_game_proxy
 from yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
 from yards_py.core.publisher import Publisher
 from services.system.app.di import create_publisher

@@ -1,11 +1,13 @@
 
+
+from datetime import datetime, timezone
 from services.system.app.di import create_publisher
 from yards_py.core.annotate_args import annotate_args
 from yards_py.core.logging import Logger
 from yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
 from yards_py.domain.repositories.state_repository import StateRepository, create_state_repository
 from yards_py.domain.repositories.game_repository import GameRepository, create_game_repository
-from services.system.app.cfl.cfl_player_proxy import CflPlayerProxy, create_cfl_player_proxy
+from services.system.app.api_proxies.cfl_player_proxy import CflPlayerProxy, create_cfl_player_proxy
 from yards_py.domain.enums.league_command_type import LeagueCommandType
 from services.system.app.domain.services.league_command_push_data import LeagueCommandPushData
 from services.system.app.domain.commands.league.update_league_player_details import UpdateLeaguePlayerDetailsCommand
@@ -17,8 +19,10 @@ from typing import Dict, List, Optional
 from yards_py.domain.entities.player import Player, STATUS_ACTIVE, STATUS_INACTIVE
 from fastapi.param_functions import Depends
 from yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
-from services.system.app.cfl.cfl_roster_proxy import CflRosterProxy, cfl_roster_proxy
+from services.system.app.api_proxies.cfl_roster_proxy import CflRosterProxy, cfl_roster_proxy
 from yards_py.core.publisher import Publisher
+from firebase_admin.firestore import firestore
+from google.cloud.firestore import Transaction
 
 
 class UpdateActivePlayersCommand(BaseCommand):
@@ -55,7 +59,8 @@ def update_active_players_command_executor(
         cfl_player_proxy,
         game_repo,
         state_repo,
-        public_repo)
+        public_repo,
+    )
 
 
 class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayersCommand, UpdateActivePlayersCommandResult]):
@@ -95,20 +100,6 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
             page += 1
 
         current_players = [Player.from_cfl_api(p, using_official_api) for p in current_players]
-
-        rostered_players2 = []
-
-        for team in Team.all():
-            team_players = self.roster_proxy.get_roster(team.roster_id)
-            rostered_players2.extend(team_players)
-
-        rostered_players2 = {str(p["cfl_central_id"]): p for p in rostered_players2 if p.get("cfl_central_id")}
-
-        for player in current_players:
-            roster_match = rostered_players2.get(player.id, None)
-            if roster_match:
-                player.status_current = roster_match["status_current"]
-
         current_players = {player.id: player for player in current_players}
 
         stored_players = self.player_repo.get_all(season)
@@ -125,6 +116,14 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
             self.player_repo.set_all(season, updates)
             self.publish_changed_players(updates)
 
+        @firestore.transactional
+        def update_state(transaction: Transaction):
+            state = self.state_repo.get(transaction)
+            state.last_player_update = datetime.now().astimezone(tz=timezone.utc)
+            self.state_repo.set(state, transaction)
+
+        transaction = self.state_repo.firestore.create_transaction()
+        update_state(transaction)
         return UpdateActivePlayersCommandResult(command=command, updated=changed_players, deactivated=unrostered_players)
 
     def update_status_from_game_rosters(self, season, current_players: Dict[str, Player]):

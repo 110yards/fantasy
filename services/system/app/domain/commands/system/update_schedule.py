@@ -10,7 +10,7 @@ from yards_py.core.logging import Logger
 import logging
 from typing import Dict, List, Optional
 
-from services.system.app.cfl.cfl_game_proxy import CflGameProxy, create_cfl_game_proxy
+from services.system.app.api_proxies.cfl_game_proxy import CflGameProxy, create_cfl_game_proxy
 from yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
 
 from fastapi.param_functions import Depends

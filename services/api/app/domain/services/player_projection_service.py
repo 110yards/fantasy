@@ -49,13 +49,16 @@ class PlayerProjectionService:
 
         player = self.player_repo.get(state.current_season, player_id)
 
+        if not player:
+            return 0.0
+
         projections = self.get_projections(league_id, [player])
         return projections.get(player.id, 0.0)
 
     def get_projections(self, league_id: str, players: List[Player]) -> Dict[str, float]:
         opponents = self.public_repo.get_opponents()
 
-        player_ids = [p.id for p in players]
+        player_ids = [p.id for p in players if p]
         batches = create_batches(player_ids, 10)
 
         player_scores: Dict[str, PlayerLeagueSeasonScore] = {}
