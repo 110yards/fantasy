@@ -16,11 +16,16 @@
       <span v-if="showTeamName" class="pl-1">{{ player.team.abbreviation }}</span>
       <span v-if="showPosition" class="pl-1">&nbsp;- {{ player.position.toUpperCase() }}</span>
 
-      <span class="red--text pl-1" v-if="showPlayerStatus && !showShortPlayerStatus" :title="injuryDetails">
+      <span
+        class="pl-1"
+        :class="injuryTextColor"
+        v-if="showPlayerStatus && !showShortPlayerStatus"
+        :title="injuryDetails"
+      >
         {{ injuryReport }}
       </span>
 
-      <v-icon v-if="showShortPlayerStatus && isInjured" color="red" small>mdi-hospital-box-outline</v-icon>
+      <v-icon v-if="showShortPlayerStatus && isInjured" :color="injuryIconColor" small>{{ injuryIcon }}</v-icon>
 
       <national-status v-if="showNational" :national_status="player.national_status" />
     </template>
@@ -30,7 +35,7 @@
       <national-status v-if="showNational" :national_status="player.national_status" />
 
       <v-icon v-if="showShortPlayerStatus && isInjured" :color="injuryIconColor" small>{{ injuryIcon }}</v-icon>
-      <span class="red--text" v-if="showPlayerStatus && !showShortPlayerStatus" :title="injuryDetails">
+      <span :class="injuryTextColor" v-if="showPlayerStatus && !showShortPlayerStatus" :title="injuryDetails">
         {{ injuryReport }}
       </span>
 
@@ -169,6 +174,9 @@ export default {
     },
     injuryIcon() {
       return this.getInjuryIcon(this.injurySeverity)
+    },
+    injuryTextColor() {
+      return this.getInjuryIconColor(this.injurySeverity) + "--text"
     },
   },
   methods: {
