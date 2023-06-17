@@ -79,6 +79,7 @@ export const playerStatus = {
   Suspended: 5,
   Disabled: 7,
   Questionable: 8,
+  Probable: 9,
 
   getText: status => {
     switch (status) {
@@ -94,8 +95,26 @@ export const playerStatus = {
         return "PS"
       case playerStatus.Questionable:
         return "Q"
+      case playerStatus.Probable:
+        return "P"
       default:
         return "OUT"
+    }
+  },
+
+  getSeverity: status => {
+    switch (status) {
+      case playerStatus.InjuredOneGame:
+      case playerStatus.InjuredSixGames:
+      case playerStatus.Suspended:
+      case playerStatus.PracticeSquad:
+        return 3
+      case playerStatus.Questionable:
+        return 2
+      case playerStatus.Probable:
+        return 1
+      default:
+        return 0
     }
   },
 
@@ -113,6 +132,8 @@ export const playerStatus = {
         return "Practice Squad"
       case playerStatus.Questionable:
         return "Questionable"
+      case playerStatus.Probable:
+        return "Probable"
       default:
         return "Not Active"
     }

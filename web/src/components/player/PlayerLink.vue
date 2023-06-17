@@ -29,7 +29,7 @@
     <template v-else>
       <national-status v-if="showNational" :national_status="player.national_status" />
 
-      <v-icon v-if="showShortPlayerStatus && isInjured" color="red" small>mdi-hospital-box-outline</v-icon>
+      <v-icon v-if="showShortPlayerStatus && isInjured" :color="injuryIconColor" small>{{ injuryIcon }}</v-icon>
       <span class="red--text" v-if="showPlayerStatus && !showShortPlayerStatus" :title="injuryDetails">
         {{ injuryReport }}
       </span>
@@ -159,6 +159,41 @@ export default {
         return `${name.substring(0, this.maxNameLength)}...`
       } else {
         return name
+      }
+    },
+    injurySeverity() {
+      return playerStatus.getSeverity(this.injuryStatus.status_id)
+    },
+    injuryIconColor() {
+      return this.getInjuryIconColor(this.injurySeverity)
+    },
+    injuryIcon() {
+      return this.getInjuryIcon(this.injurySeverity)
+    },
+  },
+  methods: {
+    getInjuryIconColor(severity) {
+      switch (severity) {
+        case 3:
+          return "red"
+        case 2:
+          return "red"
+        case 1:
+          return "amber"
+        default:
+          return ""
+      }
+    },
+    getInjuryIcon(severity) {
+      switch (severity) {
+        case 3:
+          return "mdi-hospital-box-outline"
+        case 2:
+          return "mdi-help-box-outline"
+        case 1:
+          return "mdi-bandage"
+        default:
+          return ""
       }
     },
   },
