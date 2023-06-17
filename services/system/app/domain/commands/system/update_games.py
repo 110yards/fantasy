@@ -134,7 +134,7 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
             opponents[game.teams.away.abbreviation] = game.teams.home.abbreviation
             opponents[game.teams.home.abbreviation] = game.teams.away.abbreviation
 
-            if game.event_status.has_started():
+            if game.has_started():
                 active_games_count += 1
                 locked_teams.append(game.teams.away.abbreviation)
                 locked_teams.append(game.teams.home.abbreviation)
