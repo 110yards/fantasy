@@ -8,12 +8,15 @@ from yards_py.domain.repositories.league_repository import (
 from fastapi.param_functions import Depends
 from firebase_admin.firestore import firestore
 
+from yards_py.domain.repositories.state_repository import StateRepository, create_state_repository
+
 
 def create_league_cmd_sub_migration(
     league_repo=Depends(create_league_repository),
     command_executor=Depends(create_league_subscriptions_command_executor),
+    state_repo=Depends(create_state_repository),
 ):
-    return LeagueCommandSubMigration(league_repo, command_executor)
+    return LeagueCommandSubMigration(league_repo, command_executor, state_repo)
 
 
 class LeagueCommandSubMigration:
@@ -22,10 +25,12 @@ class LeagueCommandSubMigration:
     def __init__(
             self,
             league_repo: LeagueRepository,
-            command_executor: CreateLeagueSubscriptionsCommandExecutor
+            command_executor: CreateLeagueSubscriptionsCommandExecutor,
+            state_repo: StateRepository,
     ):
         self.league_repo = league_repo
         self.command_executor = command_executor
+        self.state_repo = state_repo
 
     def run(self, league_id: str = None) -> str:
 
@@ -36,7 +41,12 @@ class LeagueCommandSubMigration:
 
         fixed_count = 0
 
+        state = self.state_repo.get()
+
         for league in leagues:
+
+            if not league.is_active_for_season(state.current_season):
+                continue
 
             @firestore.transactional
             def mark_incomplete(transaction):
