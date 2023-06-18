@@ -143,16 +143,16 @@ def get_team_player_stats(game_id: str, week: int, boxscore: dict, roster: dict,
 
 
 def get_player_stats(game_id: int, week: int, boxscore: dict, player: dict, team: dict, opponent: dict):
-    defence = get_player_stats_for_category(boxscore["defence"], player["player_id"])
-    field_goals = get_player_stats_for_category(boxscore["field_goals"], player["player_id"])
-    kick_returns = get_player_stats_for_category(boxscore["kick_returns"], player["player_id"])
+    defence = get_player_stats_for_category(boxscore.get("defence"), player["player_id"])
+    field_goals = get_player_stats_for_category(boxscore.get("field_goals"), player["player_id"])
+    kick_returns = get_player_stats_for_category(boxscore.get("kick_returns"), player["player_id"])
     # kicking = get_player_stats_for_category(boxscore["kicking"], player["player_id"])
-    one_point_converts = get_player_stats_for_category(boxscore["one_point_converts"], player["player_id"])
-    passing = get_player_stats_for_category(boxscore["passing"], player["player_id"])
-    punt_returns = get_player_stats_for_category(boxscore["punt_returns"], player["player_id"])
-    punts = get_player_stats_for_category(boxscore["punts"], player["player_id"])
-    receiving = get_player_stats_for_category(boxscore["receiving"], player["player_id"])
-    rushing = get_player_stats_for_category(boxscore["rushing"], player["player_id"])
+    one_point_converts = get_player_stats_for_category(boxscore.get("one_point_converts"), player["player_id"])
+    passing = get_player_stats_for_category(boxscore.get("passing"), player["player_id"])
+    punt_returns = get_player_stats_for_category(boxscore.get("punt_returns"), player["player_id"])
+    punts = get_player_stats_for_category(boxscore.get("punts"), player["player_id"])
+    receiving = get_player_stats_for_category(boxscore.get("receiving"), player["player_id"])
+    rushing = get_player_stats_for_category(boxscore.get("rushing"), player["player_id"])
     # two_point_converts = get_player_stats_for_category(boxscore["two_point_converts"], player["player_id"])
     # field_goal_returns = get_player_stats_for_category(boxscore["field_goal_returns"], player["player_id"])
 
