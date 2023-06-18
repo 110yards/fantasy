@@ -12,7 +12,7 @@ on:
       - ".python-version"
       - ".github/workflows/main_system.yml"
       - ".scripts/python/**"
-      - "yards-py/**"
+      - "yards_py/**"
 
   workflow_dispatch:
 
