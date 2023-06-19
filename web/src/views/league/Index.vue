@@ -11,17 +11,28 @@
 
         <season-summary :leagueId="leagueId" v-if="isOffseason" :season="league.season" />
 
-        <schedule v-if="scheduleGenerated && !isOffseason" :leagueId="leagueId" />
-
-        <standings class="mt-5" v-if="!isOffseason" :league="league" />
+        <v-toolbar v-if="!isOffseason">
+          <v-tabs v-model="tabA">
+            <v-tab key="schedule" v-if="scheduleGenerated">Schedule</v-tab>
+            <v-tab key="standings">Standings</v-tab>
+          </v-tabs>
+        </v-toolbar>
+        <v-tabs-items v-model="tabA">
+          <v-tab-item key="schedule" v-if="scheduleGenerated">
+            <schedule :leagueId="leagueId" />
+          </v-tab-item>
+          <v-tab-item key="standings">
+            <standings class="mt-5" v-if="!isOffseason" :league="league" />
+          </v-tab-item>
+        </v-tabs-items>
 
         <v-toolbar>
-          <v-tabs v-model="tab">
+          <v-tabs v-model="tabB">
             <v-tab key="news">CFL News</v-tab>
             <v-tab key="transactions">League Transactions</v-tab>
           </v-tabs>
         </v-toolbar>
-        <v-tabs-items v-model="tab">
+        <v-tabs-items v-model="tabB">
           <v-tab-item key="news"><news /></v-tab-item>
           <v-tab-item key="transactions">
             <transactions class="mt-5" v-if="!isOffseason" :leagueId="leagueId" />
@@ -82,7 +93,8 @@ export default {
       league: null,
       rosters: [],
       weeks: [],
-      tab: null,
+      tabA: null,
+      tabB: null,
     }
   },
   computed: {
