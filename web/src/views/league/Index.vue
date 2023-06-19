@@ -9,14 +9,24 @@
           >Start {{ currentSeason }} Season</app-primary-button
         >
 
+        <season-summary :leagueId="leagueId" v-if="isOffseason" :season="league.season" />
+
         <schedule v-if="scheduleGenerated && !isOffseason" :leagueId="leagueId" />
 
         <standings class="mt-5" v-if="!isOffseason" :league="league" />
-        <transactions class="mt-5" v-if="!isOffseason" :leagueId="leagueId" />
 
-        <season-summary :leagueId="leagueId" v-if="isOffseason" :season="league.season" />
-
-        <!-- @*@Html.Partial("CflNews", Model.News)*@ -->
+        <v-toolbar>
+          <v-tabs v-model="tab">
+            <v-tab key="news">CFL News</v-tab>
+            <v-tab key="transactions">League Transactions</v-tab>
+          </v-tabs>
+        </v-toolbar>
+        <v-tabs-items v-model="tab">
+          <v-tab-item key="news"><news /></v-tab-item>
+          <v-tab-item key="transactions">
+            <transactions class="mt-5" v-if="!isOffseason" :leagueId="leagueId" />
+          </v-tab-item>
+        </v-tabs-items>
       </v-col>
 
       <v-col cols="4" class="d-none d-md-flex">
@@ -49,6 +59,7 @@ import AppPrimaryButton from "../../components/buttons/AppPrimaryButton.vue"
 import { renewLeague } from "../../api/110yards/league"
 import SeasonList from "../../components/league/SeasonList.vue"
 import LeagueHeader from "../../components/league/LeagueHeader.vue"
+import News from "../../components/News.vue"
 
 export default {
   name: "league-index",
@@ -64,12 +75,14 @@ export default {
     AppPrimaryButton,
     SeasonList,
     LeagueHeader,
+    News,
   },
   data() {
     return {
       league: null,
       rosters: [],
       weeks: [],
+      tab: null,
     }
   },
   computed: {

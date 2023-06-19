@@ -17,6 +17,7 @@ from services.api.app.routers import (
     roster_router,
     user_router,
     dev_router,
+    news_router
 )
 
 app = FastAPI(middleware=app_middleware)
@@ -40,6 +41,7 @@ app.include_router(logging_router.router)
 app.include_router(admin_router.router)
 app.include_router(migration_router.router)
 app.include_router(projection_router.router)
+app.include_router(news_router.router)
 if settings.is_dev():
     app.include_router(dev_router.router)
 

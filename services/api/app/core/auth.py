@@ -13,6 +13,7 @@ anonymous_endpoints = [
     "/login",
     "/user/register/email",
     "/user/exists",
+    "/news",
 ]
 
 anonymous_prefixes = [
