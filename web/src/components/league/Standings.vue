@@ -1,8 +1,6 @@
 <template>
   <section id="standings">
     <v-card>
-      <v-card-title class="subtitle-1">Standings</v-card-title>
-
       <v-card-text>
         <v-row>
           <v-col cols="6" md="6" class="caption"></v-col>
