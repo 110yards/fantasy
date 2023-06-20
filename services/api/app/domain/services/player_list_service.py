@@ -7,6 +7,7 @@ from fastapi import Depends
 from pydantic import BaseModel
 from yards_py.core.logging import Logger
 from yards_py.core.rtdb_client import RTDBClient, create_rtdb_client
+from yards_py.domain.entities.league import League
 from yards_py.domain.entities.player import Player
 from yards_py.domain.entities.player_league_season_score import (
     PlayerLeagueSeasonScore, rank_player_seasons)
@@ -102,12 +103,13 @@ class PlayerListService:
         state = self.public_repo.get_state()
 
         if league.draft_state == DraftState.COMPLETE and league.season == state.current_season:
-            return self.setup_current_ref(league_id, state.current_season, league.last_season_recalc)
+            return self.setup_current_ref(league, state.current_season, league.last_season_recalc)
         else:
             # last year, or old league
-            return self.setup_draft_reference(league_id, state.current_season)
+            return self.setup_draft_reference(league, state.current_season)
 
-    def setup_draft_reference(self, league_id: str, current_season: int) -> str:
+    def setup_draft_reference(self, league: League, current_season: int) -> str:
+        league_id = league.id
         current_season = current_season
         score_season = current_season
 
@@ -117,7 +119,7 @@ class PlayerListService:
 
         scoring = self.league_config_repo.get_scoring_config(league_id)
 
-        valid_cache = self._check_cache_validity(league_id, score_season, scoring)
+        valid_cache = self._check_cache_validity(league, score_season, scoring)
 
         if valid_cache:
             return self._get_players_path(league_id, score_season)
@@ -129,14 +131,15 @@ class PlayerListService:
 
         return self._save_result(league_id, score_season, None, ranked_players, scoring.hash)
 
-    def setup_current_ref(self, league_id: str, current_season: int, last_recalc_date: Optional[int]) -> List[PlayerLeagueSeasonScore]:
+    def setup_current_ref(self, league: League, current_season: int, last_recalc_date: Optional[int]) -> List[PlayerLeagueSeasonScore]:
 
+        league_id = league.id
         # weird bug from pydantic causes the recalc to be deserialized as a datetime instead of an int
         if isinstance(last_recalc_date, datetime):
             last_recalc_date = last_recalc_date.timestamp()
 
         scoring = self.league_config_repo.get_scoring_config(league_id)
-        valid_cache = self._check_cache_validity(league_id, current_season, scoring)
+        valid_cache = self._check_cache_validity(league, current_season, scoring)
 
         if valid_cache:
             return self._get_players_path(league_id, current_season)
@@ -152,13 +155,24 @@ class PlayerListService:
 
         return self._save_result(league_id, current_season, last_recalc_date, ranked_players, scoring.hash)
 
-    def _check_cache_validity(self, league_id: str, season: int, scoring: ScoringSettings) -> bool:
+    def _check_cache_validity(self, league: League, season: int, scoring: ScoringSettings) -> bool:
+        league_id = league.id
+
         path = f"{self._get_data_path(league_id, season)}/generated_at"
         generated_at = self.rtdb_client.get(path)
+
+        if generated_at is None:
+            Logger.debug("No cache found")
+            return False
+
+        if generated_at < league.last_season_recalc:
+            Logger.debug("Cache is out of date (recalc)")
+            return False
+
         last_player_update = self.state_repo.get().last_player_update.timestamp()
 
-        if generated_at is None or last_player_update > generated_at:
-            Logger.debug("Cache is out of date")
+        if last_player_update > generated_at:
+            Logger.debug("Cache is out of date (player update)")
             return False
 
         path = f"{self._get_data_path(league_id, season)}/scoring_settings_hash"
