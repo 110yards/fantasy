@@ -23,3 +23,7 @@ export const resetWeekEnd = async () => {
 export const updateSchedule = async command => {
   return client.post(null, "/admin/schedule", command)
 }
+
+export const ownershipReport = async () => {
+  return client.get(null, "/admin/report/ownership")
+}

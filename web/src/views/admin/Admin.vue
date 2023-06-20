@@ -8,6 +8,7 @@
       <v-btn class="caption" text @click="setView('leagues')">Leagues</v-btn>
       <v-btn class="caption" text @click="setView('maintenance')">Maintenance</v-btn>
       <v-btn class="caption" text @click="setView('sim')">Simulation</v-btn>
+      <v-btn class="caption" text @click="setView('reports')">Reports</v-btn>
     </v-card-text>
 
     <v-card-text>
@@ -20,6 +21,7 @@
         TODO: Start the year (start jobs, change state, fetch list of games)<br />
       </div>
       <simulation v-if="view == 'sim'" />
+      <reports v-if="view == 'reports'" />
     </v-card-text>
   </v-card>
 </template>
@@ -29,8 +31,10 @@ import Problems from "../../components/admin/Problems.vue"
 import Status from "../../components/admin/Status.vue"
 import Leagues from "../../components/admin/Leagues.vue"
 import Simulation from "../../components/admin/Simulation.vue"
+import Reports from "../../components/admin/Reports.vue"
+
 export default {
-  components: { Status, Problems, Leagues, Simulation },
+  components: { Status, Problems, Leagues, Simulation, Reports },
   name: "Admin",
   data() {
     return {

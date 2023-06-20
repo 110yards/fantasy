@@ -3,6 +3,7 @@ from typing import Optional
 from services.api.app.config.settings import Settings, get_settings
 from services.api.app.core.auth import require_role
 from services.api.app.core.role import Role
+from services.api.app.domain.services.ownership_report_service import OwnershipReportService, create_ownership_report_service
 from yards_py.core.sim_state import SimState
 from services.api.app.domain.commands.admin.reset_week_end import ResetWeekEndCommand, ResetWeekEndCommandExecutor, create_reset_week_end_command_executor
 from services.api.app.domain.services.league_problems_service import (
@@ -84,3 +85,12 @@ async def update_schedule(
 ):
     # return command_executor.execute(command)
     raise NotImplementedError("Needs to call system service")
+
+
+@router.get("/report/ownership")
+@require_role(Role.admin)
+async def get_ownership_report(
+    request: Request,
+    service: OwnershipReportService = Depends(create_ownership_report_service)
+):
+    return service.get_ownership_report()
