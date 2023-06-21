@@ -19,6 +19,7 @@ class TransactionType(str, Enum):
     COMMISSIONER_CHANGE_SCORING = "commissioner_change_scoring"
     COMMISSIONER_MOVE_PLAYER = "commissioner_move_player"
     LEAGUE_EVENT = "league_event"
+    COMMISSIONER_CHANGE_WAIVER_BUDGET = "commissioner_change_waiver_budget"
 
 
 @annotate_args
@@ -81,3 +82,11 @@ class LeagueTransaction(BaseEntity):
     @staticmethod
     def league_event(league_id: str, message: str) -> LeagueTransaction:
         return LeagueTransaction(timestamp=datetime.utcnow(), league_id=league_id, message=message, type=TransactionType.LEAGUE_EVENT)
+
+    @staticmethod
+    def change_waiver_budget(league_id: str, roster_id: str, roster_name: str, new_value: int, old_value: int):
+        message = f"Commissioner changed the waiver budget for {roster_name} from ${old_value} to ${new_value}"
+        trx_type = TransactionType.COMMISSIONER_CHANGE_ROSTER_NAME
+
+        return LeagueTransaction(timestamp=datetime.utcnow(),
+                                 league_id=league_id, roster_id=roster_id, message=message, type=trx_type)

@@ -27,3 +27,7 @@ export const cancelBid = async command => {
 export const progress = async (leagueId, rosterId) => {
   return client.post(null, "/roster/progress", { league_id: leagueId, roster_id: rosterId })
 }
+
+export const setWaiverBudget = async command => {
+  return client.put(null, "/roster/waiver_budget", command)
+}
