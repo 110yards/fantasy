@@ -11,6 +11,7 @@
     <support-link class="nav-primary" />
     <faq-link class="nav-primary" />
     <admin-link v-if="isAdmin" class="nav-primary" />
+    <discord-link class="nav-primary" />
     <log-in-link v-if="isAnonymous" class="nav-primary" />
     <log-out-link v-if="!isAnonymous" class="nav-primary" />
 
@@ -61,7 +62,7 @@
 </template>
 
 <style scoped>
-.nav-primary {
+.nav-primary >>> * {
   color: rgba(255, 255, 255, 0.5);
 }
 .nav-secondary {
@@ -71,6 +72,7 @@
 
 <script>
 import AdminLink from "../nav/AdminLink.vue"
+import DiscordLink from "../nav/DiscordLink.vue"
 import FaqLink from "../nav/FaqLink.vue"
 import HomeLink from "../nav/HomeLink.vue"
 import LeagueLink from "../nav/LeagueLink.vue"
@@ -93,6 +95,7 @@ export default {
     LogOutLink,
     SupportLink,
     ProfileLink,
+    DiscordLink,
   },
 
   props: {

@@ -67,6 +67,10 @@ export default {
     enableDiscordIntegration() {
       return this.getSwitch("enable_discord_integration")
     },
+    officialDiscordLink() {
+      if (!this.switchesLoaded) return false
+      return this.getSwitch("official_discord_link")
+    },
   },
   created() {
     this.$bind("switches", firestore.collection("public").doc("switches"))

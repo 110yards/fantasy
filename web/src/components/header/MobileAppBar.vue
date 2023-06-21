@@ -124,6 +124,15 @@
           </v-list-item-content>
         </v-list-item>
 
+        <!-- discord -->
+        <v-list-item>
+          <v-list-item-content>
+            <v-list-item-title>
+              <discord-link class="nav-primary" />
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
         <!-- log in -->
         <v-list-item v-if="isAnonymous">
           <v-list-item-content>
@@ -147,7 +156,7 @@
 </template>
 
 <style scoped>
-.nav-primary {
+.nav-primary >>> * {
   color: rgba(255, 255, 255, 0.5);
 }
 .nav-secondary {
@@ -161,6 +170,7 @@
 
 <script>
 import AdminLink from "../nav/AdminLink.vue"
+import DiscordLink from "../nav/DiscordLink.vue"
 import FaqLink from "../nav/FaqLink.vue"
 import HomeLink from "../nav/HomeLink.vue"
 import LeagueLink from "../nav/LeagueLink.vue"
@@ -183,6 +193,7 @@ export default {
     LogOutLink,
     SupportLink,
     ProfileLink,
+    DiscordLink,
   },
 
   props: {
