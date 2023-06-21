@@ -17,6 +17,11 @@ from services.api.app.domain.commands.roster.move_player import (
 from services.api.app.domain.commands.roster.update_roster_name import (
     UpdateRosterNameCommand, UpdateRosterNameCommandExecutor,
     create_update_roster_name_command_executor)
+from services.api.app.domain.commands.roster.update_waiver_budget import (
+    UpdateWaiverBudgetCommand,
+    UpdateWaiverBudgetCommandExecutor,
+    create_update_waiver_budget_command_executor
+)
 from services.api.app.domain.services.roster_progress_service import (
     ProgressRequest, ProgressService, create_roster_progress_service)
 from fastapi import Depends
@@ -82,3 +87,13 @@ async def progress(
     service: ProgressService = Depends(create_roster_progress_service),
 ):
     return service.get_projection(request.league_id, request.roster_id)
+
+
+@router.put("/waiver_budget")
+async def set_waiver_budget(
+    command: UpdateWaiverBudgetCommand,
+    current_user_id: str = Depends(get_current_user_id),
+    command_executor: UpdateWaiverBudgetCommandExecutor = Depends(create_update_waiver_budget_command_executor),
+):
+    command.current_user_id = current_user_id
+    return command_executor.execute(command)
