@@ -1,0 +1,10 @@
+fastapi==0.96.*
+firebase_admin==6.1.0
+google-cloud-logging==3.5.0
+google-cloud-pubsub==2.17.1
+python-dotenv==1.0.0
+pytz==2023.3
+requests==2.31.0
+starlette-context==0.3.6
+StriveLogger==1.0.*
+uvicorn==0.22.0

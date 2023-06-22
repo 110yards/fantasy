@@ -1,0 +1,30 @@
+apiVersion: skaffold/v4beta2
+kind: Config
+metadata:
+  name: 110yards
+
+deploy:
+  statusCheckDeadlineSeconds: 300
+  tolerateFailuresUntilDeadline: true
+
+portForward:
+  - resourceType: deployment
+    resourceName: gateway
+    port: 80
+    localPort: 8000
+
+build:
+  artifacts:
+    # - image: events
+    #   context: services/events
+    #   docker:
+    #     dockerfile: Dockerfile
+    - image: gateway
+      context: services/gateway
+      docker:
+        dockerfile: Dockerfile
+
+manifests:
+  rawYaml:
+    - env.yaml
+    - k8s/gateway.yaml

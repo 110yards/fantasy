@@ -1,0 +1,24 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "API",
+            "type": "python",
+            "request": "launch",
+            "module": "uvicorn",
+            "console": "internalConsole",
+            "justMyCode": false,
+            "args": [
+                "app.main:app",
+                "--reload",
+                "--reload-dir",
+                "app",
+                "--port",
+                "8003",
+                "--env-file",
+                ".env",
+            ],
+            "jinja": true
+        },
+    ]
+}

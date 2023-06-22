@@ -1,0 +1,15 @@
+name: "API Archive"
+
+inputs:
+  TAG:
+    required: true
+
+runs:
+  using: composite
+
+  steps:
+    - name: "Archive"
+      shell: bash
+      working-directory: api
+      run: |
+        ./archive.sh ${{ inputs.TAG }}

@@ -40,3 +40,5 @@ firebase-debug.log
 *.sw?
 
 .tmp/
+
+env.yaml

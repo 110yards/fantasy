@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+spec:
+  ports:
+    - name: "80"
+      port: 80
+      targetPort: 80
+  selector:
+    name: gateway
+status:
+  loadBalancer: {}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    name: gateway
+  name: gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: gateway
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        name: gateway
+    spec:
+      containers:
+        - image: gateway
+          name: gateway
+          ports:
+            - containerPort: 80
+          resources: {}
+      restartPolicy: Always
+status: {}

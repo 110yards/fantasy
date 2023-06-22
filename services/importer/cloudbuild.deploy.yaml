@@ -1,0 +1,37 @@
+steps:
+  - name: "gcr.io/cloud-builders/gcloud"
+    args: ["run", "deploy", "$_SERVICE_NAME-$_ENVIRONMENT", 
+            "--image", "us-docker.pkg.dev/$_REGISTRY/us.gcr.io/$_IMAGE_NAME:$_TAG", 
+            "--region", "$_REGION",
+            "--project", "$_TARGET_PROJECT_ID",
+            "--platform", "managed",
+            "--allow-unauthenticated",
+            "--memory", "1Gi",
+            "--concurrency", "10",
+            "--timeout", "$_TIMEOUT",
+            "--tag", "$_ENVIRONMENT",
+            # GUNICORN CONFIG            
+            "--set-env-vars", "TIMEOUT=$_TIMEOUT",
+            "--set-env-vars", "GRACEFUL_TIMEOUT=$_TIMEOUT",
+            # ENVIRONMENT
+            "--set-env-vars", "VERSION=$_TAG",
+            "--set-env-vars", "ENVIRONMENT=$_ENVIRONMENT",
+            # GCP
+            "--set-env-vars", "GCLOUD_PROJECT=$_TARGET_PROJECT_ID",
+            "--set-env-vars", "RTDB_URL=$_RTDB_URL",
+            "--set-env-vars", "SERVICE_NAME=$_SERVICE_NAME",
+            "--set-env-vars", "REGION=$_REGION",
+            "--set-env-vars", "USE_TSN_SCHEDULE=$_USE_TSN_SCHEDULE",
+            # SECRETS
+            "--update-secrets=API_KEY=IMPORTER_API_KEY:latest"
+]
+
+substitutions:
+  _REGISTRY: mdryden-ci
+  _IMAGE_NAME: importer
+  _TIMEOUT: '600'
+  _SERVICE_NAME: importer
+  _REGION: us-central1
+  _TARGET_PROJECT_ID: cfldata
+  _RTDB_URL: https://cfldata-default-rtdb.firebaseio.com
+  _USE_TSN_SCHEDULE: 'False'

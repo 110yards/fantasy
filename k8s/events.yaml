@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: events
+spec:
+  ports:
+    - port: 3000
+  selector:
+    name: events
+status:
+  loadBalancer: {}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    name: events
+  name: events
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: events
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        name: events
+    spec:
+      containers:
+        - image: events
+          name: events
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGO_CONNECTION_STRING
+              valueFrom:
+                configMapKeyRef:
+                  name: environment
+                  key: MONGO_CONNECTION_STRING
+          resources: {}
+      restartPolicy: Always
+status: {}

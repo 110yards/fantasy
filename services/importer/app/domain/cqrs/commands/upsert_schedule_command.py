@@ -1,0 +1,2 @@
+class UpsertScheduleCommand:
+    pass

@@ -1,0 +1,19 @@
+{
+    "folders": [
+        {
+            "path": "."
+        },
+        {
+            "path": "services/gateway",
+            "name": "gateway"
+        },
+        {
+            "path": "services/realtime",
+            "name": "realtime"
+        },
+        {
+            "path": "services/importer",
+            "name": "importer"
+        }
+    ]
+}

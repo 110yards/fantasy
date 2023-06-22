@@ -1,0 +1,2 @@
+class UpsertInjuryReportCommand:
+    pass
