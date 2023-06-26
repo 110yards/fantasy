@@ -1,5 +1,5 @@
-from yards_py.domain.entities.stats import Stats
-from yards_py.domain.entities.scoring_settings import ScoringSettings
+from app.yards_py.domain.entities.stats import Stats
+from app.yards_py.domain.entities.scoring_settings import ScoringSettings
 
 
 def test_score_calculation():

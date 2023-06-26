@@ -1,16 +1,16 @@
 from typing import List, Optional
 
-from services.api.app.config.settings import Settings, get_settings
-from yards_py.core.annotate_args import annotate_args
-from yards_py.core.base_command_executor import (BaseCommand, BaseCommandExecutor,
+from app.config.settings import Settings, get_settings
+from app.yards_py.core.annotate_args import annotate_args
+from app.yards_py.core.base_command_executor import (BaseCommand, BaseCommandExecutor,
                                                  BaseCommandResult)
-from yards_py.core.logging import Logger
-from yards_py.core.publisher import Publisher
-from services.api.app.di import create_publisher
-from yards_py.domain.entities.league import League
-from services.api.app.domain.repositories.league_repository import (
+from app.yards_py.core.logging import Logger
+from app.yards_py.core.publisher import Publisher
+from app.di import create_publisher
+from app.yards_py.domain.entities.league import League
+from app.domain.repositories.league_repository import (
     LeagueRepository, create_league_repository)
-from yards_py.domain.topics import LEAGUE_COMMAND_TOPIC
+from app.yards_py.domain.topics import LEAGUE_COMMAND_TOPIC
 from fastapi.param_functions import Depends
 from firebase_admin import firestore
 

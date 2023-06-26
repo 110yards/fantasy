@@ -63,7 +63,12 @@ def map_tsn_player(player_data: dict) -> Optional[Player]:
     if position == Position.unknown():
         StriveLogger.warn(f"Unknown position '{player_data['positionShort']}' for player: {player_data['displayName']}")
 
-    team = map_tsn_teams(player_data["competitorId"], player_data["number"])
+    birth_date = player_data["birthDate"]
+    if birth_date is None:
+        StriveLogger.warn(f"Missing birth date for player: {player_data['displayName']}")
+        return None
+
+    team = map_tsn_teams(player_data["competitorId"])
 
     if team == Team.free_agent():
         StriveLogger.warn(f"Found free agent on TSN roster somehow: {player_data['displayName']}")
@@ -77,7 +82,7 @@ def map_tsn_player(player_data: dict) -> Optional[Player]:
         height=f"{player_data['heightFeet']}'{player_data['heightInches']}",
         weight=player_data["weight"],
         rookie_year=None,
-        foreign_player=player_data.get("iso") != "CA",
+        canadian_player=player_data.get("iso") != "CA",
         image_url=None,
         school=None,  # Not available in TSN data
         position=position,

@@ -1,8 +1,8 @@
 
 from fastapi.param_functions import Depends
-from services.api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from services.api.app.domain.repositories.state_repository import StateRepository, create_state_repository
-from services.api.app.domain.services.player_projection_service import PlayerProjectionService, create_player_projection_service
+from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from app.domain.repositories.state_repository import StateRepository, create_state_repository
+from app.domain.services.player_projection_service import PlayerProjectionService, create_player_projection_service
 
 
 def create_roster_projection_service(

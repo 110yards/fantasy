@@ -1,8 +1,7 @@
-from services.api.app.config import settings
-from yards_py.core import firebase
+from app.config import settings
+from app.yards_py.core import firebase
 from fastapi import Depends
 
-from services.api.app.domain.repositories.user_repository import create_user_repository
 from .api_router import APIRouter
 from pydantic import BaseModel
 
@@ -16,5 +15,4 @@ class LoginRequest(BaseModel):
 
 @router.post("/")
 async def login(request: LoginRequest, settings: settings.Settings = Depends(settings.get_settings)):
-    create_user_repository()
-    return firebase.login(request.email, request.password, settings.firebase_api_key, settings.is_dev())
+    return firebase.login(request.email, request.password, settings)

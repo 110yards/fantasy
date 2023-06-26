@@ -1,9 +1,0 @@
-[flake8]
-max-line-length=128
-select = C,E,F,W,B,B950
-extend-ignore = E203, E501, W503
-extend-immutable-calls = fastapi.Depends, fastapi.params.Depends, Depends, Body
-exclude=
-    .git
-    .pytest_cache
-    .venv

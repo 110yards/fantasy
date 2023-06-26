@@ -1,9 +1,9 @@
 from google.cloud.firestore_v1.base_document import BaseDocumentReference
-from yards_py.core.firestore_proxy import Query
+from app.yards_py.core.firestore_proxy import Query
 from typing import Any, Dict, Generic, List, TypeVar, Union
 import uuid
 
-from yards_py.core.base_entity import BaseEntity
+from app.yards_py.core.base_entity import BaseEntity
 from google.cloud.firestore_v1.transaction import Transaction
 
 T = TypeVar("T", bound=BaseEntity)

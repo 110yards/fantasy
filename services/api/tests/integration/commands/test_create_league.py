@@ -1,16 +1,17 @@
 from datetime import datetime
-from yards_py.domain.entities.state import State
-from services.api.app.domain.repositories.league_config_repository import LeagueConfigRepository
-from services.api.app.domain.repositories.league_roster_repository import LeagueRosterRepository
-from services.api.app.domain.repositories.public_repository import PublicRepository
-from services.api.app.domain.repositories.user_league_repository import UserLeagueRepository
-from services.api.app.domain.repositories.league_repository import LeagueRepository
-from yards_py.core.publisher import VirtualPubSubPublisher
-from services.api.app.domain.repositories.user_repository import UserRepository
-from services.api.app.domain.commands.league.create_league import CreateLeagueCommand, CreateLeagueCommandExecutor
-from yards_py.domain.entities.user import User
-from api.tests.mocks.mock_firestore_proxy import MockFirestoreProxy
-from api.tests.asserts import are_equal
+
+from app.domain.commands.league.create_league import CreateLeagueCommand, CreateLeagueCommandExecutor
+from app.domain.repositories.league_config_repository import LeagueConfigRepository
+from app.domain.repositories.league_repository import LeagueRepository
+from app.domain.repositories.league_roster_repository import LeagueRosterRepository
+from app.domain.repositories.public_repository import PublicRepository
+from app.domain.repositories.user_league_repository import UserLeagueRepository
+from app.domain.repositories.user_repository import UserRepository
+from app.yards_py.core.publisher import VirtualPubSubPublisher
+from app.yards_py.domain.entities.state import State
+from app.yards_py.domain.entities.user import User
+from tests.asserts import are_equal
+from tests.mocks.mock_firestore_proxy import MockFirestoreProxy
 
 
 def get_commissioner():
@@ -70,7 +71,8 @@ def test_user_joins_league():
         league_roster_repo,
         league_config_repo,
         publisher,
-        get_public_repo(),)
+        get_public_repo(),
+    )
 
     command = CreateLeagueCommand(commissioner_id=commissioner.id, name="Test League", private=False)
     result = command_executor.execute(command)
@@ -100,7 +102,8 @@ def test_league_added_to_user():
         league_roster_repo,
         league_config_repo,
         publisher,
-        get_public_repo(),)
+        get_public_repo(),
+    )
 
     command = CreateLeagueCommand(commissioner_id=commissioner.id, name="Test League", private=False)
     result = command_executor.execute(command)
@@ -130,7 +133,8 @@ def test_league_preview_has_matchup():
         league_roster_repo,
         league_config_repo,
         publisher,
-        get_public_repo(),)
+        get_public_repo(),
+    )
 
     command = CreateLeagueCommand(commissioner_id=commissioner.id, name="Test League", private=False)
     result = command_executor.execute(command)
@@ -162,7 +166,8 @@ def test_creator_is_commissioner():
         league_roster_repo,
         league_config_repo,
         publisher,
-        get_public_repo(),)
+        get_public_repo(),
+    )
 
     command = CreateLeagueCommand(commissioner_id=commissioner.id, name="Test League", private=False)
     result = command_executor.execute(command)
@@ -192,7 +197,8 @@ def test_private_config_initialized():
         league_roster_repo,
         league_config_repo,
         publisher,
-        get_public_repo(),)
+        get_public_repo(),
+    )
 
     command = CreateLeagueCommand(commissioner_id=commissioner.id, name="Test League", private=False)
     result = command_executor.execute(command)
@@ -219,7 +225,8 @@ def test_scoring_config_initialized():
         league_roster_repo,
         league_config_repo,
         publisher,
-        get_public_repo(),)
+        get_public_repo(),
+    )
 
     command = CreateLeagueCommand(commissioner_id=commissioner.id, name="Test League", private=False)
     result = command_executor.execute(command)
@@ -246,7 +253,8 @@ def test_positions_config_initialized():
         league_roster_repo,
         league_config_repo,
         publisher,
-        get_public_repo(),)
+        get_public_repo(),
+    )
 
     command = CreateLeagueCommand(commissioner_id=commissioner.id, name="Test League", private=False)
     result = command_executor.execute(command)

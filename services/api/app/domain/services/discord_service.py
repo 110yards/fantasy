@@ -1,7 +1,7 @@
 from fastapi.param_functions import Depends
 import requests
 
-from services.api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
+from app.domain.repositories.public_repository import PublicRepository, create_public_repository
 
 
 def create_discord_service(public_repo: PublicRepository = Depends(create_public_repository)):

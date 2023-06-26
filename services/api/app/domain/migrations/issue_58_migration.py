@@ -1,16 +1,16 @@
 
-from yards_py.core.logging import Logger
-from yards_py.domain.entities.schedule import ScheduleWeek
-from yards_py.domain.entities.matchup_preview import MatchupPreview
-from yards_py.domain.entities.user_league_preview import UserLeaguePreview
+from app.yards_py.core.logging import Logger
+from app.yards_py.domain.entities.schedule import ScheduleWeek
+from app.yards_py.domain.entities.matchup_preview import MatchupPreview
+from app.yards_py.domain.entities.user_league_preview import UserLeaguePreview
 from typing import Dict
-from services.api.app.domain.repositories.state_repository import StateRepository, create_state_repository
-from services.api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from services.api.app.domain.enums.draft_state import DraftState
-from services.api.app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
+from app.domain.repositories.state_repository import StateRepository, create_state_repository
+from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from app.domain.enums.draft_state import DraftState
+from app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
 from fastapi.param_functions import Depends
-from services.api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from services.api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from firebase_admin.firestore import firestore
 
 

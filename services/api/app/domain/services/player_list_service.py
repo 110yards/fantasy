@@ -1,35 +1,25 @@
-
-
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
 from fastapi import Depends
 from pydantic import BaseModel
-from yards_py.core.logging import Logger
-from yards_py.core.rtdb_client import RTDBClient, create_rtdb_client
-from yards_py.domain.entities.league import League
-from yards_py.domain.entities.player import Player
-from yards_py.domain.entities.player_league_season_score import (
-    PlayerLeagueSeasonScore, rank_player_seasons)
-from yards_py.domain.entities.player_season import PlayerSeason
-from yards_py.domain.entities.scoring_settings import ScoringSettings
-from yards_py.domain.entities.stats import Stats
 
-from services.api.app.domain.enums.draft_state import DraftState
-from services.api.app.domain.repositories.league_config_repository import (
-    LeagueConfigRepository, create_league_config_repository)
-from services.api.app.domain.repositories.league_repository import (
-    LeagueRepository, create_league_repository)
-from services.api.app.domain.repositories.player_league_season_score_repository import (
-    PlayerLeagueSeasonScoreRepository,
-    create_player_league_season_score_repository)
-from services.api.app.domain.repositories.player_repository import (
-    PlayerRepository, create_player_repository)
-from services.api.app.domain.repositories.player_season_repository import (
-    PlayerSeasonRepository, create_player_season_repository)
-from services.api.app.domain.repositories.public_repository import (
-    PublicRepository, create_public_repository)
-from yards_py.domain.repositories.state_repository import StateRepository, create_state_repository
+from app.domain.enums.draft_state import DraftState
+from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository, create_player_league_season_score_repository
+from app.domain.repositories.player_repository import PlayerRepository, create_player_repository
+from app.domain.repositories.player_season_repository import PlayerSeasonRepository, create_player_season_repository
+from app.domain.repositories.public_repository import PublicRepository, create_public_repository
+from app.yards_py.core.logging import Logger
+from app.yards_py.core.rtdb_client import RTDBClient, create_rtdb_client
+from app.yards_py.domain.entities.league import League
+from app.yards_py.domain.entities.player import Player
+from app.yards_py.domain.entities.player_league_season_score import PlayerLeagueSeasonScore, rank_player_seasons
+from app.yards_py.domain.entities.player_season import PlayerSeason
+from app.yards_py.domain.entities.scoring_settings import ScoringSettings
+from app.yards_py.domain.entities.stats import Stats
+from app.yards_py.domain.repositories.state_repository import StateRepository, create_state_repository
 
 
 def create_player_list_service(
@@ -132,7 +122,6 @@ class PlayerListService:
         return self._save_result(league_id, score_season, None, ranked_players, scoring.hash)
 
     def setup_current_ref(self, league: League, current_season: int, last_recalc_date: Optional[int]) -> List[PlayerLeagueSeasonScore]:
-
         league_id = league.id
         # weird bug from pydantic causes the recalc to be deserialized as a datetime instead of an int
         if isinstance(last_recalc_date, datetime):
@@ -161,7 +150,7 @@ class PlayerListService:
         path = f"{self._get_data_path(league_id, season)}/generated_at"
         generated_at = self.rtdb_client.get(path)
 
-        if generated_at is None:
+        if generated_at is None or league.last_season_recalc is None:
             Logger.debug("No cache found")
             return False
 
@@ -212,31 +201,26 @@ class PlayerListService:
     def _get_players_path(self, league_id: str, season: int) -> str:
         return f"{self._get_data_path(league_id, season)}/players"
 
-    def _save_result(
-            self,
-            league_id: str,
-            season: int,
-            last_recalc_date: Optional[datetime],
-            ranked_players: List[RankedPlayer],
-            scoring_hash: str
-    ) -> str:
+    def _save_result(self, league_id: str, season: int, last_recalc_date: Optional[datetime], ranked_players: List[RankedPlayer], scoring_hash: str) -> str:
         if not last_recalc_date:
             last_recalc_date = datetime.now().timestamp()
 
-        data = CacheData(league_id=league_id, season=season, players=ranked_players, scoring_settings_hash=scoring_hash,
-                         recalc_date=last_recalc_date, generated_at=datetime.now().astimezone(tz=timezone.utc).timestamp())
+        data = CacheData(
+            league_id=league_id,
+            season=season,
+            players=ranked_players,
+            scoring_settings_hash=scoring_hash,
+            recalc_date=last_recalc_date,
+            generated_at=datetime.now().astimezone(tz=timezone.utc).timestamp(),
+        )
 
         path = self._get_data_path(league_id, season)
         self.rtdb_client.set(path, data.dict())
         return f"{path}/players"
 
     def _combine_result(
-        self,
-        current_season: int,
-        player_seasons: Dict[str, PlayerSeason],
-        player_scores: Dict[str, PlayerLeagueSeasonScore]
+        self, current_season: int, player_seasons: Dict[str, PlayerSeason], player_scores: Dict[str, PlayerLeagueSeasonScore]
     ) -> List[RankedPlayer]:
-
         players = self.player_repo.get_all(current_season)  # for draft we still only care about the current player list
 
         ranked_players: List[RankedPlayer] = []
@@ -267,7 +251,6 @@ class PlayerListService:
         return {x.id: x for x in player_seasons}
 
     def _calculate_scores(self, league_id: str, player_seasons: Dict[str, PlayerSeason], scoring: ScoringSettings) -> Dict[str, PlayerLeagueSeasonScore]:
-
         if not scoring:
             Logger.error(f"No scoring configuration found for league '{league_id}'")
             return None

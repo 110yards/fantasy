@@ -9,22 +9,29 @@ deploy:
 
 portForward:
   - resourceType: deployment
-    resourceName: gateway
-    port: 80
+    resourceName: api
+    port: 3000
     localPort: 8000
+
+  - resourceType: deployment
+    resourceName: importer
+    port: 3000
+    localPort: 3001
 
 build:
   artifacts:
-    # - image: events
-    #   context: services/events
-    #   docker:
-    #     dockerfile: Dockerfile
-    - image: gateway
-      context: services/gateway
+    - image: api
+      context: services/api
       docker:
-        dockerfile: Dockerfile
+        dockerfile: Dockerfile.dev
+
+    - image: importer
+      context: services/importer
+      docker:
+        dockerfile: Dockerfile.dev
 
 manifests:
   rawYaml:
     - env.yaml
-    - k8s/gateway.yaml
+    - k8s/api.yaml
+    - k8s/importer.yaml

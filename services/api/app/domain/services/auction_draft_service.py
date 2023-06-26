@@ -3,13 +3,13 @@
 from typing import Optional
 
 from pydantic.main import BaseModel
-from services.api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
 from google.cloud.firestore_v1.transaction import Transaction
-from yards_py.domain.entities.draft import Draft, DraftSlot
-from services.api.app.domain.services.roster_player_service import create_roster_player_service
+from app.yards_py.domain.entities.draft import Draft, DraftSlot
+from app.domain.services.roster_player_service import create_roster_player_service
 from fastapi import Depends
-from services.api.app.domain.services.roster_player_service import RosterPlayerService
-from yards_py.core.annotate_args import annotate_args
+from app.domain.services.roster_player_service import RosterPlayerService
+from app.yards_py.core.annotate_args import annotate_args
 
 
 def create_auction_draft_service(

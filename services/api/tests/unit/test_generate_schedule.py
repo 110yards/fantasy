@@ -1,9 +1,9 @@
-from typing import List
-from yards_py.domain.entities.roster import Roster
-from yards_py.domain.entities.schedule import MatchupType, PlayoffType
 import pytest
-from yards_py.domain.services.schedule_service import ScheduledMatchup, combine_schedule, generate_schedule, get_sequence_for_count
-from api.tests.asserts import are_equal
+
+from app.yards_py.domain.entities.roster import Roster
+from app.yards_py.domain.entities.schedule import MatchupType, PlayoffType
+from app.yards_py.domain.services.schedule_service import combine_schedule, generate_schedule, get_sequence_for_count
+from tests.asserts import are_equal
 
 SEASON_WEEKS = 21
 
@@ -34,22 +34,18 @@ combinations = [
     (teamCounts[0], playoffTypes[1]),
     (teamCounts[0], playoffTypes[2]),
     (teamCounts[0], playoffTypes[3]),
-
     (teamCounts[1], playoffTypes[0]),
     (teamCounts[1], playoffTypes[1]),
     (teamCounts[1], playoffTypes[2]),
     (teamCounts[1], playoffTypes[3]),
-
     (teamCounts[2], playoffTypes[0]),
     (teamCounts[2], playoffTypes[1]),
     (teamCounts[2], playoffTypes[2]),
     (teamCounts[2], playoffTypes[3]),
-
     (teamCounts[3], playoffTypes[0]),
     (teamCounts[3], playoffTypes[1]),
     (teamCounts[3], playoffTypes[2]),
     (teamCounts[3], playoffTypes[3]),
-
     (teamCounts[4], playoffTypes[0]),
     (teamCounts[4], playoffTypes[1]),
     (teamCounts[4], playoffTypes[2]),

@@ -25,7 +25,7 @@ class UpsertInjuryReportExecutor:
             report = self.service.get_report()
         except Exception as e:
             StriveLogger.error("Failed to load schedule", exc_info=e)
-            return CommandResult.failure("Failed to load schedule")
+            return CommandResult.failure_result("Failed to load schedule")
 
         existing = self.store.get_report()
         needs_update = existing is None or existing.hash() != report.hash()
@@ -39,7 +39,7 @@ class UpsertInjuryReportExecutor:
             self.store.save_report(report)
         except Exception as e:
             StriveLogger.error("Failed to save report", exc_info=e)
-            return CommandResult.failure("Failed to save report")
+            return CommandResult.failure_result("Failed to save report")
 
         StriveLogger.info("Injury report saved")
         return CommandResult.success()

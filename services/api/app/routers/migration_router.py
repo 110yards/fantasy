@@ -1,18 +1,18 @@
 
 
-from services.api.app.domain.migrations.issue_102_migration import Issue102Migration, create_issue_102_migration
-from services.api.app.domain.migrations.issue_121_migration import Issue121Migration, create_issue_121_migration
-from services.api.app.domain.migrations.issue_84_migration import Issue84Migration, create_issue_84_migration
-from services.api.app.domain.migrations.issue_82_migration import Issue82Migration, create_issue_82_migration
-from services.api.app.domain.migrations.issue_58_migration import Issue58Migration, create_issue_58_migration
-from services.api.app.domain.migrations.league_command_sub_migration import LeagueCommandSubMigration, create_league_command_sub_migration
+from app.domain.migrations.issue_102_migration import Issue102Migration, create_issue_102_migration
+from app.domain.migrations.issue_121_migration import Issue121Migration, create_issue_121_migration
+from app.domain.migrations.issue_84_migration import Issue84Migration, create_issue_84_migration
+from app.domain.migrations.issue_82_migration import Issue82Migration, create_issue_82_migration
+from app.domain.migrations.issue_58_migration import Issue58Migration, create_issue_58_migration
+from app.domain.migrations.league_command_sub_migration import LeagueCommandSubMigration, create_league_command_sub_migration
 from typing import Optional
-from services.api.app.domain.migrations.issue_46_migration import Issue46Migration, create_issue_46_migration
+from app.domain.migrations.issue_46_migration import Issue46Migration, create_issue_46_migration
 from starlette.requests import Request
-from services.api.app.core.role import Role
-from services.api.app.core.auth import require_role
+from app.core.role import Role
+from app.core.auth import require_role
 from fastapi.params import Depends
-from services.api.app.routers.api_router import APIRouter
+from app.routers.api_router import APIRouter
 
 router = APIRouter(prefix="/migration")
 

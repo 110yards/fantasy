@@ -16,7 +16,7 @@ class ScheduleService:
         self.use_tsn_schedule = use_tsn_schedule
 
     def get_schedule(self) -> Schedule:
-        return get_from_tsn() if self.use_tsn_schedule else get_from_cfl()
+        return get_from_cfl()
 
 
 #########################################

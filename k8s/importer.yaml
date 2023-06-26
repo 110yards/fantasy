@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: importer
+spec:
+  ports:
+    - port: 3000
+  selector:
+    name: importer
+status:
+  loadBalancer: {}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    name: importer
+  name: importer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: importer
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        name: importer
+    spec:
+      containers:
+        - image: importer
+          name: importer
+          ports:
+            - containerPort: 80
+          resources: {}
+          env:
+            - name: ENVIRONMENT
+              value: "dev"
+            - name: API_KEY
+              value: "1234"
+            - name: GCLOUD_PROJECT
+              valueFrom:
+                configMapKeyRef:
+                  name: environment
+                  key: GCLOUD_PROJECT
+
+            - name: RTDB_EMULATOR_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: environment
+                  key: RTDB_EMULATOR_HOST
+      restartPolicy: Always
+status: {}

@@ -1,8 +1,8 @@
 
 from fastapi.param_functions import Depends
-from services.api.app.domain.enums.draft_state import DraftState
-from services.api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from services.api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from app.domain.enums.draft_state import DraftState
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 
 
 def create_issue_121_migration(

@@ -1,8 +1,8 @@
-from yards_py.domain.entities.owned_player import OwnedPlayer
-from services.api.app.domain.repositories.league_repository import LeagueRepository
+from app.yards_py.domain.entities.owned_player import OwnedPlayer
+from app.domain.repositories.league_repository import LeagueRepository
 from google.cloud.firestore_v1.transaction import Transaction
 from typing import List
-from yards_py.core.firestore_proxy import FirestoreProxy
+from app.yards_py.core.firestore_proxy import FirestoreProxy
 
 
 def create_league_owned_player_repository():

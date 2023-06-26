@@ -1,17 +1,17 @@
 
-from yards_py.core.publisher import Publisher
-from services.api.app.di import create_publisher
-from yards_py.domain.entities.league_transaction import LeagueTransaction
-from services.api.app.domain.repositories.league_transaction_repository import LeagueTransactionRepository, create_league_transaction_repository
-from services.api.app.domain.repositories.state_repository import StateRepository, create_state_repository
+from app.yards_py.core.publisher import Publisher
+from app.di import create_publisher
+from app.yards_py.domain.entities.league_transaction import LeagueTransaction
+from app.domain.repositories.league_transaction_repository import LeagueTransactionRepository, create_league_transaction_repository
+from app.domain.repositories.state_repository import StateRepository, create_state_repository
 from typing import Optional
 
-from yards_py.core.annotate_args import annotate_args
-from yards_py.core.base_command_executor import (BaseCommand, BaseCommandExecutor,
+from app.yards_py.core.annotate_args import annotate_args
+from app.yards_py.core.base_command_executor import (BaseCommand, BaseCommandExecutor,
                                                  BaseCommandResult)
-from services.api.app.domain.repositories.league_config_repository import (
+from app.domain.repositories.league_config_repository import (
     LeagueConfigRepository, create_league_config_repository)
-from services.api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from fastapi import Depends
 from firebase_admin import firestore
 

@@ -1,17 +1,17 @@
 
-from services.api.app.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository, create_league_week_matchup_repository
-from services.api.app.domain.repositories.state_repository import StateRepository, create_state_repository
-# from services.api.app.domain.services.schedule_service import generate_schedule
-from services.api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from services.api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
-from services.api.app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
-from services.api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from yards_py.domain.entities.schedule import PlayoffType, Schedule
+from app.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository, create_league_week_matchup_repository
+from app.domain.repositories.state_repository import StateRepository, create_state_repository
+# from app.domain.services.schedule_service import generate_schedule
+from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.yards_py.domain.entities.schedule import PlayoffType, Schedule
 from typing import Optional
-from services.api.app.config.settings import Settings, get_settings
+from app.config.settings import Settings, get_settings
 from fastapi import Depends
-from yards_py.core.annotate_args import annotate_args
-from yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
+from app.yards_py.core.annotate_args import annotate_args
+from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
 from firebase_admin import firestore
 
 

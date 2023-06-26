@@ -1,24 +1,29 @@
-
-
 from datetime import datetime, timedelta
 
 import pytest
 import pytz
-from yards_py.domain.entities.scoreboard import (Scoreboard,
-                                                 ScoreboardGame)
-from api.tests.asserts import are_equal
-from yards_py.domain.entities.event_status import (
-    EVENT_STATUS_CANCELLED, EVENT_STATUS_FINAL, EVENT_STATUS_IN_PROGRESS,
-    EVENT_STATUS_POSTPONED, EVENT_STATUS_PRE_GAME, EventStatus)
+
+from app.yards_py.domain.entities.event_status import (
+    EVENT_STATUS_CANCELLED,
+    EVENT_STATUS_FINAL,
+    EVENT_STATUS_IN_PROGRESS,
+    EVENT_STATUS_POSTPONED,
+    EVENT_STATUS_PRE_GAME,
+    EventStatus,
+)
+from app.yards_py.domain.entities.scoreboard import Scoreboard, ScoreboardGame
+from tests.asserts import are_equal
 
 
 def test_last_game_start():
-    scoreboard = Scoreboard(games={
-        "1": ScoreboardGame.construct(date_start=datetime(2021, 7, 1, 12, 00)),
-        "2": ScoreboardGame.construct(date_start=datetime(2021, 7, 1, 16, 00)),
-        "3": ScoreboardGame.construct(date_start=datetime(2021, 7, 2, 19, 00)),
-        "4": ScoreboardGame.construct(date_start=datetime(2021, 7, 3, 18, 00)),
-    })
+    scoreboard = Scoreboard(
+        games={
+            "1": ScoreboardGame.construct(date_start=datetime(2021, 7, 1, 12, 00)),
+            "2": ScoreboardGame.construct(date_start=datetime(2021, 7, 1, 16, 00)),
+            "3": ScoreboardGame.construct(date_start=datetime(2021, 7, 2, 19, 00)),
+            "4": ScoreboardGame.construct(date_start=datetime(2021, 7, 3, 18, 00)),
+        }
+    )
 
     expected = scoreboard.games["4"].date_start
     actual = scoreboard.last_game_start_time()
@@ -41,7 +46,7 @@ is_game_complete_inputs = [
 ]
 
 
-@ pytest.mark.parametrize("expected,game", is_game_complete_inputs)
+@pytest.mark.parametrize("expected,game", is_game_complete_inputs)
 def test_is_game_complete(expected: bool, game: ScoreboardGame):
     actual = game.is_complete()
 

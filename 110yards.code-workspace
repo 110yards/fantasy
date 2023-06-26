@@ -4,12 +4,8 @@
             "path": "."
         },
         {
-            "path": "services/gateway",
-            "name": "gateway"
-        },
-        {
-            "path": "services/realtime",
-            "name": "realtime"
+            "path": "services/api",
+            "name": "api"
         },
         {
             "path": "services/importer",

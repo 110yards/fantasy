@@ -1,9 +1,9 @@
 
-from yards_py.core.annotate_args import annotate_args
-from yards_py.core.base_command_executor import (BaseCommand, BaseCommandExecutor,
+from app.yards_py.core.annotate_args import annotate_args
+from app.yards_py.core.base_command_executor import (BaseCommand, BaseCommandExecutor,
                                                  BaseCommandResult)
-from yards_py.domain.entities.league import League
-from services.api.app.domain.repositories.league_repository import (
+from app.yards_py.domain.entities.league import League
+from app.domain.repositories.league_repository import (
     LeagueRepository, create_league_repository)
 from fastapi.param_functions import Depends
 from google.cloud.firestore import Transaction

@@ -27,7 +27,7 @@ class UpsertActiveGamesExecutor:
             games = self.service.get_games(command.hours)
         except Exception as e:
             StriveLogger.error("Failed to load games", exc_info=e)
-            return CommandResult.failure("Failed to load games")
+            return CommandResult.failure_result("Failed to load games")
 
         if len(games) == 0:
             StriveLogger.info("No games found")
@@ -50,7 +50,7 @@ class UpsertActiveGamesExecutor:
                 self.store.save_boxscore(datetime.now().year, game)
         except Exception as e:
             StriveLogger.error("Failed to save game(s)", exc_info=e)
-            return CommandResult.failure("Failed to save game(s)")
+            return CommandResult.failure_result("Failed to save game(s)")
 
         StriveLogger.info("Games saved")
         return CommandResult.success()

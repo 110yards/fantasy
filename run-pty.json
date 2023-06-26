@@ -110,9 +110,9 @@
     "command": [
       "npm",
       "run",
-      "start:system"
+      "start:importer"
     ],
-    "title": "System\t\t\thttp://localhost:8001",
+    "title": "Importer\t\t\thttp://localhost:3001",
     "status": {
       "Loading": [
         "⚪",

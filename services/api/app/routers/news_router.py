@@ -1,5 +1,5 @@
 from fastapi import Depends
-from services.api.app.domain.services.news_service import NewsService, create_news_service
+from app.domain.services.news_service import NewsService, create_news_service
 from .api_router import APIRouter
 
 router = APIRouter(prefix="/news")

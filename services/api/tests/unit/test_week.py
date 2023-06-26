@@ -1,11 +1,11 @@
 import pytest
-from api.tests.asserts import are_equal
-from yards_py.domain.entities.roster import Roster
 
-from yards_py.domain.entities.schedule import Matchup, PlayoffType, ScheduleWeek
-from services.api.app.domain.enums.matchup_type import MatchupType
-from services.api.app.domain.enums.week_type import WeekType
-from yards_py.domain.services.schedule_service import generate_playoffs
+from app.domain.enums.matchup_type import MatchupType
+from app.domain.enums.week_type import WeekType
+from app.yards_py.domain.entities.roster import Roster
+from app.yards_py.domain.entities.schedule import Matchup, PlayoffType, ScheduleWeek
+from app.yards_py.domain.services.schedule_service import generate_playoffs
+from tests.asserts import are_equal
 
 # MANAGERS
 team_1 = Roster(id=1, name="team 1", rank=1)
@@ -282,13 +282,11 @@ def test_assign_winners_week2_away_win_home_win():
     previous_week = ScheduleWeek(week_number=1, week_type=WeekType.PLAYOFFS)
     previous_week.matchups = [
         Matchup(id="01", away=team_3, home=team_2, type=MatchupType.PLAYOFF, away_score=100, home_score=50),
-        Matchup(id="02", away=team_4, home=team_1, type=MatchupType.PLAYOFF, away_score=50, home_score=100)
+        Matchup(id="02", away=team_4, home=team_1, type=MatchupType.PLAYOFF, away_score=50, home_score=100),
     ]
 
     current_week = ScheduleWeek(week_number=2, week_type=WeekType.CHAMPIONSHIP)
-    current_week.matchups = [
-        Matchup(id="01", type=MatchupType.CHAMPIONSHIP)
-    ]
+    current_week.matchups = [Matchup(id="01", type=MatchupType.CHAMPIONSHIP)]
 
     current_week.assign_playoff_matchups(PlayoffType.TOP_4, teams, previous_week)
     matchup = current_week.matchups[0]

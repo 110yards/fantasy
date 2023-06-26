@@ -1,9 +1,9 @@
 
 
-from services.api.app.domain.commands.league.create_league_subscriptions import (
+from app.domain.commands.league.create_league_subscriptions import (
     CreateLeagueSubscriptionsCommand, CreateLeagueSubscriptionsCommandExecutor,
     create_league_subscriptions_command_executor)
-from services.api.app.domain.repositories.league_repository import (
+from app.domain.repositories.league_repository import (
     LeagueRepository, create_league_repository)
 from fastapi.param_functions import Depends
 from firebase_admin.firestore import firestore

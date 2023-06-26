@@ -1,44 +1,44 @@
-from yards_py.core.abort import abort_not_found
-from services.api.app.domain.commands.league.close_league_registration import (
+from app.yards_py.core.abort import abort_not_found
+from app.domain.commands.league.close_league_registration import (
     CloseLeagueRegistrationCommand, CloseLeagueRegistrationCommandExecutor,
     create_close_league_registration_command_executor)
-from services.api.app.domain.commands.league.create_league import (
+from app.domain.commands.league.create_league import (
     CreateLeagueCommand, CreateLeagueCommandExecutor,
     create_league_command_executor)
-from services.api.app.domain.commands.league.generate_schedule import (
+from app.domain.commands.league.generate_schedule import (
     GenerateScheduleCommand, GenerateScheduleCommandExecutor,
     create_generate_schedule_command_executor)
-from services.api.app.domain.commands.league.join_league import (
+from app.domain.commands.league.join_league import (
     JoinLeagueCommand, JoinLeagueCommandExecutor,
     create_join_league_command_executor)
-from services.api.app.domain.commands.league.open_league_registration import (
+from app.domain.commands.league.open_league_registration import (
     OpenLeagueRegistrationCommand, OpenLeagueRegistrationCommandExecutor,
     create_open_league_registration_command_executor)
-from services.api.app.domain.commands.league.remove_roster import (
+from app.domain.commands.league.remove_roster import (
     RemoveRosterCommand, RemoveRosterCommandExecutor,
     create_remove_roster_command_executor)
-from services.api.app.domain.commands.league.renew_league import RenewLeagueCommand, RenewLeagueCommandExecutor, create_renew_league_command_executor
-from services.api.app.domain.commands.league.set_notes import SetNotesCommand, SetNotesCommandExecutor, create_set_notes_command_executor
-from services.api.app.domain.commands.league.update_draft_order import (
+from app.domain.commands.league.renew_league import RenewLeagueCommand, RenewLeagueCommandExecutor, create_renew_league_command_executor
+from app.domain.commands.league.set_notes import SetNotesCommand, SetNotesCommandExecutor, create_set_notes_command_executor
+from app.domain.commands.league.update_draft_order import (
     UpdateDraftOrderCommand, UpdateDraftOrderCommandExecutor,
     create_update_draft_order_command_executor)
-from services.api.app.domain.commands.league.update_league import (
+from app.domain.commands.league.update_league import (
     UpdateLeagueCommand, UpdateLeagueCommandExecutor,
     create_update_league_command_executor)
-from services.api.app.domain.commands.league.update_league_positions import (
+from app.domain.commands.league.update_league_positions import (
     UpdateLeaguePositionsCommand, UpdateLeaguePositionsCommandExecutor,
     create_update_league_positions_command_executor)
-from services.api.app.domain.commands.league.update_league_scoring import (
+from app.domain.commands.league.update_league_scoring import (
     UpdateLeagueScoringCommand, UpdateLeagueScoringCommandExecutor,
     create_update_league_scoring_command_executor)
-from yards_py.domain.entities.league import League
-from services.api.app.domain.repositories.league_repository import LeagueRepository
-from services.api.app.domain.repositories.repository_factory import get_league_repository
+from app.yards_py.domain.entities.league import League
+from app.domain.repositories.league_repository import LeagueRepository
+from app.domain.repositories.repository_factory import get_league_repository
 from fastapi import Depends, Request
 
-from services.api.app.domain.services.discord_service import DiscordService, create_discord_service
-from services.api.app.domain.services.player_list_service import PlayerListService, create_player_list_service
-from services.api.app.domain.services.player_details_service import PlayerDetailsService, create_player_details_service
+from app.domain.services.discord_service import DiscordService, create_discord_service
+from app.domain.services.player_list_service import PlayerListService, create_player_list_service
+from app.domain.services.player_details_service import PlayerDetailsService, create_player_details_service
 
 from .api_router import APIRouter
 

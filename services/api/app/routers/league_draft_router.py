@@ -1,21 +1,21 @@
-# from yards_py.core.auth import require_role
-from services.api.app.domain.commands.league.end_draft import EndDraftCommand, EndDraftCommandExecutor, create_end_draft_command_executor
-from services.api.app.domain.commands.league.reset_draft import ResetDraftCommand, ResetDraftCommandExecutor, create_reset_draft_command_executor
-from services.api.app.domain.commands.league.select_player import SelectPlayerCommand, SelectPlayerCommandExecutor, create_select_player_command_executor
-from services.api.app.domain.commands.league.bid import (BidCommand, BidCommandExecutor,
-                                                         create_bid_command_executor)
-from services.api.app.domain.commands.league.nominate_player import (
+# from app.yards_py.core.auth import require_role
+from app.domain.commands.league.end_draft import EndDraftCommand, EndDraftCommandExecutor, create_end_draft_command_executor
+from app.domain.commands.league.reset_draft import ResetDraftCommand, ResetDraftCommandExecutor, create_reset_draft_command_executor
+from app.domain.commands.league.select_player import SelectPlayerCommand, SelectPlayerCommandExecutor, create_select_player_command_executor
+from app.domain.commands.league.bid import (BidCommand, BidCommandExecutor,
+                                            create_bid_command_executor)
+from app.domain.commands.league.nominate_player import (
     NominatePlayerCommand, NominatePlayerCommandExecutor,
     create_nominate_player_command_executor)
-from services.api.app.domain.commands.league.pass_bid import (
+from app.domain.commands.league.pass_bid import (
     PassBidCommand, PassBidCommandExecutor, create_pass_bid_command_executor)
-from services.api.app.domain.commands.league.pause_resume_draft import (
+from app.domain.commands.league.pause_resume_draft import (
     PauseResumeDraftCommand, PauseResumeDraftCommandExecutor,
     create_pause_resume_draft_command_executor)
-from services.api.app.domain.commands.league.start_draft import (
+from app.domain.commands.league.start_draft import (
     StartDraftCommand, StartDraftCommandExecutor,
     create_start_draft_command_executor)
-from services.api.app.domain.commands.league.undo_last_draft_pick import (
+from app.domain.commands.league.undo_last_draft_pick import (
     UndoLastDraftPickCommand, UndoLastDraftPickCommandExecutor,
     create_undo_last_draft_pick_command_executor)
 from fastapi import Depends

@@ -1,20 +1,24 @@
 
-from datetime import datetime
 import os
+import sys
+from datetime import datetime
 
 import firebase_admin
-from yards_py.core.firestore_proxy import FirestoreProxy
 
+sys.path.insert(0, "./services/api")
+
+from app.domain.commands.user.register_email import RegisterCommandExecutor, RegisterEmailCommand
+from app.domain.enums.position_type import get_position_type_config
+from app.domain.repositories.public_repository import create_public_repository
+from app.domain.repositories.user_repository import create_user_repository
+
+from yards_py.core.firestore_proxy import FirestoreProxy
 from yards_py.core.publisher import VirtualPubSubPublisher
-from services.api.app.domain.commands.user.register_email import RegisterCommandExecutor, RegisterEmailCommand
 from yards_py.domain.entities.opponents import Opponents
 from yards_py.domain.entities.schedule import get_playoff_type_config
 from yards_py.domain.entities.scoring_info import ScoringInfo
 from yards_py.domain.entities.state import State
 from yards_py.domain.entities.switches import Switches
-from services.api.app.domain.enums.position_type import get_position_type_config
-from services.api.app.domain.repositories.public_repository import create_public_repository
-from services.api.app.domain.repositories.user_repository import create_user_repository
 
 DEV_PROJECT_ID = "yards-dev"
 
@@ -24,6 +28,9 @@ DEV_PROJECT_ID = "yards-dev"
 os.environ["GCLOUD_PROJECT"] = DEV_PROJECT_ID
 os.environ["FIRESTORE_EMULATOR_HOST"] = "localhost:9000"
 os.environ["FIREBASE_AUTH_EMULATOR_HOST"] = "localhost:9099"
+os.environ["FIREBASE_API_KEY"] = "fake-api-key"
+os.environ["ENDPOINT"] = "http://localhost:8000"
+os.environ["ORIGINS"] = "*"
 
 firebase_admin.initialize_app(options={"projectId": DEV_PROJECT_ID})
 

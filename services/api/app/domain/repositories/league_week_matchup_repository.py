@@ -1,8 +1,8 @@
-from yards_py.domain.entities.schedule import Matchup
-from services.api.app.domain.repositories.league_repository import LeagueRepository
+from app.yards_py.domain.entities.schedule import Matchup
+from app.domain.repositories.league_repository import LeagueRepository
 from google.cloud.firestore_v1.transaction import Transaction
 from typing import Dict, List
-from yards_py.core.firestore_proxy import FirestoreProxy
+from app.yards_py.core.firestore_proxy import FirestoreProxy
 
 
 def create_league_week_matchup_repository():

@@ -15,26 +15,26 @@ class TeamIds(int, Enum):
     WPG = 1075
 
 
-def map_tsn_teams(team_id: int, uniform: int) -> Team:
+def map_tsn_teams(team_id: int) -> Team:
     match team_id:
         case TeamIds.BC:
-            return Team.bc(uniform=uniform)
+            return Team.bc()
         case TeamIds.CGY:
-            return Team.cgy(uniform=uniform)
+            return Team.cgy()
         case TeamIds.EDM:
-            return Team.edm(uniform=uniform)
+            return Team.edm()
         case TeamIds.HAM:
-            return Team.ham(uniform=uniform)
+            return Team.ham()
         case TeamIds.MTL:
-            return Team.mtl(uniform=uniform)
+            return Team.mtl()
         case TeamIds.OTT:
-            return Team.ott(uniform=uniform)
+            return Team.ott()
         case TeamIds.SSK:
-            return Team.ssk(uniform=uniform)
+            return Team.ssk()
         case TeamIds.TOR:
-            return Team.tor(uniform=uniform)
+            return Team.tor()
         case TeamIds.WPG:
-            return Team.wpg(uniform=uniform)
+            return Team.wpg()
         case _:
             return Team.free_agent()
 

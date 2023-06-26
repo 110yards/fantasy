@@ -9,9 +9,9 @@ class CommandResult(BaseModel):
     data: Any = None
 
     @staticmethod
-    def success(message: str = "Success", data: Any = None) -> "CommandResult":
+    def success_result(message: str = "Success", data: Any = None) -> "CommandResult":
         return CommandResult(success=True, message=message, data=data)
 
     @staticmethod
-    def failure(message: str) -> "CommandResult":
+    def failure_result(message: str) -> "CommandResult":
         return CommandResult(success=False, message=message)

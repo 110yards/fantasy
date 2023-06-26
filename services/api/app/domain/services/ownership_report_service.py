@@ -2,9 +2,9 @@ from datetime import datetime, timezone
 from fastapi import Depends
 
 from pydantic import BaseModel
-from yards_py.domain.repositories.league_owned_player_repository import LeagueOwnedPlayerRepository, create_league_owned_player_repository
-from yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from yards_py.domain.repositories.player_repository import PlayerRepository, create_player_repository
+from app.yards_py.domain.repositories.league_owned_player_repository import LeagueOwnedPlayerRepository, create_league_owned_player_repository
+from app.yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.yards_py.domain.repositories.player_repository import PlayerRepository, create_player_repository
 
 
 class OwnershipReportPlayer(BaseModel):

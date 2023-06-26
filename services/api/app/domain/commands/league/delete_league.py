@@ -1,21 +1,21 @@
-from services.api.app.domain.repositories.league_week_repository import LeagueWeekRepository
-from services.api.app.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository
-from services.api.app.domain.repositories.league_transaction_repository import LeagueTransactionRepository
-from services.api.app.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository
-from services.api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
-from services.api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from services.api.app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
+from app.domain.repositories.league_week_repository import LeagueWeekRepository
+from app.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository
+from app.domain.repositories.league_transaction_repository import LeagueTransactionRepository
+from app.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository
+from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
 
-from yards_py.core.annotate_args import annotate_args
-from yards_py.core.base_command_executor import (BaseCommand, BaseCommandExecutor,
+from app.yards_py.core.annotate_args import annotate_args
+from app.yards_py.core.base_command_executor import (BaseCommand, BaseCommandExecutor,
                                                  BaseCommandResult)
-from yards_py.core.publisher import Publisher, create_publisher
-from yards_py.domain.entities.league import (League)
-from services.api.app.domain.repositories.league_repository import (
+from app.yards_py.core.publisher import Publisher, create_publisher
+from app.yards_py.domain.entities.league import (League)
+from app.domain.repositories.league_repository import (
     LeagueRepository, create_league_repository)
 from fastapi.param_functions import Depends
 from firebase_admin.firestore import firestore
-from services.api.app.domain.repositories.user_repository import UserRepository, create_user_repository
+from app.domain.repositories.user_repository import UserRepository, create_user_repository
 
 
 def create_delete_league_command_executor(

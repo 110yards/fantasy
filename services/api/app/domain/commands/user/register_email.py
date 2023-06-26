@@ -1,18 +1,19 @@
-
 from typing import Optional
-from services.api.app.config.settings import Settings, get_settings
-from yards_py.domain.entities.user import User
-from services.api.app.domain.enums.login_type import LoginType
-from services.api.app.domain.repositories.user_repository import UserRepository, create_user_repository
+
 from fastapi import Depends
-from yards_py.core.annotate_args import annotate_args
-from yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
 from firebase_admin import auth
-from firebase_admin.exceptions import InvalidArgumentError
 from firebase_admin.auth import UserRecord
-from yards_py.core.logging import Logger
-from yards_py.core.publisher import Publisher
-from services.api.app.di import create_publisher
+from firebase_admin.exceptions import InvalidArgumentError
+
+from app.config.settings import Settings, get_settings
+from app.di import create_publisher
+from app.domain.enums.login_type import LoginType
+from app.domain.repositories.user_repository import UserRepository, create_user_repository
+from app.yards_py.core.annotate_args import annotate_args
+from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from app.yards_py.core.logging import Logger
+from app.yards_py.core.publisher import Publisher
+from app.yards_py.domain.entities.user import User
 
 
 def create_register_email_command_executor(
@@ -35,21 +36,19 @@ class RegisterEmailResult(BaseCommandResult[RegisterEmailCommand]):
 
 
 class RegisterCommandExecutor(BaseCommandExecutor[RegisterEmailCommand, RegisterEmailResult]):
-
     def __init__(self, user_repository: UserRepository, publisher: Publisher, is_dev: bool):
         self.user_repository = user_repository
         self.publisher = publisher
         self.is_dev = is_dev
 
     def on_execute(self, command: RegisterEmailCommand) -> RegisterEmailResult:
-
         existing = self.user_repository.get_by_email(command.email)
 
         if existing:
             return RegisterEmailResult(command=command, error="A user with that email already exists")
 
         try:
-            result = auth.create_user(display_name=command.display_name, email=command.email)  # type: UserRecord
+            result: UserRecord = auth.create_user(display_name=command.display_name, email=command.email)
         except auth.EmailAlreadyExistsError:
             return RegisterEmailResult(command=command, error="A user with that email already exists")
         except InvalidArgumentError as ex:

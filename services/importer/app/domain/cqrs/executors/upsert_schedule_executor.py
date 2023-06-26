@@ -24,15 +24,15 @@ class UpsertScheduleExecutor:
             schedule = self.service.get_schedule()
         except Exception as e:
             StriveLogger.error("Failed to load schedule", exc_info=e)
-            return CommandResult.failure("Failed to load schedule")
+            return CommandResult.failure_result("Failed to load schedule")
 
         if len(schedule.games) == 0:
             StriveLogger.error("No games found")
-            return CommandResult.failure("No games found")
+            return CommandResult.failure_result("No games found")
 
         if schedule.year != datetime.now().year:
             StriveLogger.warn("Schedule is not for the current year")
-            return CommandResult.failure("Schedule is not for the current year")
+            return CommandResult.failure_result("Schedule is not for the current year")
 
         existing_schedule = self.store.get_schedule(schedule.year)
 
@@ -49,7 +49,7 @@ class UpsertScheduleExecutor:
             self.store.save_schedule(schedule)
         except Exception as e:
             StriveLogger.error("Failed to save schedule", exc_info=e)
-            return CommandResult.failure("Failed to save schedule")
+            return CommandResult.failure_result("Failed to save schedule")
 
         StriveLogger.info("Schedule saved")
         return CommandResult.success()

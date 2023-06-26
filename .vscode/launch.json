@@ -2,6 +2,32 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Kubernetes: Run/Debug",
+      "type": "cloudcode.kubernetes",
+      "request": "launch",
+      "skaffoldConfig": "${workspaceFolder}/skaffold.yaml",
+      "watch": true,
+      "cleanUp": true,
+      "portForward": true,
+      "debug": [
+        {
+          "image": "api",
+          "containerName": "api",
+          "sourceFileMap": {
+            "${workspaceFolder}/services/api/app": "/app"
+          },
+          "justMyCode": false
+        },
+        {
+          "image": "importer",
+          "containerName": "importer",
+          "sourceFileMap": {
+            "${workspaceFolder}/services/importer/app": "/app"
+          }
+        }
+      ]
+    },
+    {
       "name": "API",
       "type": "python",
       "request": "launch",

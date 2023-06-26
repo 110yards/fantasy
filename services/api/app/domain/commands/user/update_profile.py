@@ -1,11 +1,11 @@
 
 from typing import Optional
-from services.api.app.domain.repositories.user_repository import UserRepository, create_user_repository
+from app.domain.repositories.user_repository import UserRepository, create_user_repository
 from fastapi import Depends
-from yards_py.core.annotate_args import annotate_args
-from yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
-from yards_py.core.publisher import Publisher
-from services.api.app.di import create_publisher
+from app.yards_py.core.annotate_args import annotate_args
+from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
+from app.yards_py.core.publisher import Publisher
+from app.di import create_publisher
 
 
 def create_update_profile_command_executor(

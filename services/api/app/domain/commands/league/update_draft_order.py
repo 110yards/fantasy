@@ -1,14 +1,14 @@
 
-from services.api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from yards_py.domain.entities.draft import DraftOrder
-from services.api.app.domain.enums.draft_state import DraftState
+from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from app.yards_py.domain.entities.draft import DraftOrder
+from app.domain.enums.draft_state import DraftState
 from typing import List, Optional
 
-from yards_py.core.annotate_args import annotate_args
-from yards_py.core.base_command_executor import (BaseCommand, BaseCommandExecutor,
+from app.yards_py.core.annotate_args import annotate_args
+from app.yards_py.core.base_command_executor import (BaseCommand, BaseCommandExecutor,
                                                  BaseCommandResult)
-from yards_py.domain.entities.league import League
-from services.api.app.domain.repositories.league_repository import (
+from app.yards_py.domain.entities.league import League
+from app.domain.repositories.league_repository import (
     LeagueRepository, create_league_repository)
 from fastapi import Depends
 from firebase_admin import firestore

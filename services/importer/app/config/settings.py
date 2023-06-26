@@ -3,7 +3,7 @@ from functools import lru_cache
 from typing import Optional
 
 from dotenv import load_dotenv
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 
 class Environment(str, Enum):
@@ -15,12 +15,13 @@ class Environment(str, Enum):
 class Settings(BaseSettings):
     environment: Environment
     gcloud_project: str
-    service_name: Optional[str]
-    region: Optional[str]
-    rtdb_url: str
+    service_name: Optional[str] = None
+    region: Optional[str] = None
     api_key: str
-    use_tsn_schedule: bool
+    use_tsn_schedule: bool = False
     version: str = "dev"
+    rtdb_emulator_host: Optional[str] = None
+    firestore_emulator_host: Optional[str] = None
 
     class Config:
         env_file = ".env"

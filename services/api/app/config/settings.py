@@ -2,8 +2,8 @@ from enum import Enum
 from functools import lru_cache
 from typing import Optional
 
-from pydantic import BaseSettings
 from dotenv import load_dotenv
+from pydantic import BaseSettings
 
 
 class Environment(str, Enum):
@@ -22,6 +22,8 @@ class Settings(BaseSettings):
     origins: str
     version: str = "dev"
     rtdb_emulator_host: Optional[str] = None
+    firebase_auth_emulator_host: Optional[str] = None
+    firestore_emulator_host: str
 
     class Config:
         env_file = ".env"

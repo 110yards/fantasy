@@ -1,8 +1,8 @@
-from services.api.app.domain.services.user_existence_service import UserExistenceRequest, UserExistenceService, create_user_existence_service
-from services.api.app.domain.commands.user.record_sign_in import RecordSignInCommand, RecordSignInCommandExecutor, create_record_sign_in_command_executor
-from services.api.app.core.auth import get_current_user_id
-from services.api.app.domain.commands.user.update_profile import UpdateProfileCommand, UpdateProfileCommandExecutor, create_update_profile_command_executor
-from services.api.app.domain.commands.user.register_email import RegisterCommandExecutor, RegisterEmailCommand, create_register_email_command_executor
+from app.domain.services.user_existence_service import UserExistenceRequest, UserExistenceService, create_user_existence_service
+from app.domain.commands.user.record_sign_in import RecordSignInCommand, RecordSignInCommandExecutor, create_record_sign_in_command_executor
+from app.core.auth import get_current_user_id
+from app.domain.commands.user.update_profile import UpdateProfileCommand, UpdateProfileCommandExecutor, create_update_profile_command_executor
+from app.domain.commands.user.register_email import RegisterCommandExecutor, RegisterEmailCommand, create_register_email_command_executor
 from fastapi import Depends
 from .api_router import APIRouter
 

@@ -1,9 +1,9 @@
 
-from yards_py.core.logging import Logger
-from services.api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from services.api.app.domain.enums.draft_state import DraftState
+from app.yards_py.core.logging import Logger
+from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from app.domain.enums.draft_state import DraftState
 from fastapi.param_functions import Depends
-from services.api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from firebase_admin.firestore import firestore
 
 

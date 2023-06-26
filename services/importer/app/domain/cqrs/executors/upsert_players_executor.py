@@ -1,4 +1,3 @@
-import uuid
 from datetime import datetime
 
 from fastapi import Depends
@@ -23,29 +22,25 @@ class UpsertPlayersExecutor:
             players = self.service.get_players()
         except Exception as e:
             StriveLogger.error("Failed to load players", exc_info=e)
-            return CommandResult.failure("Failed to load schedule")
+            return CommandResult.failure_result("Failed to load schedule")
 
         if len(players) == 0:
             StriveLogger.error("No players found")
-            return CommandResult.failure("No players found")
+            return CommandResult.failure_result("No players found")
 
         StriveLogger.info("Getting existing players")
         existing_players = self.store.get_players(datetime.now().year)
-        existing_players = {player.tsn_id: player for player in existing_players.values()}
 
         to_save: list[Player] = []
 
-        # tightly coupled to TSN here
         for player in players:
-            existing_player = existing_players.get(player.tsn_id)
+            existing_player = existing_players.get(player.player_id)
             if existing_player:
-                player.player_id = existing_player.player_id
-                existing_players.pop(player.tsn_id)  # remove from existing so we know anyone left is a free agent now
+                existing_players.pop(player.player_id)  # remove from existing so we know anyone left is a free agent now
                 if existing_player.hash() != player.hash():
                     StriveLogger.info(f"Player changed: {player.full_name()} ({player.team.abbreviation})")
                     to_save.append(player)
             else:
-                player.player_id = uuid.uuid4().hex
                 StriveLogger.info(f"New player: {player.full_name()} ({player.team.abbreviation})")
                 to_save.append(player)
 
@@ -57,17 +52,17 @@ class UpsertPlayersExecutor:
 
         if len(to_save) == 0:
             StriveLogger.info("No changes to players")
-            return CommandResult.success(data=existing_players)
+            return CommandResult.success_result(data=existing_players)
 
         try:
             for player in to_save:
-                self.store.save_player(datetime.now().year, player)
+                self.store.save_player(player)
         except Exception as e:
             StriveLogger.error("Failed to save players", exc_info=e)
-            return CommandResult.failure("Failed to save players")
+            return CommandResult.failure_result("Failed to save players")
 
         message = f"Saved {len(to_save)} players"
-        return CommandResult.success(message=message, data=to_save)
+        return CommandResult.success_result(message=message, data=to_save)
 
 
 def create_upsert_players_executor(

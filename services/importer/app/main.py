@@ -53,7 +53,7 @@ from app.middleware.logging_middleware import LoggingMiddleware
 
 settings = get_settings()
 
-ApiKeyAuthMiddleware.setup(key=settings.api_key, anonymous_routes=["/"])
+ApiKeyAuthMiddleware.setup(key=settings.api_key, anonymous_routes=[""])
 
 app = FastAPI(
     middleware=[
@@ -73,7 +73,7 @@ logger = UvicornLogger()
 
 StriveLogger.initialize(logger=logger)
 
-initialize_firebase(settings)
+initialize_firebase(settings.rtdb_emulator_host, settings.gcloud_project)
 
 StriveLogger.info("Importer started")
 

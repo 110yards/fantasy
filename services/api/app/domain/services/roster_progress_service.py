@@ -1,11 +1,11 @@
 
 
-from yards_py.domain.entities.event_status import EVENT_STATUS_FINAL, EVENT_STATUS_IN_PROGRESS, EVENT_STATUS_PRE_GAME
-from services.api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
+from app.yards_py.domain.entities.event_status import EVENT_STATUS_FINAL, EVENT_STATUS_IN_PROGRESS, EVENT_STATUS_PRE_GAME
+from app.domain.repositories.public_repository import PublicRepository, create_public_repository
 
 from fastapi.param_functions import Depends
 from pydantic.main import BaseModel
-from services.api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
 
 
 def create_roster_progress_service(
