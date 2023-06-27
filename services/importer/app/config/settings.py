@@ -18,10 +18,16 @@ class Settings(BaseSettings):
     service_name: Optional[str] = None
     region: Optional[str] = None
     api_key: str
-    use_tsn_schedule: bool = False
     version: str = "dev"
     rtdb_emulator_host: Optional[str] = None
     firestore_emulator_host: Optional[str] = None
+    realtime_schedule_url: str
+    boxscore_schedule_url: str
+    boxscore_source_referer: str
+    players_url_format: str
+    players_source_referer: str
+    injuries_url_format: str
+    injuries_source_referer: str
 
     class Config:
         env_file = ".env"

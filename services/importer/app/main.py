@@ -1,5 +1,3 @@
-from typing import Optional
-
 from fastapi import FastAPI
 from fastapi.param_functions import Depends
 from starlette.middleware import Middleware
@@ -11,22 +9,13 @@ from strivelogger.logger_implementations.uvicorn_logger import UvicornLogger
 
 from app.config.settings import Settings, get_settings
 from app.core.initialize_firebase import initialize_firebase
-from app.domain.cqrs.commands.upsert_active_games_command import (
-    UpsertActiveGamesCommand,
-)
-from app.domain.cqrs.commands.upsert_injury_report_command import (
-    UpsertInjuryReportCommand,
-)
 from app.domain.cqrs.commands.upsert_players_command import UpsertPlayersCommand
 from app.domain.cqrs.commands.upsert_schedule_command import UpsertScheduleCommand
-from app.domain.cqrs.executors.upsert_active_games_executor import (
-    UpsertActiveGamesExecutor,
-    create_upsert_active_games_executor,
-)
-from app.domain.cqrs.executors.upsert_injury_report_executor import (
-    UpsertInjuryReportExecutor,
-    create_upsert_injury_report_executor,
-)
+
+# from app.domain.cqrs.executors.upsert_active_games_executor import (
+#     UpsertActiveGamesExecutor,
+#     create_upsert_active_games_executor,
+# )
 from app.domain.cqrs.executors.upsert_players_executor import (
     UpsertPlayersExecutor,
     create_upsert_players_executor,
@@ -35,14 +24,11 @@ from app.domain.cqrs.executors.upsert_schedule_executor import (
     UpsertScheduleExecutor,
     create_upsert_schedule_executor,
 )
-from app.domain.services.active_games_service import (
-    ActiveGamesService,
-    create_active_games_service,
-)
-from app.domain.services.injury_report_service import (
-    InjuryReportService,
-    create_injury_report_service,
-)
+
+# from app.domain.services.injury_report_service import (
+#     InjuryReportService,
+#     create_injury_report_service,
+# )
 from app.domain.services.player_service import PlayerService, create_player_service
 from app.domain.services.schedule_service import (
     ScheduleService,
@@ -50,6 +36,10 @@ from app.domain.services.schedule_service import (
 )
 from app.middleware.api_key_auth_middleware import ApiKeyAuthMiddleware
 from app.middleware.logging_middleware import LoggingMiddleware
+
+from .domain.cqrs.commands.upsert_scoreboard_command import UpsertScoreboardCommand
+from .domain.cqrs.executors.upsert_scoreboard_executor import UpsertScoreboardExecutor, create_upsert_scoreboard_executor
+from .domain.services.scoreboard_service import ScoreboardService, create_scoreboard_service
 
 settings = get_settings()
 
@@ -93,17 +83,17 @@ async def upsert_schedule(executor: UpsertScheduleExecutor = Depends(create_upse
     return executor.execute(UpsertScheduleCommand())
 
 
-@app.get("/games")
-async def get_games(hours: Optional[int] = None, service: ActiveGamesService = Depends(create_active_games_service)):
-    return service.get_games(hours)
+# @app.get("/games")
+# async def get_games(hours: Optional[int] = None, service: ActiveGamesService = Depends(create_active_games_service)):
+#     return service.get_games(hours)
 
 
-@app.post("/games")
-async def upsert_games(
-    hours: Optional[int] = None,
-    executor: UpsertActiveGamesExecutor = Depends(create_upsert_active_games_executor),
-):
-    return executor.execute(UpsertActiveGamesCommand(hours=hours))
+# @app.post("/games")
+# async def upsert_games(
+#     hours: Optional[int] = None,
+#     executor: UpsertActiveGamesExecutor = Depends(create_upsert_active_games_executor),
+# ):
+#     return executor.execute(UpsertActiveGamesCommand(hours=hours))
 
 
 @app.get("/players")
@@ -116,15 +106,27 @@ async def upsert_players(executor: UpsertPlayersExecutor = Depends(create_upsert
     return executor.execute(UpsertPlayersCommand())
 
 
-@app.get("/injury_report")
-async def get_injury_report(
-    service: InjuryReportService = Depends(create_injury_report_service),
-):
-    return service.get_report()
+# @app.get("/injury_report")
+# async def get_injury_report(
+#     service: InjuryReportService = Depends(create_injury_report_service),
+# ):
+#     return service.get_report()
 
 
-@app.post("/injury_report")
-async def upsert_injury_report(
-    executor: UpsertInjuryReportExecutor = Depends(create_upsert_injury_report_executor),
+# @app.post("/injury_report")
+# async def upsert_injury_report(
+#     executor: UpsertInjuryReportExecutor = Depends(create_upsert_injury_report_executor),
+# ):
+#     return executor.execute(UpsertInjuryReportCommand())
+
+
+@app.get("/scoreboard")
+async def get_scoreboard(service: ScoreboardService = Depends(create_scoreboard_service)):
+    return service.get_scoreboard()
+
+
+@app.post("/scoreboard")
+async def upsert_scoreboard(
+    executor: UpsertScoreboardExecutor = Depends(create_upsert_scoreboard_executor),
 ):
-    return executor.execute(UpsertInjuryReportCommand())
+    return executor.execute(UpsertScoreboardCommand())

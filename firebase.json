@@ -23,23 +23,18 @@
   },
   "emulators": {
     "auth": {
-      "host": "0.0.0.0",
       "port": 9099
     },
     "firestore": {
-      "host": "0.0.0.0",
       "port": 9000
     },
     "database": {
-      "host": "0.0.0.0",
       "port": 9001
     },
     "pubsub": {
-      "host": "0.0.0.0",
       "port": 9085
     },
     "ui": {
-      "host": "0.0.0.0",
       "enabled": true
     }
   }

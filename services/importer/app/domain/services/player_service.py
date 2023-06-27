@@ -1,276 +1,232 @@
+from datetime import datetime
 from typing import Optional
 
 import requests
+from dateutil import parser
 from fastapi import Depends
 from strivelogger import StriveLogger
 
 from app.config.settings import Settings, get_settings
-from app.domain.constants.tsn import TeamIds, map_tsn_position, map_tsn_teams
-from app.domain.models.player import Player, Position, Team
+from app.domain.models.player import InjuryDetails, InjuryStatus, Player, Position
+from app.domain.store.schedule_store import ScheduleStore, create_schedule_store
 
 
 class PlayerService:
     def __init__(
         self,
         settings: Settings,
+        schedule_store: ScheduleStore,
     ):
         self.settings = settings
+        self.schedule_store = schedule_store
 
     def get_players(self) -> list[Player]:
-        return get_from_tsn()
+        season_id = self.schedule_store.get_boxscore_source_season_id(datetime.now().year)
+        if not season_id:
+            raise ValueError("No boxscore source season id found")
 
+        players_data = self.load_players_data(season_id)
+        injury_data = self.load_injury_data(season_id)
 
-def get_from_tsn() -> list[Player]:
-    team_ids = [
-        TeamIds.BC,
-        TeamIds.CGY,
-        TeamIds.EDM,
-        TeamIds.HAM,
-        TeamIds.MTL,
-        TeamIds.OTT,
-        TeamIds.SSK,
-        TeamIds.TOR,
-        TeamIds.WPG,
-    ]
+        injuries = map_injuries_data(injury_data)
+        players = map_players(players_data, injuries)
 
-    players = []
-    for team_id in team_ids:
-        StriveLogger.info(f"Getting players for team: {team_id.name}")
-        team_players = get_from_tsn_roster(team_id)
+        return players
 
-        if len(team_players) == 0:
-            StriveLogger.warn(f"No players found for team: {team_id.name}")
+    def load_players_data(self, season_id: str) -> list[Player]:
+        url = self.settings.players_url_format.replace("{season_id}", season_id)
+        StriveLogger.info(f"Fetching {url}")
+        response = requests.get(url, headers={"Referer": self.settings.players_source_referer})
+
+        data = response.json()
+        if not data:
             return []
 
-        players.extend(team_players)
+        return data["playerListWidgetData"]["players"]
+
+    def load_injury_data(self, season_id: str) -> list[InjuryDetails]:
+        url = self.settings.injuries_url_format.replace("{season_id}", season_id)
+        StriveLogger.info(f"Fetching {url}")
+        response = requests.get(url, headers={"Referer": self.settings.injuries_source_referer})
+
+        data = response.json()
+        if not data:
+            return []
+
+        return data["injuries"]["teamInjuries"]
+
+
+def map_injuries_data(injuries_data: dict) -> dict[str, InjuryDetails]:
+    injuries = {}
+
+    for team_injury_data in injuries_data:
+        for injury_data in team_injury_data["injuries"]:
+            injury_player_id = injury_data["playerId"]
+            injuries[injury_player_id] = map_player_injury(injury_data)
+
+    return injuries
+
+
+def map_player_injury(injury_data: dict) -> InjuryDetails:
+    return InjuryDetails(
+        status_id=map_injury_status(injury_data["status"]),
+        text=injury_data.get("displayStatus") or "",
+        injury=injury_data["injury"],
+        last_updated=parser.parse(injury_data["lastUpdated"]).strftime("%Y-%m-%d"),
+    )
+
+
+def map_injury_status(status_text: str) -> InjuryStatus:
+    match status_text:
+        case "questionable":
+            return InjuryStatus.Questionable
+        case "Six-Game Injured List":
+            return InjuryStatus.InjuredSixGames
+        case "out":
+            return InjuryStatus.Out
+        case "probable":
+            return InjuryStatus.Probable
+        case _:
+            StriveLogger.warn(f"Unknown injury status: {status_text}")
+            return InjuryStatus.Out
+
+
+def map_players(players_data: dict, injuries: dict[str, InjuryDetails]) -> list[Player]:
+    players = []
+
+    for player_data in players_data:
+        player = map_player(player_data, injuries)
+
+        if player:
+            players.append(player)
 
     return players
 
 
-def get_from_tsn_roster(team_id: TeamIds) -> list[Player]:
-    url = f"https://stats.sports.bellmedia.ca/sports/football/leagues/cfl/competitor/{team_id.value}/players"
-    response = requests.get(url)
-
-    data = response.json()
-
-    players = [map_tsn_player(player_data) for player_data in data]
-    return [player for player in players if player is not None]
-
-
-def map_tsn_player(player_data: dict) -> Optional[Player]:
-    position = map_tsn_position(player_data["positionShort"])
-
-    if position == Position.unknown():
-        StriveLogger.warn(f"Unknown position '{player_data['positionShort']}' for player: {player_data['displayName']}")
-
-    birth_date = player_data["birthDate"]
-    if birth_date is None:
-        StriveLogger.warn(f"Missing birth date for player: {player_data['displayName']}")
+def map_player(player_data: dict, injuries: dict[str, InjuryDetails]) -> Optional[Player]:
+    displayName = f"{player_data['playerFirstName']} {player_data['playerLastName']}"
+    if len(player_data["seasonDetails"]["position"]) != 1:
+        StriveLogger.warn(f"Found multiple positions for player: {displayName}")
         return None
 
-    team = map_tsn_teams(player_data["competitorId"])
+    birth_date = parser.isoparse(player_data.get("birthdate")) if player_data.get("birthdate") else None
+    if not birth_date:
+        StriveLogger.warn(f"No birthdate for player: {displayName}")
+        return None
 
-    if team == Team.free_agent():
-        StriveLogger.warn(f"Found free agent on TSN roster somehow: {player_data['displayName']}")
+    position_short = player_data["seasonDetails"]["position"][0]["positionShortName"]
+    position = map_position(position_short)
+
+    if position == Position.unknown():
+        StriveLogger.warn(f"Unknown position '{position_short}' for player: {displayName}")
+        return None
+
+    uniform = player_data["seasonDetails"].get("number")
+    team_abbr = map_boxscore_source_team_id(player_data["teamId"])
+
+    height_inches = int(player_data["height"]["value"]) if player_data.get("height") else 0
+    height_feet = height_inches // 12 if height_inches else None
+    height_inches = height_inches % 12 if height_inches else None
+    height = f"{height_feet}'{height_inches}" if height_feet and height_inches else None
 
     return Player(
-        tsn_id=player_data["playerId"],
-        first_name=player_data["firstName"],
-        last_name=player_data["lastName"],
-        birth_date=player_data["birthDate"],
-        birth_place=player_data["birthPlace"],
-        height=f"{player_data['heightFeet']}'{player_data['heightInches']}",
-        weight=player_data["weight"],
+        first_name=player_data["playerFirstName"],
+        last_name=player_data["playerLastName"],
+        boxscore_source_id=player_data["playerId"],
+        birth_date=birth_date,
+        birth_place=player_data.get("birthplace"),
+        height=height,
+        weight=player_data.get("weight", {"value": None})["value"],
         rookie_year=None,
-        canadian_player=player_data.get("iso") != "CA",
+        canadian_player=player_data.get("location")["country"] == "CAN" if player_data.get("location") else True,
         image_url=None,
-        school=None,  # Not available in TSN data
+        school=player_data.get("school"),
         position=position,
-        team=team,
+        team_abbr=team_abbr,
+        uniform=uniform,
+        injury_status=injuries.get(player_data["playerId"]),
     )
 
 
-# uses the cfl list which is fucked
-# class PlayerService:
-#     def get_players(self) -> list[Player]:
-#         url = "https://www.cfl.ca/wp-content/themes/cfl.ca/inc/admin-ajax.php?action=get_all_players"
-#         response = requests.get(url)
+def map_position(abbr: str) -> Position:
+    match abbr:
+        case "QB":
+            return Position.quarterback()
+        case "RB":
+            return Position.runningback()
+        case "FB":
+            return Position.fullback()
+        case "DL":
+            return Position.defensiveline()
+        case "DB":
+            return Position.defensiveback()
+        case "WR":
+            return Position.widereceiver()
+        case "LB":
+            return Position.linebacker()
+        case "OL":
+            return Position.offensiveline()
+        case "K":
+            return Position.kicker()
+        case "P":
+            return Position.punter()
+        case "LS":
+            return Position.longsnapper()
+        case "DE":
+            return Position.defensiveend()
+        case "G":
+            return Position.guard()
+        case "DT":
+            return Position.defensivetackle()
+        case "S":
+            return Position.safety()
+        case "T":
+            return Position.tackle()
+        case "OT":
+            return Position.tackle()
 
-#         data = response.json()
-
-#         players = [map_cfl_player(player_data) for player_data in data["data"]]
-#         return [player for player in players if player is not None]
-
-
-# def map_cfl_player(player_data: list) -> Player:
-#     StriveLogger.debug(f"Mapping player: {player_data}")
-
-#     jersey: str = player_data[0]
-#     name: str = player_data[1]
-#     team_abbr: str = player_data[2]
-#     position: str = player_data[3]
-#     a_n_g: str = player_data[4]
-#     height: str = player_data[5]
-#     weight: str = player_data[6]
-#     age: int = player_data[7]
-#     college: str = player_data[8]
-#     url: str = player_data[9]
-
-#     parts = url.split("/")
-
-#     cfl_central_id = parts[-2]
-
-#     try:
-#         cfl_central_id = int(cfl_central_id)
-#     except ValueError:
-#         StriveLogger.error(f"Could not determine CFL Central ID: {url}")
-#         return None
-
-#     if ", Jr" in name:
-#         name = name.replace(", Jr", " Jr")
-
-#     parts = name.split(",")
-#     if len(parts) != 2:
-#         StriveLogger.error(f"Invalid name: {name}")
-#         return None
-
-#     last_name = parts[0].strip()
-#     first_name = parts[1].strip()
-
-#     foreign_player = a_n_g != "N"
-
-#     position = map_cfl_position(position)
-
-#     if position is None:
-#         StriveLogger.error(f"No position for player: {url}")
-#         return None
-
-#     weight = weight.replace("lbs", "").strip()
-#     weight = int(weight) if weight else None
-
-#     team = map_cfl_team(team_abbr)
-
-#     pseudo_id = f"{team.abbreviation}-{last_name}-{first_name}".lower()
-
-#     return Player(
-#         cfl_central_id=cfl_central_id,
-#         pseudo_id=pseudo_id,
-#         stats_inc_id=0,
-#         first_name=first_name,
-#         last_name=last_name,
-#         jersey=jersey,
-#         team=team,
-#         position=position,
-#         age=age,
-#         height=height,
-#         weight=weight,
-#         college=college,
-#         foreign_player=foreign_player,
-#         school=School(name=college),
-#     )
+        case _:
+            return Position.unknown()
 
 
-# def map_cfl_team(abbr: str) -> Team:
-#     match abbr:
-#         case "BC":
-#             return Team.bc()
-#         case "CGY":
-#             return Team.cgy()
-#         case "EDM":
-#             return Team.edm()
-#         case "HAM":
-#             return Team.ham()
-#         case "MTL":
-#             return Team.mtl()
-#         case "OTT":
-#             return Team.ott()
-#         case "SSK":
-#             return Team.ssk()
-#         case "TOR":
-#             return Team.tor()
-#         case "WPG":
-#             return Team.wpg()
-#         case _:
-#             return Team.free_agent()
+def map_boxscore_source_team_id(team_id: str) -> str:
+    match team_id:
+        case "/sport/football/team:241":
+            return "bc"
 
+        case "/sport/football/team:243":
+            return "cgy"
 
-# def map_cfl_position(pos: str) -> Optional[Position]:
-#     match pos:
-#         case "QB":
-#             return Position(position_id=1, abbreviation="QB", description="Quarterback", offence_defence_or_special="O")
-#         case "RB":
-#             return Position(
-#                 position_id=2, abbreviation="RB", description="Running Back", offence_defence_or_special="O"
-#             )
-#         case "FB":
-#             return Position(position_id=3, abbreviation="FB", description="Full Back", offence_defence_or_special="O")
-#         case "SB":
-#             return Position(position_id=4, abbreviation="SB", description="Slot Back", offence_defence_or_special="O")
-#         case "OL":
-#             return Position(
-#                 position_id=5, abbreviation="OL", description="Offensive Lineman", offence_defence_or_special="O"
-#             )
-#         case "G":
-#             return Position(position_id=6, abbreviation="G", description="Guard", offence_defence_or_special="O")
-#         case "DE":
-#             return Position(
-#                 position_id=7, abbreviation="DE", description="Defensive End", offence_defence_or_special="D"
-#             )
-#         case "WR":
-#             return Position(
-#                 position_id=8, abbreviation="WR", description="Wide Receiver", offence_defence_or_special="O"
-#             )
-#         case "LB":
-#             return Position(position_id=11, abbreviation="LB", description="Linebacker", offence_defence_or_special="D")
-#         case "DB":
-#             return Position(
-#                 position_id=12, abbreviation="DB", description="Defensive Back", offence_defence_or_special="D"
-#             )
-#         case "DL":
-#             return Position(
-#                 position_id=13, abbreviation="DL", description="Defensive Lineman", offence_defence_or_special="D"
-#             )
-#         case "P":
-#             return Position(position_id=14, abbreviation="P", description="Punter", offence_defence_or_special="S")
-#         case "K":
-#             return Position(position_id=16, abbreviation="K", description="Kicker", offence_defence_or_special="S")
-#         case "LS":
-#             return Position(
-#                 position_id=17, abbreviation="LS", description="Long Snapper", offence_defence_or_special="S"
-#             )
-#         case "DT":
-#             return Position(
-#                 position_id=18, abbreviation="DT", description="Defensive Tackle", offence_defence_or_special="D"
-#             )
-#         case "C":
-#             return Position(position_id=19, abbreviation="C", description="Center", offence_defence_or_special="O")
-#         case "CB":
-#             return Position(
-#                 position_id=21, abbreviation="CB", description="Corner Back", offence_defence_or_special="D"
-#             )
-#         case "S":
-#             return Position(position_id=23, abbreviation="S", description="Safety", offence_defence_or_special="D")
-#         case "T":
-#             return Position(position_id=24, abbreviation="T", description="Tackle", offence_defence_or_special="D")
-#         case "TE":
-#             return Position(position_id=26, abbreviation="TE", description="Tight End", offence_defence_or_special="O")
-#         case "ST":
-#             return Position(
-#                 position_id=27, abbreviation="ST", description="Special Teams Tackle", offence_defence_or_special="S"
-#             )
-#         case "RE":
-#             return Position(position_id=28, abbreviation="RE", description="Right End", offence_defence_or_special="D")
-#         case "NT":
-#             return Position(
-#                 position_id=30, abbreviation="NT", description="Nose Tackle", offence_defence_or_special="D"
-#             )
-#         case _:
-#             return None
+        case "/sport/football/team:242":
+            return "edm"
+
+        case "/sport/football/team:246":
+            return "ham"
+
+        case "/sport/football/team:249":
+            return "mtl"
+
+        case "/sport/football/team:947":
+            return "ott"
+
+        case "/sport/football/team:244":
+            return "ssk"
+
+        case "/sport/football/team:247":
+            return "tor"
+
+        case "/sport/football/team:245":
+            return "wpg"
+
+        case _:
+            raise ValueError(f"Unknown team id '{team_id}'")
 
 
 def create_player_service(
     settings: Settings = Depends(get_settings),
+    schedule_store: ScheduleStore = Depends(create_schedule_store),
 ) -> PlayerService:
     return PlayerService(
         settings=settings,
+        schedule_store=schedule_store,
     )

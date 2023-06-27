@@ -101,15 +101,11 @@ class Team(BaseModel):
 
     @staticmethod
     def cgy(score: int, is_at_home: bool):
-        return Team(
-            team_id=2, abbreviation="CGY", location="Calgary", nickname="Stampeders", score=score, is_at_home=is_at_home
-        )
+        return Team(team_id=2, abbreviation="CGY", location="Calgary", nickname="Stampeders", score=score, is_at_home=is_at_home)
 
     @staticmethod
     def edm(score: int, is_at_home: bool):
-        return Team(
-            team_id=3, abbreviation="EDM", location="Edmonton", nickname="Elks", score=score, is_at_home=is_at_home
-        )
+        return Team(team_id=3, abbreviation="EDM", location="Edmonton", nickname="Elks", score=score, is_at_home=is_at_home)
 
     @staticmethod
     def ham(score: int, is_at_home: bool):
@@ -124,15 +120,11 @@ class Team(BaseModel):
 
     @staticmethod
     def mtl(score: int, is_at_home: bool):
-        return Team(
-            team_id=5, abbreviation="MTL", location="Montreal", nickname="Alouettes", score=score, is_at_home=is_at_home
-        )
+        return Team(team_id=5, abbreviation="MTL", location="Montreal", nickname="Alouettes", score=score, is_at_home=is_at_home)
 
     @staticmethod
     def ott(score: int, is_at_home: bool):
-        return Team(
-            team_id=6, abbreviation="OTT", location="Ottawa", nickname="Redblacks", score=score, is_at_home=is_at_home
-        )
+        return Team(team_id=6, abbreviation="OTT", location="Ottawa", nickname="Redblacks", score=score, is_at_home=is_at_home)
 
     @staticmethod
     def ssk(score: int, is_at_home: bool):
@@ -147,9 +139,7 @@ class Team(BaseModel):
 
     @staticmethod
     def tor(score: int, is_at_home: bool):
-        return Team(
-            team_id=8, abbreviation="TOR", location="Toronto", nickname="Argonauts", score=score, is_at_home=is_at_home
-        )
+        return Team(team_id=8, abbreviation="TOR", location="Toronto", nickname="Argonauts", score=score, is_at_home=is_at_home)
 
     @staticmethod
     def wpg(score: int, is_at_home: bool):
@@ -303,9 +293,6 @@ class GamePlayer(BaseModel):
     first_name: str
     last_name: str
     player_id: Optional[str] = None
-    tsn_id: Optional[int] = None
-    cfl_central_id: Optional[int]
-    middle_name: Optional[str] = None
     birth_date: Optional[str] = None
 
 
@@ -609,9 +596,6 @@ class PlayReview(BaseModel):
 
 class Game(BaseModel):
     game_id: str
-    cfl_game_id: Optional[int]
-    genius_game_id: Optional[int]
-    tsn_game_id: Optional[int]
     date_start: str
     # game_number: int
     week: int

@@ -26,10 +26,6 @@ class UpsertScheduleExecutor:
             StriveLogger.error("Failed to load schedule", exc_info=e)
             return CommandResult.failure_result("Failed to load schedule")
 
-        if len(schedule.games) == 0:
-            StriveLogger.error("No games found")
-            return CommandResult.failure_result("No games found")
-
         if schedule.year != datetime.now().year:
             StriveLogger.warn("Schedule is not for the current year")
             return CommandResult.failure_result("Schedule is not for the current year")
@@ -38,11 +34,9 @@ class UpsertScheduleExecutor:
 
         needs_update = existing_schedule is None or existing_schedule.hash() != schedule.hash()
 
-        StriveLogger.info(f"{schedule.games['20230309'].event_status}")
-
         if not needs_update:
             StriveLogger.info("Schedule is up to date")
-            return CommandResult.success()
+            return CommandResult.success_result()
 
         try:
             StriveLogger.info("Saving schedule")
@@ -52,7 +46,7 @@ class UpsertScheduleExecutor:
             return CommandResult.failure_result("Failed to save schedule")
 
         StriveLogger.info("Schedule saved")
-        return CommandResult.success()
+        return CommandResult.success_result()
 
 
 def create_upsert_schedule_executor(

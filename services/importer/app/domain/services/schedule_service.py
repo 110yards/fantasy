@@ -6,306 +6,139 @@ from fastapi import Depends
 from strivelogger import StriveLogger
 
 from app.config.settings import Settings, get_settings
-from app.core import game_mappings
-from app.domain.models.game import EventStatus, EventType, Game, Team
-from app.domain.models.schedule import Schedule
+from app.domain.models.schedule import Schedule, ScheduleGame, ScheduleWeek, create_game_id
 
 
 class ScheduleService:
-    def __init__(self, use_tsn_schedule: bool):
-        self.use_tsn_schedule = use_tsn_schedule
+    def __init__(self, settings: Settings):
+        self.settings = settings
 
     def get_schedule(self) -> Schedule:
-        return get_from_cfl()
+        StriveLogger.info("Getting schedule from primary source")
+        realtime_source_data = self.get_realtime_source_data()
+        boxscore_source_data = self.get_boxscore_source_date()
+
+        return create_schedule(realtime_source_data, boxscore_source_data)
+
+    def get_realtime_source_data(self) -> dict:
+        return requests.get(self.settings.realtime_schedule_url).json()
+
+    def get_boxscore_source_date(self) -> dict:
+        return requests.get(
+            self.settings.boxscore_schedule_url,
+            headers={
+                "Referer": self.settings.boxscore_source_referer,
+            },
+        ).json()
 
 
-#########################################
-# TSN - not updating live currently
-def get_from_tsn() -> Schedule:
-    StriveLogger.info("Getting schedule from TSN")
-    page = 4
+def create_schedule(realtime_source_data: dict, boxscore_source_data: dict) -> Schedule:
+    weeks: dict[str, ScheduleWeek] = {}
 
-    games: list[Game] = []
-    year = 0
+    year = realtime_source_data[0]["startDate"].split("-")[0]
+    boxscore_source_season_id: str | None = None
 
-    while True:
-        url = f"https://stats.sports.bellmedia.ca/sports/football/leagues/cfl/schedule/subset/dates?brand=tsn&type=json&dateOrId={page}&toAdd=99"
-        response = requests.get(url)
+    for seasons in boxscore_source_data["datepicker"]["activeSeasons"]:
+        if seasons["seasonName"] == str(year):
+            boxscore_source_season_id = seasons["editionId"]
 
-        if response.headers.get("Content-Type") != "application/json":
-            break
-
-        data: dict = response.json()
-        if len(data) == 0:
-            break
-
-        games.extend(map_tsn_week(data))
-
-        if year == 0:
-            year = data[str(page)]["season"]
-
-        page += len(data)
-
-    return Schedule(
-        year=year,
-        games=games,
-    )
-
-
-def map_tsn_week(data: dict) -> list[Game]:
-    games = []
-
-    for key in data.keys():
-        week = data[key]
-        for game in week["events"]:
-            games.append(map_tsn_game(week, game))
-
-    return games
-
-
-def map_tsn_game(week_data: dict, game_data: dict) -> Game:
-    # game_id = game_data["id"] if year > 2023 else mappings_2023[str(game_data["id"])]
-
-    return Game(
-        tsn_game_id=game_data["eventId"],
-        date_start=game_data["dateGMT"] + "+00:00",
-        week=week_data["eventGrouping"],
-        season=week_data["season"],
-        event_type=map_tsn_game_type(week_data["seasonType"]),
-        event_status=map_tsn_event_status(game_data["status"], "0:00"),
-        team_1=map_tsn_team(game_data["awayEventResult"], is_at_home=False),
-        team_2=map_tsn_team(game_data["homeEventResult"], is_at_home=True),
-    )
-
-
-def map_tsn_game_type(type: str) -> EventType:
-    if type == "Exhibition":
-        return EventType(
-            event_type_id=0,
-            name="Preseason",
-        )
-
-    if type == "Regular Season":
-        return EventType(
-            event_type_id=1,
-            name="Regular Season",
-        )
-
-    raise NotImplementedError(f"Event type {type} not implemented")
-
-
-def map_tsn_event_status(status: str, clock: str) -> EventStatus:
-    if status == "Pre-Game":
-        return EventStatus(
-            event_status_id=0,
-            name="Pre-Game",
-            is_active=False,
-        )
-
-    if status == "Final":
-        return EventStatus(
-            event_status_id=1,
-            name="Final",
-            is_active=False,
-        )
-
-    # if status in ["first_quarter", "second_quarter", "third_quarter", "fourth_quarter", "overtime"]:
-    #     if status == "first_quarter":
-    #         quarter = 1
-    #     elif status == "second_quarter":
-    #         quarter = 2
-    #     elif status == "third_quarter":
-    #         quarter = 3
-    #     elif status == "fourth_quarter":
-    #         quarter = 4
-    #     elif status == "overtime":
-    #         quarter = 5
-    #     else:
-    #         quarter = None
-
-    #     clock_parts = clock.split(":")
-    #     minutes = int(clock_parts[0])
-    #     seconds = int(clock_parts[1])
-
-    #     return EventStatus(
-    #         event_status_id=2,
-    #         name="In Progress",
-    #         is_active=True,
-    #         quarter=quarter,
-    #         minutes=minutes,
-    #         seconds=seconds,
-    #     )
-
-    raise NotImplementedError(f"Event status {status} not implemented")
-
-
-def map_tsn_team(team_data: dict, is_at_home: bool) -> Team:
-    score = team_data["score"] or 0
-    match team_data["competitor"]["competitorId"]:
-        case 1069:
-            return Team.cgy(score, is_at_home)
-        case 1070:
-            return Team.edm(score, is_at_home)
-        case 38354:
-            return Team.ott(score, is_at_home)
-        case 1072:
-            return Team.mtl(score, is_at_home)
-        case 1071:
-            return Team.ham(score, is_at_home)
-        case 1074:
-            return Team.tor(score, is_at_home)
-        case 1075:
-            return Team.wpg(score, is_at_home)
-        case 1073:
-            return Team.ssk(score, is_at_home)
-        case 1068:
-            return Team.bc(score, is_at_home)
-        case _:
-            raise NotImplementedError(f"Team {team_data['id']} not implemented")
-
-
-#########################################
-# CFL / Genius
-
-
-def get_from_cfl() -> Schedule:
-    StriveLogger.info("Getting schedule from CFL")
-    data = requests.get("https://cflscoreboard.cfl.ca/json/scoreboard/rounds.json").json()
-
-    return map_genius_scoreboard(data)
-
-
-def map_genius_scoreboard(data: dict) -> Schedule:
-    games: list[Game] = []
     game_number = 1
-    for week in data:
-        if week["type"] != "REG":
+    for realtime_source_week in realtime_source_data:
+        if realtime_source_week["type"] != "REG":
             continue
 
-        for game in week["tournaments"]:
-            games.append(map_genius_game(week, game, game_number))
-            game_number += 1
+        week_number = realtime_source_week["number"]
 
-    year = data[0]["startDate"].split("-")[0]
-    games = {game.game_id: game for game in games}
+        key = f"Week {week_number}"
+        boxscore_week = boxscore_source_data["datepicker"]["matchSortByWeek"].get(key)
+
+        if not boxscore_week:
+            raise ValueError(f"Boxscore week not found for key '{key}'")
+
+        week_key = f"W{str(week_number).zfill(2)}"
+        week = ScheduleWeek(week_number=week_number, games=[])
+        weeks[week_key] = week
+
+        index = 0
+        for realtime_source_game in realtime_source_week["tournaments"]:
+            boxscore_source_game = boxscore_week[index]
+
+            week.games.append(map_game(realtime_source_game, boxscore_source_game, week_number, game_number))
+
+            game_number += 1
+            index += 1
 
     return Schedule(
         year=year,
-        games=games,
+        boxscore_source_season_id=boxscore_source_season_id,
+        weeks=weeks,
     )
 
 
-def map_genius_game(week_data: dict, game_data: dict, game_number: int) -> Game:
-    game_date = parser.isoparse(game_data["date"])
+def map_game(realtime_source_data: dict, boxscore_source_data: dict, week_number: int, game_number: int) -> ScheduleGame:
+    game_date = parser.isoparse(realtime_source_data["date"])
     year = game_date.year
-    week = week_data["number"]
 
-    game_id = Game.get_game_id(year, week, game_number)
-    cfl_game_id = None if year > 2023 else game_mappings.genius_to_legacy_mappings_2023[str(game_data["id"])]
-    tsn_game_id = game_mappings.genius_to_tsn_mappings_2023[str(game_data["id"])]
-    genius_game_id = game_data["id"]
+    game_id = create_game_id(year, week_number, game_number)
+    realtime_source_id = realtime_source_data["id"]
+    boxscore_source_id = boxscore_source_data["matchId"]
 
-    return Game(
+    away_abbr = realtime_source_data["awaySquad"]["shortName"].lower()
+    home_abbr = realtime_source_data["homeSquad"]["shortName"].lower()
+
+    # sanity check
+    boxscore_source_away = map_boxscore_source_team_id(boxscore_source_data["awayTeamId"])
+    boxscore_source_home = map_boxscore_source_team_id(boxscore_source_data["homeTeamId"])
+
+    assert away_abbr == boxscore_source_away, f"Away team mismatch: expected '{away_abbr}', got '{boxscore_source_away}'"
+    assert home_abbr == boxscore_source_home, f"Home team mismatch: expected '{home_abbr}', got '{boxscore_source_home}'"
+
+    return ScheduleGame(
         game_id=game_id,
-        cfl_game_id=cfl_game_id,
-        genius_game_id=genius_game_id,
-        tsn_game_id=tsn_game_id,
-        date_start=game_data["date"],
-        week=week,
-        season=year,
-        event_type=map_genius_game_type(week_data["type"]),
-        event_status=map_genius_event_status(game_data["status"], game_data["clock"]),
-        team_1=map_genius_team(game_data["awaySquad"], is_at_home=False),
-        team_2=map_genius_team(game_data["homeSquad"], is_at_home=True),
+        realtime_source_id=realtime_source_id,
+        boxscore_source_id=boxscore_source_id,
+        date_start=game_date,
+        week=week_number,
+        game_number=game_number,
+        away_abbr=away_abbr,
+        home_abbr=home_abbr,
     )
 
 
-def map_genius_game_type(type: str) -> EventType:
-    if type == "PRE":
-        return EventType(
-            event_type_id=0,
-            name="Preseason",
-        )
+def map_boxscore_source_team_id(team_id: str) -> str:
+    match team_id:
+        case "/sport/football/team:241":
+            return "bc"
 
-    if type == "REG":
-        return EventType(
-            event_type_id=1,
-            name="Regular Season",
-        )
+        case "/sport/football/team:243":
+            return "cgy"
 
-    raise NotImplementedError(f"Event type {type} not implemented")
+        case "/sport/football/team:242":
+            return "edm"
 
+        case "/sport/football/team:246":
+            return "ham"
 
-def map_genius_event_status(status: str, clock: str) -> EventStatus:
-    if status == "scheduled":
-        return EventStatus(
-            event_status_id=1,
-            name="Pre-Game",
-            is_active=False,
-        )
+        case "/sport/football/team:249":
+            return "mtl"
 
-    if status == "complete":
-        return EventStatus(
-            event_status_id=4,
-            name="Final",
-            is_active=False,
-        )
+        case "/sport/football/team:947":
+            return "ott"
 
-    if status in ["first_quarter", "second_quarter", "third_quarter", "fourth_quarter", "overtime"]:
-        if status == "first_quarter":
-            quarter = 1
-        elif status == "second_quarter":
-            quarter = 2
-        elif status == "third_quarter":
-            quarter = 3
-        elif status == "fourth_quarter":
-            quarter = 4
-        elif status == "overtime":
-            quarter = 5
-        else:
-            quarter = None
+        case "/sport/football/team:244":
+            return "ssk"
 
-        clock_parts = clock.split(":")
-        minutes = int(clock_parts[0])
-        seconds = int(clock_parts[1])
+        case "/sport/football/team:247":
+            return "tor"
 
-        return EventStatus(
-            event_status_id=2,
-            name="In Progress",
-            is_active=True,
-            quarter=quarter,
-            minutes=minutes,
-            seconds=seconds,
-        )
+        case "/sport/football/team:245":
+            return "wpg"
 
-
-def map_genius_team(team_data: dict, is_at_home: bool) -> Team:
-    match team_data["id"]:
-        case 112939:
-            return Team.cgy(team_data["score"], is_at_home)
-        case 114347:
-            return Team.edm(team_data["score"], is_at_home)
-        case 88019:
-            return Team.ott(team_data["score"], is_at_home)
-        case 86680:
-            return Team.mtl(team_data["score"], is_at_home)
-        case 83579:
-            return Team.ham(team_data["score"], is_at_home)
-        case 122345:
-            return Team.tor(team_data["score"], is_at_home)
-        case 110380:
-            return Team.wpg(team_data["score"], is_at_home)
-        case 106752:
-            return Team.ssk(team_data["score"], is_at_home)
-        case 93775:
-            return Team.bc(team_data["score"], is_at_home)
         case _:
-            raise NotImplementedError(f"Team {team_data['id']} not implemented")
+            raise ValueError(f"Unknown team id '{team_id}'")
 
 
 def create_schedule_service(
     settings: Settings = Depends(get_settings),
 ) -> ScheduleService:
-    return ScheduleService(
-        use_tsn_schedule=settings.use_tsn_schedule,
-    )
+    return ScheduleService(settings=settings)

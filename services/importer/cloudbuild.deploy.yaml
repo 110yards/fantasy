@@ -21,7 +21,6 @@ steps:
             "--set-env-vars", "RTDB_URL=$_RTDB_URL",
             "--set-env-vars", "SERVICE_NAME=$_SERVICE_NAME",
             "--set-env-vars", "REGION=$_REGION",
-            "--set-env-vars", "USE_TSN_SCHEDULE=$_USE_TSN_SCHEDULE",
             # SECRETS
             "--update-secrets=API_KEY=IMPORTER_API_KEY:latest"
 ]
@@ -34,4 +33,3 @@ substitutions:
   _REGION: us-central1
   _TARGET_PROJECT_ID: cfldata
   _RTDB_URL: https://cfldata-default-rtdb.firebaseio.com
-  _USE_TSN_SCHEDULE: 'False'
