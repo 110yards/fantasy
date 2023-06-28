@@ -51,3 +51,6 @@ class Scoreboard(BaseModel):
 
     def is_locked(self, team_abbr: str) -> bool:
         return getattr(self.teams, team_abbr).locked
+
+    def is_team_on_bye(self, team_abbr: str) -> bool:
+        return getattr(self.teams, team_abbr).opponent is None

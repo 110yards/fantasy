@@ -8,9 +8,10 @@ from app.domain.repositories.public_repository import PublicRepository, create_p
 from app.domain.repositories.state_repository import StateRepository, create_state_repository
 from app.yards_py.core.batch import create_batches
 from app.yards_py.core.firestore_proxy import Query
-from app.yards_py.domain.entities.opponents import Opponents
 from app.yards_py.domain.entities.player import Player
 from app.yards_py.domain.entities.player_league_season_score import PlayerLeagueSeasonScore
+
+from ...yards_py.domain.entities.scoreboard import Scoreboard
 
 
 def create_player_projection_service(
@@ -45,9 +46,9 @@ class PlayerProjectionService:
         return projections.get(player.player_id, 0.0)
 
     def get_projections(self, league_id: str, players: List[Player]) -> Dict[str, float]:
-        opponents = self.public_repo.get_opponents()
+        scoreboard = self.public_repo.get_scoreboard()
 
-        player_ids = [p.id for p in players if p]
+        player_ids = [p.player_id for p in players if p]
         batches = create_batches(player_ids, 10)
 
         player_scores: Dict[str, PlayerLeagueSeasonScore] = {}
@@ -60,18 +61,18 @@ class PlayerProjectionService:
         projections = {}
         for player in players:
             player_score = player_scores.get(player.player_id, None)  # TODO: last year's average if week 1
-            projections[player.player_id] = self.calculate(opponents, player, player_score)
+            projections[player.player_id] = self.calculate(scoreboard, player, player_score)
 
         return projections
 
-    def calculate(self, opponents: Opponents, player: Player, player_score: PlayerLeagueSeasonScore) -> float:
+    def calculate(self, scoreboard: Scoreboard, player: Player, player_score: PlayerLeagueSeasonScore) -> float:
         if player.likely_out_for_game():
             return 0.0
 
         if player.is_free_agent():
             return 0.0
 
-        if opponents.is_team_on_bye(player.team_abbr):
+        if scoreboard.is_team_on_bye(player.team_abbr):
             return 0.0
 
         if not player_score:
