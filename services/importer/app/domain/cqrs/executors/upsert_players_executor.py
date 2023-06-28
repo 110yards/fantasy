@@ -8,26 +8,35 @@ from app.domain.models.player import Player
 from app.domain.services.player_service import PlayerService, create_player_service
 from app.domain.store.player_store import PlayerStore, create_player_store
 
+from ...store.import_state_store import ImportStateStore, create_import_state_store
+
 
 class UpsertPlayersExecutor:
-    def __init__(self, settings: Settings, store: PlayerStore, service: PlayerService):
+    def __init__(
+        self,
+        settings: Settings,
+        player_store: PlayerStore,
+        player_service: PlayerService,
+        import_state_store: ImportStateStore,
+    ):
         self.settings = settings
-        self.service = service
-        self.store = store
+        self.player_service = player_service
+        self.player_store = player_store
+        self.import_state_store = import_state_store
 
     def execute(self, command: UpsertPlayersCommand) -> CommandResult:
         try:
-            players = self.service.get_players()
+            players = self.player_service.get_players()
         except Exception as e:
             StriveLogger.error("Failed to load players", exc_info=e)
-            return CommandResult.failure_result("Failed to load schedule")
+            return CommandResult.failure_result("Failed to load players")
 
         if len(players) == 0:
             StriveLogger.error("No players found")
             return CommandResult.failure_result("No players found")
 
         StriveLogger.info("Getting existing players")
-        existing_players = self.store.get_players()
+        existing_players = self.player_store.get_players()
 
         auto_accept_all = len(existing_players) == 0
         if auto_accept_all:
@@ -36,10 +45,16 @@ class UpsertPlayersExecutor:
         to_update: list[Player] = []
         new_players: list[Player] = []
 
+        len(players) == 0 and len(existing_players) == 0
+
         for player in players:
             existing_player = existing_players.get(player.player_id)
             if existing_player:
-                existing_players.pop(player.player_id)  # remove from existing so we know anyone left is a free agent now
+                existing_players.pop(player.player_id)  # remove from existing so we know anyone left is a free agent
+                # merge seasons so we don't erase any history
+                seasons = set(player.seasons).union(set(existing_player.seasons))
+                player.seasons = seasons
+
                 if existing_player.hash() != player.hash():
                     StriveLogger.info(f"Player changed: {player.full_name} ({player.team_abbr or 'FA'})")
                     to_update.append(player)
@@ -57,23 +72,25 @@ class UpsertPlayersExecutor:
                 StriveLogger.info(f"Player became free agent: {player.full_name}")
                 to_update.append(player)
 
+        # save updated players
         try:
             if len(to_update) == 0:
                 StriveLogger.info("No players to update")
             else:
                 StriveLogger.info(f"Updating {len(to_update)} players")
                 for player in to_update:
-                    self.store.save_player(player)
+                    self.player_store.save_player(player)
         except Exception as e:
             StriveLogger.error("Failed to update players", exc_info=e)
             return CommandResult.failure_result("Failed to save players")
 
+        # save new players for approval
         try:
             if len(new_players) == 0:
                 StriveLogger.info("No new players to approve")
             else:
                 StriveLogger.info(f"Adding {len(new_players)} new players for approval")
-                self.store.save_players_for_approval(new_players)
+                self.player_store.save_players_for_approval(new_players)
         except Exception as e:
             StriveLogger.error("Failed to save new players for approval", exc_info=e)
             return CommandResult.failure_result("Failed to save new players for approval")
@@ -84,11 +101,13 @@ class UpsertPlayersExecutor:
 
 def create_upsert_players_executor(
     settings: Settings = Depends(get_settings),
-    service: PlayerService = Depends(create_player_service),
-    store: PlayerStore = Depends(create_player_store),
+    player_service: PlayerService = Depends(create_player_service),
+    player_store: PlayerStore = Depends(create_player_store),
+    import_state_store: ImportStateStore = Depends(create_import_state_store),
 ) -> UpsertPlayersExecutor:
     return UpsertPlayersExecutor(
         settings=settings,
-        service=service,
-        store=store,
+        player_service=player_service,
+        player_store=player_store,
+        import_state_store=import_state_store,
     )

@@ -14,147 +14,25 @@ from pydantic import BaseModel, computed_field
 #     name: Optional[str]
 
 
-class Position(BaseModel):
-    position_id: int
-    offence_defence_or_special: str
-    abbreviation: str
-    description: str
-
-    def __eq__(self, __value: object) -> bool:
-        if not isinstance(__value, Position):
-            return False
-
-        return self.position_id == __value.position_id
-
-    @staticmethod
-    def quarterback():
-        return Position(position_id=1, offence_defence_or_special="O", abbreviation="QB", description="Quarterback")
-
-    @staticmethod
-    def runningback():
-        return Position(position_id=2, offence_defence_or_special="O", abbreviation="RB", description="Running Back")
-
-    @staticmethod
-    def fullback():
-        return Position(position_id=3, offence_defence_or_special="O", abbreviation="FB", description="Full Back")
-
-    @staticmethod
-    def widereceiver():
-        return Position(position_id=8, offence_defence_or_special="O", abbreviation="WR", description="Wide Receiver")
-
-    @staticmethod
-    def defensiveback():
-        return Position(position_id=12, offence_defence_or_special="D", abbreviation="DB", description="Defensive Back")
-
-    def defensiveend():
-        return Position(position_id=7, offence_defence_or_special="D", abbreviation="DE", description="Defensive End")
-
-    @staticmethod
-    def defensiveline():
-        return Position(position_id=13, offence_defence_or_special="D", abbreviation="DL", description="Defensive Lineman")
-
-    @staticmethod
-    def kicker():
-        return Position(position_id=16, offence_defence_or_special="S", abbreviation="K", description="Kicker")
-
-    @staticmethod
-    def offensiveline():
-        return Position(position_id=5, offence_defence_or_special="O", abbreviation="OL", description="Offensive Lineman")
-
-    @staticmethod
-    def punter():
-        return Position(position_id=14, offence_defence_or_special="S", abbreviation="P", description="Punter")
-
-    @staticmethod
-    def linebacker():
-        return Position(position_id=11, offence_defence_or_special="D", abbreviation="LB", description="Linebacker")
-
-    @staticmethod
-    def longsnapper():
-        return Position(position_id=17, offence_defence_or_special="S", abbreviation="LS", description="Long Snapper")
-
-    @staticmethod
-    def defensivetackle():
-        return Position(position_id=18, offence_defence_or_special="D", abbreviation="DT", description="Defensive Tackle")
-
-    @staticmethod
-    def tackle():
-        return Position(position_id=24, offence_defence_or_special="D", abbreviation="T", description="Tackle")
-
-    @staticmethod
-    def tightend():
-        return Position(position_id=26, offence_defence_or_special="O", abbreviation="TE", description="Tight End")
-
-    @staticmethod
-    def safety():
-        return Position(position_id=23, offence_defence_or_special="D", abbreviation="S", description="Safety")
-
-    @staticmethod
-    def center():
-        return Position(position_id=19, offence_defence_or_special="O", abbreviation="C", description="Center")
-
-    @staticmethod
-    def guard():
-        return Position(position_id=20, offence_defence_or_special="O", abbreviation="G", description="Guard")
-
-    @staticmethod
-    def unknown():
-        return Position(position_id=0, offence_defence_or_special="U", abbreviation="U", description="Unknown")
-
-
-# class Team(BaseModel):
-#     abbreviation: str
-#     location: Optional[str] = ""
-#     nickname: Optional[str] = ""
-
-#     def __eq__(self, other: Any) -> bool:
-#         if not isinstance(other, Team):
-#             return False
-
-#         return self.abbreviation == other.abbreviation
-
-#     def __hash__(self) -> int:
-#         return hash(repr(self))
-
-#     @staticmethod
-#     def free_agent():
-#         return Team(abbreviation="FA")
-
-#     @staticmethod
-#     def bc():
-#         return Team(abbreviation="BC", location="BC", nickname="Lions")
-
-#     @staticmethod
-#     def cgy():
-#         return Team(abbreviation="CGY", location="Calgary", nickname="Stampeders")
-
-#     @staticmethod
-#     def edm():
-#         return Team(abbreviation="EDM", location="Edmonton", nickname="Elks")
-
-#     @staticmethod
-#     def ham():
-#         return Team(abbreviation="HAM", location="Hamilton", nickname="Tiger-Cats")
-
-#     @staticmethod
-#     def mtl(uniform: Optional[int] = None):
-#         return Team(team_id=5, abbreviation="MTL", location="Montreal", nickname="Alouettes", uniform=uniform)
-
-#     @staticmethod
-#     def ott():
-#         return Team(abbreviation="OTT", location="Ottawa", nickname="Redblacks")
-
-#     @staticmethod
-#     def ssk():
-#         return Team(abbreviation="SSK", location="Saskatchewan", nickname="Roughriders")
-
-#     @staticmethod
-#     def tor():
-#         return Team(abbreviation="TOR", location="Toronto", nickname="Argonauts")
-
-#     @staticmethod
-#     def wpg():
-#         return Team(abbreviation="WPG", location="Winnipeg", nickname="Blue Bombers")
+class Position(str, Enum):
+    quarterback = "qb"
+    runningback = "rb"
+    fullback = "fb"
+    widereceiver = "wr"
+    defensiveback = "db"
+    defensiveend = "de"
+    defensiveline = "dl"
+    kicker = "k"
+    offensiveline = "ol"
+    punter = "p"
+    linebacker = "lb"
+    longsnapper = "ls"
+    defensivetackle = "dt"
+    tackle = "t"
+    tightend = "te"
+    safety = "s"
+    center = "c"
+    guard = "g"
 
 
 # class SeasonDefence(BaseModel):
@@ -540,9 +418,10 @@ class Player(BaseModel):
     alternate_computed_ids: list[str] = []
     uniform: Optional[int] = None
     school: Optional[str]
-    seasons: list[int] = []
+    seasons: list[int]
     injury_status: Optional[InjuryDetails]
     boxscore_source_id: str
+    last_updated: Optional[datetime] = None
 
     @computed_field
     @property
@@ -579,4 +458,8 @@ class Player(BaseModel):
         return not self.team_abbr
 
     def hash(self) -> str:
-        return hashlib.md5(json.dumps(self.json()).encode("utf-8")).hexdigest()
+        to_compare = self.model_dump_json(
+            exclude={"last_updated"},
+        )
+
+        return hashlib.md5(json.dumps(to_compare).encode("utf-8")).hexdigest()

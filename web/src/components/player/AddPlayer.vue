@@ -146,11 +146,11 @@ export default {
 
   methods: {
     getNextOpponent(player) {
-      return player != null && player.team != null ? this.$root.getOpponent(player.team.abbreviation) : ""
+      return player != null && player.team != null ? this.$root.getOpponent(player.team_abbr) : ""
     },
 
     getSeasonPoints(player) {
-      let filterResults = this.players.filter(p => p.id == player.id)
+      let filterResults = this.players.filter(p => p.id == player.player_id)
 
       let playerScore = filterResults && filterResults.length == 1 ? filterResults[0] : null
 
@@ -158,7 +158,7 @@ export default {
     },
 
     isLocked(player) {
-      return this.$root.isLocked(player.team.abbreviation)
+      return this.$root.isLocked(player.team_abbr)
     },
 
     async confirmAddPlayer(dropTarget) {
@@ -173,8 +173,8 @@ export default {
       let command = {
         league_id: this.leagueId,
         roster_id: this.currentRoster.id,
-        player_id: this.player.id,
-        drop_player_id: dropTarget != null ? dropTarget.player.id : null,
+        player_id: this.player.player_id,
+        drop_player_id: dropTarget != null ? dropTarget.player.player_id : null,
         bid: this.bid,
       }
 

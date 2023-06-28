@@ -149,7 +149,7 @@ export default {
       let command = {
         pick_number: this.currentSlot.pick_number,
         league_id: this.leagueId,
-        player_id: player.id,
+        player_id: player.player_id,
         nominator: this.currentRosterId,
       }
 

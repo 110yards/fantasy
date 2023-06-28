@@ -142,7 +142,7 @@ export default {
         pick_number: this.currentSlot.pick_number,
         roster_id: this.currentRosterId,
         league_id: this.leagueId,
-        player_id: player.id,
+        player_id: player.player_id,
       }
 
       let result = await selectPlayer(this.currentUser, this.leagueId, command)

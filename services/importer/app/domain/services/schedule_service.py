@@ -6,7 +6,9 @@ from fastapi import Depends
 from strivelogger import StriveLogger
 
 from app.config.settings import Settings, get_settings
-from app.domain.models.schedule import Schedule, ScheduleGame, ScheduleWeek, create_game_id
+from app.domain.models.schedule import ByeWeeks, Schedule, ScheduleGame, ScheduleWeek
+
+from ..models.game_id import create_game_id
 
 
 class ScheduleService:
@@ -72,7 +74,17 @@ def create_schedule(realtime_source_data: dict, boxscore_source_data: dict) -> S
         year=year,
         boxscore_source_season_id=boxscore_source_season_id,
         weeks=weeks,
+        bye_weeks=create_bye_weeks(weeks.values()),
     )
+
+
+def create_bye_weeks(weeks: list[ScheduleWeek]) -> ByeWeeks:
+    bye_weeks = ByeWeeks()
+
+    for week in weeks:
+        bye_weeks.add_byes(week.week_number, week.bye_teams)
+
+    return bye_weeks
 
 
 def map_game(realtime_source_data: dict, boxscore_source_data: dict, week_number: int, game_number: int) -> ScheduleGame:

@@ -1,16 +1,16 @@
-
-from app.yards_py.domain.entities.league_transaction import LeagueTransaction
-from app.domain.repositories.league_transaction_repository import LeagueTransactionRepository, create_league_transaction_repository
-from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from app.domain.repositories.public_repository import PublicRepository, create_public_repository
-from app.yards_py.domain.entities.player import Player, STATUS_ACTIVE
-from app.domain.enums.position_type import PositionType
-from app.domain.repositories.state_repository import StateRepository, create_state_repository
-from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
 from fastapi import Depends
-from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
 from firebase_admin import firestore
+
+from app.domain.enums.position_type import PositionType
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from app.domain.repositories.league_transaction_repository import LeagueTransactionRepository, create_league_transaction_repository
+from app.domain.repositories.public_repository import PublicRepository, create_public_repository
+from app.domain.repositories.state_repository import StateRepository, create_state_repository
+from app.yards_py.core.annotate_args import annotate_args
+from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from app.yards_py.domain.entities.league_transaction import LeagueTransaction
+from app.yards_py.domain.entities.player import Player
 
 
 def create_move_player_command_executor(
@@ -43,7 +43,6 @@ class MovePlayerResult(BaseCommandResult[MovePlayerCommand]):
 
 
 class MovePlayerCommandExecutor(BaseCommandExecutor[MovePlayerCommand, MovePlayerResult]):
-
     def __init__(
         self,
         league_roster_repo: LeagueRosterRepository,
@@ -59,7 +58,6 @@ class MovePlayerCommandExecutor(BaseCommandExecutor[MovePlayerCommand, MovePlaye
         self.transaction_repo = transaction_repo
 
     def on_execute(self, command: MovePlayerCommand) -> MovePlayerResult:
-
         opponents = self.public_repo.get_opponents()
 
         @firestore.transactional
@@ -100,13 +98,13 @@ class MovePlayerCommandExecutor(BaseCommandExecutor[MovePlayerCommand, MovePlaye
 
             if not target_position.position_type.is_eligible_for(player_to_move.position):
                 return MovePlayerResult(
-                    command=command,
-                    error=f"{player_to_move.display_name} is not eligible for {target_position.position_type.display_name()} position")
+                    command=command, error=f"{player_to_move.display_name} is not eligible for {target_position.position_type.display_name()} position"
+                )
 
             if player_to_swap and not current_position.position_type.is_eligible_for(player_to_swap.position):
                 return MovePlayerResult(
-                    command=command,
-                    error=f"{player_to_swap.display_name} is not eligible for {current_position.position_type.display_name()} position")
+                    command=command, error=f"{player_to_swap.display_name} is not eligible for {current_position.position_type.display_name()} position"
+                )
 
             if target_position.position_type == PositionType.bye and not opponents.is_team_on_bye(player_to_move.team):
                 return MovePlayerResult(command=command, error=f"{player_to_move.team.location} is not on bye")
@@ -123,14 +121,14 @@ class MovePlayerCommandExecutor(BaseCommandExecutor[MovePlayerCommand, MovePlaye
             target_position.player = player_to_move
             current_position.player = player_to_swap
 
-            assert target_position.player.id == player_to_move.id
+            assert target_position.player.player_id == player_to_move.id
 
             if commissioner_override:
                 trx = LeagueTransaction.commissioner_move_player(command.league_id, roster, player_to_move, current_position.name, target_position.name)
                 self.transaction_repo.create(command.league_id, trx, transaction)
 
             if player_to_swap:
-                assert current_position.player.id == player_to_swap.id
+                assert current_position.player.player_id == player_to_swap.id
 
             if player_to_swap and commissioner_override:
                 trx = LeagueTransaction.commissioner_move_player(command.league_id, roster, player_to_swap, target_position.name, current_position.name)

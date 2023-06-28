@@ -3,7 +3,7 @@
     <v-btn @click="$emit('close')" class="mb-2">Close</v-btn>
     <pre id="dataTable">
 {{ headers }}
-<template v-for="player in data"><template v-for="key in keys">{{getValue(player, key)}},</template><br :key="player.id" /></template>
+<template v-for="player in data"><template v-for="key in keys">{{getValue(player, key)}},</template><br :key="player.player_id" /></template>
   </pre>
   </div>
 </template>
@@ -80,7 +80,7 @@ export default {
         case "last_name":
           return player.last_name.replace(",", "")
         case "team":
-          return player.team.abbreviation
+          return player.team_abbr
         case "position":
           return player.position.toUpperCase()
         case "status_current":

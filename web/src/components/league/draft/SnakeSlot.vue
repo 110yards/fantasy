@@ -4,7 +4,7 @@
     <v-card-text>
       <p v-for="slot in draft.slots" :key="slot.pick_number">
         Pick {{ slot.pick_number }} - {{ getRosterName(slot.roster_id) }}
-        <span v-if="slot.completed"> - {{ slot.player.id }} </span>
+        <span v-if="slot.completed"> - {{ slot.player.player_id }} </span>
       </p>
     </v-card-text>
     <v-card-text v-if="yourTurn"> Your turn! </v-card-text>

@@ -1,11 +1,11 @@
 <template>
-  <span v-if="player" class="player" :data-player-id="player.id">
+  <span v-if="player" class="player" :data-player-id="player.player_id">
     <!-- left to right -->
     <template v-if="!reverse">
       <span v-if="showTeamLogo" class="team-icon" :class="team"> </span>
       <router-link
         v-if="enablePlayerLinks"
-        :to="{ name: 'league-player', params: { leagueId: leagueId, playerId: player.id } }"
+        :to="{ name: 'league-player', params: { leagueId: leagueId, playerId: player.player_id } }"
       >
         {{ displayName }}
       </router-link>
@@ -13,7 +13,7 @@
         {{ displayName }}
       </span>
 
-      <span v-if="showTeamName" class="pl-1">{{ player.team.abbreviation }}</span>
+      <span v-if="showTeamName" class="pl-1">{{ player.team_abbr }}</span>
       <span v-if="showPosition" class="pl-1">&nbsp;- {{ player.position.toUpperCase() }}</span>
 
       <span
@@ -27,12 +27,12 @@
 
       <v-icon v-if="showShortPlayerStatus && isInjured" :color="injuryIconColor" small>{{ injuryIcon }}</v-icon>
 
-      <national-status v-if="showNational" :national_status="player.national_status" />
+      <canadian-status v-if="showCanadian" :isCanadian="player.canadian_player" />
     </template>
 
     <!-- right to left -->
     <template v-else>
-      <national-status v-if="showNational" :national_status="player.national_status" />
+      <canadian-status v-if="showCanadian" :isCanadian="player.canadian_player" />
 
       <v-icon v-if="showShortPlayerStatus && isInjured" :color="injuryIconColor" small>{{ injuryIcon }}</v-icon>
       <span :class="injuryTextColor" v-if="showPlayerStatus && !showShortPlayerStatus" :title="injuryDetails">
@@ -41,7 +41,7 @@
 
       <router-link
         v-if="enablePlayerLinks"
-        :to="{ name: 'league-player', params: { leagueId: leagueId, playerId: player.id } }"
+        :to="{ name: 'league-player', params: { leagueId: leagueId, playerId: player.player_id } }"
       >
         {{ displayName }}
       </router-link>
@@ -49,7 +49,7 @@
         {{ displayName }}
       </span>
 
-      <span v-if="showTeamName" class="">{{ player.team.abbreviation }}</span>
+      <span v-if="showTeamName" class="">{{ player.team_abbr }}</span>
       <span v-if="showPosition" class="">&nbsp;- {{ player.position.toUpperCase() }}</span>
 
       <span v-if="showTeamLogo" class="team-icon pl-1" :class="team"> </span>
@@ -61,12 +61,12 @@
 
 <script>
 import { playerStatus } from "../../api/110yards/constants"
-import NationalStatus from "./NationalStatus.vue"
+import CanadianStatus from "./CanadianStatus.vue"
 
 export default {
   name: "player-link",
   components: {
-    NationalStatus,
+    CanadianStatus,
   },
   props: {
     leagueId: {
@@ -92,7 +92,7 @@ export default {
       type: Boolean,
       default: true,
     },
-    showNational: {
+    showCanadian: {
       required: false,
       type: Boolean,
       default: true,
@@ -121,7 +121,7 @@ export default {
       return this.boldName ? "font-weight-bold" : ""
     },
     team() {
-      return this.player.team != null ? this.player.team.abbreviation : "FA"
+      return this.player.team_abbr ? this.player.team_abbr.toUpperCase() : "FA"
     },
     showPlayerStatus() {
       return this.isInjured
@@ -158,7 +158,7 @@ export default {
       return `${this.player.first_name[0]}. ${this.player.last_name}`
     },
     displayName() {
-      let name = this.shortenName ? this.shortName : this.player.display_name
+      let name = this.shortenName ? this.shortName : this.player.full_name
 
       if (this.maxNameLength && name.length > this.maxNameLength) {
         return `${name.substring(0, this.maxNameLength)}...`

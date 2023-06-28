@@ -15,7 +15,7 @@
               :player="position.player"
               :showShortPlayerStatus="true"
               :showStatus="false"
-              :showNational="true"
+              :showCanadian="true"
               :leagueId="leagueId"
             />
           </td>
@@ -30,7 +30,7 @@
 
 <script>
 import { selectablePositions } from "../../../api/110yards/constants"
-import NationalStatus from "../../player/NationalStatus.vue"
+import NationalStatus from "../../player/CanadianStatus.vue"
 import { playerStatus } from "../../../api/110yards/constants"
 import PlayerLink from "../../player/PlayerLink.vue"
 

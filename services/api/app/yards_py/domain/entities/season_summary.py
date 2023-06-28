@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 from typing import List, Optional
+
 from pydantic.main import BaseModel
+
+from app.yards_py.core.annotate_args import annotate_args
 from app.yards_py.core.base_entity import BaseEntity
 from app.yards_py.domain.entities.draft import Draft, DraftSlot
 from app.yards_py.domain.entities.league_position import LeaguePosition
@@ -9,7 +12,6 @@ from app.yards_py.domain.entities.roster import Roster
 from app.yards_py.domain.entities.schedule import Matchup, PlayoffType, Schedule, ScheduleWeek
 from app.yards_py.domain.enums.position_type import PositionType
 from app.yards_py.domain.enums.week_type import WeekType
-from app.yards_py.core.annotate_args import annotate_args
 
 
 @annotate_args
@@ -26,8 +28,8 @@ class PositionSummary(BaseModel):
             position_id=position.id,
             name=position.name,
             position_type=position.position_type,
-            player_id=position.player.id if position.player else None,
-            player_name=position.player.display_name if position.player else None,
+            player_id=position.player.player_id if position.player else None,
+            player_name=position.player.full_name if position.player else None,
         )
 
         return summary
@@ -77,7 +79,7 @@ class MatchupSummary(BaseModel):
             home_id=matchup.home.id if matchup.home else None,
             home_name=matchup.home.name if matchup.home else None,
             home_score=matchup.home_score,
-            matchup_type=matchup.type.display()
+            matchup_type=matchup.type.display(),
         )
 
         return summary
@@ -121,11 +123,11 @@ class DraftPickSummary(BaseModel):
         return DraftPickSummary(
             pick_number=draft_slot.pick_number,
             roster_id=draft_slot.roster_id,
-            player_id=draft_slot.player.id if draft_slot.player else None,
-            player_name=draft_slot.player.display_name if draft_slot.player else None,
+            player_id=draft_slot.player.player_id if draft_slot.player else None,
+            player_name=draft_slot.player.full_name if draft_slot.player else None,
             nominator=draft_slot.nominator,
             bid=draft_slot.bid,
-            result=draft_slot.result
+            result=draft_slot.result,
         )
 
 
@@ -165,7 +167,7 @@ class SeasonSummary(BaseEntity):
             weeks=weeks_summaries,
             champion=champion,
             runner_up=runner_up,
-            draft_picks=draft_picks
+            draft_picks=draft_picks,
         )
 
         return summary

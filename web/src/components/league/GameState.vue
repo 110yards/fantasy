@@ -15,34 +15,35 @@ export default {
       type: Object,
       required: false,
     },
-    scoreboard: { type: Object, required: true },
     short: { type: Boolean, required: false, default: false },
   },
 
   computed: {
     gameStatus() {
-      if (!this.player) return null
-      if (this.player.team.abbreviation == "FA") return "No game"
+      if (!this.player || !this.$root.scoreboard) return null
+      if (this.player.team_abbr == "FA") return "No game"
 
-      let game = this.$root.getGameForTeam(this.player.team.abbreviation, this.scoreboard)
+      let team = this.$root.scoreboard.teams[this.player.team_abbr]
 
-      if (!game) return "Bye week"
+      if (!team.game) return "Bye week"
 
-      let isHomePlayer = game.teams.home.abbreviation == this.player.team.abbreviation
+      let game = team.game
+
+      let isHomePlayer = team.is_at_home
       let vsMarker = isHomePlayer ? "v" : "@"
-      let scoreFor = isHomePlayer ? game.score.home : game.score.away
-      let scoreAgainst = isHomePlayer ? game.score.away : game.score.home
-      let opponent = this.$root.getOpponent(this.player.team.abbreviation)
+      let scoreFor = isHomePlayer ? game.home_score : game.away_score
+      let scoreAgainst = isHomePlayer ? game.away_score : game.home_score
+      let opponent = team.opponent.toUpperCase()
 
-      switch (game.event_status.event_status_id) {
+      switch (game.status) {
         case eventStatus.PreGame: {
-          let date = game.date_start.toDate()
+          let date = game.game_date.toDate()
           let start = formatter.gameStartTime(date, this.short)
           return `${start} ${vsMarker} ${opponent}`
         }
 
         case eventStatus.InProgress:
-          return `Q${game.event_status.quarter} ${scoreFor}-${scoreAgainst} ${vsMarker} ${opponent}`
+          return `${game.quarter} ${scoreFor}-${scoreAgainst} ${vsMarker} ${opponent}`
 
         case eventStatus.Final: {
           let won = scoreFor > scoreAgainst
@@ -50,11 +51,8 @@ export default {
           let result = won ? "W" : lost ? "L" : "T"
           return `Final ${result} ${scoreFor}-${scoreAgainst} ${vsMarker} ${opponent}`
         }
-        case eventStatus.Postponed:
-          return game.event_status.name
-
         default:
-          return `${vsMarker} ${opponent} - ${game.event_status.name}`
+          return `${vsMarker} ${opponent} - ${game.status}`
       }
     },
   },

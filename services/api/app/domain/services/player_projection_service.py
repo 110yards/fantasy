@@ -1,25 +1,16 @@
-
-
 from typing import Dict, List
 
 from fastapi.param_functions import Depends
+
+from app.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository, create_player_league_season_score_repository
+from app.domain.repositories.player_repository import PlayerRepository, create_player_repository
+from app.domain.repositories.public_repository import PublicRepository, create_public_repository
+from app.domain.repositories.state_repository import StateRepository, create_state_repository
 from app.yards_py.core.batch import create_batches
 from app.yards_py.core.firestore_proxy import Query
 from app.yards_py.domain.entities.opponents import Opponents
-from app.yards_py.domain.entities.player import STATUS_ACTIVE, Player
-from app.yards_py.domain.entities.player_league_season_score import \
-    PlayerLeagueSeasonScore
-from app.yards_py.domain.entities.team import Team
-
-from app.domain.repositories.player_league_season_score_repository import (
-    PlayerLeagueSeasonScoreRepository,
-    create_player_league_season_score_repository)
-from app.domain.repositories.player_repository import (
-    PlayerRepository, create_player_repository)
-from app.domain.repositories.public_repository import (
-    PublicRepository, create_public_repository)
-from app.domain.repositories.state_repository import (
-    StateRepository, create_state_repository)
+from app.yards_py.domain.entities.player import Player
+from app.yards_py.domain.entities.player_league_season_score import PlayerLeagueSeasonScore
 
 
 def create_player_projection_service(
@@ -45,15 +36,13 @@ class PlayerProjectionService:
         self.public_repo = public_repo
 
     def get_projection(self, league_id: str, player_id: str) -> float:
-        state = self.state_repo.get()
-
-        player = self.player_repo.get(state.current_season, player_id)
+        player = self.player_repo.get(player_id)
 
         if not player:
             return 0.0
 
         projections = self.get_projections(league_id, [player])
-        return projections.get(player.id, 0.0)
+        return projections.get(player.player_id, 0.0)
 
     def get_projections(self, league_id: str, players: List[Player]) -> Dict[str, float]:
         opponents = self.public_repo.get_opponents()
@@ -70,19 +59,19 @@ class PlayerProjectionService:
 
         projections = {}
         for player in players:
-            player_score = player_scores.get(player.id, None)  # TODO: last year's average if week 1
-            projections[player.id] = self.calculate(opponents, player, player_score)
+            player_score = player_scores.get(player.player_id, None)  # TODO: last year's average if week 1
+            projections[player.player_id] = self.calculate(opponents, player, player_score)
 
         return projections
 
     def calculate(self, opponents: Opponents, player: Player, player_score: PlayerLeagueSeasonScore) -> float:
-        if (player.status_current != STATUS_ACTIVE):
+        if player.likely_out_for_game():
             return 0.0
 
-        if (player.team.id == Team.free_agent().id):
+        if player.is_free_agent():
             return 0.0
 
-        if opponents.is_team_on_bye(player.team):
+        if opponents.is_team_on_bye(player.team_abbr):
             return 0.0
 
         if not player_score:

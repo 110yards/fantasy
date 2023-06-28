@@ -1,20 +1,22 @@
+from typing import List, Optional
 
-from app.yards_py.domain.entities.league import League
-from app.yards_py.domain.entities.league_transaction import LeagueTransaction
+from fastapi import Depends
+from firebase_admin import firestore
+
+from app.domain.repositories.league_owned_player_repository import LeagueOwnedPlayerRepository, create_league_owned_player_repository
 from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from app.yards_py.domain.entities.waiver_bid import WaiverBid
-from app.domain.repositories.state_repository import StateRepository, create_state_repository
+from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from app.domain.repositories.league_transaction_repository import LeagueTransactionRepository, create_league_transaction_repository
 from app.domain.repositories.player_repository import PlayerRepository, create_player_repository
 from app.domain.services.notification_service import NotificationService, create_notification_service
 from app.domain.services.roster_player_service import RosterPlayerService, create_roster_player_service
-from typing import List, Optional
-from app.domain.repositories.league_owned_player_repository import LeagueOwnedPlayerRepository, create_league_owned_player_repository
-from app.domain.repositories.league_transaction_repository import LeagueTransactionRepository, create_league_transaction_repository
-from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from fastapi import Depends
 from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
-from firebase_admin import firestore
+from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from app.yards_py.domain.entities.league import League
+from app.yards_py.domain.entities.league_transaction import LeagueTransaction
+from app.yards_py.domain.entities.waiver_bid import WaiverBid
+
+from ...repositories.public_repository import PublicRepository, create_public_repository
 
 
 def create_add_player_command_executor(
@@ -23,7 +25,7 @@ def create_add_player_command_executor(
     league_owned_players_repo: LeagueOwnedPlayerRepository = Depends(create_league_owned_player_repository),
     player_repo: PlayerRepository = Depends(create_player_repository),
     roster_player_service: RosterPlayerService = Depends(create_roster_player_service),
-    state_repo: StateRepository = Depends(create_state_repository),
+    public_repo: PublicRepository = Depends(create_public_repository),
     league_repo: LeagueRepository = Depends(create_league_repository),
     notification_service: NotificationService = Depends(create_notification_service),
 ):
@@ -33,9 +35,9 @@ def create_add_player_command_executor(
         league_owned_players_repo=league_owned_players_repo,
         player_repo=player_repo,
         roster_player_service=roster_player_service,
-        state_repo=state_repo,
         league_repo=league_repo,
         notification_service=notification_service,
+        public_repo=public_repo,
     )
 
 
@@ -55,7 +57,6 @@ class AddPlayerResult(BaseCommandResult[AddPlayerCommand]):
 
 
 class AddPlayerCommandExecutor(BaseCommandExecutor[AddPlayerCommand, AddPlayerResult]):
-
     def __init__(
         self,
         league_roster_repo: LeagueRosterRepository,
@@ -63,25 +64,25 @@ class AddPlayerCommandExecutor(BaseCommandExecutor[AddPlayerCommand, AddPlayerRe
         league_owned_players_repo: LeagueOwnedPlayerRepository,
         roster_player_service: RosterPlayerService,
         player_repo: PlayerRepository,
-        state_repo: StateRepository,
         league_repo: LeagueRepository,
         notification_service: NotificationService,
+        public_repo: PublicRepository,
     ):
         self.league_roster_repo = league_roster_repo
         self.league_transaction_repo = league_transaction_repo
         self.league_owned_players_repo = league_owned_players_repo
         self.roster_player_service = roster_player_service
         self.player_repo = player_repo
-        self.state_repo = state_repo
         self.league_repo = league_repo
         self.notification_service = notification_service
+        self.public_repo = public_repo
 
     def on_execute(self, command: AddPlayerCommand) -> AddPlayerResult:
-
         if command.roster_id != command.request_user_id:  # TODO: allow commissioner to make moves
             return AddPlayerResult(command=command, error="Forbidden")
 
-        state = self.state_repo.get()  # don't lock state
+        scoreboard = self.public_repo.get_scoreboard()
+        state = self.public_repo.get_state()
 
         @firestore.transactional
         def update(transaction):
@@ -96,13 +97,13 @@ class AddPlayerCommandExecutor(BaseCommandExecutor[AddPlayerCommand, AddPlayerRe
             if current_owner:
                 return AddPlayerResult(command=command, error="That player is already on a roster")
 
-            player = self.player_repo.get(state.current_season, command.player_id, transaction)
+            player = self.player_repo.get(command.player_id, transaction)
 
             if not player:
                 return AddPlayerResult(command=command, error="Player not found")
 
-            if state.locks.is_locked(player.team):
-                return AddPlayerResult(command=command, error=f"{player.team.location} players are locked")
+            if scoreboard.is_locked(player.team_abbr):
+                return AddPlayerResult(command=command, error=f"{player.team_abbr} players are locked")
 
             target_position = None
             if command.drop_player_id:
@@ -120,23 +121,21 @@ class AddPlayerCommandExecutor(BaseCommandExecutor[AddPlayerCommand, AddPlayerRe
                 return AddPlayerResult(command=command)
 
             elif not state.waivers_active and league.waivers_active:
-                return AddPlayerResult(command=command, error="Waivers are still being processed for your league, please try again in a few minutes. "
-                                       + "If you see this message for more than a few minutes, please contact the site administrator.")
+                return AddPlayerResult(
+                    command=command,
+                    error="Waivers are still being processed for your league, please try again in a few minutes. "
+                    + "If you see this message for more than a few minutes, please contact the site administrator.",
+                )
 
             else:
                 if not target_position:
                     target_position = self.roster_player_service.find_position_for(player, roster)
 
                 if not target_position:
-                    return AddPlayerResult(command=command, error=f"There is no space on roster for a {player.position.display_name()}")
+                    return AddPlayerResult(command=command, error=f"There is no space on roster for a {player.position}")
 
                 success, info = self.roster_player_service.assign_player_to_roster(
-                    league_id=command.league_id,
-                    roster=roster,
-                    player=player,
-                    target_position=target_position,
-                    record_transaction=True,
-                    transaction=transaction
+                    league_id=command.league_id, roster=roster, player=player, target_position=target_position, record_transaction=True, transaction=transaction
                 )
 
                 if success:

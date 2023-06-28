@@ -117,7 +117,7 @@ def map_player(player_data: dict, injuries: dict[str, InjuryDetails]) -> Optiona
     position_short = player_data["seasonDetails"]["position"][0]["positionShortName"]
     position = map_position(position_short)
 
-    if position == Position.unknown():
+    if not position:
         StriveLogger.warn(f"Unknown position '{position_short}' for player: {displayName}")
         return None
 
@@ -129,12 +129,17 @@ def map_player(player_data: dict, injuries: dict[str, InjuryDetails]) -> Optiona
     height_inches = height_inches % 12 if height_inches else None
     height = f"{height_feet}'{height_inches}" if height_feet and height_inches else None
 
+    birth_place = player_data.get("birthplace")
+
+    if birth_place and "," in birth_place:
+        birth_place = birth_place.replace(",", ", ")
+
     return Player(
         first_name=player_data["playerFirstName"],
         last_name=player_data["playerLastName"],
         boxscore_source_id=player_data["playerId"],
         birth_date=birth_date,
-        birth_place=player_data.get("birthplace"),
+        birth_place=birth_place,
         height=height,
         weight=player_data.get("weight", {"value": None})["value"],
         rookie_year=None,
@@ -145,48 +150,13 @@ def map_player(player_data: dict, injuries: dict[str, InjuryDetails]) -> Optiona
         team_abbr=team_abbr,
         uniform=uniform,
         injury_status=injuries.get(player_data["playerId"]),
+        seasons=[datetime.now().year],
     )
 
 
-def map_position(abbr: str) -> Position:
-    match abbr:
-        case "QB":
-            return Position.quarterback()
-        case "RB":
-            return Position.runningback()
-        case "FB":
-            return Position.fullback()
-        case "DL":
-            return Position.defensiveline()
-        case "DB":
-            return Position.defensiveback()
-        case "WR":
-            return Position.widereceiver()
-        case "LB":
-            return Position.linebacker()
-        case "OL":
-            return Position.offensiveline()
-        case "K":
-            return Position.kicker()
-        case "P":
-            return Position.punter()
-        case "LS":
-            return Position.longsnapper()
-        case "DE":
-            return Position.defensiveend()
-        case "G":
-            return Position.guard()
-        case "DT":
-            return Position.defensivetackle()
-        case "S":
-            return Position.safety()
-        case "T":
-            return Position.tackle()
-        case "OT":
-            return Position.tackle()
-
-        case _:
-            return Position.unknown()
+def map_position(abbr: str) -> Optional[Position]:
+    abbr = abbr.lower()
+    return Position(abbr) if abbr in Position.__members__.values() else None
 
 
 def map_boxscore_source_team_id(team_id: str) -> str:

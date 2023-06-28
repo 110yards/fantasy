@@ -70,44 +70,37 @@ export const selectablePositions = [
   positionType.WR,
 ]
 
+/*
+    Probable = "probable"
+    Questionable = "questionable"
+    Out = "out"
+    InjuredSixGames = "six-game"
+*/
 export const playerStatus = {
-  Inactive: 0,
-  Active: 1,
-  InjuredOneGame: 2,
-  InjuredSixGames: 3,
-  PracticeSquad: 4,
-  Suspended: 5,
-  Disabled: 7,
-  Questionable: 8,
-  Probable: 9,
+  Out: "out",
+  InjuredSixGames: "six-game",
+  Questionable: "questionable",
+  Probable: "probable",
 
   getText: status => {
     switch (status) {
-      case playerStatus.Active:
-        return ""
-      case playerStatus.InjuredOneGame:
-        return "IL-1"
+      case playerStatus.Out:
+        return "O"
       case playerStatus.InjuredSixGames:
         return "IL-6"
-      case playerStatus.Suspended:
-        return "SUSP"
-      case playerStatus.PracticeSquad:
-        return "PS"
       case playerStatus.Questionable:
         return "Q"
       case playerStatus.Probable:
         return "P"
       default:
-        return "OUT"
+        return "O"
     }
   },
 
   getSeverity: status => {
     switch (status) {
-      case playerStatus.InjuredOneGame:
+      case playerStatus.Out:
       case playerStatus.InjuredSixGames:
-      case playerStatus.Suspended:
-      case playerStatus.PracticeSquad:
         return 3
       case playerStatus.Questionable:
         return 2
@@ -120,28 +113,53 @@ export const playerStatus = {
 
   getFullText: status => {
     switch (status) {
-      case playerStatus.Active:
-        return "Active"
-      case playerStatus.InjuredOneGame:
-        return "1-Game Injured List"
+      case playerStatus.Out:
+        return "Out"
       case playerStatus.InjuredSixGames:
         return "6-Game Injured List"
-      case playerStatus.Suspended:
-        return "Suspended"
-      case playerStatus.PracticeSquad:
-        return "Practice Squad"
       case playerStatus.Questionable:
         return "Questionable"
       case playerStatus.Probable:
         return "Probable"
       default:
-        return "Not Active"
+        return "Not active"
     }
   },
 }
 
-export const teamId = {
-  FreeAgent: 0,
+export const teams = {
+  BC: "bc",
+  CGY: "cgy",
+  EDM: "edm",
+  HAM: "ham",
+  MTL: "mtl",
+  OTT: "ott",
+  SSK: "ssk",
+  TOR: "tor",
+  WPG: "wpg",
+
+  getFullName: team => {
+    switch (team) {
+      case teams.BC:
+        return "BC Lions"
+      case teams.CGY:
+        return "Calgary Stampeders"
+      case teams.EDM:
+        return "Edmonton Elks"
+      case teams.HAM:
+        return "Hamilton Tiger-Cats"
+      case teams.MTL:
+        return "Montreal Alouettes"
+      case teams.OTT:
+        return "Ottawa Redblacks"
+      case teams.SSK:
+        return "Saskatchewan Roughriders"
+      case teams.TOR:
+        return "Toronto Argonauts"
+      case teams.WPG:
+        return "Winnipeg Blue Bombers"
+    }
+  },
 }
 
 export const matchupType = {
@@ -153,11 +171,9 @@ export const matchupType = {
 }
 
 export const eventStatus = {
-  PreGame: 1,
-  InProgress: 2,
-  Final: 4,
-  Postponed: 6,
-  Cancelled: 9,
+  PreGame: "scheduled",
+  InProgress: "active",
+  Final: "complete",
 }
 
 export const waiverBidResult = {

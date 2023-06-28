@@ -1,25 +1,20 @@
-
-
 from typing import Optional
 
-from pydantic.main import BaseModel
-from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from google.cloud.firestore_v1.transaction import Transaction
-from app.yards_py.domain.entities.draft import Draft, DraftSlot
-from app.domain.services.roster_player_service import create_roster_player_service
 from fastapi import Depends
-from app.domain.services.roster_player_service import RosterPlayerService
+from google.cloud.firestore_v1.transaction import Transaction
+from pydantic.main import BaseModel
+
+from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from app.domain.services.roster_player_service import RosterPlayerService, create_roster_player_service
 from app.yards_py.core.annotate_args import annotate_args
+from app.yards_py.domain.entities.draft import Draft, DraftSlot
 
 
 def create_auction_draft_service(
     roster_player_service: RosterPlayerService = Depends(create_roster_player_service),
     league_roster_repo: LeagueRosterRepository = Depends(create_league_roster_repository),
 ):
-    return AuctionDraftService(
-        roster_player_service=roster_player_service,
-        league_roster_repo=league_roster_repo
-    )
+    return AuctionDraftService(roster_player_service=roster_player_service, league_roster_repo=league_roster_repo)
 
 
 @annotate_args
@@ -34,18 +29,14 @@ class CompleteSlotResult(BaseModel):
 
 
 class AuctionDraftService:
-    def __init__(
-        self,
-        roster_player_service: RosterPlayerService,
-        league_roster_repo: LeagueRosterRepository
-    ):
+    def __init__(self, roster_player_service: RosterPlayerService, league_roster_repo: LeagueRosterRepository):
         self.roster_player_service = roster_player_service
         self.league_roster_repo = league_roster_repo
 
     def complete_slot(self, league_id: str, draft: Draft, slot: DraftSlot, winner_id: str, transaction: Transaction) -> CompleteSlotResult:
         roster = self.league_roster_repo.get(league_id, winner_id, transaction)
         slot.completed = True
-        message = f"{roster.name} selected {slot.player.display_name} for ${slot.bid} (no other players were able to bid)"
+        message = f"{roster.name} selected {slot.player.full_name} for ${slot.bid} (no other players were able to bid)"
         slot.result = message
         draft.draft_events.insert(0, f"Pick #{slot.pick_number} - {message}")
 

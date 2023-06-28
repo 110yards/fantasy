@@ -1,14 +1,14 @@
+from fastapi import Depends
+from firebase_admin import firestore
 
+from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from app.domain.repositories.league_owned_player_repository import LeagueOwnedPlayerRepository, create_league_owned_player_repository
+from app.domain.repositories.player_repository import PlayerRepository, create_player_repository
 from app.domain.repositories.state_repository import StateRepository, create_state_repository
 from app.domain.services.auction_draft_service import AuctionDraftService, create_auction_draft_service
 from app.domain.services.roster_player_service import RosterPlayerService, create_roster_player_service
-from app.domain.repositories.player_repository import PlayerRepository, create_player_repository
-from app.domain.repositories.league_owned_player_repository import LeagueOwnedPlayerRepository, create_league_owned_player_repository
-from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
-from fastapi import Depends
 from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
-from firebase_admin import firestore
+from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
 
 
 def create_nominate_player_command_executor(
@@ -20,12 +20,7 @@ def create_nominate_player_command_executor(
     auction_draft_service: AuctionDraftService = Depends(create_auction_draft_service),
 ):
     return NominatePlayerCommandExecutor(
-        state_repo,
-        league_config_repo,
-        league_owned_player_repo,
-        player_repo,
-        roster_player_service,
-        auction_draft_service=auction_draft_service
+        state_repo, league_config_repo, league_owned_player_repo, player_repo, roster_player_service, auction_draft_service=auction_draft_service
     )
 
 
@@ -43,7 +38,6 @@ class NominatePlayerResult(BaseCommandResult[NominatePlayerCommand]):
 
 
 class NominatePlayerCommandExecutor(BaseCommandExecutor[NominatePlayerCommand, NominatePlayerResult]):
-
     def __init__(
         self,
         state_repo: StateRepository,
@@ -67,9 +61,7 @@ class NominatePlayerCommandExecutor(BaseCommandExecutor[NominatePlayerCommand, N
         if existing:
             return NominatePlayerResult(command=command, error="Player has already been drafted")
 
-        state = self.state_repo = self.state_repo.get()
-
-        player = self.player_repo.get(state.current_season, command.player_id)
+        player = self.player_repo.get(command.player_id)
 
         if not player:
             return NominatePlayerResult(command=command, error="Player does not exist")

@@ -1,11 +1,12 @@
-from app.domain.repositories.public_repository import PublicRepository, create_public_repository
-from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
-from google.cloud.firestore_v1.transaction import Transaction
-from app.domain.enums.draft_state import DraftState
-from app.yards_py.domain.entities.league import League
-from app.yards_py.domain.entities.draft import Draft
-from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from fastapi import Depends
+from google.cloud.firestore_v1.transaction import Transaction
+
+from app.domain.enums.draft_state import DraftState
+from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.domain.repositories.public_repository import PublicRepository, create_public_repository
+from app.yards_py.domain.entities.draft import Draft
+from app.yards_py.domain.entities.league import League
 
 
 def create_draft_service(
@@ -27,10 +28,11 @@ class DraftService:
 
     def complete(self, draft: Draft, league: League, transaction: Transaction):
         state = self.public_repo.get_state()
+        scoreboard = self.public_repo.get_scoreboard()
 
         start_week = state.current_week
 
-        if state.locks and state.locks.any_locks():
+        if scoreboard.any_locks():
             start_week += 1
 
         league.draft_state = DraftState.COMPLETE

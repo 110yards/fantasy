@@ -17,11 +17,7 @@ export default {
     },
   },
 
-  methods: {
-    isLocked(teamAbbreviation) {
-      return this.state.locks && this.state.locks[teamAbbreviation]
-    },
-  },
+  methods: {},
 
   created() {
     this.$bind("state", firestore.doc("public/state"))

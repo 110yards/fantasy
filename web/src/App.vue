@@ -17,7 +17,7 @@
           <donate v-if="donateAtTop" />
           <router-view />
           <throbber />
-          <donate v-if="donateAtBotton" :top="false" />
+          <donate v-if="donateAtBottom" :top="false" />
           <app-footer />
         </div>
       </v-container>
@@ -109,7 +109,7 @@ export default {
       return !this.isErrorPage && this.$root.showDonationLink && this.$route.name == "home"
     },
 
-    donateAtBotton() {
+    donateAtBottom() {
       return !this.isErrorPage && this.$root.showDonationLink && this.$route.name != "home"
     },
   },

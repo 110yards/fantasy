@@ -50,7 +50,7 @@
       <!-- todo: max name length -->
 
       <v-row>
-        <span v-if="spot.player && scoreboard"><game-state :player="spot.player" :scoreboard="scoreboard" /></span>
+        <span v-if="spot.player"><game-state :player="spot.player" /></span>
       </v-row>
       <!-- could I get some stats in here? -->
     </v-col>
@@ -60,7 +60,7 @@
     <v-col cols="0" md="3" class="text-right d-none d-md-block">
       <v-row>
         <v-col class="py-0">
-          <position-score :leagueId="leagueId" :position="spot" :scoreboard="scoreboard" :weekNumber="weekNumber" />
+          <position-score :leagueId="leagueId" :position="spot" :weekNumber="weekNumber" />
         </v-col>
       </v-row>
       <v-row v-if="playerScore && enableProjections">
@@ -80,7 +80,7 @@
       <v-row>
         <v-col v-if="!playerToBeMoved" class="py-0">
           <span v-if="gameStarted">
-            <position-score :leagueId="leagueId" :position="spot" :scoreboard="scoreboard" :weekNumber="weekNumber" />
+            <position-score :leagueId="leagueId" :position="spot" :weekNumber="weekNumber" />
           </span>
           <span v-else>--</span>
         </v-col>
@@ -122,7 +122,7 @@
 import PlayerLink from "../../player/PlayerLink.vue"
 import Locked from "../../icons/Locked.vue"
 import { eventStatus, playerStatus, positionType, teamId } from "../../../api/110yards/constants"
-import NationalStatus from "../../player/NationalStatus.vue"
+import NationalStatus from "../../player/CanadianStatus.vue"
 import GameState from "../GameState.vue"
 import { firestore } from "../../../modules/firebase"
 import PositionScore from "../PositionScore.vue"
@@ -153,10 +153,6 @@ export default {
       type: Object,
       required: false,
     },
-    scoreboard: {
-      type: Object,
-      required: false,
-    },
     active: {
       type: Boolean,
       required: true,
@@ -170,6 +166,9 @@ export default {
   },
 
   computed: {
+    scoreboard() {
+      return this.$root.scoreboard
+    },
     enableProjections() {
       return this.$root.enableProjections
     },
@@ -179,7 +178,7 @@ export default {
 
       if (this.spot.player.team.id == teamId.FreeAgent) return 0
 
-      if (this.$root.getOpponent(this.spot.player.team.abbreviation) == "FA") return 0
+      if (this.$root.getOpponent(this.spot.player.team_abbr) == "FA") return 0
 
       return this.playerScore.average_score
     },
@@ -191,7 +190,7 @@ export default {
     },
 
     isLocked() {
-      return !!this.spot.player && this.$root.isLocked(this.spot.player.team.abbreviation)
+      return !!this.spot.player && this.$root.isLocked(this.spot.player.team_abbr)
     },
 
     positionsForSpot() {
@@ -199,7 +198,7 @@ export default {
     },
 
     playerToBeMovedIsSame() {
-      return !!this.playerToBeMoved && !!this.spot.player && this.playerToBeMoved.id == this.spot.player.id
+      return !!this.playerToBeMoved && !!this.spot.player && this.playerToBeMoved.id == this.spot.player.player_id
     },
 
     canReceive() {
@@ -219,12 +218,11 @@ export default {
     game() {
       if (!this.spot.player) return null
 
-      return this.$root.getGameForTeam(this.spot.player.team.abbreviation, this.scoreboard)
+      return this.scoreboard.teams[this.spot.player.team_abbr].game
     },
 
     gameStarted() {
-      if (!this.game) return false
-      return [eventStatus.InProgress, eventStatus.Final].includes(this.game.event_status.event_status_id)
+      return this.game && this.game.started
     },
 
     weekNumber() {
@@ -236,7 +234,7 @@ export default {
     configureReferences() {
       if (!this.leagueId || !this.spot || !this.spot.player) return
 
-      let ref = firestore.doc(`league/${this.leagueId}/player_score/${this.spot.player.id}`)
+      let ref = firestore.doc(`league/${this.leagueId}/player_score/${this.spot.player.player_id}`)
       this.$bind("playerScore", ref)
     },
   },

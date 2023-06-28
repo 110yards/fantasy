@@ -30,9 +30,6 @@
             :rules="firstPlayoffWeekRules"
             required
           />
-          <p v-else>
-            <app-form-label>First playoff week: {{ form.firstPlayoffWeek }}</app-form-label>
-          </p>
 
           <div v-if="canUseLoserPlayoff()">
             <app-form-label
@@ -44,34 +41,47 @@
               <span>Yes</span>
             </v-layout>
           </div>
+
+          <p class="caption" v-if="!leagueStarted">
+            Teams on bye are listed beside each week.<br /><br />
+            Selecting a week marked "balanced" will ensure all teams play each other an equal number of times.
+            <br /><br />
+            For a better experience, avoid running your league too long. The longer your regular season, the more likely
+            your playoffs will be impacted by teams resting starters.
+          </p>
+
+          <p class="caption" v-if="!leagueStarted"></p>
+          <p v-else>
+            <app-form-label>First playoff week: {{ form.firstPlayoffWeek }}</app-form-label>
+          </p>
+
           <app-primary-button v-if="!leagueStarted" type="submit" class="btn btn-default">
             Generate schedule
           </app-primary-button>
+          <start-draft :league="league" />
           <saved-indicator :saved="saved" />
         </v-form>
       </v-col>
     </v-row>
 
     <v-row v-if="hasSchedule">
-      <v-simple-table>
-        <template v-slot:default>
-          <thead>
-            <tr>
-              <th>Week</th>
-              <th v-for="x in matchupsPerWeek" :key="x">Matchup {{ x }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="week in schedule.weeks" :key="week.week_number">
-              <th>{{ week.week_number }}</th>
-              <td v-for="(matchup, index) in week.matchups" :key="index">
-                <span v-if="matchup.type == 'regular'">{{ matchup.away.name }} @ {{ matchup.home.name }}</span>
-                <span v-else>{{ matchup.type_display }}</span>
-              </td>
-            </tr>
-          </tbody>
-        </template>
-      </v-simple-table>
+      <v-card v-for="week in schedule.weeks" :key="week.week_number" class="col-md-4 col-12 text-center">
+        <v-card-title class="justify-center"> Week {{ week.week_number }} </v-card-title>
+        <v-card-subtitle> Byes: {{ getByeTeams(week.week_number) }} </v-card-subtitle>
+        <v-card-text>
+          <div v-for="(matchup, index) in week.matchups" :key="index">
+            <div v-if="matchup.type == 'regular'">
+              <span class="d-block overline matchup-heading">Matchup {{ matchup.id }}</span>
+              <span class="d-block body-2">{{ matchup.away.name }}</span>
+              <span class="d-block caption">vs</span>
+              <span class="d-block body-2">{{ matchup.home.name }}</span>
+            </div>
+            <div v-else>
+              <span class="matchup-heading overline">{{ matchup.type_display }}</span>
+            </div>
+          </div>
+        </v-card-text>
+      </v-card>
     </v-row>
 
     <v-row>
@@ -81,10 +91,6 @@
 </template>
 
 <style scoped>
-option.ideal {
-  font-weight: bold;
-}
-
 .table {
   margin-top: 2em;
 }
@@ -94,14 +100,18 @@ option.ideal {
   padding: 0.5em;
 }
 
-.table tr:nth-child(even) {
+.matchup-heading {
+  color: var(--color-secondary);
+}
+
+.v-card:nth-child(even) {
   background-color: var(--bg-color-secondary);
 }
 </style>
 
 <script>
 import _ from "lodash"
-import { firestore } from "../../modules/firebase"
+import { firestore, rtdb } from "../../modules/firebase"
 import * as leagueService from "../../api/110yards/league"
 import SavedIndicator from "../SavedIndicator"
 import StartDraft from "./StartDraft"
@@ -138,6 +148,8 @@ export default {
       playoffTypeRules: [v => !!v || "Playoff type is required"],
       firstPlayoffWeekRules: [v => !!v || "First playoff week is required"],
       saved: false,
+      weekCounts: [],
+      seasonSchedule: null,
     }
   },
   computed: {
@@ -165,22 +177,23 @@ export default {
       return selections
     },
 
-    weekCounts() {
-      const firstWeek = this.$root.state.current_week + 1
-      const lastWeek = this.$root.state.season_weeks
-
-      let counts = []
-      for (let i = firstWeek; i <= lastWeek; i++) {
-        counts.push({ text: `${i}`, value: `${i}` })
-      }
-      return counts
-    },
-
     matchupsPerWeek() {
       return this.rosters.length / 2
     },
   },
   methods: {
+    getWeekKey(weekNumber) {
+      return `W${weekNumber.toString().padStart(2, "0")}`
+    },
+
+    getByeTeams(weekNumber) {
+      if (!this.seasonSchedule) return ""
+
+      let key = this.getWeekKey(weekNumber)
+      let teams = this.seasonSchedule.weeks[key].bye_teams
+      return teams.join(", ").toUpperCase()
+    },
+
     isIdeal(x) {
       return (x - 1) % (this.rosters.length - 1) == 0
     },
@@ -231,8 +244,49 @@ export default {
     bindPlayoffTypes() {
       this.$bind("playoffTypes", firestore.collection(`playoff-types`))
     },
+
+    async setupWeekCounts(rosterCount) {
+      let path = `/schedules/${this.$root.state.current_season}`
+      let schedule = (await rtdb.ref(path).get()).val()
+      this.seasonSchedule = schedule
+
+      const firstWeek = this.$root.state.current_week + 1
+      const lastWeek = schedule.week_count
+
+      let counts = []
+      let opponentCount = rosterCount - 1
+
+      for (let i = firstWeek; i <= lastWeek; i++) {
+        let ideal = rosterCount > 2 && (i - 1) % opponentCount == 0
+        // zero padded 2 digit
+        let weekKey = this.getWeekKey(i)
+
+        let byes = schedule.weeks[weekKey].bye_teams
+        let byesString = byes.length > 0 ? byes.join(", ") : ""
+        byesString = byesString.toUpperCase()
+
+        let marker = ""
+        if (ideal) {
+          marker = ` - ${byesString} (balanced)`
+        } else {
+          marker = ` - ${byesString}`
+        }
+
+        counts.push({ text: `${i}${marker}`, value: `${i}` })
+      }
+
+      this.weekCounts = counts
+    },
   },
   watch: {
+    rosters: {
+      handler(rosters) {
+        if (rosters == null || rosters.length == 0) return
+
+        this.setupWeekCounts(rosters.length)
+      },
+    },
+
     leagueId: {
       immediate: true,
       handler(leagueId) {

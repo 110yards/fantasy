@@ -5,15 +5,16 @@
         <v-col cols="12">
           <v-card>
             <v-card-title>
-              <div class="team-colors" :class="details.player.team.abbreviation">
+              <div class="team-colors" :class="details.player.team_abbr">
                 {{ details.player.uniform || "-" }}
               </div>
               {{ details.player.display_name }}
+              <canadian-status :isCanadian="details.player.canadian_player" />
             </v-card-title>
             <v-card-subtitle>
               <span>{{ details.player.position.toUpperCase() }}</span>
               <span> - </span>
-              <span>{{ details.player.team.location }} {{ details.player.team.name }}</span>
+              <span>{{ teamName }}</span>
               <div v-if="statusText" :class="statusClass">{{ statusText }}</div>
             </v-card-subtitle>
 
@@ -28,13 +29,13 @@
             <v-card-subtitle>
               <div v-if="details.player.age"><label>Age:</label> {{ details.player.age }}</div>
               <div v-if="hasHeight && hasWeight">
-                <label>Height/Weight:</label> {{ details.player.formatted_height }} /
-                {{ details.player.formatted_weight }}
+                <label>Height/Weight:</label> {{ details.player.height }} /
+                {{ details.player.weight }}
               </div>
-              <div v-if="hasHeight && !hasWeight"><label>Height:</label> {{ details.player.formatted_height }}</div>
-              <div v-if="!hasHeight && hasWeight"><label>Weight:</label> {{ details.player.formatted_weight }}</div>
+              <div v-if="hasHeight && !hasWeight"><label>Height:</label> {{ details.player.height }}</div>
+              <div v-if="!hasHeight && hasWeight"><label>Weight:</label> {{ details.player.weight }}</div>
               <div v-if="details.player.birth_place"><label>Hometown:</label> {{ details.player.birth_place }}</div>
-              <div v-if="details.player.college"><label>College:</label> {{ details.player.college }}</div>
+              <div v-if="details.player.school"><label>College:</label> {{ details.player.school }}</div>
             </v-card-subtitle>
 
             <!-- <v-card-text>
@@ -324,7 +325,7 @@ label {
 </style>
 
 <script>
-import { playerStatus, positionType } from "../../api/110yards/constants"
+import { playerStatus, positionType, teams } from "../../api/110yards/constants"
 import { getPlayerDetails } from "../../api/110yards/league"
 import GameAverage from "../../components/player/stats/GameAverage.vue"
 import GamePercent from "../../components/player/stats/GamePercent.vue"
@@ -332,6 +333,7 @@ import GameResult from "../../components/player/stats/GameResult.vue"
 import GameValue from "../../components/player/stats/GameValue.vue"
 import { firestore } from "../../modules/firebase"
 import * as formatter from "../../modules/formatter"
+import CanadianStatus from "../../components/player/CanadianStatus.vue"
 
 export default {
   name: "PlayerDetails",
@@ -340,6 +342,7 @@ export default {
     GameResult,
     GamePercent,
     GameValue,
+    CanadianStatus,
   },
   props: {
     leagueId: { type: String, required: true },
@@ -384,12 +387,18 @@ export default {
       }`
     },
 
+    teamName() {
+      return this.details && this.details.player.team_abbr
+        ? teams.getFullName(this.details.player.team_abbr)
+        : "Free Agent"
+    },
+
     hasHeight() {
-      return this.details.player.formatted_height
+      return this.details.player.height
     },
 
     hasWeight() {
-      return this.details.player.formatted_weight
+      return this.details.player.weight
     },
 
     showPassing() {

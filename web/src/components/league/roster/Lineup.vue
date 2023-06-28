@@ -26,7 +26,6 @@
         v-on:movePlayer="showMoveTargets"
         v-on:acceptPlayer="movePlayer"
         v-on:cancelMovePlayer="cancelMovePlayer"
-        :scoreboard="scoreboard"
       />
     </template>
   </v-container>
@@ -39,7 +38,6 @@ import AppDefaultButton from "../../buttons/AppDefaultButton.vue"
 import { dropPlayer, movePlayer } from "../../../api/110yards/roster"
 import { draftState } from "../../../api/110yards/constants"
 import LineupSpot from "./LineupSpot.vue"
-import scoreboard from "../../../mixins/scoreboard"
 
 export default {
   name: "lineup",
@@ -48,7 +46,6 @@ export default {
     AppDefaultButton,
     LineupSpot,
   },
-  mixins: [scoreboard],
   props: {
     roster: {
       type: Object,
@@ -126,7 +123,7 @@ export default {
         let command = {
           league_id: this.league.id,
           roster_id: this.roster.id,
-          player_id: spot.player.id,
+          player_id: spot.player.player_id,
         }
 
         await dropPlayer(command)

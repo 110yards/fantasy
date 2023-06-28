@@ -1,103 +1,136 @@
+from typing import Optional
+
 import requests
-from dateutil import parser
 from fastapi import Depends
 
 from ...config.settings import Settings, get_settings
-from ..models.scoreboard import Locks, Opponents, Scoreboard, ScoreboardGame
+from ..models.schedule import ScheduleGame, ScheduleWeek
+from ..models.scoreboard import Scoreboard, ScoreboardGame, Team, Teams
+from ..store.schedule_store import ScheduleStore, create_schedule_store
 from ..store.state_store import StateStore, create_state_store
 
 
 class ScoreboardService:
-    def __init__(self, settings: Settings, state_store: StateStore):
+    def __init__(self, settings: Settings, schedule_store: ScheduleStore, state_store: StateStore):
         self.settings = settings
+        self.schedule_store = schedule_store
         self.state_store = state_store
 
     def get_scoreboard(self) -> Scoreboard:
         state = self.state_store.get_state()
-        current_week = state.current_week
+
+        week_key = f"W{state.current_week:02d}"
+        schedule_week = self.schedule_store.get_schedule_week(state.current_season, week_key)
+
+        if not schedule_week:
+            raise Exception("Unable to find schedule week")
 
         data = requests.get(self.settings.realtime_schedule_url).json()
 
-        return load_scoreboard(data, current_week)
+        return load_scoreboard(schedule_week, data)
 
 
-def load_scoreboard(data: dict, current_week: int) -> Scoreboard:
-    games = map_games(data, current_week)
-    locks = create_locks(games)
-    opponents = create_opponents(games)
+def load_scoreboard(schedule_week: ScheduleWeek, data: dict) -> Scoreboard:
+    games = map_games(schedule_week, data)
+    focus_game = get_focus_game(games)
+    teams = create_teams(games)
 
     return Scoreboard(
+        focus_game=focus_game,
         games=games,
-        locks=locks,
-        opponents=opponents,
+        teams=teams,
     )
 
 
-def map_games(data: dict, current_week: int) -> list[ScoreboardGame]:
+def map_games(schedule_week: ScheduleWeek, scoreboard_data: dict) -> list[ScoreboardGame]:
     games = []
+    week_data: dict = None
 
-    for week in data:
-        if week["type"] == "REG" and week["number"] == current_week:
-            games.extend(map_week_games(week["tournaments"]))
+    schedule_games = {x.realtime_source_id: x for x in schedule_week.games}
+
+    for week_data in scoreboard_data:
+        if week_data["type"] == "REG" and week_data["number"] == schedule_week.week_number:
+            break
+
+    if week_data is None:
+        raise Exception(f"Unable to find week {schedule_week.week_number} in scoreboard data")
+
+    for game_data in week_data["tournaments"]:
+        schedule_game = schedule_games.get(game_data["id"])
+        if schedule_game is None:
+            raise Exception(f"Unable to find game {game_data['id']} in schedule")
+
+        games.append(map_game(schedule_game, game_data))
 
     return games
 
 
-def map_week_games(week_data: dict) -> list[ScoreboardGame]:
-    games = []
-    for game_data in week_data:
-        games.append(map_game(game_data))
-
-    return games
-
-
-def map_game(game_data: dict) -> ScoreboardGame:
-    game_date = parser.isoparse(game_data["date"])
+def map_game(schedule_game: ScheduleGame, game_data: dict) -> ScoreboardGame:
+    status = map_status(game_data["status"])
+    started = status not in ["scheduled", "postponed"]
+    complete = status == "final"
 
     return ScoreboardGame(
-        game_date=game_date,
-        away_abbr=game_data["awaySquad"]["shortName"],
-        home_abbr=game_data["homeSquad"]["shortName"],
+        game_id=schedule_game.game_id,
+        game_date=schedule_game.date_start,
+        away_abbr=schedule_game.away_abbr,
+        home_abbr=schedule_game.home_abbr,
         away_score=game_data["awaySquad"]["score"],
         home_score=game_data["homeSquad"]["score"],
-        status=game_data["status"],
+        status=status,
+        started=started,
+        complete=complete,
         quarter=game_data["activePeriod"],
         clock=game_data["clock"],
     )
 
 
-def create_locks(games: list[ScoreboardGame]) -> Locks:
-    started_statuses = ["first_quarter", "second_quarter", "third_quarter", "fourth_quarter", "overtime", "complete"]
-    lock_data = {}
+def map_status(status: str) -> str:
+    active_statuses = ["first_quarter", "second_quarter", "third_quarter", "fourth_quarter", "overtime"]
+    if status in active_statuses:
+        return "active"
+    else:
+        return status
 
-    locked_count = 0
 
+def get_focus_game(games: list[ScoreboardGame]) -> Optional[ScoreboardGame]:
+    # returns the first scheduled or active game
+    focus_statuses = ["scheduled", "first_quarter", "second_quarter", "third_quarter", "fourth_quarter", "overtime"]
     for game in games:
-        if game.status in started_statuses:
+        if game.status in focus_statuses:
+            return game
+
+    return None
+
+
+def create_teams(games: list[ScoreboardGame]) -> Teams:
+    team_data = {}
+
+    locked_statuses = ["first_quarter", "second_quarter", "third_quarter", "fourth_quarter", "overtime", "complete"]
+    locked_count = 0
+    for game in games:
+        locked = game.status in locked_statuses
+        if locked:
             locked_count += 1
-            lock_data[game.away_abbr] = True
-            lock_data[game.home_abbr] = True
+        team_data[game.away_abbr] = Team(opponent=game.home_abbr, locked=locked, game=game, is_at_home=False)
+        team_data[game.home_abbr] = Team(opponent=game.away_abbr, locked=locked, game=game, is_at_home=True)
+
+    teams = Teams(**team_data)
 
     all_locked = locked_count == len(games)
+    if all_locked:
+        teams.lock_all()
 
-    return Locks.all_locked() if all_locked else Locks(**lock_data)
-
-
-def create_opponents(games: list[ScoreboardGame]) -> Opponents:
-    opponent_data = {}
-
-    for game in games:
-        opponent_data[game.away_abbr] = game.home_abbr
-        opponent_data[game.home_abbr] = game.away_abbr
-
-    return Opponents(**opponent_data)
+    return teams
 
 
 def create_scoreboard_service(
     settings: Settings = Depends(get_settings),
+    schedule_store: ScheduleStore = Depends(create_schedule_store),
     state_store: StateStore = Depends(create_state_store),
 ) -> ScoreboardService:
     return ScoreboardService(
         settings=settings,
+        schedule_store=schedule_store,
         state_store=state_store,
     )

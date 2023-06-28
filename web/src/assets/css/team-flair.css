@@ -47,7 +47,9 @@
 }
 
 .team-colors.BC,
-.team-icon.BC::before {
+.team-icon.BC::before,
+.team-colors.bc,
+.team-icon.bc::before {
   content: "B";
   color: var(--bc-secondary);
   background-color: var(--bc-primary);
@@ -55,7 +57,9 @@
 }
 
 .team-colors.CGY,
-.team-icon.CGY::before {
+.team-icon.CGY::before,
+.team-colors.cgy,
+.team-icon.cgy::before {
   content: "C";
   color: black;
   background-color: var(--cgy-primary);
@@ -63,7 +67,9 @@
 }
 
 .team-colors.EDM,
-.team-icon.EDM::before {
+.team-icon.EDM::before,
+.team-colors.edm,
+.team-icon.edm::before {
   content: "E";
   color: var(--edm-secondary);
   background-color: var(--edm-primary);
@@ -71,7 +77,9 @@
 }
 
 .team-colors.HAM,
-.team-icon.HAM::before {
+.team-icon.HAM::before,
+.team-colors.ham,
+.team-icon.ham::before {
   content: "H";
   color: var(--ham-secondary);
   background-color: var(--ham-primary);
@@ -79,7 +87,9 @@
 }
 
 .team-colors.MTL,
-.team-icon.MTL::before {
+.team-icon.MTL::before,
+.team-colors.mtl,
+.team-icon.mtl::before {
   content: "M";
   color: white;
   background-color: var(--mtl-primary);
@@ -87,7 +97,9 @@
 }
 
 .team-colors.OTT,
-.team-icon.OTT::before {
+.team-icon.OTT::before,
+.team-colors.ott,
+.team-icon.ott::before {
   content: "O";
   color: var(--ott-primary);
   background-color: var(--ott-secondary);
@@ -95,7 +107,9 @@
 }
 
 .team-colors.SSK,
-.team-icon.SSK::before {
+.team-icon.SSK::before,
+.team-colors.ssk,
+.team-icon.ssk::before {
   content: "S";
   color: var(--ssk-secondary);
   background-color: var(--ssk-primary);
@@ -103,7 +117,9 @@
 }
 
 .team-colors.TOR,
-.team-icon.TOR::before {
+.team-icon.TOR::before,
+.team-colors.tor,
+.team-icon.tor::before {
   content: "T";
   color: var(--tor-secondary);
   background-color: var(--tor-primary);
@@ -111,7 +127,9 @@
 }
 
 .team-colors.WPG,
-.team-icon.WPG::before {
+.team-icon.WPG::before,
+.team-colors.wpg,
+.team-icon.wpg::before {
   content: "W";
   color: var(--wpg-secondary);
   background-color: var(--wpg-primary);

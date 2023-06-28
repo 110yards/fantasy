@@ -616,10 +616,6 @@ class Game(BaseModel):
     penalties: Optional[List[Penalty]]
     play_reviews: Optional[List[PlayReview]]
 
-    @staticmethod
-    def get_game_id(year: int, week: int, game_number: int) -> str:
-        return f"{year}{week:0>2}{game_number:0>2}"
-
     class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat(),

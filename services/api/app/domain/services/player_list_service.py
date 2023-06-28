@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
+from dateutil import parser
 from fastapi import Depends
 from pydantic import BaseModel
 
@@ -21,6 +22,8 @@ from app.yards_py.domain.entities.scoring_settings import ScoringSettings
 from app.yards_py.domain.entities.stats import Stats
 from app.yards_py.domain.repositories.state_repository import StateRepository, create_state_repository
 
+from ..stores.import_state_store import ImportStateStore, create_import_state_store
+
 
 def create_player_list_service(
     league_repo: LeagueRepository = Depends(create_league_repository),
@@ -31,6 +34,7 @@ def create_player_list_service(
     player_season_score_repo: PlayerLeagueSeasonScoreRepository = Depends(create_player_league_season_score_repository),
     rtdb_client: RTDBClient = Depends(create_rtdb_client),
     state_repo: StateRepository = Depends(create_state_repository),
+    import_state_store: ImportStateStore = Depends(create_import_state_store),
 ):
     return PlayerListService(
         league_repo=league_repo,
@@ -41,6 +45,7 @@ def create_player_list_service(
         player_season_score_repo=player_season_score_repo,
         rtdb_client=rtdb_client,
         state_repo=state_repo,
+        import_state_store=import_state_store,
     )
 
 
@@ -60,7 +65,7 @@ class CacheData(BaseModel):
     players: List[RankedPlayer]
     recalc_date: Optional[int]
     last_player_update: Optional[datetime]
-    generated_at: int = 0
+    generated_at: datetime
 
 
 class PlayerListService:
@@ -74,6 +79,7 @@ class PlayerListService:
         player_season_score_repo: PlayerLeagueSeasonScoreRepository,
         rtdb_client: RTDBClient,
         state_repo: StateRepository,
+        import_state_store: ImportStateStore,
     ):
         self.league_repo = league_repo
         self.player_season_repo = player_season_repo
@@ -133,6 +139,7 @@ class PlayerListService:
         if valid_cache:
             return self._get_players_path(league_id, current_season)
 
+        # TODO: combine players with seasons (which don't exist)
         player_seasons = self._get_player_seasons(current_season)
         player_scores = self.player_season_score_repo.get_all(league_id)
         player_scores = {x.id: x for x in player_scores}
@@ -148,17 +155,28 @@ class PlayerListService:
         league_id = league.id
 
         path = f"{self._get_data_path(league_id, season)}/generated_at"
+
         generated_at = self.rtdb_client.get(path)
+
+        if isinstance(generated_at, int):
+            generated_at = datetime.fromtimestamp(generated_at)
+
+        if isinstance(generated_at, str):
+            generated_at = parser.isoparse(generated_at)
 
         if generated_at is None or league.last_season_recalc is None:
             Logger.debug("No cache found")
             return False
 
-        if generated_at < league.last_season_recalc:
+        last_season_recalc = league.last_season_recalc
+        if isinstance(last_season_recalc, int):
+            last_season_recalc = datetime.fromtimestamp(last_season_recalc).replace(tzinfo=timezone.utc)
+
+        if generated_at < last_season_recalc:
             Logger.debug("Cache is out of date (recalc)")
             return False
 
-        last_player_update = self.state_repo.get().last_player_update.timestamp()
+        last_player_update = self.player_repo.get_last_updated()
 
         if last_player_update > generated_at:
             Logger.debug("Cache is out of date (player update)")
@@ -211,11 +229,13 @@ class PlayerListService:
             players=ranked_players,
             scoring_settings_hash=scoring_hash,
             recalc_date=last_recalc_date,
-            generated_at=datetime.now().astimezone(tz=timezone.utc).timestamp(),
+            generated_at=datetime.now().astimezone(tz=timezone.utc).isoformat(),
         )
 
         path = self._get_data_path(league_id, season)
-        self.rtdb_client.set(path, data.dict())
+        data = data.dict()
+        data["generated_at"] = data["generated_at"].isoformat()
+        self.rtdb_client.set(path, data)
         return f"{path}/players"
 
     def _combine_result(
@@ -230,8 +250,8 @@ class PlayerListService:
         for player in players:
             ranked_player = RankedPlayer.parse_obj(player.dict())
 
-            season = player_seasons.get(player.id, None)
-            season_score = player_scores.get(player.id, None)
+            season = player_seasons.get(player.player_id, None)
+            season_score = player_scores.get(player.player_id, None)
             if season and season_score:
                 ranked_player.rank = season_score.rank
                 ranked_player.average = season_score.average_score

@@ -1,20 +1,18 @@
-
-
-from app.domain.enums.position_type import PositionType
-from app.yards_py.domain.entities.league_transaction import LeagueTransaction
-from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
-from app.domain.repositories.league_transaction_repository import LeagueTransactionRepository, create_league_transaction_repository
-from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from app.yards_py.domain.entities.roster import Roster
 from typing import List, Optional, Tuple, Union
 
-from app.yards_py.domain.entities.league_position import LeaguePosition
-from app.yards_py.domain.entities.owned_player import OwnedPlayer
-from app.yards_py.domain.entities.player import Player
-from app.domain.repositories.league_owned_player_repository import (
-    LeagueOwnedPlayerRepository, create_league_owned_player_repository)
 from fastapi.param_functions import Depends
 from google.cloud.firestore_v1.transaction import Transaction
+
+from app.domain.enums.position_type import PositionType
+from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from app.domain.repositories.league_owned_player_repository import LeagueOwnedPlayerRepository, create_league_owned_player_repository
+from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from app.domain.repositories.league_transaction_repository import LeagueTransactionRepository, create_league_transaction_repository
+from app.yards_py.domain.entities.league_position import LeaguePosition
+from app.yards_py.domain.entities.league_transaction import LeagueTransaction
+from app.yards_py.domain.entities.owned_player import OwnedPlayer
+from app.yards_py.domain.entities.player import Player
+from app.yards_py.domain.entities.roster import Roster
 
 
 def create_roster_player_service(
@@ -24,10 +22,7 @@ def create_roster_player_service(
     league_config_repo: LeagueConfigRepository = Depends(create_league_config_repository),
 ):
     return RosterPlayerService(
-        league_owned_player_repo,
-        roster_repo=roster_repo,
-        league_transaction_repo=league_transaction_repo,
-        league_config_repo=league_config_repo
+        league_owned_player_repo, roster_repo=roster_repo, league_transaction_repo=league_transaction_repo, league_config_repo=league_config_repo
     )
 
 
@@ -45,7 +40,6 @@ class RosterPlayerService:
         self.league_config_repo = league_config_repo
 
     def find_position_for(self, player: Player, roster: Roster) -> Optional[LeaguePosition]:
-
         positions = list(roster.positions.values())
 
         def sort_key(item: LeaguePosition):
@@ -89,7 +83,7 @@ class RosterPlayerService:
         transaction: Transaction = None,
         target_position: LeaguePosition = None,
         record_transaction: bool = False,
-        waiver_bid: int = None
+        waiver_bid: int = None,
     ) -> Tuple[bool, Union[str, List[LeagueTransaction]]]:
         config = self.league_config_repo.get_positions_config(league_id)
         if not config:
@@ -113,7 +107,8 @@ class RosterPlayerService:
                 return False, "Rosters are limited to 1 kicker"
 
         league_transactions = self.assign_player_to_roster_position(
-            league_id, roster, player, position, transaction, record_transaction=record_transaction, waiver_bid=waiver_bid)
+            league_id, roster, player, position, transaction, record_transaction=record_transaction, waiver_bid=waiver_bid
+        )
 
         return True, league_transactions
 
@@ -121,19 +116,19 @@ class RosterPlayerService:
         return target_position and target_position.player and target_position.player.position == type
 
     def assign_player_to_roster_position(
-            self,
-            league_id: str,
-            roster: Roster,
-            player: Player,
-            position: LeaguePosition,
-            transaction: Transaction = None,
-            record_transaction: bool = False,
-            waiver_bid: int = None,
+        self,
+        league_id: str,
+        roster: Roster,
+        player: Player,
+        position: LeaguePosition,
+        transaction: Transaction = None,
+        record_transaction: bool = False,
+        waiver_bid: int = None,
     ) -> Optional[List[LeagueTransaction]]:
         drop_player: Player = None
         if position.player:
             drop_player = position.player
-            self.league_owned_player_repo.delete(league_id, drop_player.id, transaction)
+            self.league_owned_player_repo.delete(league_id, drop_player.player_id, transaction)
 
         position.player = player
         owned_player = OwnedPlayer.create(roster.id, player)
@@ -159,17 +154,10 @@ class RosterPlayerService:
 
         return league_transactions
 
-    def remove_player_from_roster(
-        self,
-        league_id: str,
-        roster: Roster,
-        player_id: str,
-        transaction: Transaction = None
-    ):
-
+    def remove_player_from_roster(self, league_id: str, roster: Roster, player_id: str, transaction: Transaction = None):
         for position_id in roster.positions:
             position = roster.positions[position_id]
-            if not position.player or position.player.id != player_id:
+            if not position.player or position.player.player_id != player_id:
                 continue
 
             position.player = None

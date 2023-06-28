@@ -2,22 +2,22 @@
 #   filename:  game.json
 #   timestamp: 2021-03-19T11:38:10+00:00
 from __future__ import annotations
-from dateutil import parser
+
 from datetime import datetime, timezone
-from app.yards_py.core.sim_state import SimState
-
-from app.yards_py.domain.entities.game_player import GamePlayer
-from app.yards_py.domain.entities.player_game import PlayerGame
-from app.yards_py.domain.enums.position_type import PositionType
-
 from typing import Dict, List, Optional
+
+from dateutil import parser
 
 from app.yards_py.core.base_entity import BaseEntity
 from app.yards_py.core.hash_dict import hash_dict
+from app.yards_py.core.sim_state import SimState
 from app.yards_py.domain.entities.event_status import EventStatus
 from app.yards_py.domain.entities.event_type import EventType
+from app.yards_py.domain.entities.game_player import GamePlayer
 from app.yards_py.domain.entities.game_score import GameScore
 from app.yards_py.domain.entities.game_teams import GameTeams
+from app.yards_py.domain.entities.player_game import PlayerGame
+from app.yards_py.domain.enums.position_type import PositionType
 
 
 class Game(BaseEntity):
@@ -114,7 +114,7 @@ def get_roster(roster: List[Dict]) -> Dict[str, GamePlayer]:
         player["id"] = str(player["player_id"])
         game_player = GamePlayer(**player)
 
-        game_roster[game_player.id] = game_player
+        game_roster[game_player.player_id] = game_player
 
     return game_roster
 

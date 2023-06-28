@@ -1,37 +1,31 @@
 from __future__ import annotations
-from yards_py.core.sim_state import SimState
-from yards_py.domain.entities.event_status import EVENT_STATUS_POSTPONED
 
-from pydantic.main import BaseModel
-from yards_py.domain.entities.opponents import Opponents
-from yards_py.domain.entities.scoreboard import Scoreboard
-from yards_py.domain.entities.state import Locks
-from yards_py.domain.entities.team import Team
-from yards_py.domain.repositories.player_game_repository import PlayerGameRepository, create_player_game_repository
-from yards_py.domain.repositories.scheduled_game_repository import ScheduledGameRepository, create_scheduled_game_repository
-from yards_py.domain.repositories.state_repository import StateRepository, create_state_repository
-
-
-from yards_py.domain.entities.player_game import PlayerGame
-from yards_py.domain.repositories.player_repository import PlayerRepository, create_player_repository
-from yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
-from yards_py.core.logging import Logger
-from yards_py.domain.topics import UPDATE_PLAYERS_TOPIC
-
-import time
 import logging
+import time
+from timeit import default_timer as timer
 from typing import Dict, List, Optional
 
-from services.system.app.api_proxies.cfl_game_proxy import CflGameProxy, create_cfl_game_proxy
-from yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
-from yards_py.core.publisher import Publisher
-from services.system.app.di import create_publisher
-from yards_py.domain.entities.game import Game, from_cfl
-from yards_py.domain.repositories.game_repository import GameRepository, create_game_repository
 from fastapi.param_functions import Depends
 from firebase_admin import firestore
-from timeit import default_timer as timer
+from pydantic.main import BaseModel
 
+from services.system.app.api_proxies.cfl_game_proxy import CflGameProxy, create_cfl_game_proxy
+from services.system.app.di import create_publisher
+from yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from yards_py.core.logging import Logger
+from yards_py.core.publisher import Publisher
+from yards_py.core.sim_state import SimState
+from yards_py.domain.entities.event_status import EVENT_STATUS_POSTPONED
+from yards_py.domain.entities.game import Game, from_cfl
+from yards_py.domain.entities.player_game import PlayerGame
+from yards_py.domain.entities.team import Team
+from yards_py.domain.repositories.game_repository import GameRepository, create_game_repository
+from yards_py.domain.repositories.player_game_repository import PlayerGameRepository, create_player_game_repository
+from yards_py.domain.repositories.player_repository import PlayerRepository, create_player_repository
+from yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
+from yards_py.domain.repositories.scheduled_game_repository import ScheduledGameRepository, create_scheduled_game_repository
+from yards_py.domain.repositories.state_repository import StateRepository, create_state_repository
+from yards_py.domain.topics import UPDATE_PLAYERS_TOPIC
 
 logger = logging.getLogger()
 
@@ -91,10 +85,7 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
         season = command.season or state.current_season
         week = command.week or state.current_week
 
-        updating_current_season = season == state.current_season
-        updating_current_week = week == state.current_week
 
-        update_state = updating_current_season and updating_current_week
 
         Logger.info(f"Updating games for week {week}")
 
@@ -139,24 +130,10 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
                 locked_teams.append(game.teams.away.abbreviation)
                 locked_teams.append(game.teams.home.abbreviation)
 
-        all_games_active = active_games_count == len(current_games)
-
-        new_locks_state = Locks.create(locked_teams, all_games_active)
-
-        Logger.debug(f"Initializing scoreboard ({timer() - start})")
-        new_scoreboard = Scoreboard.create(current_games.values())
-        Logger.debug(f"Initializing opponents ({timer() - start})")
-        new_opponents = Opponents.create(opponents)
 
         @firestore.transactional
         def update_games(transaction, games: Dict[str, Game], players: List[PlayerGame]):
             Logger.debug(f"Saving changes ({timer() - start})")
-
-            new_state = state.copy()
-            new_state.locks = new_locks_state
-
-            current_scoreboard = self.public_repo.get_scoreboard(transaction)
-            current_opponents = self.public_repo.get_opponents(transaction)
 
             pending_player_updates = []
 
@@ -169,17 +146,6 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
                 game = game_updates[game_id]
                 self.game_repo.set(season, game, transaction)
 
-            if new_state.changed(state) and update_state:
-                Logger.debug(f"Saving state ({timer() - start})")
-                self.state_repo.set(new_state, transaction)
-
-            if new_scoreboard.changed(current_scoreboard) and update_state:
-                Logger.debug(f"Saving scoreboard ({timer() - start})")
-                self.public_repo.set_scoreboard(new_scoreboard, transaction)
-
-            if new_opponents.changed(current_opponents) and update_state:
-                Logger.debug(f"Saving opponents ({timer() - start})")
-                self.public_repo.set_opponents(new_opponents, transaction)
 
             return pending_player_updates
 

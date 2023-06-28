@@ -1,7 +1,8 @@
 from datetime import datetime, timezone
-from fastapi import Depends
 
+from fastapi import Depends
 from pydantic import BaseModel
+
 from app.yards_py.domain.repositories.league_owned_player_repository import LeagueOwnedPlayerRepository, create_league_owned_player_repository
 from app.yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from app.yards_py.domain.repositories.player_repository import PlayerRepository, create_player_repository
@@ -54,8 +55,8 @@ class OwnershipReportService:
         owned_players: dict[str, int] = {}
         players = self.player_repo.get_all(season)
         for player in players:
-            if player.id not in owned_players:
-                owned_players[player.id] = 0
+            if player.player_id not in owned_players:
+                owned_players[player.player_id] = 0
 
         for league in active_leagues:
             league_owned_players = self.league_owned_player_repo.get_all(league.id)
@@ -70,12 +71,14 @@ class OwnershipReportService:
         for player_id, ownership_count in owned_players.items():
             player = players[player_id]
             owned_percent = ownership_count / league_count
-            ownership_report_players.append(OwnershipReportPlayer(
-                player_name=player.display_name,
-                player_id=player.id,
-                ownership_count=ownership_count,
-                owned_percent=owned_percent,
-            ))
+            ownership_report_players.append(
+                OwnershipReportPlayer(
+                    player_name=player.full_name,
+                    player_id=player.player_id,
+                    ownership_count=ownership_count,
+                    owned_percent=owned_percent,
+                )
+            )
 
         ownership_report_players.sort(key=lambda p: p.owned_percent, reverse=True)
 

@@ -28,7 +28,7 @@ export default {
       if (!this.leagueId) return
 
       if (this.player) {
-        this.projection = await playerProjection(this.leagueId, this.player.id)
+        this.projection = await playerProjection(this.leagueId, this.player.player_id)
       } else {
         this.projection = null
       }

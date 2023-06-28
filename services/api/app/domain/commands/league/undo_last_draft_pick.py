@@ -1,16 +1,17 @@
-
 from typing import Optional
+
+from fastapi import Depends
+from firebase_admin import firestore
+
 from app.domain.enums.draft_type import DraftType
-from app.yards_py.domain.entities.draft import DraftSlot
+from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
 from app.domain.services.notification_service import NotificationService, create_notification_service
 from app.domain.services.roster_player_service import RosterPlayerService, create_roster_player_service
-from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
-from fastapi import Depends
 from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
-from firebase_admin import firestore
+from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from app.yards_py.domain.entities.draft import DraftSlot
 
 
 def create_undo_last_draft_pick_command_executor(
@@ -21,11 +22,7 @@ def create_undo_last_draft_pick_command_executor(
     league_repo: LeagueRepository = Depends(create_league_repository),
 ):
     return UndoLastDraftPickCommandExecutor(
-        league_config_repo,
-        league_roster_repo,
-        roster_player_service,
-        notification_service=notification_service,
-        league_repo=league_repo
+        league_config_repo, league_roster_repo, roster_player_service, notification_service=notification_service, league_repo=league_repo
     )
 
 
@@ -40,14 +37,13 @@ class UndoLastDraftPickResult(BaseCommandResult[UndoLastDraftPickCommand]):
 
 
 class UndoLastDraftPickCommandExecutor(BaseCommandExecutor[UndoLastDraftPickCommand, UndoLastDraftPickResult]):
-
     def __init__(
-            self,
-            league_config_repo: LeagueConfigRepository,
-            league_roster_repo: LeagueRosterRepository,
-            roster_player_service: RosterPlayerService,
-            league_repo: LeagueRepository,
-            notification_service: NotificationService,
+        self,
+        league_config_repo: LeagueConfigRepository,
+        league_roster_repo: LeagueRosterRepository,
+        roster_player_service: RosterPlayerService,
+        league_repo: LeagueRepository,
+        notification_service: NotificationService,
     ):
         self.league_config_repo = league_config_repo
         self.league_roster_repo = league_roster_repo
@@ -78,7 +74,7 @@ class UndoLastDraftPickCommandExecutor(BaseCommandExecutor[UndoLastDraftPickComm
             if draft.draft_type == DraftType.AUCTION:
                 last_winner.draft_budget += last_slot.bid
 
-            self.roster_player_service.remove_player_from_roster(command.league_id, last_winner, last_slot.player.id, transaction)
+            self.roster_player_service.remove_player_from_roster(command.league_id, last_winner, last_slot.player.player_id, transaction)
 
             self.reset_slot(last_slot, draft.draft_type)
             self.reset_slot(current_slot, draft.draft_type)

@@ -311,7 +311,7 @@ export default {
     },
 
     playerOwners() {
-      return this.ownedPlayers.reduce((players, player) => ((players[player.id] = player), players), {})
+      return this.ownedPlayers.reduce((players, player) => ((players[player.player_id] = player), players), {})
     },
 
     currentRoster() {
@@ -328,7 +328,7 @@ export default {
   },
   methods: {
     isOwned(player) {
-      return player.id in this.playerOwners
+      return player.player_id in this.playerOwners
     },
 
     addPlayer(player) {
@@ -343,7 +343,7 @@ export default {
     isLocked(player) {
       if (this.isDraft) return false
 
-      return this.$root.isLocked(player.team.abbreviation)
+      return this.$root.isLocked(player.team_abbr)
     },
 
     searchPlayers(value, search, item) {
@@ -363,7 +363,7 @@ export default {
     },
 
     isAvailable(player) {
-      return this.getOwnerId(player.id) == null
+      return this.getOwnerId(player.player_id) == null
     },
 
     formatScore(score) {
@@ -371,17 +371,17 @@ export default {
     },
 
     getNextOpponent(player) {
-      return player != null && player.team != null ? this.$root.getOpponent(player.team.abbreviation) : ""
+      return player != null && player.team_abbr ? this.$root.getOpponent(player.team_abbr) : ""
     },
 
     getPlayerScore(player) {
-      let filterResults = this.playerScores.filter(p => p.id == player.id)
+      let filterResults = this.playerScores.filter(p => p.id == player.player_id)
 
       return filterResults && filterResults.length == 1 ? filterResults[0] : null
     },
 
     getPlayerStats(player) {
-      let filterResults = this.seasonStats.filter(p => p.player_id == player.id)
+      let filterResults = this.seasonStats.filter(p => p.player_id == player.player_id)
 
       return filterResults && filterResults.length == 1 ? filterResults[0] : null
     },

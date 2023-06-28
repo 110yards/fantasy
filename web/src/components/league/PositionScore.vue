@@ -67,7 +67,7 @@ export default {
 
       let ref = firestore
         .collection(path)
-        .where("player_id", "==", this.position.player.id)
+        .where("player_id", "==", this.position.player.player_id)
         .where("week_number", "==", parseInt(this.weekNumber))
         .orderBy("game_id")
         .limit(1)

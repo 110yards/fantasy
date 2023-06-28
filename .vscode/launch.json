@@ -28,27 +28,6 @@
       ]
     },
     {
-      "name": "API",
-      "type": "python",
-      "request": "launch",
-      "module": "uvicorn",
-      "console": "internalConsole",
-      "justMyCode": false,
-      "args": [
-        "services.api.app.main:app",
-        "--app-dir",
-        "..",
-        "--reload",
-        "--reload-dir",
-        "services/api",
-        "--port",
-        "8000",
-        "--env-file",
-        "./services/api/.env"
-      ],
-      "jinja": true
-    },
-    {
       "name": "System",
       "type": "python",
       "request": "launch",

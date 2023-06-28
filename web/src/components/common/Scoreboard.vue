@@ -3,14 +3,14 @@
     <table class="scoreboard">
       <tbody v-for="game in games" :key="game.id" class="score">
         <tr class="away">
-          <td class="team" :class="awayClass(game)">{{ game.teams.away.abbreviation }}</td>
-          <td class="pts" :class="awayClass(game)">{{ game.score.away }}</td>
+          <td class="team" :class="awayClass(game)">{{ game.away_abbr.toUpperCase() }}</td>
+          <td class="pts" :class="awayClass(game)">{{ game.away_score }}</td>
           <td class="caption">{{ gameStatus(game) }}</td>
         </tr>
 
         <tr class="home">
-          <td class="team" :class="homeClass(game)">{{ game.teams.home.abbreviation }}</td>
-          <td class="pts" :class="homeClass(game)">{{ game.score.home }}</td>
+          <td class="team" :class="homeClass(game)">{{ game.home_abbr.toUpperCase() }}</td>
+          <td class="pts" :class="homeClass(game)">{{ game.home_score }}</td>
           <td class="caption">{{ gameStatusLine2(game) }}</td>
         </tr>
       </tbody>
@@ -72,63 +72,63 @@ export default {
   },
 
   methods: {
+    isPreGame(game) {
+      return game.game_date > new Date()
+    },
+
+    isFinal(game) {
+      return game.status == "complete"
+    },
     awayClass(game) {
-      let awayWon = game.event_status.event_status_id == eventStatus.Final && game.score.away >= game.score.home
+      let awayWon = this.isFinal(game) && game.away_score >= game.home_score
 
       return awayWon ? "won" : ""
     },
 
     homeClass(game) {
-      let homeWon = game.event_status.event_status_id == eventStatus.Final && game.score.home >= game.score.away
+      let homeWon = this.isFinal(game) && game.home_score >= game.away_score
 
       return homeWon ? "won" : ""
     },
 
     gameStatus(game) {
-      switch (game.event_status.event_status_id) {
-        case eventStatus.PreGame:
-          return `${shortDate(game.date_start.toDate())}`
-
-        case eventStatus.Cancelled:
-          return "Cancelled"
-
-        case eventStatus.Postponed:
-          return "Postponed"
-
-        case eventStatus.Final:
-          return "Final"
-
-        default:
-          return `${this.formatQuarter(game.event_status.quarter)}`
+      if (this.isPreGame(game)) {
+        return `${shortDate(game.game_date.toDate())}`
       }
+
+      if (game.status == "complete") {
+        return "Final"
+      }
+
+      // return `${this.formatQuarter(game.quarter)}`
+      return game.quarter
     },
 
-    formatQuarter(quarter) {
-      switch (quarter) {
-        case 1:
-          return "Q1"
-        case 2:
-          return "Q2"
-        case 3:
-          return "Q3"
-        case 4:
-          return "Q4"
-        default:
-          return "OT"
-      }
-    },
+    // formatQuarter(quarter) {
+    //   switch (quarter) {
+    //     case "Q1":
+    //       return "Q1"
+    //     case "2":
+    //       return "Q2"
+    //     case "3":
+    //       return "Q3"
+    //     case "4":
+    //       return "Q4"
+    //     default:
+    //       return "OT"
+    //   }
+    // },
 
     gameStatusLine2(game) {
-      switch (game.event_status.event_status_id) {
-        case eventStatus.PreGame:
-          return `${shortTime(game.date_start.toDate())}`
-
-        case eventStatus.InProgress:
-          return `${game.event_status.minutes}:${String(game.event_status.seconds).padStart(2, "0")}`
-
-        default:
-          return ""
+      if (this.isPreGame(game)) {
+        return `${shortTime(game.game_date.toDate())}`
       }
+
+      if (this.isFinal(game)) {
+        return ""
+      }
+
+      return `${game.clock}`
     },
   },
 }

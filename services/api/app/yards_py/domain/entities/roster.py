@@ -1,13 +1,14 @@
 from __future__ import annotations
+
 from datetime import datetime
 from functools import cmp_to_key
-
-from app.yards_py.domain.entities.waiver_bid import WaiverBid
-from app.yards_py.domain.enums.position_type import PositionType
-from app.yards_py.domain.entities.league_position import LeaguePosition
 from typing import Dict, List, Optional, Union
+
 from app.yards_py.core.annotate_args import annotate_args
 from app.yards_py.core.base_entity import BaseEntity
+from app.yards_py.domain.entities.league_position import LeaguePosition
+from app.yards_py.domain.entities.waiver_bid import WaiverBid
+from app.yards_py.domain.enums.position_type import PositionType
 
 DEFAULT_WAIVER_BUDGET = 100
 
@@ -59,7 +60,7 @@ class Roster(BaseEntity):
     def find_player_position(self, player_id: str) -> Union[LeaguePosition, None]:
         for position_id in self.positions:
             position = self.positions[position_id]
-            if position.player and position.player.id == player_id:
+            if position.player and position.player.player_id == player_id:
                 return position
 
     def calculate_score(self) -> float:
@@ -85,11 +86,13 @@ class Roster(BaseEntity):
         return score
 
     def count_position_player(self, type: PositionType, ignore_reserve=True) -> int:
-        return len([
-            position for position in self.positions.values() if
-            position.player and position.player.position == type
-            and (not ignore_reserve or not position.is_reserve_type())
-        ])
+        return len(
+            [
+                position
+                for position in self.positions.values()
+                if position.player and position.player.position == type and (not ignore_reserve or not position.is_reserve_type())
+            ]
+        )
 
     def count_qbs(self) -> int:
         return self.count_position_player(PositionType.qb)

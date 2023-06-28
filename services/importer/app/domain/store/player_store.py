@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from fastapi import Depends
 
 from app.config.settings import Settings, get_settings
@@ -22,6 +24,8 @@ class PlayerStore:
 
     def save_player(self, player: Player) -> None:
         path = f"players/{player.player_id}"
+        player.last_updated = datetime.now(timezone.utc)
+
         self.firestore_client.set(path, player.model_dump())
 
     def save_players_for_approval(self, players: list[Player]) -> None:

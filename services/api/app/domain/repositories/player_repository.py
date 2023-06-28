@@ -1,9 +1,9 @@
-
-
+from datetime import datetime, timezone
 from typing import List, Union
-from fastapi.param_functions import Query
+
 from google.cloud.firestore_v1.transaction import Transaction
-from app.yards_py.core.firestore_proxy import FirestoreProxy
+
+from app.yards_py.core.firestore_proxy import FirestoreProxy, Query
 from app.yards_py.domain.entities.player import Player
 
 
@@ -12,25 +12,36 @@ def create_player_repository():
     return PlayerRepository(firestore)
 
 
-class PlayerRepository():
+class PlayerRepository:
     def __init__(self, firestore: FirestoreProxy[Player]):
         self.firestore = firestore
 
     @staticmethod
-    def path(season: int):
-        return f"season/{season}/player"
+    def path():
+        return "players"
 
-    def get(self, season, player_id, transaction: Transaction = None) -> Player:
-        return self.firestore.get(PlayerRepository.path(season), player_id, transaction)
+    def get(self, player_id, transaction: Transaction = None) -> Player:
+        return self.firestore.get(PlayerRepository.path(), player_id, transaction)
 
-    def get_all(self, season, transaction: Transaction = None) -> List[Player]:
-        return self.firestore.get_all(PlayerRepository.path(season), transaction)
+    def get_all(self, season: int, transaction: Transaction = None) -> List[Player]:
+        query = Query("seasons", "array_contains", season)
+        return self.firestore.where(PlayerRepository.path(), query, transaction)
 
-    def set(self, season, player: Player, transaction: Transaction = None):
-        return self.firestore.set(PlayerRepository.path(season), player, transaction)
+    # def set(self, player: Player, transaction: Transaction = None):
+    #     return self.firestore.set(PlayerRepository.path(season), player, transaction)
 
-    def set_all(self, season: int, players: List[Player]):
-        self.firestore.set_all(PlayerRepository.path(season), players)
+    # def set_all(self, players: List[Player]):
+    #     self.firestore.set_all(PlayerRepository.path(season), players)
 
     def where(self, season, queries: Union[Query, List[Query]], transaction: Transaction = None) -> List[Player]:
         return self.firestore.where(PlayerRepository.path(season), queries, transaction)
+
+    def get_last_updated(self) -> datetime:
+        path = PlayerRepository.path()
+        ref = self.firestore.client.collection(path).order_by("last_updated", direction="DESCENDING").limit(1)
+        player = ref.get()
+
+        if not player:
+            return datetime.min.replace(tzinfo=timezone.utc)
+
+        return player[0].to_dict()["last_updated"]
