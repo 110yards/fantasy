@@ -225,10 +225,13 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
 
             count_away_players = game_count_for_team[game["team_1"]["team_id"]] <= 1
             count_home_players = game_count_for_team[game["team_2"]["team_id"]] <= 1
-
-            games[game_id] = from_cfl(game, count_away_players, count_home_players, sim_state)
-            if len(game_ids) > 20:
-                time.sleep(2.5)  # sleep to avoid rate limiting from the API
+            try:
+                games[game_id] = from_cfl(game, count_away_players, count_home_players, sim_state)
+                if len(game_ids) > 20:
+                    time.sleep(2.5)  # sleep to avoid rate limiting from the API
+            except Exception as e:
+                Logger.error(f"Error parsing game {game_id}: {e}")
+                
 
         return games
 
