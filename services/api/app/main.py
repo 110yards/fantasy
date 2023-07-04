@@ -12,6 +12,7 @@ from app.routers import (
     logging_router,
     login_router,
     migration_router,
+    mod_router,
     news_router,
     projection_router,
     roster_router,
@@ -49,6 +50,8 @@ app.include_router(admin_router.router)
 app.include_router(migration_router.router)
 app.include_router(projection_router.router)
 app.include_router(news_router.router)
+app.include_router(mod_router.router)
+
 if settings.is_dev():
     app.include_router(dev_router.router)
 

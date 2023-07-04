@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+from datetime import datetime
 from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel
+
+from ...core.base_entity import BaseEntity
 
 
 class Position(str, Enum):
@@ -41,11 +44,11 @@ class InjuryDetails(BaseModel):
     injury: str
 
 
-class Player(BaseModel):
-    player_id: str
+class Player(BaseEntity):
+    player_id: Optional[str] = None
     first_name: str
     last_name: str
-    full_name: str
+    birth_date: datetime
     birth_place: Optional[str]
     height: Optional[str] = None
     weight: Optional[int] = None
@@ -56,10 +59,10 @@ class Player(BaseModel):
     uniform: Optional[int] = None
     school: Optional[str]
     seasons: list[int]
-    injury_status: Optional[InjuryDetails]
+    injury_status: Optional[InjuryDetails] = None
     boxscore_source_id: str
-
-    hash: str = ""
+    last_updated: Optional[datetime] = None
+    full_name: str
 
     def likely_out_for_game(self) -> bool:
         if not self.injury_status:

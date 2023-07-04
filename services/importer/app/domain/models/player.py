@@ -420,7 +420,7 @@ class Player(BaseModel):
     uniform: Optional[int] = None
     school: Optional[str]
     seasons: list[int]
-    injury_status: Optional[InjuryDetails]
+    injury_status: Optional[InjuryDetails] = None
     boxscore_source_id: str
     last_updated: Optional[datetime] = None
 

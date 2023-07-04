@@ -22,8 +22,6 @@ from app.yards_py.domain.entities.scoring_settings import ScoringSettings
 from app.yards_py.domain.entities.stats import Stats
 from app.yards_py.domain.repositories.state_repository import StateRepository, create_state_repository
 
-from ..stores.import_state_store import ImportStateStore, create_import_state_store
-
 
 def create_player_list_service(
     league_repo: LeagueRepository = Depends(create_league_repository),
@@ -34,7 +32,6 @@ def create_player_list_service(
     player_season_score_repo: PlayerLeagueSeasonScoreRepository = Depends(create_player_league_season_score_repository),
     rtdb_client: RTDBClient = Depends(create_rtdb_client),
     state_repo: StateRepository = Depends(create_state_repository),
-    import_state_store: ImportStateStore = Depends(create_import_state_store),
 ):
     return PlayerListService(
         league_repo=league_repo,
@@ -45,7 +42,6 @@ def create_player_list_service(
         player_season_score_repo=player_season_score_repo,
         rtdb_client=rtdb_client,
         state_repo=state_repo,
-        import_state_store=import_state_store,
     )
 
 
@@ -79,7 +75,6 @@ class PlayerListService:
         player_season_score_repo: PlayerLeagueSeasonScoreRepository,
         rtdb_client: RTDBClient,
         state_repo: StateRepository,
-        import_state_store: ImportStateStore,
     ):
         self.league_repo = league_repo
         self.player_season_repo = player_season_repo
@@ -233,7 +228,13 @@ class PlayerListService:
         )
 
         path = self._get_data_path(league_id, season)
+
+        for player in ranked_players:
+            player.birth_date = None
+            player.last_updated = None
+
         data = data.dict()
+
         data["generated_at"] = data["generated_at"].isoformat()
         self.rtdb_client.set(path, data)
         return f"{path}/players"

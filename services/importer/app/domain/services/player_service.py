@@ -160,6 +160,10 @@ def map_player(player_data: dict, injuries: dict[str, InjuryDetails]) -> Optiona
 def map_position(abbr: str) -> Optional[Position]:
     abbr = abbr.lower()
 
+    # source bug
+    if abbr == "kr":
+        return Position.kicker
+
     return Position(abbr) if abbr in Position.__members__.values() else None
 
 

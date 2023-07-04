@@ -26,6 +26,7 @@ import CommissionerIndex from "../../views/commissioner/Index.vue"
 
 import Players from "../../views/player/Players.vue"
 import PlayerDetails from "../../views/player/PlayerDetails.vue"
+import Mod from "../../views/mod/Mod.vue"
 
 export const routes = [
   {
@@ -171,5 +172,11 @@ export const routes = [
     path: "/profile",
     name: "profile",
     component: Profile,
+  },
+  {
+    path: "/mod",
+    name: "mod",
+    component: Mod,
+    meta: { mod: true },
   },
 ]

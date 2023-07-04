@@ -27,8 +27,11 @@ class PlayerRepository:
         query = Query("seasons", "array_contains", season)
         return self.firestore.where(PlayerRepository.path(), query, transaction)
 
-    # def set(self, player: Player, transaction: Transaction = None):
-    #     return self.firestore.set(PlayerRepository.path(season), player, transaction)
+    def create(self, player: Player, transaction: Transaction = None):
+        return self.firestore.create(PlayerRepository.path(), player, transaction)
+
+    def update(self, player: Player, transaction: Transaction = None):
+        return self.firestore.update(PlayerRepository.path(), player, transaction)
 
     # def set_all(self, players: List[Player]):
     #     self.firestore.set_all(PlayerRepository.path(season), players)

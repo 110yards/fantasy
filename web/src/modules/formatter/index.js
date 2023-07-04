@@ -11,6 +11,10 @@ export const relativeDateTime = date => {
   return formatRelative(date, new Date())
 }
 
+export const birthDate = date => {
+  return format(date, "MMMM d, yyyy")
+}
+
 export const shortDate = date => {
   return format(date, "MMM d")
 }

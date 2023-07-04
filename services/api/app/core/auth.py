@@ -1,12 +1,14 @@
-from app.domain.repositories.user_repository import create_user_repository
+from functools import wraps
 from typing import List, Union
-from app.core.role import Role
-from app.yards_py.core.abort import abort_unauthorized
+
 from fastapi import Request
 from firebase_admin import auth
-from app.yards_py.core.logging import Logger
-from functools import wraps
 from starlette_context import context
+
+from app.core.role import Role
+from app.domain.repositories.user_repository import create_user_repository
+from app.yards_py.core.abort import abort_unauthorized
+from app.yards_py.core.logging import Logger
 
 anonymous_endpoints = [
     "",
@@ -85,9 +87,10 @@ def get_current_user_id(request: Request) -> str:
 
 
 def require_role(roles: Union[str, List[Role]], **kwargs):
-    '''
+    """
     request: Request must be in the route params
-    '''
+    """
+
     def decorator(function):
         @wraps(function)
         async def wrapper(**kwargs):
@@ -113,8 +116,11 @@ def require_role(roles: Union[str, List[Role]], **kwargs):
                 return abort_unauthorized()
 
             for role in roles_to_check:
-                # this could be better
                 if role == Role.admin and user.is_admin:
+                    allowed = True
+                    break
+
+                if role == Role.mod and (user.is_mod or user.is_admin):
                     allowed = True
                     break
 
@@ -122,5 +128,7 @@ def require_role(roles: Union[str, List[Role]], **kwargs):
                 abort_unauthorized()
 
             return await function(**kwargs)
+
         return wrapper
+
     return decorator

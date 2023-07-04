@@ -37,19 +37,9 @@ class PlayerStore:
         self.firestore_client.set(path, player.model_dump())
 
     def save_players_for_approval(self, players: list[Player]) -> None:
-        count = len(players)
-
-        players = [player.model_dump() for player in players]
-
         for player in players:
-            player["birth_date"] = player["birth_date"].isoformat()
-
-        data = {
-            "count": count,
-            "players": players,
-        }
-        path = "players_for_approval"
-        self.rtdb_client.set(path, data)
+            path = f"mod/approvals/players/{player.player_id}"
+            self.firestore_client.set(path, player.model_dump())
 
     def get_player_by_team(self, team_abbr: str) -> dict[str, Player]:
         path = "players"

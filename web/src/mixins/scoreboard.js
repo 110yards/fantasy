@@ -13,6 +13,7 @@ export default {
       return opponent ? opponent.toUpperCase() : "BYE"
     },
     isLocked(teamAbbreviation) {
+      if (!teamAbbreviation) return false
       return this.scoreboard && this.scoreboard.teams && this.scoreboard.teams[teamAbbreviation].locked
     },
   },

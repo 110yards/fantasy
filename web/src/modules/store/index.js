@@ -14,6 +14,7 @@ export default new Vuex.Store({
     currentLeagueId: null,
     isAdmin: false,
     systemState: null,
+    isMod: false,
   },
   mutations: {
     logIn(state, data) {
@@ -23,6 +24,7 @@ export default new Vuex.Store({
       state.uid = data.user.uid
       state.isAdmin = data.profile.is_admin
       state.systemState = data.systemState
+      state.isMod = data.profile.is_mod
     },
     logOut(state) {
       state.currentUser = null
@@ -30,6 +32,7 @@ export default new Vuex.Store({
       state.isAnonymous = true
       state.uid = null
       state.isAdmin = false
+      state.isMod = false
     },
     setCurrentLeagueId(state, leagueId) {
       state.currentLeagueId = leagueId

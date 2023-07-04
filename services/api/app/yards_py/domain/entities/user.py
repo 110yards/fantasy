@@ -1,8 +1,9 @@
-from app.yards_py.domain.enums.login_type import LoginType
-from typing import List, Optional
-from app.yards_py.core.base_entity import BaseEntity
-from app.yards_py.core.annotate_args import annotate_args
 from datetime import datetime
+from typing import List, Optional
+
+from app.yards_py.core.annotate_args import annotate_args
+from app.yards_py.core.base_entity import BaseEntity
+from app.yards_py.domain.enums.login_type import LoginType
 
 
 @annotate_args
@@ -15,3 +16,4 @@ class User(BaseEntity):
     confirmed: bool = False
     commissioner_of: List[str] = []
     is_admin: bool = False
+    is_mod: bool = False

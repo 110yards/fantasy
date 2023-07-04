@@ -124,6 +124,14 @@
           </v-list-item-content>
         </v-list-item>
 
+        <v-list-item v-if="isMod">
+          <v-list-item-content>
+            <v-list-item-title>
+              <mod-link class="nav-primary" />
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
         <!-- discord -->
         <v-list-item>
           <v-list-item-content>
@@ -180,6 +188,7 @@ import PlayersLink from "../nav/PlayersLink.vue"
 import ProfileLink from "../nav/ProfileLink.vue"
 import RosterLink from "../nav/RosterLink.vue"
 import SupportLink from "../nav/SupportLink.vue"
+import ModLink from "../nav/ModLink.vue"
 
 export default {
   components: {
@@ -194,6 +203,7 @@ export default {
     SupportLink,
     ProfileLink,
     DiscordLink,
+    ModLink,
   },
 
   props: {
@@ -206,6 +216,7 @@ export default {
     hasLeague: { required: true },
     hasRoster: { required: true },
     hasNotes: { required: true },
+    isMod: { required: true },
   },
 
   data() {

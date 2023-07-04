@@ -12,6 +12,7 @@
       :userId="userId"
       :username="username"
       :hasNotes="hasNotes"
+      :isMod="isMod"
     />
 
     <mobile-app-bar
@@ -26,6 +27,7 @@
       :userId="userId"
       :username="username"
       :hasNotes="hasNotes"
+      :isMod="isMod"
     />
   </div>
 </template>
@@ -87,6 +89,9 @@ export default {
     },
     isAdmin() {
       return this.$store.state.isAdmin
+    },
+    isMod() {
+      return this.$store.state.isMod || this.isAdmin
     },
     isCommissioner() {
       return this.$root.isCommissioner
