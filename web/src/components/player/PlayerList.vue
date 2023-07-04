@@ -242,7 +242,7 @@ export default {
       players = players.filter(player => visiblePlayerPositions.includes(player.position))
 
       if (this.search) {
-        players = players.filter(player => player.display_name.toLowerCase().indexOf(this.search.toLowerCase()) > -1)
+        players = players.filter(player => player.full_name.toLowerCase().indexOf(this.search.toLowerCase()) > -1)
       }
 
       if (this.filterPositions.length > 0) {

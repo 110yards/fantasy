@@ -406,6 +406,7 @@ class InjuryDetails(BaseModel):
 
 
 class Player(BaseModel):
+    player_id: Optional[str] = None
     first_name: str
     last_name: str
     birth_date: Optional[datetime]
@@ -430,7 +431,7 @@ class Player(BaseModel):
 
     @computed_field
     @property
-    def player_id(self) -> str:
+    def computed_player_id(self) -> str:
         id_clear = self.computed_id_clear
         return hashlib.md5(id_clear.encode("utf-8")).hexdigest()
 

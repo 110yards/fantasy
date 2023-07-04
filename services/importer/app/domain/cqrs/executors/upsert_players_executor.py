@@ -37,6 +37,11 @@ class UpsertPlayersExecutor:
 
         StriveLogger.info("Getting existing players")
         existing_players = self.player_store.get_players()
+        players_with_alt_ids = {}
+        # support lookups by alternate IDs as well
+        for player in existing_players.values():
+            for alternate_id in player.alternate_computed_ids:
+                players_with_alt_ids[alternate_id] = player
 
         auto_accept_all = len(existing_players) == 0
         if auto_accept_all:
@@ -49,10 +54,19 @@ class UpsertPlayersExecutor:
 
         for player in players:
             existing_player = existing_players.get(player.player_id)
+
+            if not existing_player:
+                existing_player = players_with_alt_ids.get(player.player_id)
+
             if existing_player:
-                existing_players.pop(player.player_id)  # remove from existing so we know anyone left is a free agent
+                existing_players.pop(player.player_id, None)  # remove from existing so we know anyone left is a free agent
                 # merge seasons so we don't erase any history
-                seasons = set(player.seasons).union(set(existing_player.seasons))
+                seasons = list(set(player.seasons).union(set(existing_player.seasons)))
+
+                # in the event that we found a player by alternate ID, make sure we keep the existing player id
+                player.player_id = existing_player.player_id
+                player.alternate_computed_ids = existing_player.alternate_computed_ids
+
                 player.seasons = seasons
 
                 if existing_player.hash() != player.hash():

@@ -39,6 +39,7 @@ from app.middleware.logging_middleware import LoggingMiddleware
 
 from .domain.cqrs.commands.upsert_scoreboard_command import UpsertScoreboardCommand
 from .domain.cqrs.executors.upsert_scoreboard_executor import UpsertScoreboardExecutor, create_upsert_scoreboard_executor
+from .domain.services.active_boxscores_service import ActiveBoxscoresService, create_active_boxscores_service
 from .domain.services.scoreboard_service import ScoreboardService, create_scoreboard_service
 
 settings = get_settings()
@@ -83,9 +84,19 @@ async def upsert_schedule(executor: UpsertScheduleExecutor = Depends(create_upse
     return executor.execute(UpsertScheduleCommand())
 
 
-# @app.get("/games")
-# async def get_games(hours: Optional[int] = None, service: ActiveGamesService = Depends(create_active_games_service)):
-#     return service.get_games(hours)
+@app.get("/boxscores/active")
+async def get_active_boxscores(service: ActiveBoxscoresService = Depends(create_active_boxscores_service)):
+    return service.get_boxscores()
+
+
+@app.get("/foo")
+async def get_foo(service: ActiveBoxscoresService = Depends(create_active_boxscores_service)):
+    return {"get": "bar"}
+
+
+@app.post("/foo")
+async def post_foo():
+    return {"post": "bar"}
 
 
 # @app.post("/games")

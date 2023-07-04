@@ -22,6 +22,14 @@ class PlayerStore:
         players = [Player(**player) for player in players]
         return {player.player_id: player for player in players}
 
+    def get_player_by_boxscore_source_id(self, boxscore_source_id: str) -> dict[str, Player]:
+        path = "players"
+        query = self.firestore_client.query(path, "boxscore_source_id", "==", boxscore_source_id)
+        players = self.firestore_client.get_query(query)
+
+        players = [Player(**player) for player in players]
+        return {player.player_id: player for player in players}
+
     def save_player(self, player: Player) -> None:
         path = f"players/{player.player_id}"
         player.last_updated = datetime.now(timezone.utc)
@@ -42,6 +50,14 @@ class PlayerStore:
         }
         path = "players_for_approval"
         self.rtdb_client.set(path, data)
+
+    def get_player_by_team(self, team_abbr: str) -> dict[str, Player]:
+        path = "players"
+        query = self.firestore_client.query(path, "team_abbr", "==", team_abbr)
+        players = self.firestore_client.get_query(query)
+
+        players = [Player(**player) for player in players]
+        return {player.player_id: player for player in players}
 
 
 def create_player_store(

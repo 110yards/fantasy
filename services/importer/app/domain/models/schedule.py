@@ -60,3 +60,10 @@ class Schedule(BaseModel):
 
     def hash(self) -> str:
         return hashlib.md5(json.dumps(self.json()).encode("utf-8")).hexdigest()
+
+    def get_week(self, week_number: int) -> ScheduleWeek:
+        return self.weeks[self.week_key(week_number)]
+
+    @staticmethod
+    def week_key(week_number: int) -> str:
+        return f"W{str(week_number).zfill(2)}"

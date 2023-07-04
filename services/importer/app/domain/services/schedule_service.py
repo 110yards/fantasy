@@ -57,7 +57,7 @@ def create_schedule(realtime_source_data: dict, boxscore_source_data: dict) -> S
         if not boxscore_week:
             raise ValueError(f"Boxscore week not found for key '{key}'")
 
-        week_key = f"W{str(week_number).zfill(2)}"
+        week_key = Schedule.week_key(week_number)
         week = ScheduleWeek(week_number=week_number, games=[])
         weeks[week_key] = week
 

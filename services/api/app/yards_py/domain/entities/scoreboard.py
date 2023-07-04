@@ -14,10 +14,19 @@ class ScoreboardGame(BaseModel):
     away_score: int
     home_score: int
     status: str
+    started: bool
 
     @property
     def is_complete(self) -> bool:
         return self.status == "complete"
+
+    @property
+    def is_in_progress(self) -> bool:
+        return self.started
+
+    @property
+    def is_upcoming(self) -> bool:
+        return self.status == "scheduled"
 
 
 class Team(BaseModel):
@@ -54,3 +63,6 @@ class Scoreboard(BaseModel):
 
     def is_team_on_bye(self, team_abbr: str) -> bool:
         return getattr(self.teams, team_abbr).opponent is None
+
+    def get_game_for_team(self, team_abbr: str) -> Optional[ScoreboardGame]:
+        return next((game for game in self.games if game.game_id == getattr(self.teams, team_abbr).game_id), None)

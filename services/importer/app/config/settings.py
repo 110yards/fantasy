@@ -22,12 +22,15 @@ class Settings(BaseSettings):
     rtdb_emulator_host: Optional[str] = None
     firestore_emulator_host: Optional[str] = None
     realtime_schedule_url: str
+    realtime_boxscore_url_format: str
     boxscore_schedule_url: str
-    boxscore_source_referer: str
+    boxscore_schedule_url_referer: str
+    boxscore_url_format: str
+    boxscore_url_referer: str
     players_url_format: str
-    players_source_referer: str
+    players_url_referer: str
     injuries_url_format: str
-    injuries_source_referer: str
+    injuries_url_referer: str
 
     class Config:
         env_file = ".env"

@@ -1,11 +1,8 @@
-
-
-from app.yards_py.domain.entities.event_status import EVENT_STATUS_FINAL, EVENT_STATUS_IN_PROGRESS, EVENT_STATUS_PRE_GAME
-from app.domain.repositories.public_repository import PublicRepository, create_public_repository
-
 from fastapi.param_functions import Depends
 from pydantic.main import BaseModel
+
 from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from app.domain.repositories.public_repository import PublicRepository, create_public_repository
 
 
 def create_roster_progress_service(
@@ -21,11 +18,7 @@ class ProgressRequest(BaseModel):
 
 
 class ProgressService:
-    def __init__(
-        self,
-        roster_repo: LeagueRosterRepository,
-        public_repo: PublicRepository
-    ):
+    def __init__(self, roster_repo: LeagueRosterRepository, public_repo: PublicRepository):
         self.roster_repo = roster_repo
         self.public_repo = public_repo
 
@@ -39,17 +32,19 @@ class ProgressService:
 
         for position in roster.positions.values():
             if position.position_type.is_starting_position_type() and position.player:
+                game = scoreboard.get_game_for_team(position.player.team_abbr)
 
-                game = scoreboard.get_game_for_team(position.player.team.id)
+                if not game:
+                    continue
 
-                if game and game.event_status.event_status_id == EVENT_STATUS_PRE_GAME:
+                if game.is_upcoming:
                     total += 1
 
-                if game and game.event_status.event_status_id == EVENT_STATUS_IN_PROGRESS:
+                if game.is_in_progress:
                     total += 1
                     in_progress += 1
 
-                if game and game.event_status.event_status_id == EVENT_STATUS_FINAL:
+                if game.is_complete:
                     total += 1
                     completed += 1
 
@@ -58,5 +53,5 @@ class ProgressService:
             "in_progress": in_progress,
             "completed": completed,
             "percent_complete": completed * 100 / total if total else 0,
-            "remaining": total - completed
+            "remaining": total - completed,
         }

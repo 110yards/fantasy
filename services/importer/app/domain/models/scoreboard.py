@@ -1,14 +1,16 @@
 import hashlib
 import json
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, computed_field
+from strivelogger import StriveLogger
 
 
 class ScoreboardGame(BaseModel):
     game_id: str
     game_date: datetime
+    end_date: Optional[datetime] = None
     away_abbr: str
     home_abbr: str
     away_score: int
@@ -17,7 +19,22 @@ class ScoreboardGame(BaseModel):
     quarter: Optional[str]
     clock: Optional[str]
     started: bool
-    complete: bool
+    realtime_source_id: int
+    boxscore_source_id: str
+
+    @computed_field
+    @property
+    def is_complete(self) -> bool:
+        return self.status == "complete" and self.end_date is not None
+
+    def is_active(self) -> bool:
+        buffer_minutes = 30
+        within_start_buffer = self.game_date - timedelta(minutes=buffer_minutes) <= datetime.now(timezone.utc)
+        within_end_buffer = self.end_date is None or self.end_date + timedelta(minutes=buffer_minutes) >= datetime.now(timezone.utc)
+
+        StriveLogger.info(f"Game {self.game_id} is active: {within_start_buffer and within_end_buffer}")
+
+        return within_start_buffer and within_end_buffer
 
 
 class Team(BaseModel):

@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from fastapi import Depends
 from strivelogger import StriveLogger
 
@@ -23,6 +25,15 @@ class UpsertScoreboardExecutor:
             return CommandResult.failure_result("Failed to load scoreboard")
 
         existing_scoreboard = self.store.get_scoreboard()
+
+        if existing_scoreboard:
+            for existing_game in existing_scoreboard.games:
+                updated_game = next((x for x in scoreboard.games if x.game_id == existing_game.game_id))
+
+                if updated_game.is_complete and not existing_game.is_complete:
+                    updated_game.end_date = datetime.now(timezone.utc)
+                elif updated_game.is_complete and existing_game.is_complete:
+                    updated_game.end_date = existing_game.end_date  # don't continually change the end date
 
         needs_update = existing_scoreboard is None or existing_scoreboard.hash() != scoreboard.hash()
 

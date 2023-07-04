@@ -1,6 +1,6 @@
-fastapi==0.100.0-beta1
-pydantic>=2.0b3
-pydantic-settings>=2.0b2
+fastapi==0.100.0-beta2
+# pydantic>=2.0b3
+pydantic-settings
 
 firebase_admin==6.1.0
 google-cloud-logging==3.5.0

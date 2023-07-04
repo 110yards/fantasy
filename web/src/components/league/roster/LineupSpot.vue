@@ -121,7 +121,7 @@
 <script>
 import PlayerLink from "../../player/PlayerLink.vue"
 import Locked from "../../icons/Locked.vue"
-import { eventStatus, playerStatus, positionType, teamId } from "../../../api/110yards/constants"
+import { eventStatus, playerStatus, positionType } from "../../../api/110yards/constants"
 import NationalStatus from "../../player/CanadianStatus.vue"
 import GameState from "../GameState.vue"
 import { firestore } from "../../../modules/firebase"
@@ -176,7 +176,7 @@ export default {
     projection() {
       if (!this.spot.player || !this.playerScore) return
 
-      if (this.spot.player.team.id == teamId.FreeAgent) return 0
+      if (!this.spot.player.team_abbr) return 0
 
       if (this.$root.getOpponent(this.spot.player.team_abbr) == "FA") return 0
 

@@ -36,7 +36,7 @@ class PlayerService:
     def load_players_data(self, season_id: str) -> list[Player]:
         url = self.settings.players_url_format.replace("{season_id}", season_id)
         StriveLogger.info(f"Fetching {url}")
-        response = requests.get(url, headers={"Referer": self.settings.players_source_referer})
+        response = requests.get(url, headers={"Referer": self.settings.players_url_referer})
 
         data = response.json()
         if not data:
@@ -47,7 +47,7 @@ class PlayerService:
     def load_injury_data(self, season_id: str) -> list[InjuryDetails]:
         url = self.settings.injuries_url_format.replace("{season_id}", season_id)
         StriveLogger.info(f"Fetching {url}")
-        response = requests.get(url, headers={"Referer": self.settings.injuries_source_referer})
+        response = requests.get(url, headers={"Referer": self.settings.injuries_url_referer})
 
         data = response.json()
         if not data:
@@ -134,7 +134,7 @@ def map_player(player_data: dict, injuries: dict[str, InjuryDetails]) -> Optiona
     if birth_place and "," in birth_place:
         birth_place = birth_place.replace(",", ", ")
 
-    return Player(
+    player = Player(
         first_name=player_data["playerFirstName"],
         last_name=player_data["playerLastName"],
         boxscore_source_id=player_data["playerId"],
@@ -153,9 +153,13 @@ def map_player(player_data: dict, injuries: dict[str, InjuryDetails]) -> Optiona
         seasons=[datetime.now().year],
     )
 
+    player.player_id = player.computed_player_id
+    return player
+
 
 def map_position(abbr: str) -> Optional[Position]:
     abbr = abbr.lower()
+
     return Position(abbr) if abbr in Position.__members__.values() else None
 
 

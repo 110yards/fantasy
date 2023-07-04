@@ -1,6 +1,6 @@
 from typing import Any, Dict, Optional
 
-from google.cloud.firestore_v1 import Client
+from google.cloud.firestore_v1 import Client, Query
 from google.cloud.firestore_v1.transaction import Transaction
 
 from ..config.settings import Settings
@@ -12,6 +12,12 @@ class FirestoreClient:
 
     def create_transaction(self) -> Transaction:
         return self.client.transaction()
+
+    def query(self, path, field: str, operator: str, value: Any) -> Query:
+        return self.client.collection(path).where(field, operator, value)
+
+    def get_query(self, query: Query) -> list[dict[str, Any]]:
+        return [doc.to_dict() for doc in query.get()]
 
     def get(self, path: str, transaction: Optional[Transaction] = None) -> Optional[tuple | Any]:
         path_parts = len(path.split("/"))

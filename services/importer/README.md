@@ -11,3 +11,7 @@ The schedule is divided into weeks, which also have a start and end date
 ### /scoreboard
 
 Loads the scoreboard for the current week.
+
+### /boxscore/active
+
+### /boxscore/final

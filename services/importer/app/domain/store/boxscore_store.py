@@ -2,7 +2,7 @@ from fastapi import Depends
 
 from app.config.settings import Settings, get_settings
 from app.core.rtdb_client import RTDBClient, create_rtdb_client
-from app.domain.models.game import Game
+from app.domain.models.boxscore import Boxscore
 
 
 class BoxscoreStore:
@@ -13,16 +13,14 @@ class BoxscoreStore:
     def path(self, year: int, game_id: str) -> str:
         return f"{self.settings.environment.lower()}/boxscores/{year}/{game_id}"
 
-    def get_boxscore(self, year: int, game_id: str) -> Game | None:
+    def get_boxscore(self, year: int, game_id: str) -> Boxscore | None:
         game = self.rtdb_client.get(self.path(year, game_id))
-        game = Game(**game) if game else None
+        game = Boxscore(**game) if game else None
 
-    def save_boxscore(self, year: int, game: Game) -> None:
+    def save_boxscore(self, year: int, game: Boxscore) -> None:
         path = self.path(year, game.game_id)
         self.rtdb_client.set(path, game.dict())
 
 
-def create_boxscore_store(
-    settings: Settings = Depends(get_settings), rtdb_client: RTDBClient = Depends(create_rtdb_client)
-) -> BoxscoreStore:
+def create_boxscore_store(settings: Settings = Depends(get_settings), rtdb_client: RTDBClient = Depends(create_rtdb_client)) -> BoxscoreStore:
     return BoxscoreStore(settings=settings, rtdb_client=rtdb_client)

@@ -1,10 +1,11 @@
+from datetime import datetime, timezone
 from typing import Optional
 
 import requests
 from fastapi import Depends
 
 from ...config.settings import Settings, get_settings
-from ..models.schedule import ScheduleGame, ScheduleWeek
+from ..models.schedule import Schedule, ScheduleGame, ScheduleWeek
 from ..models.scoreboard import Scoreboard, ScoreboardGame, Team, Teams
 from ..store.schedule_store import ScheduleStore, create_schedule_store
 from ..store.state_store import StateStore, create_state_store
@@ -19,7 +20,7 @@ class ScoreboardService:
     def get_scoreboard(self) -> Scoreboard:
         state = self.state_store.get_state()
 
-        week_key = f"W{state.current_week:02d}"
+        week_key = Schedule.week_key(state.current_week)
         schedule_week = self.schedule_store.get_schedule_week(state.current_season, week_key)
 
         if not schedule_week:
@@ -68,10 +69,12 @@ def map_games(schedule_week: ScheduleWeek, scoreboard_data: dict) -> list[Scoreb
 def map_game(schedule_game: ScheduleGame, game_data: dict) -> ScoreboardGame:
     status = map_status(game_data["status"])
     started = status not in ["scheduled", "postponed"]
-    complete = status == "final"
+    complete = status == "complete"
 
     return ScoreboardGame(
         game_id=schedule_game.game_id,
+        realtime_source_id=schedule_game.realtime_source_id,
+        boxscore_source_id=schedule_game.boxscore_source_id,
         game_date=schedule_game.date_start,
         away_abbr=schedule_game.away_abbr,
         home_abbr=schedule_game.home_abbr,
@@ -82,6 +85,7 @@ def map_game(schedule_game: ScheduleGame, game_data: dict) -> ScoreboardGame:
         complete=complete,
         quarter=game_data["activePeriod"],
         clock=game_data["clock"],
+        end_date=datetime.now(timezone.utc) if complete else None,
     )
 
 
