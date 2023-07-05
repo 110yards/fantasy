@@ -19,7 +19,7 @@
             </tr>
           </thead>
 
-          <tbody>
+          <tbody v-if="playersToApprove && playersToApprove.length != 0">
             <tr v-for="player in playersToApprove" :key="player.id">
               <td>{{ player.full_name }}</td>
               <td>
@@ -29,6 +29,12 @@
               <td>
                 <AppPrimaryButton @click="review(player)">Review</AppPrimaryButton>
               </td>
+            </tr>
+          </tbody>
+
+          <tbody v-else>
+            <tr>
+              <td colspan="4">No players to approve</td>
             </tr>
           </tbody>
         </template>

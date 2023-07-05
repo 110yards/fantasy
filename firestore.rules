@@ -159,6 +159,10 @@ service cloud.firestore {
     match /mod/approvals/players/{document=**} {
       allow read: if userIsMod();
     }
+
+    match /system_transactions/{document=**} {
+      allow read: if userIsMod();
+    }
     
   }
 }
