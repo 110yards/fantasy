@@ -58,7 +58,8 @@ class MovePlayerCommandExecutor(BaseCommandExecutor[MovePlayerCommand, MovePlaye
         self.transaction_repo = transaction_repo
 
     def on_execute(self, command: MovePlayerCommand) -> MovePlayerResult:
-        opponents = self.public_repo.get_opponents()
+        scoreboard = self.public_repo.get_scoreboard()
+        self.state_repo.get()
 
         @firestore.transactional
         def update(transaction):
@@ -85,50 +86,49 @@ class MovePlayerCommandExecutor(BaseCommandExecutor[MovePlayerCommand, MovePlaye
             if not current_position:
                 return MovePlayerResult(command=command, error="That player is not on your roster")
 
-            state = self.state_repo.get()
-            if state.locks.is_locked(current_position.player.team):
-                return MovePlayerResult(command=command, error=f"{current_position.player.team.location} players are locked")
+            if scoreboard.is_locked(current_position.player.team_abbr):
+                return MovePlayerResult(command=command, error=f"{current_position.player.team_abbr} players are locked")
 
             target_position = roster.positions[command.position_id]
-            if target_position.player and state.locks.is_locked(target_position.player.team):
-                return MovePlayerResult(command=command, error=f"{target_position.player.team.location} players are locked")
+            if target_position.player and scoreboard.is_locked(target_position.player.team_abbr):
+                return MovePlayerResult(command=command, error=f"{target_position.player.team_abbr} players are locked")
 
             player_to_move = current_position.player
             player_to_swap = target_position.player
 
             if not target_position.position_type.is_eligible_for(player_to_move.position):
                 return MovePlayerResult(
-                    command=command, error=f"{player_to_move.display_name} is not eligible for {target_position.position_type.display_name()} position"
+                    command=command, error=f"{player_to_move.full_name} is not eligible for {target_position.position_type.display_name()} position"
                 )
 
             if player_to_swap and not current_position.position_type.is_eligible_for(player_to_swap.position):
                 return MovePlayerResult(
-                    command=command, error=f"{player_to_swap.display_name} is not eligible for {current_position.position_type.display_name()} position"
+                    command=command, error=f"{player_to_swap.full_name} is not eligible for {current_position.position_type.display_name()} position"
                 )
 
-            if target_position.position_type == PositionType.bye and not opponents.is_team_on_bye(player_to_move.team):
-                return MovePlayerResult(command=command, error=f"{player_to_move.team.location} is not on bye")
+            if target_position.position_type == PositionType.bye and not scoreboard.is_team_on_bye(player_to_move.team_abbr):
+                return MovePlayerResult(command=command, error=f"{player_to_move.team_abbr} is not on bye")
 
-            if player_to_swap and current_position.position_type == PositionType.bye and not opponents.is_team_on_bye(player_to_swap.team):
-                return MovePlayerResult(command=command, error=f"{player_to_swap.team.location} is not on bye")
+            if player_to_swap and current_position.position_type == PositionType.bye and not scoreboard.is_team_on_bye(player_to_swap.team_abbr):
+                return MovePlayerResult(command=command, error=f"{player_to_swap.team_abbr} is not on bye")
 
             if target_position.position_type == PositionType.ir and not self.eligible_for_ir(player_to_move):
-                return MovePlayerResult(command=command, error=f"{player_to_move.display_name} is not injured")
+                return MovePlayerResult(command=command, error=f"{player_to_move.full_name} is not injured")
 
             if player_to_swap and current_position.position_type == PositionType.ir and not self.eligible_for_ir(player_to_swap):
-                return MovePlayerResult(command=command, error=f"{player_to_swap.display_name} is not injured")
+                return MovePlayerResult(command=command, error=f"{player_to_swap.full_name} is not injured")
 
             target_position.player = player_to_move
             current_position.player = player_to_swap
 
-            assert target_position.player.player_id == player_to_move.id
+            assert target_position.player.player_id == player_to_move.player_id
 
             if commissioner_override:
                 trx = LeagueTransaction.commissioner_move_player(command.league_id, roster, player_to_move, current_position.name, target_position.name)
                 self.transaction_repo.create(command.league_id, trx, transaction)
 
             if player_to_swap:
-                assert current_position.player.player_id == player_to_swap.id
+                assert current_position.player.player_id == player_to_swap.player_id
 
             if player_to_swap and commissioner_override:
                 trx = LeagueTransaction.commissioner_move_player(command.league_id, roster, player_to_swap, target_position.name, current_position.name)
@@ -143,4 +143,4 @@ class MovePlayerCommandExecutor(BaseCommandExecutor[MovePlayerCommand, MovePlaye
 
     def eligible_for_ir(self, player: Player) -> bool:
         enable_relaxed_ir = self.public_repo.get_switches().enable_relaxed_ir
-        return enable_relaxed_ir or player.status_current != STATUS_ACTIVE
+        return enable_relaxed_ir or player.injury_status is not None

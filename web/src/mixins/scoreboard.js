@@ -16,6 +16,14 @@ export default {
       if (!teamAbbreviation) return false
       return this.scoreboard && this.scoreboard.teams && this.scoreboard.teams[teamAbbreviation].locked
     },
+    getGameForTeam(teamAbbreviation) {
+      let team = this.scoreboard && this.scoreboard.teams ? this.scoreboard.teams[teamAbbreviation] : null
+      return team != null ? team.game : null
+    },
+    getGameIdForTeam(teamAbbreviation) {
+      let game = this.getGameForTeam(teamAbbreviation)
+      return game ? game.game_id : null
+    },
   },
   created() {
     this.$bind("scoreboard", firestore.doc("public/scoreboard"))

@@ -1,6 +1,7 @@
 from typing import Any, Dict, Optional
 
 from google.cloud.firestore_v1 import Client, Query
+from google.cloud.firestore_v1.base_query import BaseCompositeFilter, FieldFilter
 from google.cloud.firestore_v1.transaction import Transaction
 
 from ..config.settings import Settings
@@ -14,7 +15,8 @@ class FirestoreClient:
         return self.client.transaction()
 
     def query(self, path, field: str, operator: str, value: Any) -> Query:
-        return self.client.collection(path).where(field, operator, value)
+        filter = BaseCompositeFilter("AND", filters=[FieldFilter(field, operator, value)])
+        return self.client.collection(path).where(filter=filter)
 
     def get_query(self, query: Query) -> list[dict[str, Any]]:
         return [doc.to_dict() for doc in query.get()]

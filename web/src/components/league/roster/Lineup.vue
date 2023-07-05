@@ -147,7 +147,7 @@ export default {
       let command = {
         league_id: this.league.id,
         roster_id: this.roster.id,
-        player_id: this.playerToBeMoved.id,
+        player_id: this.playerToBeMoved.player_id,
         position_id: spot.id,
       }
 

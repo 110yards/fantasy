@@ -48,7 +48,7 @@ class Player(BaseEntity):
     player_id: Optional[str] = None
     first_name: str
     last_name: str
-    birth_date: datetime
+    birth_date: Optional[datetime]
     birth_place: Optional[str]
     height: Optional[str] = None
     weight: Optional[int] = None
