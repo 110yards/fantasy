@@ -7,6 +7,13 @@ export default {
     }
   },
 
+  computed: {
+    completedGames() {
+      if (!this.scoreboard) return []
+      return Object.values(this.scoreboard.games).filter(x => x.complete)
+    },
+  },
+
   methods: {
     getOpponent(teamAbbreviation) {
       let opponent = this.scoreboard && this.scoreboard.teams ? this.scoreboard.teams[teamAbbreviation].opponent : null

@@ -11,7 +11,7 @@ export default {
   props: {
     roster: { type: Object, required: false },
     weekNumber: { required: true },
-    calculatedScore: { type: Number, required: true },
+    calculatedScore: { type: Number, required: false, default: 0.0 },
   },
   data() {
     return {
@@ -44,18 +44,25 @@ export default {
       // console.log(positions)
 
       let activePlayers = positions
-        .filter(x => x.player && this.$root.isActivePositionType(x.position_type))
+        .filter(x => x.player && this.$root.isActivePositionType(x.position_type) && !x.player.is_free_agent)
         .map(x => x.player)
 
-      // console.log(activePlayers)
+      let teamGameIds = {}
 
-      let playerIds = activePlayers.map(x => x.id)
-
-      for (let playerId of playerIds) {
+      for (let player of activePlayers) {
         // add each player id as an observable property on dataProp.players
-        this.$set(this.players, playerId, null)
+        this.$set(this.players, player.player_id, null)
+
+        // check if player.team_abbr in teamGameIds
+        if (!teamGameIds[player.team_abbr]) {
+          // if not, get the game id for that team
+          teamGameIds[player.team_abbr] = this.$root.getGameIdForTeam(player.team_abbr)
+        }
+
         // finally, bind to each player id property
-        this.$bind(`players.${playerId}`, getPlayerGameRef(season, this.weekNumber, playerId))
+        let ref = getPlayerGameRef(season, teamGameIds[player.team_abbr], player.player_id)
+
+        this.$rtdbBind(`players.${player.player_id}`, ref)
       }
     },
 
@@ -65,21 +72,19 @@ export default {
 
       if (!this.players) return totalScore
 
-      let playerGameArrays = Object.values(this.players)
+      let stats = Object.values(this.players)
 
       let calcDetails = {
         roster: this.roster.name,
         scores: [],
       }
 
-      for (let playerGameArray of playerGameArrays) {
-        if (playerGameArray.length == 0) continue
+      for (let playerStats of stats) {
+        if (!playerStats) continue
 
-        let game = playerGameArray[0]
-        let gameScore = calculate(this.scoring, game.stats)
+        let gameScore = calculate(this.scoring, playerStats)
         calcDetails.scores.push({
-          game: game.game_id,
-          player: game.player_id,
+          player: playerStats.player,
           score: gameScore,
         })
 

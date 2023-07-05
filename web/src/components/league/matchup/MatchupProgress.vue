@@ -22,11 +22,13 @@ export default {
     return {
       progress: null,
       remainingGames: null,
-      completedGames: null,
     }
   },
 
   computed: {
+    completedGames() {
+      return this.$root.completedGames
+    },
     currentUser() {
       return this.$store.state.currentUser
     },
@@ -67,14 +69,6 @@ export default {
         this.update()
       },
     },
-  },
-
-  mounted() {
-    let ref = firestore
-      .collection(`season/${this.season}/game`)
-      .where("event_status.event_status_id", "in", [eventStatus.Final, eventStatus.Cancelled])
-
-    this.$bind("completedGames", ref)
   },
 }
 </script>

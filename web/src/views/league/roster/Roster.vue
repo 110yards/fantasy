@@ -32,7 +32,9 @@
 
           <v-col cols="3" class="pa-0">
             <v-row>
-              <v-col class="pb-0 text-right font-weight-medium"><score :score="score" /></v-col>
+              <v-col class="pb-0 text-right font-weight-medium"
+                ><RosterScore :roster="roster" :weekNumber="currentWeek"
+              /></v-col>
             </v-row>
             <v-row>
               <v-col class="py-0 text-right caption" v-if="projection !== null">
@@ -108,9 +110,10 @@ import { draftState } from "../../../api/110yards/constants"
 import PlayerLink from "../../../components/player/PlayerLink.vue"
 import Waivers from "./Waivers.vue"
 import scoreboard from "../../../mixins/scoreboard"
-import { calculateMultiple, getRosterScoreRef } from "../../../modules/scoring"
+import { calculateMultiple } from "../../../modules/scoring"
 import { rosterProjection } from "../../../api/110yards/projection"
 import Score from "../../../components/Score.vue"
+import RosterScore from "../../../components/league/RosterScore.vue"
 
 export default {
   name: "roster",
@@ -122,6 +125,7 @@ export default {
     PlayerLink,
     Waivers,
     Score,
+    RosterScore,
   },
   props: {
     leagueId: String,
@@ -282,8 +286,6 @@ export default {
       immediate: true,
       async handler(roster) {
         if (roster != null && !!this.roster.current_matchup) {
-          this.$bind("playersStats", getRosterScoreRef(this.currentSeason, this.currentWeek, roster))
-
           this.projection = await rosterProjection(this.leagueId, roster.id)
         }
       },

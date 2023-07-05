@@ -1,4 +1,4 @@
-import { firestore } from "../firebase"
+import { firestore, rtdb } from "../firebase"
 
 export const calculate = (scoring, stats) => {
   let totalScore = 0.0
@@ -46,26 +46,26 @@ export const calculateRosterScore = (scoring, playerGames) => {
   return totalScore
 }
 
-export const getRosterScoreRef = (season, weekNumber, roster) => {
-  let positions = Object.values(roster.positions)
-  let players = positions.filter(x => x.player).map(x => x.player)
-  let playerIds = players.map(x => x.id)
+// export const getRosterScoreRef = (season, roster, scoreboard) => {
+//   let positions = Object.values(roster.positions)
+//   let players = positions.filter(x => x.player).map(x => x.player)
+//   let playerIds = players.map(x => x.id)
 
-  let path = `season/${season}/player_game/`
-  let ref = firestore
-    .collection(path)
-    .where("week_number", "==", parseInt(weekNumber))
-    .where("player_id", "in", playerIds)
+//   let path = `boxscores/${season}/${gameId}/player_stats`
+//   let ref = rtdb.ref(path).filter(x => x.player_id in playerIds)
 
-  return ref
-}
+//   // let path = `season/${season}/player_game/`
+//   // let ref = firestore
+//   //   .collection(path)
+//   //   .where("week_number", "==", parseInt(weekNumber))
+//   //   .where("player_id", "in", playerIds)
 
-export const getPlayerGameRef = (season, weekNumber, playerId) => {
-  let path = `season/${season}/player_game`
-  let ref = firestore
-    .collection(path)
-    .where("week_number", "==", parseInt(weekNumber))
-    .where("player_id", "==", playerId)
+//   return ref
+// }
+
+export const getPlayerGameRef = (season, gameId, playerId) => {
+  let path = `boxscores/${season}/${gameId}/player_stats/${playerId}`
+  let ref = rtdb.ref(path)
 
   return ref
 }
