@@ -18,7 +18,11 @@ class BoxscoreStore:
 
     def save_boxscore(self, year: int, box: Boxscore) -> None:
         path = self.path(year, box.game_id)
-        self.rtdb_client.set(path, box.model_dump())
+
+        data = box.model_dump()
+        data["last_updated"] = data["last_updated"].isoformat()
+
+        self.rtdb_client.set(path, data)
 
 
 def create_boxscore_store(rtdb_client: RTDBClient = Depends(create_rtdb_client)) -> BoxscoreStore:

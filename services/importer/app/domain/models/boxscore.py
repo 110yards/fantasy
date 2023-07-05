@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import hashlib
-from typing import Literal
+from datetime import datetime
+from typing import Literal, Optional
 
 from pydantic import BaseModel, computed_field
 
@@ -111,6 +112,7 @@ class Boxscore(BaseModel):
     home_abbr: str
     player_stats: StatsCollection = {}
     unmatched_player_stats: StatsCollection = {}
+    last_updated: Optional[datetime] = None
 
     def hash(self) -> str:
         return hashlib.md5(self.model_dump_json().encode("utf-8")).hexdigest()

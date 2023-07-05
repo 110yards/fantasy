@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from dictdiffer import diff
 from fastapi import Depends
@@ -27,11 +27,14 @@ class UpsertBoxscoresExecutor:
         for box in command.boxscores:
             existing_game = self.store.get_boxscore(datetime.now().year, box.game_id)
 
-            if existing_game.source == "official" and box.source == "realtime":
+            if existing_game and existing_game.source == "official" and box.source == "realtime":
                 continue  # don't overwrite official boxscores with realtime boxscores
 
-            has_diffs = existing_game is None or len(list(diff(existing_game.model_dump(), box.model_dump()))) > 0
+            has_diffs = (
+                existing_game is None or len(list(diff(existing_game.model_dump(exclude={"last_updated"}), box.model_dump(exclude={"last_updated"})))) > 0
+            )
             if has_diffs:
+                box.last_updated = datetime.now(tz=timezone.utc)
                 to_update.append(box)
 
         if not to_update:
