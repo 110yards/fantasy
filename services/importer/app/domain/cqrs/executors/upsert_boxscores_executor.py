@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from dictdiffer import diff
 from fastapi import Depends
 from strivelogger import StriveLogger
 
@@ -19,13 +20,18 @@ class UpsertBoxscoresExecutor:
     def execute(self, command: UpsertBoxscoresCommand) -> CommandResult:
         if len(command.boxscores) == 0:
             StriveLogger.info("No boxscores")
-            return CommandResult.success()
+            return CommandResult.success_result()
 
         to_update: list[Boxscore] = []
 
         for box in command.boxscores:
             existing_game = self.store.get_boxscore(datetime.now().year, box.game_id)
-            if existing_game is None or existing_game.hash() != box.hash():
+
+            if existing_game.source == "official" and box.source == "realtime":
+                continue  # don't overwrite official boxscores with realtime boxscores
+
+            has_diffs = existing_game is None or len(list(diff(existing_game.model_dump(), box.model_dump()))) > 0
+            if has_diffs:
                 to_update.append(box)
 
         if not to_update:

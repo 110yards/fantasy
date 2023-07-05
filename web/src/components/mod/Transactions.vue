@@ -27,7 +27,7 @@
 
 <script>
 import { firestore } from "../../modules/firebase/index.js"
-import { longDate, shortDate, shortTime } from "../../modules/formatter/index.js"
+import { longDate, shortTime } from "../../modules/formatter/index.js"
 
 export default {
   name: "Transactions",

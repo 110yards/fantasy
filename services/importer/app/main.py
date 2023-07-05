@@ -42,6 +42,7 @@ from .domain.cqrs.commands.upsert_scoreboard_command import UpsertScoreboardComm
 from .domain.cqrs.executors.upsert_boxscores_executor import UpsertBoxscoresExecutor, create_upsert_boxscores_executor
 from .domain.cqrs.executors.upsert_scoreboard_executor import UpsertScoreboardExecutor, create_upsert_scoreboard_executor
 from .domain.services.active_boxscores_service import ActiveBoxscoresService, create_active_boxscores_service
+from .domain.services.final_boxscores_service import FinalBoxscoresService, create_final_boxscores_service
 from .domain.services.scoreboard_service import ScoreboardService, create_scoreboard_service
 
 settings = get_settings()
@@ -92,8 +93,22 @@ async def get_active_boxscores(service: ActiveBoxscoresService = Depends(create_
 
 
 @app.post("/boxscores/active")
-async def upsert_games(
+async def upsert_active_boxscores(
     service: ActiveBoxscoresService = Depends(create_active_boxscores_service),
+    executor: UpsertBoxscoresExecutor = Depends(create_upsert_boxscores_executor),
+):
+    boxscores = service.get_boxscores()
+    return executor.execute(UpsertBoxscoresCommand(boxscores=boxscores))
+
+
+@app.get("/boxscores/final")
+async def get_final_boxscores(service: FinalBoxscoresService = Depends(create_final_boxscores_service)):
+    return service.get_boxscores()
+
+
+@app.post("/boxscores/final")
+async def upsert_final_boxscores(
+    service: FinalBoxscoresService = Depends(create_final_boxscores_service),
     executor: UpsertBoxscoresExecutor = Depends(create_upsert_boxscores_executor),
 ):
     boxscores = service.get_boxscores()
@@ -108,20 +123,6 @@ async def get_players(service: PlayerService = Depends(create_player_service)):
 @app.post("/players")
 async def upsert_players(executor: UpsertPlayersExecutor = Depends(create_upsert_players_executor)):
     return executor.execute(UpsertPlayersCommand())
-
-
-# @app.get("/injury_report")
-# async def get_injury_report(
-#     service: InjuryReportService = Depends(create_injury_report_service),
-# ):
-#     return service.get_report()
-
-
-# @app.post("/injury_report")
-# async def upsert_injury_report(
-#     executor: UpsertInjuryReportExecutor = Depends(create_upsert_injury_report_executor),
-# ):
-#     return executor.execute(UpsertInjuryReportCommand())
 
 
 @app.get("/scoreboard")

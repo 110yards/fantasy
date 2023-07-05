@@ -8,10 +8,6 @@ from app.config.settings import Settings, get_settings
 from app.domain.models.boxscore import (
     Boxscore,
     BoxscorePlayer,
-    PlayerDefence,
-    PlayerFieldGoals,
-    PlayerOnePointConverts,
-    PlayerPassing,
     PlayerStats,
     StatsCollection,
 )
@@ -138,9 +134,7 @@ class ActiveBoxscoresService:
                 boxscore.unmatched_player_stats[slug] = PlayerStats(player=BoxscorePlayer(first_name=name, last_name=name, team_abbr=team_abbr))
             return boxscore.unmatched_player_stats[slug]
 
-    def map_passing(self, boxscore: Boxscore, passing_data: dict, team_abbr: str, players: dict[str, Player]) -> PlayerPassing:
-        passing: list[PlayerPassing] = []
-
+    def map_passing(self, boxscore: Boxscore, passing_data: dict, team_abbr: str, players: dict[str, Player]):
         for player_data in passing_data if passing_data else []:
             stats = {s["name"]: s for s in player_data["stats"]}
             player = self._get_player(player_data["name"], team_abbr, players, boxscore)
@@ -159,8 +153,6 @@ class ActiveBoxscoresService:
             player.pass_net_yards = int(stats["YARDS"]["statValue"])
             player.pass_touchdowns = int(stats["TOUCHDOWNS"]["statValue"])
             player.pass_interceptions = int(stats["INTERCEPTIONS"]["statValue"])
-
-        return passing
 
     def map_rushing(self, boxscore: Boxscore, rushing_data: dict, team_abbr: str, players: dict[str, Player]):
         for player_data in rushing_data if rushing_data else []:
@@ -226,8 +218,6 @@ class ActiveBoxscoresService:
             player.kick_returns_long = int(stats["KICKRETURN_LNG"]["statValue"])
 
     def map_field_goals(self, boxscore: Boxscore, kicking_data: dict, team_abbr: str, players: dict[str, Player]):
-        field_goals: list[PlayerFieldGoals] = []
-
         for player_data in kicking_data if kicking_data else []:
             stats = {s["name"]: s for s in player_data["stats"]}
 
@@ -249,11 +239,7 @@ class ActiveBoxscoresService:
             player.field_goal_made = int(success_attempts[0])
             # have blocked here
 
-        return field_goals
-
-    def map_one_point_converts(self, boxscore: Boxscore, one_point_convert_data: dict, team_abbr: str, players: dict[str, Player]) -> PlayerOnePointConverts:
-        one_point_converts: list[PlayerOnePointConverts] = []
-
+    def map_one_point_converts(self, boxscore: Boxscore, one_point_convert_data: dict, team_abbr: str, players: dict[str, Player]):
         for player_data in one_point_convert_data if one_point_convert_data else []:
             stats = {s["name"]: s for s in player_data["stats"]}
 
@@ -268,11 +254,7 @@ class ActiveBoxscoresService:
             player.one_point_converts_attempts = 0  # attempts missing
             player.one_point_converts_made = int(stats["FIELDGOALS_XP"]["statValue"])
 
-        return one_point_converts
-
     def map_defence(self, boxscore: Boxscore, defence_data: dict, team_abbr: str, players: dict[str, Player]):
-        defence: list[PlayerDefence] = []
-
         for player_data in defence_data if defence_data else []:
             stats = {s["name"]: s for s in player_data["stats"]}
             player = self._get_player(player_data["name"], team_abbr, players, boxscore)
@@ -286,8 +268,6 @@ class ActiveBoxscoresService:
             player.tackles_defensive = int(stats.get("DEFENCE_SOLO")["statValue"]) if stats.get("DEFENCE_TKL") else 0
             player.passes_knocked_down = 0  # missing :(
             # have tackles for loss here
-
-        return defence
 
 
 def create_active_boxscores_service(

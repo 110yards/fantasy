@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import hashlib
-import json
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, computed_field
 
 
 class BoxscorePlayer(BaseModel):
@@ -12,54 +11,6 @@ class BoxscorePlayer(BaseModel):
     last_name: str
     player_id: str = None
     team_abbr: str
-
-
-class PlayerPassing(BaseModel):
-    player: BoxscorePlayer
-
-
-class PlayerRushing(BaseModel):
-    player: BoxscorePlayer
-
-
-class PlayerReceiving(BaseModel):
-    player: BoxscorePlayer
-
-
-class PlayerPunts(BaseModel):
-    player: BoxscorePlayer
-
-
-class PlayerPuntReturns(BaseModel):
-    player: BoxscorePlayer
-
-
-class PlayerKickReturns(BaseModel):
-    player: BoxscorePlayer
-
-
-class PlayerFieldGoals(BaseModel):
-    player: BoxscorePlayer
-
-
-class PlayerFieldGoalReturns(BaseModel):
-    player: BoxscorePlayer
-
-
-class PlayerKicking(BaseModel):
-    player: BoxscorePlayer
-
-
-class PlayerOnePointConverts(BaseModel):
-    player: BoxscorePlayer
-
-
-class PlayerTwoPointConverts(BaseModel):
-    player: BoxscorePlayer
-
-
-class PlayerDefence(BaseModel):
-    player: BoxscorePlayer
 
 
 class PlayerStats(BaseModel):
@@ -135,7 +86,6 @@ class PlayerStats(BaseModel):
     one_point_converts_made: int = 0
     two_point_converts_made: int = 0
 
-    tackles_total: int = 0
     tackles_defensive: int = 0
     tackles_special_teams: int = 0
     sacks_qb_made: int = 0
@@ -143,6 +93,12 @@ class PlayerStats(BaseModel):
     fumbles_forced: int = 0
     fumbles_recovered: int = 0
     passes_knocked_down: int = 0
+    tackles_for_loss: int = 0
+
+    @computed_field
+    @property
+    def tackles_total(self) -> int:
+        return self.tackles_defensive + self.tackles_special_teams
 
 
 StatsCollection = dict[str, PlayerStats]
@@ -157,4 +113,4 @@ class Boxscore(BaseModel):
     unmatched_player_stats: StatsCollection = {}
 
     def hash(self) -> str:
-        return hashlib.md5(json.dumps(self.model_dump_json()).encode("utf-8")).hexdigest()
+        return hashlib.md5(self.model_dump_json().encode("utf-8")).hexdigest()

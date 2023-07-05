@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from typing import Optional
 
 from fastapi import Depends
 
@@ -22,13 +23,13 @@ class PlayerStore:
         players = [Player(**player) for player in players]
         return {player.player_id: player for player in players}
 
-    def get_player_by_boxscore_source_id(self, boxscore_source_id: str) -> dict[str, Player]:
+    def get_player_by_boxscore_source_id(self, boxscore_source_id: str) -> Optional[Player]:
         path = "players"
         query = self.firestore_client.query(path, "boxscore_source_id", "==", boxscore_source_id)
         players = self.firestore_client.get_query(query)
 
         players = [Player(**player) for player in players]
-        return {player.player_id: player for player in players}
+        return players[0] if players else None
 
     def save_player(self, player: Player) -> None:
         path = f"players/{player.player_id}"
