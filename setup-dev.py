@@ -48,7 +48,7 @@ public_repo.set_switches(default_switches)
 print("Done")
 
 print("Configuring default state")
-state = State.default(with_current_season=datetime.now().year)
+state = State.default(with_current_season=datetime.now().year-1)
 public_repo.set_state(state)
 
 print("Done")
