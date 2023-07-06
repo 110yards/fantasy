@@ -11,14 +11,12 @@ from app.domain.commands.user.register_email import RegisterCommandExecutor, Reg
 from app.domain.enums.position_type import get_position_type_config
 from app.domain.repositories.public_repository import create_public_repository
 from app.domain.repositories.user_repository import create_user_repository
-
-from yards_py.core.firestore_proxy import FirestoreProxy
-from yards_py.core.publisher import VirtualPubSubPublisher
-from yards_py.domain.entities.opponents import Opponents
-from yards_py.domain.entities.schedule import get_playoff_type_config
-from yards_py.domain.entities.scoring_info import ScoringInfo
-from yards_py.domain.entities.state import State
-from yards_py.domain.entities.switches import Switches
+from app.yards_py.core.firestore_proxy import FirestoreProxy
+from app.yards_py.core.publisher import VirtualPubSubPublisher
+from app.yards_py.domain.entities.schedule import get_playoff_type_config
+from app.yards_py.domain.entities.scoring_info import ScoringInfo
+from app.yards_py.domain.entities.state import State
+from app.yards_py.domain.entities.switches import Switches
 
 DEV_PROJECT_ID = "yards-dev"
 
@@ -53,8 +51,6 @@ print("Configuring default state")
 state = State.default(with_current_season=datetime.now().year)
 public_repo.set_state(state)
 
-opponents = Opponents.create({})
-public_repo.set_opponents(opponents)
 print("Done")
 
 print("Creating default admin account...")

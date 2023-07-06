@@ -1,8 +1,10 @@
-from app.yards_py.domain.entities.roster import Roster
-from pydantic.main import BaseModel
-from app.yards_py.domain.entities.schedule import Matchup, MatchupType, PlayoffType, ScheduleWeek, WeekType
-from app.yards_py.core.exceptions import NotSupportedException
 from typing import List
+
+from pydantic.main import BaseModel
+
+from app.yards_py.core.exceptions import NotSupportedException
+from app.yards_py.domain.entities.roster import Roster
+from app.yards_py.domain.entities.schedule import Matchup, MatchupType, PlayoffType, ScheduleWeek, WeekType
 
 
 class ScheduledMatchup(BaseModel):

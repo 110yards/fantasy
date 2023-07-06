@@ -1,13 +1,13 @@
 
 
-from yards_py.domain.entities.league_transaction import LeagueTransaction
-from yards_py.domain.entities.waiver_bid import WaiverBid, WaiverBidResult
-from yards_py.domain.entities.roster import Roster
+from app.yards_py.domain.entities.league_transaction import LeagueTransaction
+from app.yards_py.domain.entities.waiver_bid import WaiverBid, WaiverBidResult
+from app.yards_py.domain.entities.roster import Roster
 from typing import Dict, List, Optional, Union
 
 from google.cloud.firestore_v1.transaction import Transaction
 from fastapi import Depends
-from yards_py.domain.services.roster_player_service import RosterPlayerService, create_roster_player_service
+from app.yards_py.domain.services.roster_player_service import RosterPlayerService, create_roster_player_service
 from copy import deepcopy
 
 

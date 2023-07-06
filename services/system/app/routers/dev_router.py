@@ -1,6 +1,6 @@
 
 from fastapi import Depends
-from services.system.app.domain.services.dev_pubsub_service import DevPubSubService, create_dev_pubsub_service
+from app.domain.services.dev_pubsub_service import DevPubSubService, create_dev_pubsub_service
 from .api_router import APIRouter
 
 router = APIRouter(prefix="/dev")

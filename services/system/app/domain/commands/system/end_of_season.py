@@ -1,20 +1,17 @@
-
-
-from services.system.app.di import create_publisher
-from yards_py.domain.entities.scoreboard import Scoreboard
-from yards_py.domain.entities.season_summary import SeasonSummary
-from yards_py.domain.enums.draft_state import DraftState
-from yards_py.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
-from yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from yards_py.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
-from yards_py.domain.repositories.season_summary_repository import SeasonSummaryRepository, create_season_summary_repository
-from yards_py.domain.repositories.state_repository import StateRepository, create_state_repository
 from typing import List, Optional
-from yards_py.core.publisher import Publisher
+
+from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from app.yards_py.core.publisher import Publisher, create_publisher
+from app.yards_py.domain.entities.scoreboard import Scoreboard
+from app.yards_py.domain.entities.season_summary import SeasonSummary
+from app.yards_py.domain.enums.draft_state import DraftState
+from app.yards_py.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from app.yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.yards_py.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from app.yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
+from app.yards_py.domain.repositories.season_summary_repository import SeasonSummaryRepository, create_season_summary_repository
+from app.yards_py.domain.repositories.state_repository import StateRepository, create_state_repository
 from fastapi import Depends
-from yards_py.core.annotate_args import annotate_args
-from yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
 
 
 def create_end_of_season_command_executor(
@@ -37,12 +34,10 @@ def create_end_of_season_command_executor(
     )
 
 
-@annotate_args
 class EndOfSeasonCommand(BaseCommand):
     league_id: Optional[str]
 
 
-@annotate_args
 class EndOfSeasonResult(BaseCommandResult[EndOfSeasonCommand]):
     failed: List[str]
     successful: List[str]
@@ -68,7 +63,6 @@ class EndOfSeasonCommandExecutor(BaseCommandExecutor[EndOfSeasonCommand, EndOfSe
         self.public_repo = public_repo
 
     def on_execute(self, command: EndOfSeasonCommand) -> EndOfSeasonResult:
-
         if command.league_id:
             leagues = [self.league_repo.get(command.league_id)]
         else:

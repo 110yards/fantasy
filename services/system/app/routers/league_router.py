@@ -1,8 +1,8 @@
 from fastapi import Depends
-from services.system.app.domain.commands.league.create_league_subscriptions import (
+from app.domain.commands.league.create_league_subscriptions import (
     CreateLeagueSubscriptionsCommand, CreateLeagueSubscriptionsCommandExecutor,
     create_league_subscriptions_command_executor)
-from yards_py.core.pubsub.pubsub_push import PubSubPush
+from app.yards_py.core.pubsub.pubsub_push import PubSubPush
 
 from .api_router import APIRouter
 

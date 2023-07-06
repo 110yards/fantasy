@@ -1,13 +1,13 @@
 from __future__ import annotations
+
 from pydantic import BaseModel
 
 from app.yards_py.domain.entities.player_score import PlayerScore
-from .team import Team
+
+from .player_game import GameResult
 
 
 class PlayerLeagueGameScore(BaseModel):
     game_id: str
-    week_number: int
-    team: Team
-    opponent: Team
+    game_result: GameResult
     score: PlayerScore

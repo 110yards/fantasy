@@ -1,7 +1,7 @@
 from typing import Callable, List, Tuple
 from fastapi import Depends
-from yards_py.core.logging import Logger
-from yards_py.domain.repositories.state_repository import StateRepository, create_state_repository
+from app.yards_py.core.logging import Logger
+from app.yards_py.domain.repositories.state_repository import StateRepository, create_state_repository
 
 
 def run_check(name: str, target: Callable):

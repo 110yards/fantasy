@@ -143,5 +143,43 @@
       "⚪",
       "S"
     ]
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "start:system"
+    ],
+    "title": "System\t\t\thttp://localhost:8001",
+    "status": {
+      "Loading": [
+        "⚪",
+        "L"
+      ],
+      "startup complete": [
+        "🟢",
+        "U"
+      ],
+      "INFO:": [
+        "🟢",
+        "U"
+      ],
+      "DEBUG:": [
+        "🟢",
+        "U"
+      ],
+      "Error:": [
+        "🔴",
+        "E"
+      ],
+      "StatReload": [
+        "⚪",
+        "R"
+      ]
+    },
+    "defaultStatus": [
+      "⚪",
+      "S"
+    ]
   }
 ]

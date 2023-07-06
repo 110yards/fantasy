@@ -1,32 +1,28 @@
 from datetime import datetime
-from yards_py.core.base_command_executor import BaseCommandResult
-from yards_py.core.logging import Logger
 
 import pytz
-from services.system.app.config.settings import Settings, get_settings
-from yards_py.core.date_utils import hours_since
-from yards_py.core.publisher import Publisher
-from services.system.app.di import create_publisher
-from services.system.app.domain.commands.league.calculate_results import \
-    CalculateResultsCommand
-from services.system.app.domain.commands.league.process_waivers import \
-    ProcessWaiversCommand
-from services.system.app.domain.commands.system.end_system_waivers import (
-    EndSystemWaiversCommand, EndSystemWaiversCommandExecutor,
-    create_end_system_waivers_command_executor)
-from services.system.app.domain.commands.system.start_system_waivers import (
-    StartSystemWaiversCommand, StartSystemWaiversCommandExecutor, StartSystemWaiversResult,
-    create_start_system_waivers_command_executor)
-from yards_py.domain.enums.league_command_type import LeagueCommandType
-from yards_py.domain.repositories.public_repository import (
-    PublicRepository, create_public_repository)
-from services.system.app.domain.services.end_of_week_service import EndOfWeekRequest
-from services.system.app.domain.services.league_command_push_data import \
-    LeagueCommandPushData
-from yards_py.domain.topics import (END_OF_WAIVERS_TOPIC, END_OF_WEEK_TOPIC,
-                                    LEAGUE_COMMAND_TOPIC)
+from app.config.settings import Settings, get_settings
+from app.domain.commands.league.process_waivers import ProcessWaiversCommand
+from app.domain.commands.system.end_system_waivers import EndSystemWaiversCommand, EndSystemWaiversCommandExecutor, create_end_system_waivers_command_executor
+from app.domain.commands.system.start_system_waivers import (
+    StartSystemWaiversCommand,
+    StartSystemWaiversCommandExecutor,
+    StartSystemWaiversResult,
+    create_start_system_waivers_command_executor,
+)
+from app.domain.services.end_of_week_service import EndOfWeekRequest
+from app.domain.services.league_command_push_data import LeagueCommandPushData
+from app.yards_py.core.base_command_executor import BaseCommandResult
+from app.yards_py.core.date_utils import hours_since
+from app.yards_py.core.logging import Logger
+from app.yards_py.core.publisher import Publisher, create_publisher
+from app.yards_py.domain.enums.league_command_type import LeagueCommandType
+from app.yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
+from app.yards_py.domain.topics import END_OF_WAIVERS_TOPIC, END_OF_WEEK_TOPIC, LEAGUE_COMMAND_TOPIC
 from fastapi import Depends
 from pydantic.main import BaseModel
+
+from ..commands.league.calculate_results import CalculateResultsCommand
 
 
 def create_end_of_day_service(
@@ -35,7 +31,6 @@ def create_end_of_day_service(
     start_system_waivers_command_executor: StartSystemWaiversCommandExecutor = Depends(create_start_system_waivers_command_executor),
     end_system_waivers_command_executor: EndSystemWaiversCommandExecutor = Depends(create_end_system_waivers_command_executor),
     settings: Settings = Depends(get_settings),
-
 ):
     return EndOfDayService(
         publisher=publisher,
@@ -85,10 +80,10 @@ class EndOfDayService:
         now = datetime.now(tz=pytz.UTC)
         hours_since_last_game = hours_since(scoreboard.last_game_start_time(), now)
         if hours_since_last_game < self.settings.min_stat_correction_hours:
-            Logger.info("Week complete but not enough time since last game", extra={
-                "hours_since": hours_since_last_game,
-                "min_hours": self.settings.min_stat_correction_hours
-            })
+            Logger.info(
+                "Week complete but not enough time since last game",
+                extra={"hours_since": hours_since_last_game, "min_hours": self.settings.min_stat_correction_hours},
+            )
             return False
 
         return True
@@ -116,7 +111,10 @@ class EndOfDayService:
 
         if result.success:
             # Future proofing
-            self.publisher.publish(BaseModel(), END_OF_WAIVERS_TOPIC)
+            class NullModel(BaseModel):
+                pass
+
+            self.publisher.publish(NullModel(), END_OF_WAIVERS_TOPIC)
 
             # triggers leagues to process waivers
             command = ProcessWaiversCommand()

@@ -21,6 +21,7 @@ class BoxscoreStore:
 
         data = box.model_dump()
         data["last_updated"] = data["last_updated"].isoformat()
+        data["game"]["game_date"] = data["game"]["game_date"].isoformat()
 
         self.rtdb_client.set(path, data)
 

@@ -128,20 +128,6 @@ export default {
     weekNumber() {
       return this.$root.state.current_week
     },
-    // nextGame() {
-    //   if (!this.scoreboard || !this.scoreboard.games) {
-    //     return null
-    //   }
-
-    //   for (let game of Object.values(this.scoreboard.games)) {
-    //     let startDate = game.date_start.toDate()
-    //     if (startDate > new Date() || game.event_status == eventStatus.InProgress) {
-    //       return game
-    //     }
-    //   }
-
-    //   return null
-    // },
   },
   methods: {
     bind(uid) {

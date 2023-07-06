@@ -1,54 +1,57 @@
 <template>
   <div>
-    <div v-if="details">
+    <div v-if="player">
       <v-row>
         <v-col cols="12">
           <v-card>
             <v-card-title>
-              <div class="team-colors" :class="details.player.team_abbr">
-                {{ details.player.uniform || "-" }}
+              <div class="team-colors" :class="player.team_abbr">
+                {{ player.uniform || "-" }}
               </div>
-              {{ details.player.display_name }}
-              <canadian-status :isCanadian="details.player.canadian_player" />
+              {{ player.full_name }}
+              <canadian-status :isCanadian="player.canadian_player" />
             </v-card-title>
             <v-card-subtitle>
-              <span>{{ details.player.position.toUpperCase() }}</span>
+              <span>{{ player.position.toUpperCase() }}</span>
               <span> - </span>
               <span>{{ teamName }}</span>
               <div v-if="statusText" :class="statusClass">{{ statusText }}</div>
             </v-card-subtitle>
 
             <v-card-subtitle>
-              <div v-if="details.season_score && details.season_score.rank">
-                <label>Fantasy Rank:</label> {{ details.season_score.rank }}
+              <div><label>Rank: </label> {{ rank }}</div>
+              <div><label>Score: </label> <score :score="playerScore.total_score" /></div>
+              <div>
+                <label>Owner: </label>
+                <league-roster-link v-if="isOwned" :leagueId="leagueId" :roster="ownerRoster" :trim="false" />
+                <span v-else>Free agent</span>
               </div>
-              <!-- Owner -->
               <!-- Add -->
             </v-card-subtitle>
 
             <v-card-subtitle>
-              <div v-if="details.player.age"><label>Age:</label> {{ details.player.age }}</div>
+              <div v-if="player.age"><label>Age:</label> {{ player.age }}</div>
               <div v-if="hasHeight && hasWeight">
-                <label>Height/Weight:</label> {{ details.player.height }} /
-                {{ details.player.weight }}
+                <label>Height/Weight:</label> {{ player.height }} /
+                {{ player.weight }}
               </div>
-              <div v-if="hasHeight && !hasWeight"><label>Height:</label> {{ details.player.height }}</div>
-              <div v-if="!hasHeight && hasWeight"><label>Weight:</label> {{ details.player.weight }}</div>
-              <div v-if="details.player.birth_place"><label>Hometown:</label> {{ details.player.birth_place }}</div>
-              <div v-if="details.player.school"><label>College:</label> {{ details.player.school }}</div>
+              <div v-if="hasHeight && !hasWeight"><label>Height:</label> {{ player.height }}</div>
+              <div v-if="!hasHeight && hasWeight"><label>Weight:</label> {{ player.weight }}</div>
+              <div v-if="player.birth_place"><label>Hometown:</label> {{ player.birth_place }}</div>
+              <div v-if="player.school"><label>College:</label> {{ player.school }}</div>
             </v-card-subtitle>
 
             <!-- <v-card-text>
-              <a :href="details.player.cfl_url" target="_blank">CFL Page</a>
+              <a :href="player.cfl_url" target="_blank">CFL Page</a>
             </v-card-text> -->
           </v-card>
         </v-col>
       </v-row>
 
-      <v-row v-if="details">
+      <v-row v-if="playerSeason">
         <v-col cols="12">
           <h4>Game Log</h4>
-          <v-simple-table v-if="details.game_log">
+          <v-simple-table v-if="playerSeason.games">
             <template>
               <thead>
                 <tr>
@@ -139,12 +142,12 @@
               </thead>
 
               <tbody>
-                <template v-for="log in details.game_log">
-                  <tr :key="'stats' + log.game_id">
+                <template v-for="log in playerSeason.games">
+                  <tr :key="log.game_id">
                     <!-- <game-date :game="log.game" /> -->
-                    <game-result v-if="log.game" :game="log.game" :playerTeam="log.team" />
+                    <game-result :gameResult="log.game_result" />
                     <td class="text-no-wrap">
-                      <span>{{ formatScore(log.score ? log.score.total_score : 0) }}</span>
+                      <score :score="calculateGameScore(log.stats)" />
                       <v-icon @click="detailedLog = log" v-if="!detailedLog" small color="grey" class="mt-n1 pl-1"
                         >mdi-help-circle</v-icon
                       >
@@ -232,77 +235,77 @@
                   <tr v-if="detailedLog && detailedLog.game_id == log.game_id" :key="'scoring' + log.game_id">
                     <td>Score details:</td>
                     <td>
-                      <span>{{ formatScore(log.score ? log.score.total_score : 0) }}</span>
+                      <score :score="calculateGameScore(detailedLog.stats)" />
                     </td>
 
                     <template v-if="showPassing">
-                      <game-value :value="log.score.pass_attempts" />
-                      <game-value :value="log.score.pass_completions" />
-                      <game-value :value="log.score.pass_net_yards" />
+                      <td><score :score="calculateStatScore(log.stats, 'pass_attempts')" /></td>
+                      <td><score :score="calculateStatScore(log.stats, 'pass_completions')" /></td>
+                      <td><score :score="calculateStatScore(log.stats, 'pass_net_yards')" /></td>
                       <td></td>
-                      <game-value :value="log.score.pass_touchdowns" />
-                      <game-value :value="log.score.pass_interceptions" />
+                      <td><score :score="calculateStatScore(log.stats, 'pass_touchdowns')" /></td>
+                      <td><score :score="calculateStatScore(log.stats, 'pass_interceptions')" /></td>
                     </template>
 
                     <template v-if="showRushing && showRushingFirst">
-                      <game-value :value="log.score.rush_attempts" />
-                      <game-value :value="log.score.rush_net_yards" />
-                      <game-value :value="log.score.rush_touchdowns" />
+                      <td><score :score="calculateStatScore(log.stats, 'rush_attempts')" /></td>
+                      <td><score :score="calculateStatScore(log.stats, 'rush_net_yards')" /></td>
+                      <td><score :score="calculateStatScore(log.stats, 'rush_touchdowns')" /></td>
                       <game-average :attempts="log.score.rush_attempts" :yards="log.score.rush_net_yards" />
                       <td></td>
                     </template>
 
                     <template v-if="showReceiving">
-                      <game-value :value="log.score.receive_caught" />
-                      <game-value :value="log.score.receive_attempts" />
-                      <game-value :value="log.score.receive_yards" />
-                      <game-value :value="log.score.receive_touchdowns" />
+                      <td><score :score="calculateStatScore(log.stats, 'receive_caught')" /></td>
+                      <td><score :score="calculateStatScore(log.stats, 'receive_attempts')" /></td>
+                      <td><score :score="calculateStatScore(log.stats, 'receive_yards')" /></td>
+                      <td><score :score="calculateStatScore(log.stats, 'receive_touchdowns')" /></td>
                       <td></td>
                       <td></td>
                     </template>
 
                     <template v-if="showFumbles">
-                      <game-value :value="getFumbleScore(log.score)" />
+                      <td><score :score="getFumbleScore(log.score)" /></td>
                     </template>
 
                     <template v-if="showConvert2">
-                      <game-value :value="log.score.two_point_converts_made" />
+                      <td><score :score="calculateStatScore(log.stats, 'two_point_converts_made')" /></td>
                     </template>
 
                     <template v-if="showRushing && !showRushingFirst">
-                      <game-value :value="log.score.rush_attempts" />
-                      <game-value :value="log.score.rush_net_yards" />
-                      <game-value :value="log.score.rush_touchdowns" />
+                      <td><score :score="calculateStatScore(log.stats, 'rush_attempts')" /></td>
+                      <td><score :score="calculateStatScore(log.stats, 'rush_net_yards')" /></td>
+                      <td><score :score="calculateStatScore(log.stats, 'rush_touchdowns')" /></td>
                       <game-average :attempts="log.score.rush_attempts" :yards="log.score.rush_net_yards" />
                       <td></td>
                     </template>
 
                     <template v-if="showDefence">
                       <td></td>
-                      <game-value :value="log.score.tackles_defensive" />
-                      <game-value :value="log.score.tackles_special_teams" />
-                      <game-value :value="log.score.sacks_qb_made" />
-                      <game-value :value="log.score.interceptions" />
-                      <game-value :value="log.score.fumbles_forced" />
-                      <game-value :value="log.score.fumbles_recovered" />
+                      <td><score :score="calculateStatScore(log.stats, 'tackles_defensive')" /></td>
+                      <td><score :score="calculateStatScore(log.stats, 'tackles_special_teams')" /></td>
+                      <td><score :score="calculateStatScore(log.stats, 'sacks_qb_made')" /></td>
+                      <td><score :score="calculateStatScore(log.stats, 'interceptions')" /></td>
+                      <td><score :score="calculateStatScore(log.stats, 'fumbles_forced')" /></td>
+                      <td><score :score="calculateStatScore(log.stats, 'fumbles_recovered')" /></td>
                     </template>
 
                     <template v-if="showReturning">
-                      <game-value :value="log.score.field_goal_returns_yards" />
-                      <game-value :value="log.score.field_goal_returns_touchdowns" />
-                      <game-value :value="log.score.kick_returns_yards" />
-                      <game-value :value="log.score.kick_returns_touchdowns" />
-                      <game-value :value="log.score.punt_returns_yards" />
-                      <game-value :value="log.score.punt_returns_touchdowns" />
+                      <td><score :score="calculateStatScore(log.stats, 'field_goal_returns_yards')" /></td>
+                      <td><score :score="calculateStatScore(log.stats, 'field_goal_returns_touchdowns')" /></td>
+                      <td><score :score="calculateStatScore(log.stats, 'kick_returns_yards')" /></td>
+                      <td><score :score="calculateStatScore(log.stats, 'kick_returns_touchdowns')" /></td>
+                      <td><score :score="calculateStatScore(log.stats, 'punt_returns_yards')" /></td>
+                      <td><score :score="calculateStatScore(log.stats, 'punt_returns_touchdowns')" /></td>
                     </template>
 
                     <template v-if="showKicking">
-                      <game-value :value="log.score.field_goal_attempts" />
-                      <game-value :value="log.score.field_goal_made" />
-                      <game-value :value="log.score.field_goal_misses" />
+                      <td><score :score="calculateStatScore(log.stats, 'field_goal_attempts')" /></td>
+                      <td><score :score="calculateStatScore(log.stats, 'field_goal_made')" /></td>
+                      <td><score :score="calculateStatScore(log.stats, 'field_goal_misses')" /></td>
                       <game-percent :attempts="log.score.field_goal_attempts" :successes="log.score.field_goal_made" />
-                      <game-value :value="log.score.one_point_converts_made" />
-                      <game-value :value="getSingleScore(log.score)" />
+                      <td><score :score="calculateStatScore(log.stats, 'one_point_converts_made')" /></td>
+                      <td><score :score="getSingleScore(log.score)" /></td>
                     </template>
                   </tr>
                 </template>
@@ -326,14 +329,16 @@ label {
 
 <script>
 import { playerStatus, positionType, teams } from "../../api/110yards/constants"
-import { getPlayerDetails } from "../../api/110yards/league"
 import GameAverage from "../../components/player/stats/GameAverage.vue"
 import GamePercent from "../../components/player/stats/GamePercent.vue"
 import GameResult from "../../components/player/stats/GameResult.vue"
 import GameValue from "../../components/player/stats/GameValue.vue"
+import Score from "../../components/Score.vue"
 import { firestore } from "../../modules/firebase"
 import * as formatter from "../../modules/formatter"
 import CanadianStatus from "../../components/player/CanadianStatus.vue"
+import { calculate, calculateStat } from "../../modules/scoring"
+import LeagueRosterLink from "../../components/league/LeagueRosterLink.vue"
 
 export default {
   name: "PlayerDetails",
@@ -343,6 +348,8 @@ export default {
     GamePercent,
     GameValue,
     CanadianStatus,
+    Score,
+    LeagueRosterLink,
   },
   props: {
     leagueId: { type: String, required: true },
@@ -352,53 +359,60 @@ export default {
   data() {
     return {
       player: null,
-      scores: null,
+      playerSeason: null,
       detailedLog: null,
-      owner: null,
-      details: null,
+      ownerData: null,
       notFound: false,
+      playerScore: null,
+      ownerRoster: null,
     }
   },
 
   computed: {
+    isOwned() {
+      return this.ownerRoster != null
+    },
+
+    rank() {
+      return this.playerScore != null ? this.playerScore.rank : "N/A"
+    },
+
+    scoring() {
+      return this.$root.leagueScoringSettings
+    },
     uid() {
       return this.$store.state.uid
     },
-
     season() {
       return this.$root.state.current_season
     },
 
     isInjured() {
-      return this.details.player.injury_status != null
+      return this.player.injury_status != null
     },
 
     statusClass() {
-      return this.details && this.isInjured ? "red--text" : ""
+      return this.player && this.isInjured ? "red--text" : ""
     },
 
     statusText() {
-      if (!this.details || !this.isInjured) {
+      if (!this.player || !this.isInjured) {
         return null
       }
 
-      return `${playerStatus.getFullText(this.details.player.injury_status.status_id)} - ${
-        this.details.player.injury_status.injury
-      }`
+      return `${playerStatus.getFullText(this.player.injury_status.status_id)} - ${this.player.injury_status.injury}`
     },
 
     teamName() {
-      return this.details && this.details.player.team_abbr
-        ? teams.getFullName(this.details.player.team_abbr)
-        : "Free Agent"
+      return this.player && this.player.team_abbr ? teams.getFullName(this.player.team_abbr) : "Free Agent"
     },
 
     hasHeight() {
-      return this.details.player.height
+      return this.player.height
     },
 
     hasWeight() {
-      return this.details.player.weight
+      return this.player.weight
     },
 
     showPassing() {
@@ -415,11 +429,11 @@ export default {
 
     showRushingFirst() {
       let positions = [positionType.QB, positionType.RB]
-      return this.details.player && positions.includes(this.details.player.position)
+      return this.player && positions.includes(this.player.position)
     },
 
     showKicking() {
-      return this.details.player && this.details.player.position == positionType.K
+      return this.player && this.player.position == positionType.K
     },
 
     showDefence() {
@@ -440,13 +454,19 @@ export default {
   },
 
   methods: {
+    calculateGameScore(stats) {
+      return calculate(this.scoring, stats)
+    },
+    calculateStatScore(stats, statKey) {
+      return calculateStat(this.scoring, stats, statKey)
+    },
     formatScore(score) {
       if (score == null || score == undefined) return formatter.formatScore(0)
       return formatter.formatScore(score)
     },
     hasStatKey(key) {
-      if (this.details.season_stats) {
-        return key in this.details.season_stats && this.details.season_stats[key]
+      if (this.playerSeason.stats) {
+        return key in this.playerSeason.stats && this.playerSeason.stats[key]
       }
 
       return false
@@ -487,12 +507,26 @@ export default {
       let f2 = score.pass_fumbles || 0
       return f1 + f2
     },
+    setupReferences() {
+      if (this.playerId && this.season && this.leagueId) {
+        let statsRef = firestore.doc(`season/${this.season}/player_season/${this.playerId}`)
+        let playerRef = firestore.doc(`players/${this.playerId}`)
+        let scoresRef = firestore.doc(`league/${this.leagueId}/player_score/${this.playerId}`)
+        let ownerRef = firestore.doc(`league/${this.leagueId}/owned_player/${this.playerId}`)
 
-    async fetchDetails() {
-      if (!this.leagueId || !this.playerId || !this.season || !this.uid) return
-
-      this.details = await getPlayerDetails(this.season, this.leagueId, this.playerId)
-      this.notFound = this.details == null
+        this.$bind("playerSeason", statsRef)
+        this.$bind("player", playerRef)
+        this.$bind("playerScore", scoresRef)
+        this.$bind("ownerData", ownerRef)
+      }
+    },
+    setupOwnerReference() {
+      if (this.ownerData) {
+        let ownerRef = firestore.doc(`league/${this.leagueId}/roster/${this.ownerData.owner_id}`)
+        this.$bind("ownerRoster", ownerRef)
+      } else {
+        this.ownerRoster = null
+      }
     },
   },
 
@@ -501,7 +535,7 @@ export default {
       immediate: true,
       handler(leagueId) {
         if (!leagueId) return
-        this.fetchDetails()
+        this.setupReferences()
       },
     },
 
@@ -509,7 +543,7 @@ export default {
       immediate: true,
       handler(playerId) {
         if (!playerId) return
-        this.fetchDetails()
+        this.setupReferences()
       },
     },
 
@@ -517,15 +551,13 @@ export default {
       immediate: true,
       handler(season) {
         if (!season) return
-        this.fetchDetails()
+        this.setupReferences()
       },
     },
 
-    uid: {
-      immediate: true,
-      handler(uid) {
-        if (!uid) return
-        this.fetchDetails()
+    ownerData: {
+      handler(ownerData) {
+        this.setupOwnerReference()
       },
     },
   },

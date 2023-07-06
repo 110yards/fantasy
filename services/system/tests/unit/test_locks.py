@@ -1,7 +1,7 @@
 from api.tests.asserts import are_equal
 import pytest
-from yards_py.domain.entities.team import Team
-from yards_py.domain.entities.state import Locks
+from app.yards_py.domain.entities.team import Team
+from app.yards_py.domain.entities.state import Locks
 
 test_cases = [
     ({}, False),  # No teams locked

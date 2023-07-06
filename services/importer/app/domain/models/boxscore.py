@@ -105,9 +105,19 @@ class PlayerStats(BaseModel):
 StatsCollection = dict[str, PlayerStats]
 
 
+class BoxscoreGame(BaseModel):
+    game_id: str
+    game_date: datetime
+    away_abbr: str
+    home_abbr: str
+    away_score: int
+    home_score: int
+
+
 class Boxscore(BaseModel):
     source: Literal["realtime", "official"]
     game_id: str
+    game: BoxscoreGame
     away_abbr: str
     home_abbr: str
     player_stats: StatsCollection = {}

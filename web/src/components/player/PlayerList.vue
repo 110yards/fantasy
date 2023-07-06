@@ -69,7 +69,7 @@
           <template v-slot:[`item.actions`]="{ item }">
             <div v-if="showActions">
               <v-icon v-if="isAvailable(item) && !isLocked(item)" @click="addPlayer(item)">mdi-plus</v-icon>
-              <locked v-if="isAvailable(item) && isLocked(item)" />
+              <locked v-if="isLocked(item)" />
 
               <!-- auction draft -->
               <v-btn
@@ -109,7 +109,12 @@
           </template>
 
           <template v-slot:[`item.owner`]="{ item }">
-            <league-roster-link v-if="isOwned(item)" :leagueId="leagueId" :roster="getOwner(item.id)" :trim="true" />
+            <league-roster-link
+              v-if="isOwned(item)"
+              :leagueId="leagueId"
+              :roster="getOwner(item.player_id)"
+              :trim="true"
+            />
           </template>
         </v-data-table>
       </v-card-text>

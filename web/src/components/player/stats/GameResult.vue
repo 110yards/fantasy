@@ -1,10 +1,10 @@
 <template>
-  <td v-if="game && playerTeam" class="text-no-wrap">
-    <a :href="cflLink" target="_blank">
-      <span class="">{{ date }} </span>
-      <span class="d-none d-md-inline pl-1">{{ result }} {{ opponent }}</span>
-      <span class="d-md-none">({{ letterResult }})</span>
-    </a>
+  <td v-if="gameResult" class="text-no-wrap">
+    <!-- <a :href="cflLink" target="_blank"> -->
+    <span class="">{{ date }} </span>
+    <span class="d-none d-md-inline pl-1">{{ result }} {{ homeAwayMarker }} {{ opponent }}</span>
+    <span class="d-md-none">({{ letterResult }})</span>
+    <!-- </a> -->
   </td>
   <td v-else></td>
 </template>
@@ -14,33 +14,26 @@ import * as formatter from "../../../modules/formatter"
 
 export default {
   props: {
-    playerTeam: { type: Object, required: true },
-    game: { type: Object, required: true },
+    gameResult: { type: Object, required: true },
   },
 
   computed: {
     isHome() {
-      return this.game.teams.home.id == this.playerTeam.id
+      return this.gameResult.was_home
     },
     scoreFor() {
-      return this.isHome ? this.game.score.home : this.game.score.away
+      return this.gameResult.score_for
     },
     scoreAgainst() {
-      return this.isHome ? this.game.score.away : this.game.score.home
+      return this.gameResult.score_against
     },
 
     letterResult() {
-      let won = this.scoreFor > this.scoreAgainst
-      let lost = this.scoreFor < this.scoreAgainst
-
-      return won ? "W" : lost ? "L" : "T"
+      return this.gameResult.result
     },
 
-    cflLink() {
-      return `https://www.cfl.ca/games/${this.game.id}/#/boxscore`
-    },
     date() {
-      let d = Date.parse(this.game.date_start)
+      let d = Date.parse(this.gameResult.game_date.toDate())
       return formatter.shortDate(d)
     },
 
@@ -48,12 +41,12 @@ export default {
       return `${this.letterResult} ${this.scoreFor}-${this.scoreAgainst}`
     },
 
-    opponent() {
-      let game = this.game
-      let isHome = game.teams.home.id == this.playerTeam.id
-      let opponent = isHome ? game.teams.away : game.teams.home
+    homeAwayMarker() {
+      return this.isHome ? "v" : "@"
+    },
 
-      return isHome ? `v ${opponent.abbreviation}` : `@ ${opponent.abbreviation}`
+    opponent() {
+      return this.gameResult.opponent_abbr.toUpperCase()
     },
   },
 }

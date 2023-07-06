@@ -1,67 +1,43 @@
-
-from yards_py.core.publisher import Publisher
-from services.system.app.di import create_publisher
-from services.system.app.domain.commands.league.calculate_playoffs import CalculatePlayoffsCommand
-from yards_py.domain.entities.league import League
-from yards_py.domain.enums.league_command_type import LeagueCommandType
-from yards_py.domain.enums.matchup_type import MatchupType
-from yards_py.domain.repositories.game_repository import GameRepository, create_game_repository
-from yards_py.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository, create_player_league_season_score_repository
-from yards_py.domain.entities.matchup_preview import MatchupPreview
-from yards_py.domain.repositories.state_repository import StateRepository, create_state_repository
-from yards_py.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
-from yards_py.domain.enums.week_type import WeekType
-from yards_py.domain.entities.schedule import Schedule
-from yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from yards_py.domain.entities.roster import Roster
-from yards_py.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository, create_league_week_matchup_repository
-from yards_py.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from yards_py.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from typing import Optional
+
+from app.domain.commands.league.calculate_playoffs import CalculatePlayoffsCommand
+from app.domain.services.league_command_push_data import LeagueCommandPushData
+from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from app.yards_py.core.logging import Logger
+from app.yards_py.core.publisher import Publisher, create_publisher
+from app.yards_py.domain.entities.league import League
+from app.yards_py.domain.entities.matchup_preview import MatchupPreview
+from app.yards_py.domain.entities.roster import Roster
+from app.yards_py.domain.entities.schedule import Schedule
+from app.yards_py.domain.enums.league_command_type import LeagueCommandType
+from app.yards_py.domain.enums.matchup_type import MatchupType
+from app.yards_py.domain.enums.week_type import WeekType
+from app.yards_py.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from app.yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.yards_py.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from app.yards_py.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository, create_league_week_matchup_repository
+from app.yards_py.domain.repositories.player_league_season_score_repository import (
+    PlayerLeagueSeasonScoreRepository,
+    create_player_league_season_score_repository,
+)
+from app.yards_py.domain.repositories.state_repository import StateRepository, create_state_repository
+from app.yards_py.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
+from app.yards_py.domain.services.notification_service import NotificationService, create_notification_service
+from app.yards_py.domain.topics import LEAGUE_COMMAND_TOPIC
 from fastapi import Depends
-from yards_py.core.annotate_args import annotate_args
-from yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
 from firebase_admin import firestore
 
-from services.system.app.domain.services.league_command_push_data import LeagueCommandPushData
-from yards_py.domain.services.notification_service import NotificationService, create_notification_service
-from yards_py.domain.topics import LEAGUE_COMMAND_TOPIC
+from ....yards_py.domain.entities.boxscore import Boxscore
+from ....yards_py.domain.stores.boxscore_store import BoxscoreStore, create_boxscore_store
+from ....yards_py.domain.stores.system_schedule_store import SystemScheduleStore, create_system_schedule_store
 
 
-def create_calculate_results_command_executor(
-    state_repo: StateRepository = Depends(create_state_repository),
-    league_config_repo: LeagueConfigRepository = Depends(create_league_config_repository),
-    league_roster_repo: LeagueRosterRepository = Depends(create_league_roster_repository),
-    matchup_repo: LeagueWeekMatchupRepository = Depends(create_league_week_matchup_repository),
-    league_repo: LeagueRepository = Depends(create_league_repository),
-    user_league_repo: UserLeagueRepository = Depends(create_user_league_repository),
-    player_score_repo: PlayerLeagueSeasonScoreRepository = Depends(create_player_league_season_score_repository),
-    game_repo: GameRepository = Depends(create_game_repository),
-    publisher: Publisher = Depends(create_publisher),
-    notification_service: NotificationService = Depends(create_notification_service),
-):
-    return CalculateResultsCommandExecutor(
-        state_repo=state_repo,
-        league_config_repo=league_config_repo,
-        league_roster_repo=league_roster_repo,
-        matchup_repo=matchup_repo,
-        league_repo=league_repo,
-        user_league_repo=user_league_repo,
-        player_score_repo=player_score_repo,
-        game_repo=game_repo,
-        publisher=publisher,
-        notification_service=notification_service,
-    )
-
-
-@annotate_args
 class CalculateResultsCommand(BaseCommand):
-    league_id: Optional[str]
+    league_id: Optional[str] = None
     week_number: int
     past_week: bool = False
 
 
-@annotate_args
 class CalculateResultsResult(BaseCommandResult[CalculateResultsCommand]):
     next_week_is_playoffs: bool = False
     league_season_complete: bool = False
@@ -79,10 +55,10 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
         league_repo: LeagueRepository,
         user_league_repo: UserLeagueRepository,
         player_score_repo: PlayerLeagueSeasonScoreRepository,
-        game_repo: GameRepository,
         publisher: Publisher,
         notification_service: NotificationService,
-
+        system_schedule_store: SystemScheduleStore,
+        boxscore_store: BoxscoreStore,
     ):
         self.state_repo = state_repo
         self.league_config_repo = league_config_repo
@@ -91,13 +67,18 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
         self.league_repo = league_repo
         self.user_league_repo = user_league_repo
         self.player_score_repo = player_score_repo
-        self.game_repo = game_repo
         self.publisher = publisher
         self.notification_service = notification_service
+        self.system_schedule_store = system_schedule_store
+        self.boxscore_store = boxscore_store
 
     def on_execute(self, command: CalculateResultsCommand) -> CalculateResultsResult:
+        league = self.league_repo.get(command.league_id)
 
         state = self.state_repo.get()
+        if not league.is_active_for_season(state.current_season):
+            Logger.warn(f"League {command.league_id} is not active for season {state.current_season} but is receiving league events")
+            return CalculateResultsResult(command=command)
 
         schedule_config = self.league_config_repo.get_schedule_config(command.league_id)
 
@@ -112,22 +93,21 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
         #  This happens first, to block users from adding players in the event that the next part fails.
         @firestore.transactional
         def mark_league_waivers_active(transaction):
-            league = self.league_repo.get(command.league_id, transaction)
+            league_state = self.league_config_repo.get_state(command.league_id, transaction)
 
-            if not league.is_active_for_season(state.current_season):
-                return True
-
-            league.waivers_active = True
-            self.league_repo.update(league, transaction)
+            league_state.waivers_active = True
+            self.league_config_repo.set_state(command.league_id, league_state, transaction)
 
         transaction = self.league_repo.firestore.create_transaction()
-        league_inactive = mark_league_waivers_active(transaction)
+        mark_league_waivers_active(transaction)
 
-        if league_inactive:
-            # nothing to do here.
-            return CalculateResultsResult(command=command)
+        schedule_week = self.system_schedule_store.get_schedule_week(state.current_season, command.week_number)
+        self.boxscores_for_week: list[Boxscore] = []
 
-        self.games_for_week = self.game_repo.for_week(state.current_season, command.week_number)
+        for game in schedule_week.games:
+            boxscore = self.boxscore_store.get_boxscore(state.current_season, game.game_id)
+            self.boxscores_for_week.append(boxscore)
+
         self.league_scoring = self.league_config_repo.get_scoring_config(command.league_id)
 
         @firestore.transactional
@@ -193,9 +173,7 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
                     else:
                         roster_matchup = None
 
-                    updates = {
-                        "matchup": roster_matchup.dict() if roster_matchup else None
-                    }
+                    updates = {"matchup": roster_matchup.dict() if roster_matchup else None}
 
                     self.user_league_repo.partial_update(roster.id, command.league_id, updates, transaction)
 
@@ -227,7 +205,6 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
                 rank += 1
                 roster.this_week_points_for = 0
                 roster.this_week_bench_points_for = 0
-
                 for position in roster.positions.values():
                     position.game_score = 0
 
@@ -257,16 +234,16 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
         return result
 
     def archive_roster(self, roster: Roster):
-        copy = roster.copy(deep=True)
+        copy = roster.model_copy(deep=True)
 
         for position in copy.positions.values():
             if position.player:
-                for game in self.games_for_week:
-                    if position.player.id in game.player_stats:
-                        game_stats = game.player_stats[position.player.id]
-                        score = self.league_scoring.calculate_score(game_stats.stats)
+                for boxscore in self.boxscores_for_week:
+                    if position.player.id in boxscore.player_stats:
+                        game_stats = boxscore.player_stats[position.player.id]
+                        score = self.league_scoring.calculate_score(game_stats)
 
-                        position.game_id = game.id
+                        position.game_id = boxscore.game_id
                         position.game_score = score.total_score
 
         return copy
@@ -320,3 +297,31 @@ def update_record(roster: Roster, up_to_week: int, schedule: Schedule, league_st
     roster.last_week_result = last_result
     roster.points_for = total_score_for
     roster.points_against = total_score_against
+
+
+def create_calculate_results_command_executor(
+    state_repo: StateRepository = Depends(create_state_repository),
+    league_config_repo: LeagueConfigRepository = Depends(create_league_config_repository),
+    league_roster_repo: LeagueRosterRepository = Depends(create_league_roster_repository),
+    matchup_repo: LeagueWeekMatchupRepository = Depends(create_league_week_matchup_repository),
+    league_repo: LeagueRepository = Depends(create_league_repository),
+    user_league_repo: UserLeagueRepository = Depends(create_user_league_repository),
+    player_score_repo: PlayerLeagueSeasonScoreRepository = Depends(create_player_league_season_score_repository),
+    publisher: Publisher = Depends(create_publisher),
+    notification_service: NotificationService = Depends(create_notification_service),
+    system_schedule_store: SystemScheduleStore = Depends(create_system_schedule_store),
+    boxscore_store: BoxscoreStore = Depends(create_boxscore_store),
+):
+    return CalculateResultsCommandExecutor(
+        state_repo=state_repo,
+        league_config_repo=league_config_repo,
+        league_roster_repo=league_roster_repo,
+        matchup_repo=matchup_repo,
+        league_repo=league_repo,
+        user_league_repo=user_league_repo,
+        player_score_repo=player_score_repo,
+        publisher=publisher,
+        notification_service=notification_service,
+        system_schedule_store=system_schedule_store,
+        boxscore_store=boxscore_store,
+    )

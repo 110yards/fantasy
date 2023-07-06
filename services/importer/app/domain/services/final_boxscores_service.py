@@ -7,6 +7,7 @@ from strivelogger import StriveLogger
 from app.config.settings import Settings, get_settings
 from app.domain.models.boxscore import (
     Boxscore,
+    BoxscoreGame,
     BoxscorePlayer,
     PlayerStats,
     StatsCollection,
@@ -95,6 +96,7 @@ class FinalBoxscoresService:
         boxscore = Boxscore(
             source="official",
             game_id=game.game_id,
+            game=BoxscoreGame(**game.model_dump()),
             away_abbr=game.away_abbr,
             home_abbr=game.home_abbr,
             player_stats=StatsCollection(),
@@ -113,7 +115,7 @@ class FinalBoxscoresService:
             if not player:
                 continue
 
-            stats: dict = player_data["stats"]
+            stats: dict = player_data["stats"]["gameStats"]
 
             player.pass_attempts = stats.get("passingPlaysAttempted", 0)
             player.pass_completions = stats.get("passingPlaysCompleted", 0)

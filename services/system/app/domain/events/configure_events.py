@@ -1,13 +1,10 @@
-
-from services.system.app.config.settings import Settings, get_settings
+from app.config.settings import Settings, get_settings
+from app.yards_py.core.publisher import Publisher, SubscriptionConfig, create_publisher
+from app.yards_py.domain import topics
 from fastapi.params import Depends
-from yards_py.domain import topics
-from yards_py.core.publisher import Publisher, SubscriptionConfig
-from services.system.app.di import create_publisher
 
 
 def create_configure_events(settings: Settings = Depends(get_settings), publisher: Publisher = Depends(create_publisher)):
-
     return ConfigureEvents(settings.endpoint, settings.api_key, publisher)
 
 

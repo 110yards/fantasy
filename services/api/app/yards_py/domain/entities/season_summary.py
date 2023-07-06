@@ -67,8 +67,8 @@ class MatchupSummary(BaseModel):
     home_id: Optional[str]
     home_name: Optional[str]
     matchup_type: str
-    away_score: Optional[float]
-    home_score: Optional[float]
+    away_score: Optional[float] | Optional[int]
+    home_score: Optional[float] | Optional[int]
 
     @staticmethod
     def from_matchup(matchup: Matchup) -> MatchupSummary:

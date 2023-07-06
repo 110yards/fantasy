@@ -12,6 +12,7 @@ export default {
     roster: { type: Object, required: false },
     weekNumber: { required: true },
     calculatedScore: { type: Number, required: false, default: 0.0 },
+    scoring: { type: Object, required: false },
   },
   data() {
     return {
@@ -21,10 +22,6 @@ export default {
   },
 
   computed: {
-    scoring() {
-      return this.$root.leagueScoringSettings
-    },
-
     score() {
       return this.isCurrentWeek ? this.liveScore : this.calculatedScore
     },
@@ -60,6 +57,7 @@ export default {
         }
 
         // finally, bind to each player id property
+        if (!teamGameIds[player.team_abbr]) continue
         let ref = getPlayerGameRef(season, teamGameIds[player.team_abbr], player.player_id)
 
         this.$rtdbBind(`players.${player.player_id}`, ref)

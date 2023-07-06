@@ -1,20 +1,16 @@
 
 
 from datetime import datetime
-from services.system.app.domain.commands.league.create_league_subscriptions import (
-    CreateLeagueSubscriptionsCommand, CreateLeagueSubscriptionsCommandExecutor,
-    create_league_subscriptions_command_executor)
-from yards_py.core.logging import Logger
-from yards_py.domain.entities.owned_player import OwnedPlayer
-from yards_py.domain.entities.player import Player
-from yards_py.domain.entities.team import Team
-from yards_py.domain.repositories.league_owned_player_repository import LeagueOwnedPlayerRepository, create_league_owned_player_repository
-from yards_py.domain.repositories.league_repository import (
+from app.yards_py.core.logging import Logger
+from app.yards_py.domain.entities.owned_player import OwnedPlayer
+from app.yards_py.domain.entities.player import Player
+from app.yards_py.domain.entities.team import Team
+from app.yards_py.domain.repositories.league_owned_player_repository import LeagueOwnedPlayerRepository, create_league_owned_player_repository
+from app.yards_py.domain.repositories.league_repository import (
     LeagueRepository, create_league_repository)
 from fastapi.param_functions import Depends
-from firebase_admin.firestore import firestore
-from yards_py.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from yards_py.domain.repositories.player_repository import PlayerRepository, create_player_repository
+from app.yards_py.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from app.yards_py.domain.repositories.player_repository import PlayerRepository, create_player_repository
 
 
 def create_map_new_players_migration(
@@ -134,7 +130,8 @@ def slug(p: Player) -> str:
 
     slug = slug.lower()
     slug = slug.replace("jr.", "")
-    slug = slug.replace("iii", "")
     slug = slug.replace("ii", "")
+    slug = slug.replace("iii", "")
+    slug = slug.replace("iv", "")
     
     return slug

@@ -1,24 +1,24 @@
 from __future__ import annotations
 
+from typing import Literal
+
+from pydantic import BaseModel
+
 from app.yards_py.domain.entities.stats import Stats
-from app.yards_py.core.base_entity import BaseEntity
-from .team import Team
-from app.yards_py.core.annotate_args import annotate_args
 
 
-@annotate_args
-class PlayerGame(BaseEntity):
+class GameResult(BaseModel):
+    team_abbr: str
+    opponent_abbr: str
+    score_for: int
+    score_against: int
+    result: Literal["W", "L", "T"]
+    was_home: bool
+
+
+class PlayerGame(BaseModel):
     player_id: str
     game_id: int
     week_number: int
-    team: Team
-    opponent: Team
     stats: Stats
-
-    # TODO: automatically set this in init
-    def set_id(self):
-        self.id = PlayerGame.create_id(self.player_id, self.game_id)
-
-    @staticmethod
-    def create_id(player_id: str, game_id: int) -> str:
-        return f"{player_id}_{game_id}"
+    game_result: GameResult

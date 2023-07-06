@@ -1,14 +1,14 @@
-from yards_py.domain.entities.matchup_preview import MatchupPreview
-from yards_py.domain.enums.week_type import WeekType
-from yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
-from yards_py.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
-from yards_py.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository, create_league_week_matchup_repository
-from yards_py.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from yards_py.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from app.yards_py.domain.entities.matchup_preview import MatchupPreview
+from app.yards_py.domain.enums.week_type import WeekType
+from app.yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
+from app.yards_py.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
+from app.yards_py.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository, create_league_week_matchup_repository
+from app.yards_py.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from app.yards_py.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from fastapi import Depends
-from yards_py.core.annotate_args import annotate_args
-from yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
+from app.yards_py.core.annotate_args import annotate_args
+from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
 from firebase_admin import firestore
 
 
@@ -23,13 +23,13 @@ def create_calculate_playoffs_command_executor(
     return CalculatePlayoffsCommandExecutor(league_repo, league_config_repo, league_roster_repo, matchup_repo, user_league_repo, public_repo)
 
 
-@annotate_args
+
 class CalculatePlayoffsCommand(BaseCommand):
     league_id: str
     week_number: int
 
 
-@annotate_args
+
 class CalculatePlayoffsResult(BaseCommandResult[CalculatePlayoffsCommand]):
     pass
 

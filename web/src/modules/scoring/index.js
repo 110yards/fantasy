@@ -6,16 +6,27 @@ export const calculate = (scoring, stats) => {
   for (let key in scoring) {
     if (key == "id") continue
 
-    if (!(key in stats)) continue
+    // if (!(key in stats)) continue
 
-    let stat = stats[key]
-    let value = scoring[key]
+    // let stat = stats[key]
+    // let value = scoring[key]
 
-    let score = !!stat ? stat * value : 0
+    // let score = !!stat ? stat * value : 0
+    let score = calculateStat(scoring, stats, key)
     totalScore += score
   }
 
   return totalScore
+}
+
+export const calculateStat = (scoring, stats, key) => {
+  if (!(key in stats)) return 0
+
+  let stat = stats[key]
+  let value = scoring[key]
+
+  let score = !!stat ? stat * value : 0
+  return score
 }
 
 export const calculateMultiple = (scoring, playerGames) => {
@@ -65,6 +76,7 @@ export const calculateRosterScore = (scoring, playerGames) => {
 
 export const getPlayerGameRef = (season, gameId, playerId) => {
   let path = `boxscores/${season}/${gameId}/player_stats/${playerId}`
+  // console.log(path)
   let ref = rtdb.ref(path)
 
   return ref

@@ -1,25 +1,25 @@
 from __future__ import annotations
 
+from typing import Dict, List, Optional
+
+from app.yards_py.core.base_entity import BaseEntity
 from app.yards_py.domain.entities.player_league_game_score import PlayerLeagueGameScore
 from app.yards_py.domain.entities.player_season import PlayerSeason
 from app.yards_py.domain.entities.scoring_settings import ScoringSettings
-from typing import Dict, List, Optional
-from app.yards_py.core.base_entity import BaseEntity
-from app.yards_py.core.annotate_args import annotate_args
 
 
-@annotate_args
 class PlayerLeagueSeasonScore(BaseEntity):
     season: int
     player_id: str
     total_score: float
     average_score: float
-    rank: Optional[int]
+    rank: Optional[int] = None
     game_scores: Dict[str, PlayerLeagueGameScore]
-    last_week_score: Optional[float] = 0.0
+    last_week_score: Optional[float] | Optional[int] = 0.0
 
+    # TODO: de-dupe this method - it's in the system and shouldn't be here.
     @staticmethod
-    def create(id: str, player_season: PlayerSeason, scoring: ScoringSettings, completed_week: int) -> PlayerLeagueSeasonScore:
+    def create(player_season: PlayerSeason, scoring: ScoringSettings, completed_week: int) -> PlayerLeagueSeasonScore:
         season_score = scoring.calculate_score(player_season.stats)
         average = season_score.total_score / player_season.games_played if player_season.games_played else 0
         game_scores = {}
@@ -29,18 +29,17 @@ class PlayerLeagueSeasonScore(BaseEntity):
         for game in player_season.games:
             score = scoring.calculate_score(game.stats)
             game_score = PlayerLeagueGameScore(
-                game_id=game.id,
+                game_id=game.game_id,
                 week_number=game.week_number,
-                team=game.team,
-                opponent=game.opponent,
+                game_result=game.game_result,
                 score=score,
             )
-            game_scores[game.id] = game_score
+            game_scores[game.game_id] = game_score
             if game.week_number == completed_week:
                 last_week_score = score.total_score
 
         return PlayerLeagueSeasonScore(
-            id=id,
+            id=game.player_id,
             player_id=player_season.player_id,
             season=player_season.season,
             total_score=season_score.total_score,
@@ -51,7 +50,6 @@ class PlayerLeagueSeasonScore(BaseEntity):
 
 
 def rank_player_seasons(player_season_scores: List[PlayerLeagueSeasonScore]):
-
     player_season_scores.sort(key=lambda x: x.total_score, reverse=True)
 
     rank = 0

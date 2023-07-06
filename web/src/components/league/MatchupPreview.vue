@@ -45,6 +45,7 @@
             :weekNumber="weekNumber"
             v-on:update="updateAwayScore"
             :calculatedScore="matchup.away_score"
+            :scoring="scoring"
           />
         </span>
       </v-col>
@@ -71,6 +72,7 @@
             :weekNumber="weekNumber"
             v-on:update="updateHomeScore"
             :calculatedScore="matchup.home_score"
+            :scoring="scoring"
           />
         </span>
       </v-col>
@@ -206,6 +208,19 @@ export default {
             let ref = firestore.doc(path)
             this.$bind("home", ref)
           }
+        }
+      },
+    },
+
+    leagueId: {
+      immediate: true,
+      handler(leagueId) {
+        if (this.$root.leagueScoringSettings) {
+          this.scoring = this.$root.leagueScoringSettings
+        } else if (leagueId) {
+          let path = `league/${leagueId}/config/scoring`
+          let ref = firestore.doc(path)
+          this.$bind("scoring", ref)
         }
       },
     },

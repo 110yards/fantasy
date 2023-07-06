@@ -33,7 +33,7 @@
           <v-col cols="3" class="pa-0">
             <v-row>
               <v-col class="pb-0 text-right font-weight-medium"
-                ><RosterScore :roster="roster" :weekNumber="currentWeek"
+                ><RosterScore :roster="roster" :weekNumber="currentWeek" :scoring="scoring"
               /></v-col>
             </v-row>
             <v-row>
@@ -209,6 +209,10 @@ export default {
 
     matchup() {
       return this.matchups && this.matchups.length > 0 ? this.matchups[0] : null
+    },
+
+    scoring() {
+      return this.$root.leagueScoringSettings
     },
   },
   methods: {

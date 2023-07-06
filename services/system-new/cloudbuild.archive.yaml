@@ -1,0 +1,10 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "us-docker.pkg.dev/$_REGISTRY/us.gcr.io/$_IMAGE_NAME:$_TAG", "."]
+
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "us-docker.pkg.dev/$_REGISTRY/us.gcr.io/$_IMAGE_NAME:$_TAG"]
+
+substitutions:
+  _IMAGE_NAME: "importer"
+  _REGISTRY: "mdryden-ci"

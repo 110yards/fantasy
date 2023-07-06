@@ -1,0 +1,79 @@
+from __future__ import annotations
+
+from typing import Optional
+
+from pydantic import BaseModel
+
+
+class Stats(BaseModel):
+    pass_attempts: Optional[int] = 0
+    pass_completions: Optional[int] = 0
+    pass_net_yards: Optional[int] = 0
+    pass_long: Optional[int] = 0
+    pass_touchdowns: Optional[int] = 0
+    # pass_completion_percentage: Optional[str] = 0
+    # pass_efficiency: Optional[str] = 0
+    pass_interceptions: Optional[int] = 0
+    pass_fumbles: Optional[int] = 0
+    rush_attempts: Optional[int] = 0
+    rush_net_yards: Optional[int] = 0
+    rush_long: Optional[int] = 0
+    rush_touchdowns: Optional[int] = 0
+    rush_long_touchdowns: Optional[int] = 0
+    receive_attempts: Optional[int] = 0
+    receive_caught: Optional[int] = 0
+    receive_yards: Optional[int] = 0
+    receive_long: Optional[int] = 0
+    receive_touchdowns: Optional[int] = 0
+    receive_long_touchdowns: Optional[int] = 0
+    receive_yards_after_catch: Optional[int] = 0
+    receive_fumbles: Optional[int] = 0
+    punts: Optional[int] = 0
+    punt_yards: Optional[int] = 0
+    punt_net_yards: Optional[int] = 0
+    punt_long: Optional[int] = 0
+    punt_singles: Optional[int] = 0
+    punts_blocked: Optional[int] = 0
+    punts_in_10: Optional[int] = 0
+    punts_in_20: Optional[int] = 0
+    punts_returned: Optional[int] = 0
+    kick_returns: Optional[int] = 0
+    kick_returns_yards: Optional[int] = 0
+    kick_returns_touchdowns: Optional[int] = 0
+    kick_returns_long: Optional[int] = 0
+    kick_returns_touchdowns_long: Optional[int] = 0
+    field_goal_attempts: Optional[int] = 0
+    field_goal_made: Optional[int] = 0
+    field_goal_misses: Optional[int] = 0
+    field_goal_yards: Optional[int] = 0
+    field_goal_singles: Optional[int] = 0
+    field_goal_long: Optional[int] = 0
+    field_goal_points: Optional[int] = 0
+    field_goal_returns: Optional[int] = 0
+    field_goal_returns_yards: Optional[int] = 0
+    field_goal_returns_touchdowns: Optional[int] = 0
+    field_goal_returns_long: Optional[int] = 0
+    field_goal_returns_touchdowns_long: Optional[int] = 0
+    punt_returns: Optional[int] = 0
+    punt_returns_yards: Optional[int] = 0
+    punt_returns_touchdowns: Optional[int] = 0
+    punt_returns_long: Optional[int] = 0
+    punt_returns_touchdowns_long: Optional[int] = 0
+    kicks: Optional[int] = 0
+    kick_yards: Optional[int] = 0
+    kicks_net_yards: Optional[int] = 0
+    kicks_long: Optional[int] = 0
+    kicks_singles: Optional[int] = 0
+    kicks_out_of_end_zone: Optional[int] = 0
+    kicks_onside: Optional[int] = 0
+    one_point_converts_attempts: Optional[int] = 0
+    one_point_converts_made: Optional[int] = 0
+    two_point_converts_made: Optional[int] = 0
+    tackles_total: Optional[int] = 0
+    tackles_defensive: Optional[int] = 0
+    tackles_special_teams: Optional[int] = 0
+    sacks_qb_made: Optional[int] = 0
+    interceptions: Optional[int] = 0
+    fumbles_forced: Optional[int] = 0
+    fumbles_recovered: Optional[int] = 0
+    passes_knocked_down: Optional[int] = 0

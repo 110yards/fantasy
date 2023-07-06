@@ -19,6 +19,7 @@
             :weekNumber="weekNumber"
             v-on:update="updateAwayScore"
             :calculatedScore="matchup.away_score"
+            :scoring="scoring"
           />
         </v-col>
       </v-row>
@@ -61,6 +62,7 @@
             :weekNumber="weekNumber"
             v-on:update="updateHomeScore"
             :calculatedScore="matchup.home_score"
+            :scoring="scoring"
           />
         </v-col>
       </v-row>
@@ -114,6 +116,9 @@ export default {
   },
 
   computed: {
+    scoring() {
+      return this.$root.leagueScoringSettings
+    },
     season() {
       return this.$root.currentSeason
     },

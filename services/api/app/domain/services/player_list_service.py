@@ -50,7 +50,7 @@ class RankedPlayer(Player):
     average: float = 0
     points: float = 0
     games_played: int = 0
-    last_week_score: Optional[float]
+    last_week_score: Optional[float] | Optional[int]
     season_stats: Optional[Stats]
 
 
@@ -116,7 +116,7 @@ class PlayerListService:
             return self._get_players_path(league_id, score_season)
 
         player_seasons = self._get_player_seasons(score_season)
-        player_scores = self._calculate_scores(league_id, player_seasons, scoring)
+        player_scores = self._calculate_draft_scores(league_id, player_seasons, scoring)
 
         ranked_players = self._combine_result(current_season, player_seasons, player_scores)
 
@@ -209,7 +209,7 @@ class PlayerListService:
         return False
 
     def _get_data_path(self, league_id: str, season: int) -> str:
-        return f"player_lists/{season}/{league_id}"
+        return f"league/{league_id}/player_list/{season}"
 
     def _get_players_path(self, league_id: str, season: int) -> str:
         return f"{self._get_data_path(league_id, season)}/players"
@@ -271,7 +271,7 @@ class PlayerListService:
         player_seasons = self.player_season_repo.get_all(score_season)
         return {x.id: x for x in player_seasons}
 
-    def _calculate_scores(self, league_id: str, player_seasons: Dict[str, PlayerSeason], scoring: ScoringSettings) -> Dict[str, PlayerLeagueSeasonScore]:
+    def _calculate_draft_scores(self, league_id: str, player_seasons: Dict[str, PlayerSeason], scoring: ScoringSettings) -> Dict[str, PlayerLeagueSeasonScore]:
         if not scoring:
             Logger.error(f"No scoring configuration found for league '{league_id}'")
             return None

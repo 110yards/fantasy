@@ -1,13 +1,13 @@
 
 
 from fastapi import Depends
-from yards_py.core.firestore_proxy import Query
-from yards_py.domain.entities.roster import DEFAULT_WAIVER_BUDGET
-from yards_py.domain.entities.waiver_bid import WaiverBidResult
-from yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from yards_py.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from yards_py.domain.repositories.league_week_repository import LeagueWeekRepository, create_league_week_repository
-from yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
+from app.yards_py.core.firestore_proxy import Query
+from app.yards_py.domain.entities.roster import DEFAULT_WAIVER_BUDGET
+from app.yards_py.domain.entities.waiver_bid import WaiverBidResult
+from app.yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.yards_py.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from app.yards_py.domain.repositories.league_week_repository import LeagueWeekRepository, create_league_week_repository
+from app.yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
 
 
 def create_recalc_waiver_budgets_service(

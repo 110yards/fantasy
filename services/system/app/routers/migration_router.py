@@ -1,7 +1,7 @@
 
 
-from services.system.app.domain.migrations.map_new_player_source import MapNewPlayerSourceMigration, create_map_new_players_migration
-from services.system.app.domain.migrations.recreate_league_cmd_sub import LeagueCommandSubMigration, create_league_cmd_sub_migration
+from app.domain.migrations.map_new_player_source import MapNewPlayerSourceMigration, create_map_new_players_migration
+from app.domain.migrations.recreate_league_cmd_sub import LeagueCommandSubMigration, create_league_cmd_sub_migration
 from typing import Optional
 from starlette.requests import Request
 from fastapi.params import Depends

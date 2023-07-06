@@ -1,8 +1,9 @@
-
-
 import html
-from pydantic import BaseModel
+import time
+from functools import lru_cache
+
 import feedparser
+from pydantic import BaseModel
 
 
 class NewsItem(BaseModel):
@@ -18,26 +19,38 @@ class NewsService:
         pass
 
     def get_news(self) -> list[NewsItem]:
-        url = "https://cflnewshub.com/feed/"  # rss
-        feed = feedparser.parse(url)
+        return _get_news(get_ttl_hash())
 
-        news_items = []
-        for entry in feed.entries:
-            news_items.append(NewsItem(
+
+def get_ttl_hash(seconds=900):
+    return round(time.time() / seconds)
+
+
+@lru_cache()
+def _get_news(ttl_hash=None) -> list[NewsItem]:
+    url = "https://cflnewshub.com/feed/"  # rss
+    feed = feedparser.parse(url)
+
+    news_items = []
+    for entry in feed.entries:
+        news_items.append(
+            NewsItem(
                 title=entry.title,
                 link=entry.link,
                 pub_date=entry.published,
-                description=self._parse_description(entry.description),
-                guid=entry.guid
-            ))
+                description=_parse_description(entry.description),
+                guid=entry.guid,
+            )
+        )
 
-        return news_items
+    return news_items
 
-    def _parse_description(self, description: str) -> str:
-        description = description.split("<p>")[1].split("</p>")[0]
-        description = html.unescape(description)
-        description = description.replace("[…]", "…")
-        return description
+
+def _parse_description(description: str) -> str:
+    description = description.split("<p>")[1].split("</p>")[0]
+    description = html.unescape(description)
+    description = description.replace("[…]", "…")
+    return description
 
 
 def create_news_service() -> NewsService:

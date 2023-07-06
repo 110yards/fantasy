@@ -1,17 +1,20 @@
-
-
-from datetime import datetime
-from yards_py.domain.entities.player_league_season_score import PlayerLeagueSeasonScore, rank_player_seasons
-from yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from yards_py.domain.repositories.player_season_repository import PlayerSeasonRepository, create_player_season_repository
-from yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
-from yards_py.domain.repositories.player_repository import PlayerRepository, create_player_repository
-from yards_py.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository, create_player_league_season_score_repository
-from yards_py.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from datetime import datetime, timezone
 from typing import List, Optional
+
+from app.yards_py.core.annotate_args import annotate_args
+from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from app.yards_py.domain.entities.player_league_season_score import PlayerLeagueSeasonScore, rank_player_seasons
+from app.yards_py.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from app.yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.yards_py.domain.repositories.player_league_season_score_repository import (
+    PlayerLeagueSeasonScoreRepository,
+    create_player_league_season_score_repository,
+)
+from app.yards_py.domain.repositories.player_repository import PlayerRepository, create_player_repository
+from app.yards_py.domain.repositories.player_season_repository import PlayerSeasonRepository, create_player_season_repository
+from app.yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
 from fastapi import Depends
-from yards_py.core.annotate_args import annotate_args
-from yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
+from firebase_admin import firestore
 
 
 def create_calculate_season_score_command_executor(
@@ -27,8 +30,8 @@ def create_calculate_season_score_command_executor(
 
 @annotate_args
 class CalculateSeasonScoreCommand(BaseCommand):
-    league_id: Optional[str]
-    season: Optional[int]
+    league_id: Optional[str] = None
+    season: Optional[int] = None
 
 
 @annotate_args
@@ -54,7 +57,6 @@ class CalculateSeasonScoreCommandExecutor(BaseCommandExecutor[CalculateSeasonSco
         self.league_repo = league_repo
 
     def on_execute(self, command: CalculateSeasonScoreCommand) -> CalculateSeasonScoreResult:
-
         league = self.league_repo.get(command.league_id)
         if not league:
             return CalculateSeasonScoreResult(command=command)
@@ -73,7 +75,7 @@ class CalculateSeasonScoreCommandExecutor(BaseCommandExecutor[CalculateSeasonSco
         player_season_scores: List[PlayerLeagueSeasonScore] = list()
 
         for player_season in players_seasons:
-            player_season_score = PlayerLeagueSeasonScore.create(player_season.id, player_season, scoring, completed_week)
+            player_season_score = PlayerLeagueSeasonScore.create(player_season, scoring, completed_week)
             player_season_scores.append(player_season_score)
 
         rank_player_seasons(player_season_scores)
@@ -81,8 +83,13 @@ class CalculateSeasonScoreCommandExecutor(BaseCommandExecutor[CalculateSeasonSco
         for player_score in player_season_scores:
             self.player_score_repo.set(command.league_id, player_score)
 
-        self.league_repo.partial_update(league.id, {
-            "last_season_recalc": int(datetime.now().timestamp())
-        })
+        @firestore.transactional
+        def update_state(transaction):
+            league_state = self.league_config_repo.get_state(command.league_id, transaction=transaction)
+            league_state.last_season_recalc = datetime.now(tz=timezone.utc)
+            self.league_config_repo.set_state(command.league_id, league_state, transaction=transaction)
+
+        transaction = self.league_config_repo.firestore.create_transaction()
+        update_state(transaction)
 
         return CalculateSeasonScoreResult(command=command)

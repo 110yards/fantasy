@@ -7,6 +7,7 @@ from strivelogger import StriveLogger
 from app.config.settings import Settings, get_settings
 from app.domain.models.boxscore import (
     Boxscore,
+    BoxscoreGame,
     BoxscorePlayer,
     PlayerStats,
     StatsCollection,
@@ -84,6 +85,7 @@ class ActiveBoxscoresService:
         boxscore = Boxscore(
             source="realtime",
             game_id=game.game_id,
+            game=BoxscoreGame(**game.model_dump()),
             away_abbr=game.away_abbr,
             home_abbr=game.home_abbr,
             player_stats=StatsCollection(),
@@ -267,6 +269,7 @@ class ActiveBoxscoresService:
             player.sacks_qb_made = int(stats.get("DEFENCE_SK")["statValue"]) if stats.get("DEFENCE_SK") else 0
             player.tackles_defensive = int(stats.get("DEFENCE_SOLO")["statValue"]) if stats.get("DEFENCE_TKL") else 0
             player.passes_knocked_down = 0  # missing :(
+            # missing special teams tackles
             # have tackles for loss here
 
 

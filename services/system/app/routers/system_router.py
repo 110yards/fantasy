@@ -1,36 +1,25 @@
 from typing import Optional
 
 from fastapi import Depends, Response, status
-from services.system.app.domain.commands.system.end_of_season import (
+from app.domain.commands.system.end_of_season import (
     EndOfSeasonCommand, EndOfSeasonCommandExecutor,
     create_end_of_season_command_executor)
-from services.system.app.domain.commands.system.insert_public_config import (
+from app.domain.commands.system.insert_public_config import (
     InsertPublicConfigCommand, InsertPublicConfigCommandExecutor,
     create_insert_public_config_command_executor)
-from services.system.app.domain.commands.system.update_active_players import (
-    UpdateActivePlayersCommand, UpdateActivePlayersCommandExecutor,
-    UpdateActivePlayersCommandResult, update_active_players_command_executor)
-from services.system.app.domain.commands.system.update_games import (
-    SimState, UpdateGamesCommand, UpdateGamesCommandExecutor,
-    create_update_games_command_executor)
-from services.system.app.domain.commands.system.update_schedule import (
-    UpdateScheduleCommand, UpdateScheduleCommandExecutor,
-    create_update_schedule_command_executor)
-from services.system.app.domain.events.configure_events import (
+from app.domain.events.configure_events import (
     ConfigureEvents, create_configure_events)
-from services.system.app.domain.services.end_of_day_service import (
+from app.domain.services.end_of_day_service import (
     EndOfDayService, create_end_of_day_service)
-from services.system.app.domain.services.end_of_week_service import (
+from app.domain.services.end_of_week_service import (
     EndOfWeekRequest, EndOfWeekService, create_end_of_week_service)
-from services.system.app.domain.services.import_season_service import (
-    ImportSeasonService, create_previous_season_stats_service)
-from services.system.app.domain.services.league_command_service import (
+from app.domain.services.league_command_service import (
     LeagueCommandService, create_league_command_service)
-from services.system.app.domain.services.recalc_waiver_budgets_service import RecalcWaiverBudgetsService, create_recalc_waiver_budgets_service
-from services.system.app.domain.services.smoke_test_service import smoke_test
-from services.system.app.domain.services.start_next_season_service import (
+from app.domain.services.recalc_waiver_budgets_service import RecalcWaiverBudgetsService, create_recalc_waiver_budgets_service
+from app.domain.services.smoke_test_service import smoke_test
+from app.domain.services.start_next_season_service import (
     StartNextSeasonService, create_start_next_season_service)
-from yards_py.core.pubsub.pubsub_push import PubSubPush
+from app.yards_py.core.pubsub.pubsub_push import PubSubPush
 
 from .api_router import APIRouter
 
@@ -68,32 +57,32 @@ async def run_smoke_test(
     return output
 
 
-@router.post("/games")
-async def update_games(
-    week: Optional[int] = None,
-    sim_state: Optional[SimState] = None,
-    command_executor: UpdateGamesCommandExecutor = Depends(create_update_games_command_executor)
-):
-    command = UpdateGamesCommand(week=week, sim_state=sim_state)
-    return command_executor.execute(command)
+# @router.post("/games")
+# async def update_games(
+#     week: Optional[int] = None,
+#     sim_state: Optional[SimState] = None,
+#     command_executor: UpdateGamesCommandExecutor = Depends(create_update_games_command_executor)
+# ):
+#     command = UpdateGamesCommand(week=week, sim_state=sim_state)
+#     return command_executor.execute(command)
 
 
-@router.post("/games/all")
-async def update_all_games(
-    command_executor: UpdateGamesCommandExecutor = Depends(create_update_games_command_executor)
-):
-    command = UpdateGamesCommand()
-    return command_executor.execute(command)
+# @router.post("/games/all")
+# async def update_all_games(
+#     command_executor: UpdateGamesCommandExecutor = Depends(create_update_games_command_executor)
+# ):
+#     command = UpdateGamesCommand()
+#     return command_executor.execute(command)
 
 
-@router.post("/players", response_model=UpdateActivePlayersCommandResult)
-# Invoked by scheduled task - gets all players from CFL team rosters and updates player master data
-async def update_players(
-    command: Optional[UpdateActivePlayersCommand] = None,
-    command_executor: UpdateActivePlayersCommandExecutor = Depends(update_active_players_command_executor)
-):
-    command = command or UpdateActivePlayersCommand()
-    return command_executor.execute(command)
+# @router.post("/players", response_model=UpdateActivePlayersCommandResult)
+# # Invoked by scheduled task - gets all players from CFL team rosters and updates player master data
+# async def update_players(
+#     command: Optional[UpdateActivePlayersCommand] = None,
+#     command_executor: UpdateActivePlayersCommandExecutor = Depends(update_active_players_command_executor)
+# ):
+#     command = command or UpdateActivePlayersCommand()
+#     return command_executor.execute(command)
 
 
 @router.post("/end_of_day")
@@ -130,12 +119,12 @@ async def set_end_of_season(
     return command_executor.execute(command)
 
 
-@router.post("/schedule")
-async def update_schedule(
-    command: UpdateScheduleCommand,
-    command_executor: UpdateScheduleCommandExecutor = Depends(create_update_schedule_command_executor),
-):
-    return command_executor.execute(command)
+# @router.post("/schedule")
+# async def update_schedule(
+#     command: UpdateScheduleCommand,
+#     command_executor: UpdateScheduleCommandExecutor = Depends(create_update_schedule_command_executor),
+# ):
+#     return command_executor.execute(command)
 
 
 @router.post("/start_next_season")
@@ -146,13 +135,13 @@ async def start_next_season(
     return service.run_workflow(season)
 
 
-@router.post("/import_season")
-async def import_season(
-    season: int,
-    clean: bool = False,
-    service: ImportSeasonService = Depends(create_previous_season_stats_service),
-):
-    return service.import_season(season, clean)
+# @router.post("/import_season")
+# async def import_season(
+#     season: int,
+#     clean: bool = False,
+#     service: ImportSeasonService = Depends(create_previous_season_stats_service),
+# ):
+#     return service.import_season(season, clean)
 
 
 @router.post("/recalc_waiver_budgets")

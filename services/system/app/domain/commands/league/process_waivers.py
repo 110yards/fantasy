@@ -1,18 +1,19 @@
-
-from yards_py.domain.entities.league import League
-from yards_py.domain.entities.league_transaction import LeagueTransaction
-from yards_py.domain.entities.league_week import LeagueWeek
-from yards_py.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
-from yards_py.domain.repositories.state_repository import StateRepository, create_state_repository
-from yards_py.domain.repositories.league_week_repository import LeagueWeekRepository, create_league_week_repository
-from yards_py.domain.services.notification_service import NotificationService, create_notification_service
-from services.system.app.domain.services.waiver_service import WaiverService, create_waiver_service
-from yards_py.domain.entities.waiver_bid import WaiverBid, WaiverBidResult
-from yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from yards_py.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
 from typing import List, Optional
+
+from app.domain.services.waiver_service import WaiverService, create_waiver_service
+from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from app.yards_py.core.logging import Logger
+from app.yards_py.domain.entities.league import League
+from app.yards_py.domain.entities.league_transaction import LeagueTransaction
+from app.yards_py.domain.entities.league_week import LeagueWeek
+from app.yards_py.domain.entities.waiver_bid import WaiverBid, WaiverBidResult
+from app.yards_py.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from app.yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.yards_py.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from app.yards_py.domain.repositories.league_week_repository import LeagueWeekRepository, create_league_week_repository
+from app.yards_py.domain.repositories.state_repository import StateRepository, create_state_repository
+from app.yards_py.domain.services.notification_service import NotificationService, create_notification_service
 from fastapi import Depends
-from yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
 from firebase_admin import firestore
 
 
@@ -37,7 +38,7 @@ def create_process_waivers_command_executor(
 
 
 class ProcessWaiversCommand(BaseCommand):
-    league_id: Optional[str]
+    league_id: Optional[str] = None
 
 
 class ProcessWaiversResult(BaseCommandResult[ProcessWaiversCommand]):
@@ -66,17 +67,19 @@ class ProcessWaiversCommandExecutor(BaseCommandExecutor[ProcessWaiversCommand, P
         self.league_config_repo = league_config_repo
 
     def on_execute(self, command: ProcessWaiversCommand) -> ProcessWaiversResult:
-
         # don't lock the state
         state = self.state_repo.get()
         waiver_week = state.current_week - 1
 
+        league = self.league_repo.get(command.league_id)
+
+        if not league or not league.is_active_for_season(state.current_season):
+            Logger.warn(f"League {command.league_id} is not active but is receiving league events")
+            return ProcessWaiversResult(command=command, error="League is not active")
+
         @firestore.transactional
         def process(transaction) -> ProcessWaiversResult:
-            league = self.league_repo.get(command.league_id, transaction)
-
-            if not league or not league.is_active_for_season(state.current_season):
-                return ProcessWaiversResult(command=command, error="League is not active")
+            league_state = self.league_config_repo.get_state(command.league_id, transaction)
 
             rosters = self.league_roster_repo.get_all(command.league_id, transaction)
 
@@ -104,8 +107,8 @@ class ProcessWaiversCommandExecutor(BaseCommandExecutor[ProcessWaiversCommand, P
             league_week = LeagueWeek(id=str(waiver_week), waiver_bids=bids)
             self.league_week_repo.set(command.league_id, league_week, transaction)
 
-            league.waivers_active = False  # this is set to active in the calculate_results command executor
-            self.league_repo.update(league, transaction)
+            league_state.waivers_active = False  # this is set to active in the calculate_results command executor
+            self.league_config_repo.set_state(command.league_id, league_state, transaction)
 
             return ProcessWaiversResult(command=command, league=league, bids=bids, transactions=league_transactions)
 

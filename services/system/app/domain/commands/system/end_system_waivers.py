@@ -1,10 +1,10 @@
 
 
-from yards_py.domain.entities.state import State
-from yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
+from app.yards_py.domain.entities.state import State
+from app.yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
 from fastapi import Depends
-from yards_py.core.annotate_args import annotate_args
-from yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
+from app.yards_py.core.annotate_args import annotate_args
+from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
 from firebase_admin.firestore import firestore
 from google.cloud.firestore import Transaction
 
@@ -17,12 +17,12 @@ def create_end_system_waivers_command_executor(
     )
 
 
-@annotate_args
+
 class EndSystemWaiversCommand(BaseCommand):
     pass
 
 
-@annotate_args
+
 class EndSystemWaiversResult(BaseCommandResult[EndSystemWaiversCommand]):
     state: State
 

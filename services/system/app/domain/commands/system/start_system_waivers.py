@@ -1,14 +1,10 @@
-
-
-from services.system.app.di import create_publisher
-from yards_py.core.publisher import Publisher
-
-from yards_py.domain.entities.state import Locks, State
 from datetime import datetime, timedelta
-from yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
+
+from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from app.yards_py.core.publisher import Publisher, create_publisher
+from app.yards_py.domain.entities.state import State
+from app.yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
 from fastapi import Depends
-from yards_py.core.annotate_args import annotate_args
-from yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
 from firebase_admin.firestore import firestore
 from google.cloud.firestore import Transaction
 
@@ -23,12 +19,10 @@ def create_start_system_waivers_command_executor(
     )
 
 
-@annotate_args
 class StartSystemWaiversCommand(BaseCommand):
     current_week_number: int
 
 
-@annotate_args
 class StartSystemWaiversResult(BaseCommandResult[StartSystemWaiversCommand]):
     state: State
     completed_week_number: int
@@ -49,7 +43,6 @@ class StartSystemWaiversCommandExecutor(BaseCommandExecutor[StartSystemWaiversCo
             state = self.public_repo.get_state(transaction)
             state.waivers_active = True
             state.waivers_end = datetime.now().today() + timedelta(days=1)
-            state.locks = Locks.reset()
             completed_week_number = command.current_week_number
             state.current_week = completed_week_number + 1
 

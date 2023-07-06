@@ -10,12 +10,15 @@ from app.domain.cqrs.commands.upsert_boxscores_command import (
 )
 from app.domain.store.boxscore_store import BoxscoreStore, create_boxscore_store
 
+from ....core.publisher import Publisher, create_publisher
+from ....core.pubsub.topics import BOXSCORES_UPDATED_TOPIC
 from ...models.boxscore import Boxscore
 
 
 class UpsertBoxscoresExecutor:
-    def __init__(self, store: BoxscoreStore):
+    def __init__(self, store: BoxscoreStore, publisher: Publisher):
         self.store = store
+        self.publisher = publisher
 
     def execute(self, command: UpsertBoxscoresCommand) -> CommandResult:
         if len(command.boxscores) == 0:
@@ -50,12 +53,18 @@ class UpsertBoxscoresExecutor:
             return CommandResult.failure_result("Failed to save boxscores(s)")
 
         StriveLogger.info("Boxscores saved")
+
+        self.publisher.publish(BOXSCORES_UPDATED_TOPIC)
+        StriveLogger.info(f"Published {BOXSCORES_UPDATED_TOPIC}")
+
         return CommandResult.success_result()
 
 
 def create_upsert_boxscores_executor(
     store: BoxscoreStore = Depends(create_boxscore_store),
+    publisher: Publisher = Depends(create_publisher),
 ) -> UpsertBoxscoresExecutor:
     return UpsertBoxscoresExecutor(
         store=store,
+        publisher=publisher,
     )

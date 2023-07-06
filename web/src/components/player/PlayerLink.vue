@@ -127,7 +127,7 @@ export default {
       return this.isInjured
     },
     isInjured() {
-      return this.player.injury_status != null
+      return !!this.player["injury_status"] || false
     },
     injuryStatus() {
       return this.player.injury_status
@@ -167,7 +167,7 @@ export default {
       }
     },
     injurySeverity() {
-      return playerStatus.getSeverity(this.injuryStatus.status_id)
+      return this.isInjured ? playerStatus.getSeverity(this.injuryStatus.status_id) : ""
     },
     injuryIconColor() {
       return this.getInjuryIconColor(this.injurySeverity)

@@ -1,20 +1,22 @@
-
-
 from typing import List
 
+from app.domain.services.end_of_week_service import EndOfWeekService, create_end_of_week_service
+from app.domain.services.league_command_service import LeagueCommandService, create_league_command_service
+from app.domain.services.waiver_service import WaiverService, create_waiver_service
+from app.yards_py.core.logging import Logger
+from app.yards_py.core.pubsub.pubsub_message import PubSubMessage
+from app.yards_py.core.pubsub.pubsub_push import PubSubPush
+from app.yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.yards_py.domain.repositories.virtual_pubsub_repository import VirtualPubSubPayload, VirtualPubsubRepository, create_virtual_pubsub_repository
+from app.yards_py.domain.topics import (
+    BOXSCORES_UPDATED_TOPIC,
+    END_OF_WAIVERS_TOPIC,
+    END_OF_WEEK_TOPIC,
+    LEAGUE_COMMAND_TOPIC,
+    LEAGUE_CREATED_TOPIC,
+    LEAGUE_RENEWED_TOPIC,
+)
 from fastapi import Depends
-from yards_py.core.logging import Logger
-from yards_py.core.pubsub.pubsub_message import PubSubMessage
-from yards_py.core.pubsub.pubsub_push import PubSubPush
-from yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from yards_py.domain.repositories.virtual_pubsub_repository import VirtualPubSubPayload, VirtualPubsubRepository, create_virtual_pubsub_repository
-from services.system.app.domain.services.end_of_week_service import EndOfWeekService, create_end_of_week_service
-from services.system.app.domain.services.league_command_service import LeagueCommandService, create_league_command_service
-from services.system.app.domain.services.waiver_service import WaiverService, create_waiver_service
-
-from yards_py.domain.topics import (END_OF_WAIVERS_TOPIC, END_OF_WEEK_TOPIC,
-                                    LEAGUE_COMMAND_TOPIC, LEAGUE_CREATED_TOPIC,
-                                    LEAGUE_RENEWED_TOPIC, UPDATE_PLAYERS_TOPIC)
 
 
 def create_dev_pubsub_service(
@@ -29,7 +31,7 @@ def create_dev_pubsub_service(
         league_repo=league_repo,
         league_command_service=league_command_service,
         end_of_week_service=end_of_week_service,
-        waiver_service=waiver_service
+        waiver_service=waiver_service,
     )
 
 
@@ -90,8 +92,8 @@ class DevPubSubService:
             Logger.info("League created (not handled in dev)")
             return True
 
-        if payload.topic == UPDATE_PLAYERS_TOPIC:
-            Logger.info("Call to update players (not handled in dev)")
+        if payload.topic == BOXSCORES_UPDATED_TOPIC:
+            Logger.info("Boxscore was updated (not currently used)")
             return True
 
         if payload.topic == LEAGUE_RENEWED_TOPIC:
