@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from fastapi import Depends
 from strivelogger import StriveLogger
 
@@ -25,10 +23,6 @@ class UpsertScheduleExecutor:
         except Exception as e:
             StriveLogger.error("Failed to load schedule", exc_info=e)
             return CommandResult.failure_result("Failed to load schedule")
-
-        if schedule.year != datetime.now().year:
-            StriveLogger.warn("Schedule is not for the current year")
-            return CommandResult.failure_result("Schedule is not for the current year")
 
         existing_schedule = self.store.get_schedule(schedule.year)
 

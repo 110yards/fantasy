@@ -100,3 +100,9 @@ ref.set(ScoringInfo().dict())
 print("Done")
 
 print("Setup script complete")
+
+print("Next steps:")
+print("1. Run 'npm run start' to start emulator and services")
+print("2. Use postman to import the schedule")
+print("3. Use postman to import the players")
+print("4. Use postman to import the full season of boxscores")

@@ -47,7 +47,7 @@ class UpsertBoxscoresExecutor:
         try:
             StriveLogger.info(f"Saving {len(to_update)} boxscores")
             for box in to_update:
-                self.store.save_boxscore(datetime.now().year, box)
+                self.store.save_boxscore(box.game.game_date.year, box)
         except Exception as e:
             StriveLogger.error("Failed to save boxscores(s)", exc_info=e)
             return CommandResult.failure_result("Failed to save boxscores(s)")

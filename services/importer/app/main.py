@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import FastAPI
 from fastapi.param_functions import Depends
 from starlette.middleware import Middleware
@@ -11,11 +13,6 @@ from app.config.settings import Settings, get_settings
 from app.core.initialize_firebase import initialize_firebase
 from app.domain.cqrs.commands.upsert_players_command import UpsertPlayersCommand
 from app.domain.cqrs.commands.upsert_schedule_command import UpsertScheduleCommand
-
-# from app.domain.cqrs.executors.upsert_active_games_executor import (
-#     UpsertActiveGamesExecutor,
-#     create_upsert_active_games_executor,
-# )
 from app.domain.cqrs.executors.upsert_players_executor import (
     UpsertPlayersExecutor,
     create_upsert_players_executor,
@@ -24,11 +21,6 @@ from app.domain.cqrs.executors.upsert_schedule_executor import (
     UpsertScheduleExecutor,
     create_upsert_schedule_executor,
 )
-
-# from app.domain.services.injury_report_service import (
-#     InjuryReportService,
-#     create_injury_report_service,
-# )
 from app.domain.services.player_service import PlayerService, create_player_service
 from app.domain.services.schedule_service import (
     ScheduleService,
@@ -102,16 +94,17 @@ async def upsert_active_boxscores(
 
 
 @app.get("/boxscores/final")
-async def get_final_boxscores(service: FinalBoxscoresService = Depends(create_final_boxscores_service)):
-    return service.get_boxscores()
+async def get_final_boxscores(year: Optional[int] = None, service: FinalBoxscoresService = Depends(create_final_boxscores_service)):
+    return service.get_boxscores(year)
 
 
 @app.post("/boxscores/final")
 async def upsert_final_boxscores(
+    year: Optional[int] = None,
     service: FinalBoxscoresService = Depends(create_final_boxscores_service),
     executor: UpsertBoxscoresExecutor = Depends(create_upsert_boxscores_executor),
 ):
-    boxscores = service.get_boxscores()
+    boxscores = service.get_boxscores(year)
     return executor.execute(UpsertBoxscoresCommand(boxscores=boxscores))
 
 

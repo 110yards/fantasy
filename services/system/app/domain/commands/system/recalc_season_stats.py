@@ -1,4 +1,4 @@
-from typing import List
+from typing import Optional
 
 from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
 from app.yards_py.domain.entities.player_season import PlayerSeason
@@ -9,44 +9,48 @@ from strivelogger import StriveLogger
 
 from ....yards_py.domain.entities.player_game import GameResult, PlayerGame
 from ....yards_py.domain.entities.stats import Stats
+from ....yards_py.domain.entities.system_schedule import SystemScheduleGame
 from ....yards_py.domain.stores.boxscore_store import BoxscoreStore, create_boxscore_store
 from ....yards_py.domain.stores.system_schedule_store import SystemScheduleStore, create_system_schedule_store
 
 
 class RecalcSeasonStatsCommand(BaseCommand):
-    completed_week_number: int
+    completed_week_number: Optional[int] = None
+    full_season: bool = False
 
 
 class RecalcSeasonStatsResult(BaseCommandResult[RecalcSeasonStatsCommand]):
-    updated_players: List[PlayerSeason]
+    pass
 
 
 class RecalcSeasonStatsCommandExecutor(BaseCommandExecutor[RecalcSeasonStatsCommand, RecalcSeasonStatsResult]):
     def __init__(
         self,
         public_repo: PublicRepository,
-        # player_game_repo: PlayerGameRepository,
         player_season_repo: PlayerSeasonRepository,
         boxscore_store: BoxscoreStore,
         system_schedule_store: SystemScheduleStore,
     ):
         self.public_repo = public_repo
-        # self.player_game_repo = player_game_repo
         self.player_season_repo = player_season_repo
         self.boxscore_store = boxscore_store
         self.system_schedule_store = system_schedule_store
 
     def on_execute(self, command: RecalcSeasonStatsCommand) -> RecalcSeasonStatsResult:
+        if not command.completed_week_number and not command.full_season:
+            raise Exception("Must provide either completed_week_number or full_season")
+
         state = self.public_repo.get_state()
-        schedule_week = self.system_schedule_store.get_schedule_week(state.current_season, command.completed_week_number)
 
-        if not schedule_week:
-            StriveLogger.error(f"Could not find schedule week {command.completed_week_number} for season {state.current_season}")
-            raise Exception(f"Could not find schedule week {command.completed_week_number} for season {state.current_season}")
+        games = (
+            self._get_full_season_games(state.current_season)
+            if command.full_season
+            else self._get_current_week_games(state.current_season, command.completed_week_number)
+        )
 
-        updated_players = list()
+        updated_players: dict[str, PlayerSeason] = {}
 
-        for game in schedule_week.games:
+        for game in games:
             boxscore = self.boxscore_store.get_boxscore(state.current_season, game.game_id)
 
             if not boxscore:
@@ -62,15 +66,43 @@ class RecalcSeasonStatsCommandExecutor(BaseCommandExecutor[RecalcSeasonStatsComm
                     game_result=GameResult.create(boxscore.game, player_stats.player.team_abbr),
                 )
 
-                player_season = self.player_season_repo.get(state.current_season, player_stats.player.player_id)
+                player_season = None
+                if player_stats.player.player_id in updated_players:
+                    player_season = updated_players[player_stats.player.player_id]
+
+                if not player_season:
+                    player_season = self.player_season_repo.get(state.current_season, player_stats.player.player_id)
 
                 if not player_season:
                     player_season = PlayerSeason.create(state.current_season, player_stats.player.player_id, [player_game])
+                else:
+                    player_season.add_game(player_game)
 
-                updated_players.append(player_season)
-                self.player_season_repo.set(state.current_season, player_season)
+                updated_players[player_stats.player.player_id] = player_season
 
-        return RecalcSeasonStatsResult(command=command, updated_players=updated_players)
+        for player_season in updated_players.values():
+            self.player_season_repo.set(state.current_season, player_season)
+
+        return RecalcSeasonStatsResult(command=command)
+
+    def _get_current_week_games(self, current_season: int, completed_week_number: int) -> list[SystemScheduleGame]:
+        schedule_week = self.system_schedule_store.get_schedule_week(current_season, completed_week_number)
+
+        if not schedule_week:
+            StriveLogger.error(f"Could not find schedule week {completed_week_number} for season {current_season}")
+            raise Exception(f"Could not find schedule week {completed_week_number} for season {current_season}")
+
+        return schedule_week.games
+
+    def _get_full_season_games(self, current_season: int) -> list[SystemScheduleGame]:
+        schedule = self.system_schedule_store.get_schedule(current_season)
+
+        games = list()
+
+        for week in schedule.weeks.values():
+            games.extend(week.games)
+
+        return games
 
 
 def create_recalc_season_stats_command_executor(

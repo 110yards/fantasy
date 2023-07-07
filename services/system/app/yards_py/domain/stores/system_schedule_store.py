@@ -1,7 +1,7 @@
 from fastapi import Depends
 
 from ...core.rtdb_client import RTDBClient, create_rtdb_client
-from ..entities.system_schedule_week import SystemScheduleWeek
+from ..entities.system_schedule import SystemSchedule, SystemScheduleWeek
 
 
 class SystemScheduleStore:
@@ -13,6 +13,11 @@ class SystemScheduleStore:
         data = self.rtdb_client.get(f"schedules/{year}/weeks/{week_key}")
 
         return SystemScheduleWeek(**data) if data else None
+
+    def get_schedule(self, year: int) -> SystemSchedule | None:
+        data = self.rtdb_client.get(f"schedules/{year}")
+
+        return SystemSchedule(**data) if data else None
 
 
 def create_system_schedule_store(rtdb_client: RTDBClient = Depends(create_rtdb_client)) -> SystemScheduleStore:

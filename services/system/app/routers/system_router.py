@@ -1,26 +1,22 @@
 from typing import Optional
 
-from fastapi import Depends, Response, status
-from app.domain.commands.system.end_of_season import (
-    EndOfSeasonCommand, EndOfSeasonCommandExecutor,
-    create_end_of_season_command_executor)
+from app.domain.commands.system.end_of_season import EndOfSeasonCommand, EndOfSeasonCommandExecutor, create_end_of_season_command_executor
 from app.domain.commands.system.insert_public_config import (
-    InsertPublicConfigCommand, InsertPublicConfigCommandExecutor,
-    create_insert_public_config_command_executor)
-from app.domain.events.configure_events import (
-    ConfigureEvents, create_configure_events)
-from app.domain.services.end_of_day_service import (
-    EndOfDayService, create_end_of_day_service)
-from app.domain.services.end_of_week_service import (
-    EndOfWeekRequest, EndOfWeekService, create_end_of_week_service)
-from app.domain.services.league_command_service import (
-    LeagueCommandService, create_league_command_service)
+    InsertPublicConfigCommand,
+    InsertPublicConfigCommandExecutor,
+    create_insert_public_config_command_executor,
+)
+from app.domain.events.configure_events import ConfigureEvents, create_configure_events
+from app.domain.services.end_of_day_service import EndOfDayService, create_end_of_day_service
+from app.domain.services.end_of_week_service import EndOfWeekRequest, EndOfWeekService, create_end_of_week_service
+from app.domain.services.league_command_service import LeagueCommandService, create_league_command_service
 from app.domain.services.recalc_waiver_budgets_service import RecalcWaiverBudgetsService, create_recalc_waiver_budgets_service
 from app.domain.services.smoke_test_service import smoke_test
-from app.domain.services.start_next_season_service import (
-    StartNextSeasonService, create_start_next_season_service)
+from app.domain.services.start_next_season_service import StartNextSeasonService, create_start_next_season_service
 from app.yards_py.core.pubsub.pubsub_push import PubSubPush
+from fastapi import Depends, Response, status
 
+from ..domain.commands.system.recalc_season_stats import RecalcSeasonStatsCommand, RecalcSeasonStatsCommandExecutor, create_recalc_season_stats_command_executor
 from .api_router import APIRouter
 
 router = APIRouter(prefix="/system")
@@ -29,13 +25,9 @@ router = APIRouter(prefix="/system")
 @router.post("/configure")
 async def configure(
     public_config_command_executor: InsertPublicConfigCommandExecutor = Depends(create_insert_public_config_command_executor),
-    events_service: ConfigureEvents = Depends(create_configure_events)
+    events_service: ConfigureEvents = Depends(create_configure_events),
 ):
-
-    return {
-        "events_configured": events_service.configure_events(),
-        "public_info": public_config_command_executor.execute(InsertPublicConfigCommand()).success
-    }
+    return {"events_configured": events_service.configure_events(), "public_info": public_config_command_executor.execute(InsertPublicConfigCommand()).success}
 
 
 @router.post("/smoke_test")
@@ -86,28 +78,19 @@ async def run_smoke_test(
 
 
 @router.post("/end_of_day")
-async def end_of_day(
-    service: EndOfDayService = Depends(create_end_of_day_service)
-):
+async def end_of_day(service: EndOfDayService = Depends(create_end_of_day_service)):
     service.run_workflow()
 
 
 @router.post("/end_of_week")
-async def end_of_week(
-    push: PubSubPush,
-    service: EndOfWeekService = Depends(create_end_of_week_service)
-):
+async def end_of_week(push: PubSubPush, service: EndOfWeekService = Depends(create_end_of_week_service)):
     push_data = push.get_data()
     request = EndOfWeekRequest(**push_data)
     return service.run_workflow(request.completed_week_number)
 
 
 @router.post("/league_command")
-async def league_command(
-    league_id: str,
-    push: PubSubPush,
-    league_command_service: LeagueCommandService = Depends(create_league_command_service)
-):
+async def league_command(league_id: str, push: PubSubPush, league_command_service: LeagueCommandService = Depends(create_league_command_service)):
     return league_command_service.execute_league_command(league_id, push)
 
 
@@ -135,13 +118,11 @@ async def start_next_season(
     return service.run_workflow(season)
 
 
-# @router.post("/import_season")
-# async def import_season(
-#     season: int,
-#     clean: bool = False,
-#     service: ImportSeasonService = Depends(create_previous_season_stats_service),
-# ):
-#     return service.import_season(season, clean)
+@router.post("/import_season")
+async def import_season(
+    executor: RecalcSeasonStatsCommandExecutor = Depends(create_recalc_season_stats_command_executor),
+):
+    return executor.execute(RecalcSeasonStatsCommand(full_season=True))
 
 
 @router.post("/recalc_waiver_budgets")

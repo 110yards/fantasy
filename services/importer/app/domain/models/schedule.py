@@ -1,19 +1,22 @@
 import hashlib
 import json
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel, computed_field
 
 
 class ScheduleGame(BaseModel):
     game_id: str
-    realtime_source_id: int
+    realtime_source_id: Optional[int] = None
     boxscore_source_id: str
     date_start: datetime
     game_number: int
     week: int
     away_abbr: str
     home_abbr: str
+    away_score: Optional[int] = None
+    home_score: Optional[int] = None
 
 
 class ScheduleWeek(BaseModel):

@@ -15,3 +15,9 @@ class SystemScheduleGame(BaseModel):
 class SystemScheduleWeek(BaseModel):
     week_number: int
     games: list[SystemScheduleGame]
+
+
+class SystemSchedule(BaseModel):
+    year: int
+    weeks: dict[str, SystemScheduleWeek]
+    week_count: int
