@@ -1,4 +1,5 @@
-from services.api.app.core.auth import get_current_user_id
+from services.api.app.core.auth import get_current_user_id, require_role
+from services.api.app.core.role import Role
 from services.api.app.domain.commands.roster.add_player import (
     AddPlayerCommand, AddPlayerCommandExecutor,
     create_add_player_command_executor)
@@ -14,6 +15,9 @@ from services.api.app.domain.commands.roster.drop_player import (
 from services.api.app.domain.commands.roster.move_player import (
     MovePlayerCommand, MovePlayerCommandExecutor,
     create_move_player_command_executor)
+from services.api.app.domain.commands.roster.transfer_ownership import (
+    TransferOwnershipCommand, TransferOwnershipCommandExecutor,
+    create_transfer_ownership_command_executor)
 from services.api.app.domain.commands.roster.update_roster_name import (
     UpdateRosterNameCommand, UpdateRosterNameCommandExecutor,
     create_update_roster_name_command_executor)
@@ -24,7 +28,7 @@ from services.api.app.domain.commands.roster.update_waiver_budget import (
 )
 from services.api.app.domain.services.roster_progress_service import (
     ProgressRequest, ProgressService, create_roster_progress_service)
-from fastapi import Depends
+from fastapi import Depends, Request
 
 from .api_router import APIRouter
 
@@ -65,6 +69,17 @@ async def add_player(
     return command_executor.execute(command)
 
 
+@router.post("/admin/add")
+@require_role(Role.admin)
+async def admin_add_player(
+    request: Request,
+    command: AddPlayerCommand,
+    command_executor: AddPlayerCommandExecutor = Depends(create_add_player_command_executor),
+):
+    command.admin_override = True
+    return command_executor.execute(command)
+
+
 @router.post("/move")
 async def move_player(
     command: MovePlayerCommand,
@@ -96,4 +111,12 @@ async def set_waiver_budget(
     command_executor: UpdateWaiverBudgetCommandExecutor = Depends(create_update_waiver_budget_command_executor),
 ):
     command.current_user_id = current_user_id
+    return command_executor.execute(command)
+
+
+@router.put("/transfer_ownership")
+async def transfer_ownership(
+    command: TransferOwnershipCommand,
+    command_executor: TransferOwnershipCommandExecutor = Depends(create_transfer_ownership_command_executor),
+):
     return command_executor.execute(command)

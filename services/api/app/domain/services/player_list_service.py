@@ -165,7 +165,7 @@ class PlayerListService:
             Logger.debug("No cache found")
             return False
 
-        if generated_at < league.last_season_recalc:
+        if not league.last_season_recalc or generated_at < league.last_season_recalc:
             Logger.debug("Cache is out of date (recalc)")
             return False
 

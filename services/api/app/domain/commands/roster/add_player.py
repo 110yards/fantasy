@@ -46,6 +46,7 @@ class AddPlayerCommand(BaseCommand):
     player_id: str
     drop_player_id: Optional[str]
     bid: Optional[int]
+    admin_override: bool = False
 
 
 @annotate_args
@@ -78,7 +79,8 @@ class AddPlayerCommandExecutor(BaseCommandExecutor[AddPlayerCommand, AddPlayerRe
 
     def on_execute(self, command: AddPlayerCommand) -> AddPlayerResult:
 
-        if command.roster_id != command.request_user_id:  # TODO: allow commissioner to make moves
+        for_users_roster = command.roster_id == command.request_user_id
+        if not for_users_roster and not command.admin_override:  # TODO: allow commissioner to make moves
             return AddPlayerResult(command=command, error="Forbidden")
 
         state = self.state_repo.get()  # don't lock state
@@ -101,7 +103,7 @@ class AddPlayerCommandExecutor(BaseCommandExecutor[AddPlayerCommand, AddPlayerRe
             if not player:
                 return AddPlayerResult(command=command, error="Player not found")
 
-            if state.locks.is_locked(player.team):
+            if state.locks.is_locked(player.team) and not command.admin_override:
                 return AddPlayerResult(command=command, error=f"{player.team.location} players are locked")
 
             target_position = None

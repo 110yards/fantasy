@@ -20,6 +20,7 @@ class TransactionType(str, Enum):
     COMMISSIONER_MOVE_PLAYER = "commissioner_move_player"
     LEAGUE_EVENT = "league_event"
     COMMISSIONER_CHANGE_WAIVER_BUDGET = "commissioner_change_waiver_budget"
+    COMMISSIONER_TRANSFER_ROSTER_OWNERSHIP = "commissioner_transfer_roster_ownership"
 
 
 @annotate_args
@@ -87,6 +88,14 @@ class LeagueTransaction(BaseEntity):
     def change_waiver_budget(league_id: str, roster_id: str, roster_name: str, new_value: int, old_value: int):
         message = f"Commissioner changed the waiver budget for {roster_name} from ${old_value} to ${new_value}"
         trx_type = TransactionType.COMMISSIONER_CHANGE_ROSTER_NAME
+
+        return LeagueTransaction(timestamp=datetime.utcnow(),
+                                 league_id=league_id, roster_id=roster_id, message=message, type=trx_type)
+
+    @staticmethod
+    def transfer_roster_ownership(league_id: str, roster_id: str, roster_name: str, new_owner_email: str):
+        message = f"Commissioner transferred {roster_name} to {new_owner_email}"
+        trx_type = TransactionType.COMMISSIONER_TRANSFER_ROSTER_OWNERSHIP
 
         return LeagueTransaction(timestamp=datetime.utcnow(),
                                  league_id=league_id, roster_id=roster_id, message=message, type=trx_type)
