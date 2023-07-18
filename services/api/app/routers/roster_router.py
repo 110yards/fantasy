@@ -66,6 +66,7 @@ async def add_player(
     command: AddPlayerCommand,
     command_executor: AddPlayerCommandExecutor = Depends(create_add_player_command_executor),
 ):
+    command.admin_override = False
     return command_executor.execute(command)
 
 
