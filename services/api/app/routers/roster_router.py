@@ -15,6 +15,7 @@ from app.domain.commands.roster.update_waiver_budget import (
 )
 from app.domain.services.roster_progress_service import ProgressRequest, ProgressService, create_roster_progress_service
 
+from ..domain.commands.roster.transfer_ownership import TransferOwnershipCommand, TransferOwnershipCommandExecutor, create_transfer_ownership_command_executor
 from .api_router import APIRouter
 
 router = APIRouter(prefix="/roster")
