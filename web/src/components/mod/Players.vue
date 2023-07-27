@@ -107,7 +107,8 @@
           </tbody>
           <tbody v-else>
             <tr>
-              <td colspan="4">No matches for "{{ searchCriteria }}"</td>
+              <td v-if="criteriaTooShort" colspan="4">Enter a search criteria to find matches</td>
+              <td v-else colspan="4">No matches for "{{ searchCriteria }}"</td>
             </tr>
           </tbody>
         </template>
@@ -180,9 +181,12 @@ export default {
       return this.matches.length > 0
     },
 
+    criteriaTooShort() {
+      return this.searchCriteria == null || this.searchCriteria.length < 2
+    },
+
     matches() {
-      if (this.searchCriteria == null) {
-        console.log("No search criteria")
+      if (this.criteriaTooShort) {
         return []
       }
 

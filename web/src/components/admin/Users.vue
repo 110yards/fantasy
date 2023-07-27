@@ -7,6 +7,7 @@
             <th></th>
             <th>Email</th>
             <th>Last sign in</th>
+            <th>Actions</th>
           </tr>
         </thead>
 
@@ -19,7 +20,25 @@
               </td>
               <td>{{ user.email }}</td>
               <td>{{ user.last_sign_in ? formatDate(user.last_sign_in.toDate()) : "Never" }}</td>
-              <td></td>
+              <td>
+                <v-menu v-if="!user.is_admin" offset-y>
+                  <template v-slot:activator="{ on }">
+                    <v-btn icon v-on="on">
+                      <v-icon>mdi-dots-vertical</v-icon>
+                    </v-btn>
+                  </template>
+
+                  <v-list>
+                    <v-list-item v-if="isMod(user)" @click="revokeMod(user)">
+                      <v-list-item-title>Revoke mod status</v-list-item-title>
+                    </v-list-item>
+
+                    <v-list-item v-else @click="grantMod(user)">
+                      <v-list-item-title>Grant mod status</v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </td>
             </template>
           </tr>
         </tbody>
@@ -33,6 +52,7 @@ import { firestore } from "../../modules/firebase"
 import AppDefaultButton from "../buttons/AppDefaultButton.vue"
 import AppPrimaryButton from "../buttons/AppPrimaryButton.vue"
 import { shortDate } from "../../modules/formatter"
+import { makeMod, removeMod } from "../../api/110yards/user"
 
 export default {
   name: "Users",
@@ -57,6 +77,18 @@ export default {
   methods: {
     formatDate(date) {
       return shortDate(date)
+    },
+
+    isMod(user) {
+      return user.is_mod
+    },
+
+    grantMod(user) {
+      makeMod(user.id)
+    },
+
+    revokeMod(user) {
+      removeMod(user.id)
     },
   },
 

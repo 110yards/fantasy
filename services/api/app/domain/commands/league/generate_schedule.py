@@ -63,13 +63,17 @@ class GenerateScheduleCommandExecutor(BaseCommandExecutor[GenerateScheduleComman
     def on_execute(self, command: GenerateScheduleCommand) -> GenerateScheduleResult:
         state = self.public_repo.get_state()
         schedule = self.schedule_store.get_schedule(state.current_season)
+
+        if not schedule:
+            return GenerateScheduleResult(command=command, error="Schedule not found")
+
         season_weeks = len(schedule.weeks)
 
         scoreboard = self.public_repo.get_scoreboard()
 
         min_playoff_start_week = state.current_week + 1
 
-        if scoreboard.any_locks():
+        if scoreboard and scoreboard.any_locks():
             min_playoff_start_week += 1
 
         first_playoff_week = command.first_playoff_week

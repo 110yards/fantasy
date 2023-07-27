@@ -1,26 +1,23 @@
-
 from typing import Optional
+
+from fastapi.params import Depends
+from starlette.requests import Request
+
 from app.config.settings import Settings, get_settings
 from app.core.auth import require_role
 from app.core.role import Role
-from app.domain.services.ownership_report_service import OwnershipReportService, create_ownership_report_service
-from app.yards_py.core.sim_state import SimState
 from app.domain.commands.admin.reset_week_end import ResetWeekEndCommand, ResetWeekEndCommandExecutor, create_reset_week_end_command_executor
-from app.domain.services.league_problems_service import (
-    LeagueProblemsService, create_league_problems_service)
+from app.domain.services.league_problems_service import LeagueProblemsService, create_league_problems_service
+from app.domain.services.ownership_report_service import OwnershipReportService, create_ownership_report_service
 from app.routers.api_router import APIRouter
-from fastapi.params import Depends
-from starlette.requests import Request
+from app.yards_py.core.sim_state import SimState
 
 router = APIRouter(prefix="/admin")
 
 
 @router.get("/problems")
 @require_role(Role.admin)
-async def problems(
-    request: Request,
-    league_problems_service: LeagueProblemsService = Depends(create_league_problems_service)
-):
+async def problems(request: Request, league_problems_service: LeagueProblemsService = Depends(create_league_problems_service)):
     return league_problems_service.get_leagues_with_problems()
 
 
@@ -89,8 +86,5 @@ async def update_schedule(
 
 @router.get("/report/ownership")
 @require_role(Role.admin)
-async def get_ownership_report(
-    request: Request,
-    service: OwnershipReportService = Depends(create_ownership_report_service)
-):
+async def get_ownership_report(request: Request, service: OwnershipReportService = Depends(create_ownership_report_service)):
     return service.get_ownership_report()
