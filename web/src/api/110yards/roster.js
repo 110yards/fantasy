@@ -31,3 +31,7 @@ export const progress = async (leagueId, rosterId) => {
 export const setWaiverBudget = async command => {
   return client.put(null, "/roster/waiver_budget", command)
 }
+
+export const transferOwnership = async command => {
+  return client.put(null, "/roster/transfer_ownership", command)
+}

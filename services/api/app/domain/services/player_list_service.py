@@ -279,7 +279,7 @@ class PlayerListService:
         player_season_scores: List[PlayerLeagueSeasonScore] = []
 
         for player_season in player_seasons.values():
-            player_season_score = PlayerLeagueSeasonScore.create(player_season, scoring,  0)
+            player_season_score = PlayerLeagueSeasonScore.create(player_season, scoring, 0)
             player_season_scores.append(player_season_score)
 
         rank_player_seasons(player_season_scores)

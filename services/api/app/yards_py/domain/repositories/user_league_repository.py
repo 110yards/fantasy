@@ -19,8 +19,8 @@ class UserLeagueRepository:
     def path(user_id):
         return f"{UserRepository.path}/{user_id}/league"
 
-    def get_leagues(self, user_id) -> List[UserLeaguePreview]:
-        return self.client.get_all(UserLeagueRepository.path(user_id))
+    def get_leagues(self, user_id, transaction: Transaction = None) -> List[UserLeaguePreview]:
+        return self.client.get_all(UserLeagueRepository.path(user_id), transaction)
 
     def set(self, user_id, league: UserLeaguePreview, transaction: Transaction = None):
         return self.client.set(UserLeagueRepository.path(user_id), league, transaction)

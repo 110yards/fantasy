@@ -27,6 +27,23 @@
         <app-default-button class="ml-2" @click="banRoster = null">No, cancel</app-default-button>
       </div>
 
+      <div v-if="transferRosterId">
+        <v-alert dense icon="mdi-alert" type="warning">
+          Transfering ownership of a roster from one user to another will remove the current user from your league. If
+          you're sure you wish to continue, please enter the email address of the new owner. The new owner should
+          already be a member of 110yards. If the new owner has not yet registered, please have them do so before
+          continuing.
+        </v-alert>
+        <v-alert dense icon="mdi-alert-octagon" type="error" v-if="uid == transferRosterId">
+          Danger! You have selected your own roster to be transfered!!! If you do this, the new user will become the
+          commissioner of the league and you will no longer have access to this league.
+        </v-alert>
+        <strong>Transfer {{ transferRosterName }} to:</strong>
+        <app-text-field label="New owner's email" v-model="transferRosterEmail" />
+        <app-default-button @click="transferOwnership()">Confirm transfer</app-default-button>
+        <app-primary-button class="ml-2" @click="transferRosterId = null">Cancel</app-primary-button>
+      </div>
+
       <v-simple-table class="table" v-if="showTable">
         <template v-slot:default>
           <thead>
@@ -68,10 +85,12 @@
                       <v-list-item-title>Adjust budget</v-list-item-title>
                     </v-list-item>
 
-                    <v-list-item v-if="canRemove(roster)">
-                      <v-list-item-title>
-                        <app-primary-button @click="confirmRemoval(roster)"> Remove from league </app-primary-button>
-                      </v-list-item-title>
+                    <v-list-item v-if="canRemove(roster)" @click="confirmRemoval(roster)">
+                      <v-list-item-title> Remove from league </v-list-item-title>
+                    </v-list-item>
+
+                    <v-list-item @click="confirmTransferOwnership(roster)">
+                      <v-list-item-title> Transfer ownership </v-list-item-title>
                     </v-list-item>
                   </v-list>
                 </v-menu>
@@ -92,7 +111,7 @@ import AppPrimaryButton from "../buttons/AppPrimaryButton.vue"
 import AppTextField from "../inputs/AppTextField.vue"
 import AppNumberField from "../inputs/AppNumberField.vue"
 import AppDefaultButton from "../buttons/AppDefaultButton.vue"
-import { setNameChangeBan, updateRosterName, setWaiverBudget } from "../../api/110yards/roster"
+import { setNameChangeBan, updateRosterName, setWaiverBudget, transferOwnership } from "../../api/110yards/roster"
 
 export default Vue.extend({
   components: {
@@ -112,6 +131,9 @@ export default Vue.extend({
       banRoster: null,
       editBudgetRoster: null,
       editBudgetAmount: null,
+      transferRosterId: null,
+      transferRosterEmail: null,
+      transferRosterName: null,
     }
   },
   computed: {
@@ -122,7 +144,7 @@ export default Vue.extend({
       return this.$store.state.currentUser
     },
     showTable() {
-      return !this.editRosterId && !this.banRoster && !this.editBudgetRoster
+      return !this.editRosterId && !this.banRoster && !this.editBudgetRoster && !this.transferRosterId
     },
   },
   methods: {
@@ -145,6 +167,24 @@ export default Vue.extend({
     beginEditBudget(roster) {
       this.editBudgetRoster = roster
       this.editBudgetAmount = roster.waiver_budget
+    },
+
+    confirmTransferOwnership(roster) {
+      this.transferRosterId = roster.id
+      this.transferRosterName = roster.name
+    },
+
+    async transferOwnership() {
+      if (!this.transferRosterEmail) return
+
+      let command = {
+        league_id: this.league.id,
+        roster_id: this.transferRosterId,
+        new_owner_email: this.transferRosterEmail,
+      }
+
+      await transferOwnership(command)
+      this.transferRosterId = null
     },
 
     async updateRosterName() {

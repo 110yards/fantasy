@@ -48,6 +48,7 @@ class AddPlayerCommand(BaseCommand):
     player_id: str
     drop_player_id: Optional[str]
     bid: Optional[int]
+    admin_override: bool = False
 
 
 @annotate_args
@@ -78,7 +79,8 @@ class AddPlayerCommandExecutor(BaseCommandExecutor[AddPlayerCommand, AddPlayerRe
         self.public_repo = public_repo
 
     def on_execute(self, command: AddPlayerCommand) -> AddPlayerResult:
-        if command.roster_id != command.request_user_id:  # TODO: allow commissioner to make moves
+        for_users_roster = command.roster_id == command.request_user_id
+        if not for_users_roster and not command.admin_override:  # TODO: allow commissioner to make moves
             return AddPlayerResult(command=command, error="Forbidden")
 
         scoreboard = self.public_repo.get_scoreboard()
@@ -109,7 +111,7 @@ class AddPlayerCommandExecutor(BaseCommandExecutor[AddPlayerCommand, AddPlayerRe
             if command.drop_player_id:
                 target_position = roster.find_player_position(command.drop_player_id)
 
-            if state.waivers_active:
+            if state.waivers_active and not command.admin_override:
                 bid = WaiverBid(roster_id=command.roster_id, player=player, amount=command.bid)
                 if command.drop_player_id:
                     bid.drop_player = target_position.player
@@ -120,7 +122,7 @@ class AddPlayerCommandExecutor(BaseCommandExecutor[AddPlayerCommand, AddPlayerRe
 
                 return AddPlayerResult(command=command)
 
-            elif not state.waivers_active and league.waivers_active:
+            elif not state.waivers_active and league.waivers_active and not command.admin_override:
                 return AddPlayerResult(
                     command=command,
                     error="Waivers are still being processed for your league, please try again in a few minutes. "
