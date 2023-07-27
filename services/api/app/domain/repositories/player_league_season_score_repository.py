@@ -1,8 +1,10 @@
 from typing import List, Union
-from app.yards_py.domain.entities.player_league_season_score import PlayerLeagueSeasonScore
-from app.domain.repositories.league_repository import LeagueRepository
+
 from google.cloud.firestore_v1.transaction import Transaction
+
+from app.domain.repositories.league_repository import LeagueRepository
 from app.yards_py.core.firestore_proxy import FirestoreProxy, Query
+from app.yards_py.domain.entities.player_league_season_score import PlayerLeagueSeasonScore
 
 
 def create_player_league_season_score_repository():
@@ -11,7 +13,6 @@ def create_player_league_season_score_repository():
 
 
 class PlayerLeagueSeasonScoreRepository:
-
     def __init__(self, firestore: FirestoreProxy[PlayerLeagueSeasonScore]):
         self.firestore = firestore
 

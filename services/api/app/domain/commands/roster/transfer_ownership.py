@@ -1,18 +1,17 @@
-
-from services.api.app.domain.repositories.league_transaction_repository import LeagueTransactionRepository, create_league_transaction_repository
-from yards_py.domain.entities.league_transaction import LeagueTransaction
-from services.api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from services.api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
 from fastapi import Depends
-from yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
 from firebase_admin import firestore
-from yards_py.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
-from yards_py.domain.repositories.league_owned_player_repository import LeagueOwnedPlayerRepository, create_league_owned_player_repository
-from yards_py.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository, create_league_week_matchup_repository
-from yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
-from yards_py.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
 
-from yards_py.domain.repositories.user_repository import UserRepository, create_user_repository
+from ....domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository, create_league_week_matchup_repository
+from ....yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from ....yards_py.domain.entities.league_transaction import LeagueTransaction
+from ...repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from ...repositories.league_owned_player_repository import LeagueOwnedPlayerRepository, create_league_owned_player_repository
+from ...repositories.league_repository import LeagueRepository, create_league_repository
+from ...repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from ...repositories.league_transaction_repository import LeagueTransactionRepository, create_league_transaction_repository
+from ...repositories.public_repository import PublicRepository, create_public_repository
+from ...repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
+from ...repositories.user_repository import UserRepository, create_user_repository
 
 
 class TransferOwnershipCommand(BaseCommand):
@@ -26,7 +25,6 @@ class TransferOwnershipResult(BaseCommandResult[TransferOwnershipCommand]):
 
 
 class TransferOwnershipCommandExecutor(BaseCommandExecutor[TransferOwnershipCommand, TransferOwnershipResult]):
-
     def __init__(
         self,
         league_repo: LeagueRepository,
@@ -50,7 +48,6 @@ class TransferOwnershipCommandExecutor(BaseCommandExecutor[TransferOwnershipComm
         self.public_repo = public_repo
 
     def on_execute(self, command: TransferOwnershipCommand) -> TransferOwnershipResult:
-
         new_owner = self.user_repo.get_by_email(command.new_owner_email)
         state = self.public_repo.get_state()
 
@@ -59,7 +56,6 @@ class TransferOwnershipCommandExecutor(BaseCommandExecutor[TransferOwnershipComm
 
         @firestore.transactional
         def update(transaction):
-
             league = self.league_repo.get(command.league_id, transaction)
 
             if not league:
@@ -101,7 +97,9 @@ class TransferOwnershipCommandExecutor(BaseCommandExecutor[TransferOwnershipComm
             matchups_to_update_by_week = {}
             for week in schedule.weeks:
                 for schedule_matchup in week.matchups:
-                    if (schedule_matchup.away and schedule_matchup.away.id == command.roster_id) or (schedule_matchup.home and schedule_matchup.home.id == command.roster_id):  # noqa
+                    if (schedule_matchup.away and schedule_matchup.away.id == command.roster_id) or (
+                        schedule_matchup.home and schedule_matchup.home.id == command.roster_id
+                    ):  # noqa
                         matchup = self.league_matchup_repo.get(command.league_id, week.week_number, schedule_matchup.id, transaction)
 
                         if schedule_matchup.away.id == command.roster_id:

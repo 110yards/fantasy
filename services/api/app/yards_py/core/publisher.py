@@ -1,21 +1,20 @@
-
 import base64
-from datetime import datetime
 import json
+from datetime import datetime
 from typing import Dict, Optional
 
-from app.yards_py.core.exceptions import InvalidPushException
-from app.yards_py.core.logging import Logger
-from google.cloud.pubsub_v1 import PublisherClient
-from google.cloud.pubsub_v1 import SubscriberClient
+from google.api_core.exceptions import NotFound
+from google.cloud.pubsub_v1 import PublisherClient, SubscriberClient
+from google.protobuf.duration_pb2 import Duration
 from google.pubsub_v1.services.publisher.client import PublisherClient as PublisherWrapper
 from google.pubsub_v1.services.subscriber import SubscriberClient as SubscriberWrapper
-from google.api_core.exceptions import NotFound
 from google.pubsub_v1.types.pubsub import ExpirationPolicy, PushConfig, RetryPolicy, Subscription
 from pydantic.main import BaseModel
-from google.protobuf.duration_pb2 import Duration
+
+from app.domain.repositories.virtual_pubsub_repository import VirtualPubSubPayload, VirtualPubsubRepository
 from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.domain.repositories.virtual_pubsub_repository import VirtualPubSubPayload, VirtualPubsubRepository
+from app.yards_py.core.exceptions import InvalidPushException
+from app.yards_py.core.logging import Logger
 
 
 @annotate_args
@@ -102,7 +101,7 @@ class PubSubPublisher(Publisher):
                         ack_deadline_seconds=config.ack_deadline,
                         expiration_policy=ExpirationPolicy(ttl=Duration(seconds=config.expiration_days * 86400) if config.expiration_days else None),
                         retry_policy=RetryPolicy(),
-                        message_retention_duration=Duration(seconds=config.retention_days * 86400)
+                        message_retention_duration=Duration(seconds=config.retention_days * 86400),
                     )
                     subscription = subscriber.create_subscription(request=request)
                     Logger.info("Push subscription created", logging_extra)

@@ -1,12 +1,8 @@
-
-
 from fastapi import Depends
-from app.config.settings import Settings, get_settings
-from app.yards_py.core.publisher import PubSubPublisher, VirtualPubSubPublisher
-from app.yards_py.domain.repositories.virtual_pubsub_repository import (
-    VirtualPubsubRepository, create_virtual_pubsub_repository)
 
-# DI for dependencies should be next to the class it is creating, unless the class is in a different package.
+from app.config.settings import Settings, get_settings
+from app.domain.repositories.virtual_pubsub_repository import VirtualPubsubRepository, create_virtual_pubsub_repository
+from app.yards_py.core.publisher import PubSubPublisher, VirtualPubSubPublisher
 
 
 def create_publisher(

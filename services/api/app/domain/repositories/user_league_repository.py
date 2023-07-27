@@ -1,8 +1,10 @@
-from google.cloud.firestore_v1.transaction import Transaction
-from app.domain.repositories.user_repository import UserRepository
-from app.yards_py.domain.entities.user_league_preview import UserLeaguePreview
 from typing import Dict, List
+
+from google.cloud.firestore_v1.transaction import Transaction
+
+from app.domain.repositories.user_repository import UserRepository
 from app.yards_py.core.firestore_proxy import FirestoreProxy
+from app.yards_py.domain.entities.user_league_preview import UserLeaguePreview
 
 
 def create_user_league_repository():
@@ -11,7 +13,6 @@ def create_user_league_repository():
 
 
 class UserLeagueRepository:
-
     def __init__(self, firestore: FirestoreProxy[UserLeaguePreview]):
         self.client = firestore
 
@@ -19,8 +20,8 @@ class UserLeagueRepository:
     def path(user_id):
         return f"{UserRepository.path}/{user_id}/league"
 
-    def get_leagues(self, user_id) -> List[UserLeaguePreview]:
-        return self.client.get_all(UserLeagueRepository.path(user_id))
+    def get_leagues(self, user_id, transaction: Transaction = None) -> List[UserLeaguePreview]:
+        return self.client.get_all(UserLeagueRepository.path(user_id), transaction)
 
     def set(self, user_id, league: UserLeaguePreview, transaction: Transaction = None):
         return self.client.set(UserLeagueRepository.path(user_id), league, transaction)
