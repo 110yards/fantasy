@@ -1,5 +1,5 @@
-from fastapi.param_functions import Depends
 import requests
+from fastapi.param_functions import Depends
 
 from app.domain.repositories.public_repository import PublicRepository, create_public_repository
 
@@ -15,9 +15,7 @@ class DiscordService:
 
     def send_message(self, url: str, message: str):
         if self.enabled:
-            requests.post(url, json={
-                "content": message
-            })
+            requests.post(url, json={"content": message})
 
     def send_test_notification(self, url):
         self.send_message(url, "It works!")
