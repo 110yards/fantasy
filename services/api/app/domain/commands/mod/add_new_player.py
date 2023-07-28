@@ -4,8 +4,8 @@ from fastapi import Depends
 from firebase_admin import firestore
 from google.cloud.firestore_v1.transaction import Transaction
 
-from ....yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
-from ....yards_py.domain.entities.system_transaction import SystemTransaction
+from ....core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from ...entities.system_transaction import SystemTransaction
 from ...repositories.approval_player_repository import ApprovalPlayerRepository, create_approval_player_repository
 from ...repositories.player_repository import PlayerRepository, create_player_repository
 from ...repositories.system_transaction_repository import SystemTransactionRepository, create_system_transaction_repository

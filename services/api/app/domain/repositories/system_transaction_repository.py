@@ -1,9 +1,8 @@
 from google.cloud.firestore_v1.transaction import Transaction
 
-from app.core.firestore_proxy import FirestoreProxy
-from app.domain.entities.league_transaction import LeagueTransaction
-
-from ...yards_py.domain.entities.system_transaction import SystemTransaction
+from ...core.firestore_proxy import FirestoreProxy
+from ..entities.league_transaction import LeagueTransaction
+from ..entities.system_transaction import SystemTransaction
 
 
 class SystemTransactionRepository:

@@ -2,8 +2,8 @@ from typing import Optional
 
 from fastapi import Depends
 
-from ...yards_py.core.rtdb_client import RTDBClient, create_rtdb_client
-from ...yards_py.domain.models.season_schedule import ScheduleWeek, SeasonSchedule
+from ...core.rtdb_client import RTDBClient, create_rtdb_client
+from ..models.season_schedule import ScheduleWeek, SeasonSchedule
 
 
 class SeasonScheduleStore:

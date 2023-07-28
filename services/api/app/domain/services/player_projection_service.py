@@ -2,16 +2,15 @@ from typing import Dict, List
 
 from fastapi.param_functions import Depends
 
-from app.core.batch import create_batches
-from app.core.firestore_proxy import Query
-from app.domain.entities.player import Player
-from app.domain.entities.player_league_season_score import PlayerLeagueSeasonScore
-from app.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository, create_player_league_season_score_repository
-from app.domain.repositories.player_repository import PlayerRepository, create_player_repository
-from app.domain.repositories.public_repository import PublicRepository, create_public_repository
-from app.domain.repositories.state_repository import StateRepository, create_state_repository
-
-from ...yards_py.domain.entities.scoreboard import Scoreboard
+from ...core.batch import create_batches
+from ...core.firestore_proxy import Query
+from ..entities.player import Player
+from ..entities.player_league_season_score import PlayerLeagueSeasonScore
+from ..entities.scoreboard import Scoreboard
+from ..repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository, create_player_league_season_score_repository
+from ..repositories.player_repository import PlayerRepository, create_player_repository
+from ..repositories.public_repository import PublicRepository, create_public_repository
+from ..repositories.state_repository import StateRepository, create_state_repository
 
 
 def create_player_projection_service(
