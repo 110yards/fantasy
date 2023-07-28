@@ -4,8 +4,7 @@ import logging
 from abc import ABCMeta, abstractmethod
 from typing import Generic, Optional, TypeVar
 
-from pydantic import computed_field
-from pydantic.main import BaseModel
+from pydantic import BaseModel, computed_field
 from starlette_context import context
 
 from app.core.annotate_args import annotate_args

@@ -1,5 +1,5 @@
 from fastapi.param_functions import Depends
-from pydantic.main import BaseModel
+from pydantic import BaseModel
 
 from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
 from app.domain.repositories.public_repository import PublicRepository, create_public_repository

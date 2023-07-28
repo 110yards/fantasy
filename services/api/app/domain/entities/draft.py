@@ -1,6 +1,6 @@
 from typing import Dict, List, Optional, Union
 
-from pydantic.main import BaseModel
+from pydantic import BaseModel
 
 from app.core.annotate_args import annotate_args
 from app.core.base_entity import BaseEntity

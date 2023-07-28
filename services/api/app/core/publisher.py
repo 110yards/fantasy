@@ -9,7 +9,7 @@ from google.protobuf.duration_pb2 import Duration
 from google.pubsub_v1.services.publisher.client import PublisherClient as PublisherWrapper
 from google.pubsub_v1.services.subscriber import SubscriberClient as SubscriberWrapper
 from google.pubsub_v1.types.pubsub import ExpirationPolicy, PushConfig, RetryPolicy, Subscription
-from pydantic.main import BaseModel
+from pydantic import BaseModel
 
 from app.core.annotate_args import annotate_args
 from app.core.exceptions import InvalidPushException

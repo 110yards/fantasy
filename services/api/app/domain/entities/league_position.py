@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from pydantic.main import BaseModel
+from pydantic import BaseModel
 
 from app.core.annotate_args import annotate_args
 from app.domain.entities.player import Player

@@ -4,7 +4,7 @@ import hashlib
 import json
 from decimal import getcontext
 
-from pydantic.main import BaseModel
+from pydantic import BaseModel
 
 from app.domain.entities.player_score import PlayerScore
 from app.domain.entities.stats import Stats

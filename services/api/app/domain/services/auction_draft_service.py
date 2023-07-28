@@ -2,7 +2,7 @@ from typing import Optional
 
 from fastapi import Depends
 from google.cloud.firestore_v1.transaction import Transaction
-from pydantic.main import BaseModel
+from pydantic import BaseModel
 
 from app.core.annotate_args import annotate_args
 from app.domain.entities.draft import Draft, DraftSlot

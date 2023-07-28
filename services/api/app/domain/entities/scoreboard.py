@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from pydantic.main import BaseModel
+from pydantic import BaseModel
 
 
 class ScoreboardGame(BaseModel):

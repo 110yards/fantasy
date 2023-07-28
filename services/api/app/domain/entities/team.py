@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Dict, Optional
 
-from pydantic.main import BaseModel
+from pydantic import BaseModel
 
 from app.core.exceptions import ApiException
 
