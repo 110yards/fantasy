@@ -1,20 +1,18 @@
-from app.domain.repositories.league_week_repository import LeagueWeekRepository
-from app.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository
-from app.domain.repositories.league_transaction_repository import LeagueTransactionRepository
-from app.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository
-from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
-from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
-
-from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.core.base_command_executor import (BaseCommand, BaseCommandExecutor,
-                                                 BaseCommandResult)
-from app.yards_py.core.publisher import Publisher, create_publisher
-from app.yards_py.domain.entities.league import (League)
-from app.domain.repositories.league_repository import (
-    LeagueRepository, create_league_repository)
 from fastapi.param_functions import Depends
 from firebase_admin.firestore import firestore
+
+from app.core.annotate_args import annotate_args
+from app.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from app.core.publisher import Publisher, create_publisher
+from app.domain.entities.league import League
+from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from app.domain.repositories.league_transaction_repository import LeagueTransactionRepository
+from app.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository
+from app.domain.repositories.league_week_repository import LeagueWeekRepository
+from app.domain.repositories.player_league_season_score_repository import PlayerLeagueSeasonScoreRepository
+from app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
 from app.domain.repositories.user_repository import UserRepository, create_user_repository
 
 
@@ -26,13 +24,7 @@ def create_delete_league_command_executor(
     league_config_repo: LeagueConfigRepository = Depends(create_league_config_repository),
     publisher: Publisher = Depends(create_publisher),
 ):
-    return DeleteLeagueCommandExecutor(
-        user_repo,
-        league_repo,
-        user_league_repo,
-        league_roster_repo,
-        league_config_repo,
-        publisher)
+    return DeleteLeagueCommandExecutor(user_repo, league_repo, user_league_repo, league_roster_repo, league_config_repo, publisher)
 
 
 @annotate_args
@@ -46,7 +38,6 @@ class DeleteLeagueResult(BaseCommandResult[DeleteLeagueCommand]):
 
 
 class DeleteLeagueCommandExecutor(BaseCommandExecutor[DeleteLeagueCommand, DeleteLeagueResult]):
-
     def __init__(
         self,
         league_repo: LeagueRepository,
@@ -68,7 +59,6 @@ class DeleteLeagueCommandExecutor(BaseCommandExecutor[DeleteLeagueCommand, Delet
         self.league_week_repo = league_week_repo
 
     def on_execute(self, command: DeleteLeagueCommand) -> DeleteLeagueResult:
-
         @firestore.transactional
         def delete(transaction):
             league = self.league_repo.get(command.league_id)

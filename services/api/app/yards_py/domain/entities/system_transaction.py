@@ -3,8 +3,8 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 
-from app.yards_py.core.base_entity import BaseEntity
-from app.yards_py.domain.entities.player import Player
+from app.core.base_entity import BaseEntity
+from app.domain.entities.player import Player
 
 
 class TransactionType(str, Enum):

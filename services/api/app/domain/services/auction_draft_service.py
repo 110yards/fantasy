@@ -4,10 +4,10 @@ from fastapi import Depends
 from google.cloud.firestore_v1.transaction import Transaction
 from pydantic.main import BaseModel
 
+from app.core.annotate_args import annotate_args
+from app.domain.entities.draft import Draft, DraftSlot
 from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
 from app.domain.services.roster_player_service import RosterPlayerService, create_roster_player_service
-from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.domain.entities.draft import Draft, DraftSlot
 
 
 def create_auction_draft_service(

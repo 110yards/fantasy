@@ -1,13 +1,11 @@
-
-from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.core.base_command_executor import (BaseCommand, BaseCommandExecutor,
-                                                 BaseCommandResult)
-from app.yards_py.domain.entities.league import League
-from app.domain.repositories.league_repository import (
-    LeagueRepository, create_league_repository)
 from fastapi.param_functions import Depends
-from google.cloud.firestore import Transaction
 from firebase_admin.firestore import firestore
+from google.cloud.firestore import Transaction
+
+from app.core.annotate_args import annotate_args
+from app.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from app.domain.entities.league import League
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 
 
 def create_set_notes_command_executor(
@@ -30,7 +28,6 @@ class SetNotesResult(BaseCommandResult):
 
 
 class SetNotesCommandExecutor(BaseCommandExecutor[SetNotesCommand, SetNotesResult]):
-
     def __init__(
         self,
         league_repo: LeagueRepository,

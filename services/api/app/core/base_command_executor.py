@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-from app.yards_py.core.logging import Logger
-from app.yards_py.core.annotate_args import annotate_args
-
 import logging
 from abc import ABCMeta, abstractmethod
 from typing import Generic, Optional, TypeVar
@@ -10,6 +7,9 @@ from typing import Generic, Optional, TypeVar
 from pydantic import root_validator
 from pydantic.main import BaseModel
 from starlette_context import context
+
+from app.core.annotate_args import annotate_args
+from app.core.logging import Logger
 
 logger = logging.getLogger()
 

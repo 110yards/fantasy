@@ -1,11 +1,12 @@
 from __future__ import annotations
-from app.yards_py.domain.entities.event_status import EVENT_STATUS_POSTPONED
-from app.yards_py.domain.entities.scheduled_game import ScheduledGame
 
-from app.yards_py.domain.entities.team import Team
 from typing import Dict, List, Union
-from app.yards_py.core.base_entity import BaseEntity
-from app.yards_py.core.annotate_args import annotate_args
+
+from app.core.annotate_args import annotate_args
+from app.core.base_entity import BaseEntity
+from app.domain.entities.event_status import EVENT_STATUS_POSTPONED
+from app.domain.entities.scheduled_game import ScheduledGame
+from app.domain.entities.team import Team
 
 BYE = "BYE"
 
@@ -41,7 +42,7 @@ class Opponents(BaseEntity):
             OTT=opponents.get("OTT", BYE),
             SSK=opponents.get("SSK", BYE),
             TOR=opponents.get("TOR", BYE),
-            WPG=opponents.get("WPG", BYE)
+            WPG=opponents.get("WPG", BYE),
         )
 
     @staticmethod
@@ -58,13 +59,14 @@ class Opponents(BaseEntity):
         return Opponents.create(opponents)
 
     def changed(self, other: Opponents) -> bool:
-        return \
-            self.BC != other.BC or \
-            self.CGY != other.CGY or \
-            self.EDM != other.EDM or \
-            self.SSK != other.SSK or \
-            self.WPG != other.WPG or \
-            self.HAM != other.HAM or \
-            self.TOR != other.TOR or \
-            self.OTT != other.OTT or \
-            self.MTL != other.MTL
+        return (
+            self.BC != other.BC
+            or self.CGY != other.CGY
+            or self.EDM != other.EDM
+            or self.SSK != other.SSK
+            or self.WPG != other.WPG
+            or self.HAM != other.HAM
+            or self.TOR != other.TOR
+            or self.OTT != other.OTT
+            or self.MTL != other.MTL
+        )

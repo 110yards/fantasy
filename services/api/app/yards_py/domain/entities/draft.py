@@ -1,13 +1,14 @@
-
-from app.yards_py.domain.entities.league_position import LeaguePosition
-from app.yards_py.domain.entities.league_positions_config import LeaguePositionsConfig
-from app.yards_py.domain.entities.roster import Roster
 from typing import Dict, List, Optional, Union
-from app.yards_py.domain.entities.player import Player
+
 from pydantic.main import BaseModel
-from app.yards_py.domain.enums.draft_type import DraftType
-from app.yards_py.core.base_entity import BaseEntity
-from app.yards_py.core.annotate_args import annotate_args
+
+from app.core.annotate_args import annotate_args
+from app.core.base_entity import BaseEntity
+from app.domain.entities.league_position import LeaguePosition
+from app.domain.entities.league_positions_config import LeaguePositionsConfig
+from app.domain.entities.player import Player
+from app.domain.entities.roster import Roster
+from app.domain.enums.draft_type import DraftType
 
 
 @annotate_args
@@ -49,11 +50,13 @@ class DraftSlot(BaseModel):
         return next_bidder
 
     def is_eligible_after_index(self, index: int, bidder: DraftBidder) -> bool:
-        return bidder.index > index and \
-            not bidder.outbid and \
-            not bidder.passed and \
-            not bidder.roster_id == self.roster_id and \
-            not bidder.index == self.bidder_index
+        return (
+            bidder.index > index
+            and not bidder.outbid
+            and not bidder.passed
+            and not bidder.roster_id == self.roster_id
+            and not bidder.index == self.bidder_index
+        )
 
 
 @annotate_args

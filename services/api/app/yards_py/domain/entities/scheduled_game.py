@@ -1,12 +1,12 @@
-
 from __future__ import annotations
 
 from typing import Optional
-from app.yards_py.core.base_entity import BaseEntity
-from app.yards_py.domain.entities.event_status import EventStatus
-from app.yards_py.domain.entities.event_type import EventType
-from app.yards_py.domain.entities.game_score import GameScore
-from app.yards_py.domain.entities.game_teams import GameTeams
+
+from app.core.base_entity import BaseEntity
+from app.domain.entities.event_status import EventStatus
+from app.domain.entities.event_type import EventType
+from app.domain.entities.game_score import GameScore
+from app.domain.entities.game_teams import GameTeams
 
 
 class ScheduledGame(BaseEntity):
@@ -36,7 +36,6 @@ class ScheduledGame(BaseEntity):
                 "name": game["team_1"]["nickname"],
                 "abbreviation": game["team_1"]["abbreviation"],
             },
-
             "home": {
                 "id": game["team_2"]["team_id"],
                 "location": game["team_2"]["location"],

@@ -1,8 +1,10 @@
-from app.yards_py.core.firestore_proxy import Query
 from typing import List
-from app.yards_py.domain.entities.league import League
-from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
+
 from fastapi import Depends
+
+from app.core.firestore_proxy import Query
+from app.domain.entities.league import League
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 
 
 def create_league_problems_service(league_repo: LeagueRepository = Depends(create_league_repository)):

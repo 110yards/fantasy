@@ -1,11 +1,11 @@
 from google.cloud.firestore_v1.transaction import Transaction
 
-from app.yards_py.core.firestore_proxy import FirestoreProxy
-from app.yards_py.domain.entities.draft import Draft
-from app.yards_py.domain.entities.league import PrivateConfig
-from app.yards_py.domain.entities.league_positions_config import LeaguePositionsConfig
-from app.yards_py.domain.entities.schedule import Schedule
-from app.yards_py.domain.entities.scoring_settings import ScoringSettings
+from app.core.firestore_proxy import FirestoreProxy
+from app.domain.entities.draft import Draft
+from app.domain.entities.league import PrivateConfig
+from app.domain.entities.league_positions_config import LeaguePositionsConfig
+from app.domain.entities.schedule import Schedule
+from app.domain.entities.scoring_settings import ScoringSettings
 
 
 def create_league_config_repository():

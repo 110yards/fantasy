@@ -1,5 +1,6 @@
 from fastapi.param_functions import Depends
-from app.yards_py.domain.entities.league import League
+
+from app.domain.entities.league import League
 from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from app.domain.services.discord_service import DiscordService, create_discord_service
 
@@ -36,7 +37,6 @@ class NotificationService:
             self.__send_discord_message(league, message)
 
     def send_waiver_results(self, league: League, message: str):
-
         if league.enable_discord_notifications and league.notifications_waivers:
             self.__send_discord_message(league, message)
 

@@ -4,7 +4,7 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from app.yards_py.domain.entities.stats import Stats
+from app.domain.entities.stats import Stats
 
 
 class GameResult(BaseModel):

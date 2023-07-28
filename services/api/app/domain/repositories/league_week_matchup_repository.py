@@ -2,9 +2,9 @@ from typing import Dict, List
 
 from google.cloud.firestore_v1.transaction import Transaction
 
+from app.core.firestore_proxy import FirestoreProxy
+from app.domain.entities.schedule import Matchup
 from app.domain.repositories.league_repository import LeagueRepository
-from app.yards_py.core.firestore_proxy import FirestoreProxy
-from app.yards_py.domain.entities.schedule import Matchup
 
 
 def create_league_week_matchup_repository():

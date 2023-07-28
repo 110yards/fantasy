@@ -4,11 +4,11 @@ from datetime import datetime
 from functools import cmp_to_key
 from typing import Dict, List, Optional, Union
 
-from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.core.base_entity import BaseEntity
-from app.yards_py.domain.entities.league_position import LeaguePosition
-from app.yards_py.domain.entities.waiver_bid import WaiverBid
-from app.yards_py.domain.enums.position_type import PositionType
+from app.core.annotate_args import annotate_args
+from app.core.base_entity import BaseEntity
+from app.domain.entities.league_position import LeaguePosition
+from app.domain.entities.waiver_bid import WaiverBid
+from app.domain.enums.position_type import PositionType
 
 DEFAULT_WAIVER_BUDGET = 100
 

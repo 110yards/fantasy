@@ -1,8 +1,8 @@
 import pytest
 
-from app.yards_py.domain.entities.roster import Roster
-from app.yards_py.domain.entities.schedule import MatchupType, PlayoffType
-from app.yards_py.domain.services.schedule_service import combine_schedule, generate_schedule, get_sequence_for_count
+from app.domain.entities.roster import Roster
+from app.domain.entities.schedule import MatchupType, PlayoffType
+from app.domain.services.schedule_service import combine_schedule, generate_schedule, get_sequence_for_count
 from tests.asserts import are_equal
 
 SEASON_WEEKS = 21

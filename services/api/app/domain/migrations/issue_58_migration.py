@@ -1,17 +1,18 @@
-
-from app.yards_py.core.logging import Logger
-from app.yards_py.domain.entities.schedule import ScheduleWeek
-from app.yards_py.domain.entities.matchup_preview import MatchupPreview
-from app.yards_py.domain.entities.user_league_preview import UserLeaguePreview
 from typing import Dict
-from app.domain.repositories.state_repository import StateRepository, create_state_repository
-from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from app.domain.enums.draft_state import DraftState
-from app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
+
 from fastapi.param_functions import Depends
-from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from firebase_admin.firestore import firestore
+
+from app.core.logging import Logger
+from app.domain.entities.matchup_preview import MatchupPreview
+from app.domain.entities.schedule import ScheduleWeek
+from app.domain.entities.user_league_preview import UserLeaguePreview
+from app.domain.enums.draft_state import DraftState
+from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from app.domain.repositories.state_repository import StateRepository, create_state_repository
+from app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
 
 
 def create_issue_58_migration(
@@ -25,7 +26,7 @@ def create_issue_58_migration(
 
 
 class Issue58Migration:
-    '''Fixes the league preview for anyone affected by https://github.com/mdryden/110yards/issues/15'''
+    """Fixes the league preview for anyone affected by https://github.com/mdryden/110yards/issues/15"""
 
     def __init__(
         self,
@@ -42,7 +43,6 @@ class Issue58Migration:
         self.state_repo = state_repo
 
     def run(self, league_id) -> str:
-
         if league_id:
             leagues = [self.league_repo.get(league_id)]
         else:
@@ -66,7 +66,7 @@ class Issue58Migration:
                 previews: Dict[str, UserLeaguePreview] = {}
                 for roster in rosters:
                     preview = self.user_league_repo.get(roster.id, league.id, transaction)
-                    previews[roster.id] = (preview)
+                    previews[roster.id] = preview
 
                 for roster in rosters:
                     week: ScheduleWeek = next(week for week in schedule.weeks if week.week_number == current_week)

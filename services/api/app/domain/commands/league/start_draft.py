@@ -1,24 +1,25 @@
-
-from app.yards_py.domain.entities.league import League
-from app.domain.services.notification_service import NotificationService, create_notification_service
-from app.yards_py.domain.services.schedule_service import ScheduledMatchup
-from typing import Dict
-from app.yards_py.domain.entities.user_league_preview import UserLeaguePreview
-from app.yards_py.domain.entities.matchup_preview import MatchupPreview
-from app.yards_py.domain.entities.schedule import ScheduleWeek
 from copy import deepcopy
-from app.yards_py.domain.entities.draft import Draft, generate_draft
+from typing import Dict
+
+from fastapi import Depends
+from firebase_admin import firestore
+
+from app.core.annotate_args import annotate_args
+from app.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from app.domain.entities.draft import Draft, generate_draft
+from app.domain.entities.league import League
+from app.domain.entities.matchup_preview import MatchupPreview
+from app.domain.entities.schedule import ScheduleWeek
+from app.domain.entities.user_league_preview import UserLeaguePreview
 from app.domain.enums.draft_state import DraftState
+from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
 from app.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository, create_league_week_matchup_repository
 from app.domain.repositories.state_repository import StateRepository, create_state_repository
-from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
-from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from fastapi import Depends
-from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
-from firebase_admin import firestore
+from app.domain.services.notification_service import NotificationService, create_notification_service
+from app.domain.services.schedule_service import ScheduledMatchup
 
 
 def create_start_draft_command_executor(
@@ -53,16 +54,16 @@ class StartDraftResult(BaseCommandResult[StartDraftCommand]):
 
 
 class StartDraftCommandExecutor(BaseCommandExecutor[StartDraftCommand, StartDraftResult]):
-
-    def __init__(self,
-                 league_repo: LeagueRepository,
-                 league_config_repo: LeagueConfigRepository,
-                 user_league_repo: UserLeagueRepository,
-                 league_roster_repo: LeagueRosterRepository,
-                 state_repo: StateRepository,
-                 league_week_matchup_repo: LeagueWeekMatchupRepository,
-                 notification_service: NotificationService,
-                 ):
+    def __init__(
+        self,
+        league_repo: LeagueRepository,
+        league_config_repo: LeagueConfigRepository,
+        user_league_repo: UserLeagueRepository,
+        league_roster_repo: LeagueRosterRepository,
+        state_repo: StateRepository,
+        league_week_matchup_repo: LeagueWeekMatchupRepository,
+        notification_service: NotificationService,
+    ):
         self.league_repo = league_repo
         self.league_config_repo = league_config_repo
         self.user_league_repo = user_league_repo
@@ -72,7 +73,6 @@ class StartDraftCommandExecutor(BaseCommandExecutor[StartDraftCommand, StartDraf
         self.notification_service = notification_service
 
     def on_execute(self, command: StartDraftCommand) -> StartDraftResult:
-
         current_week = self.state_repo.get().current_week
 
         @firestore.transactional

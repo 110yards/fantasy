@@ -1,21 +1,19 @@
+from typing import Optional
 
+from fastapi import Depends
+from firebase_admin import firestore
+
+from app.core.annotate_args import annotate_args
+from app.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
 from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from typing import Optional
-from fastapi import Depends
-from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
-from firebase_admin import firestore
 
 
 def create_set_name_change_ban_command_executor(
-        league_repo: LeagueRepository = Depends(create_league_repository),
-        league_roster_repo: LeagueRosterRepository = Depends(create_league_roster_repository),
+    league_repo: LeagueRepository = Depends(create_league_repository),
+    league_roster_repo: LeagueRosterRepository = Depends(create_league_roster_repository),
 ):
-    return SetNameChangeBanCommandExecutor(
-        league_repo=league_repo,
-        league_roster_repo=league_roster_repo
-    )
+    return SetNameChangeBanCommandExecutor(league_repo=league_repo, league_roster_repo=league_roster_repo)
 
 
 @annotate_args
@@ -32,7 +30,6 @@ class SetNameChangeBanResult(BaseCommandResult[SetNameChangeBanCommand]):
 
 
 class SetNameChangeBanCommandExecutor(BaseCommandExecutor[SetNameChangeBanCommand, SetNameChangeBanResult]):
-
     def __init__(
         self,
         league_repo: LeagueRepository,
@@ -42,7 +39,6 @@ class SetNameChangeBanCommandExecutor(BaseCommandExecutor[SetNameChangeBanComman
         self.league_roster_repo = league_roster_repo
 
     def on_execute(self, command: SetNameChangeBanCommand) -> SetNameChangeBanResult:
-
         @firestore.transactional
         def update(transaction):
             league = self.league_repo.get(command.league_id, transaction)

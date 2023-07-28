@@ -1,19 +1,20 @@
+from typing import Optional
 
-from app.domain.repositories.league_transaction_repository import LeagueTransactionRepository, create_league_transaction_repository
-from app.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository, create_league_week_matchup_repository
-from app.yards_py.domain.entities.league_transaction import LeagueTransaction
-from app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
+from fastapi import Depends
+from firebase_admin import firestore
+
+from app.core.annotate_args import annotate_args
+from app.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from app.core.publisher import Publisher
+from app.di import create_publisher
+from app.domain.entities.league_transaction import LeagueTransaction
 from app.domain.enums.draft_state import DraftState
 from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from typing import Optional
-from fastapi import Depends
-from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
-from app.yards_py.core.publisher import Publisher
-from app.di import create_publisher
-from firebase_admin import firestore
+from app.domain.repositories.league_transaction_repository import LeagueTransactionRepository, create_league_transaction_repository
+from app.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository, create_league_week_matchup_repository
+from app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
 
 
 def create_update_roster_name_command_executor(
@@ -50,7 +51,6 @@ class UpdateRosterNameResult(BaseCommandResult[UpdateRosterNameCommand]):
 
 
 class UpdateRosterNameCommandExecutor(BaseCommandExecutor[UpdateRosterNameCommand, UpdateRosterNameResult]):
-
     def __init__(
         self,
         league_repo: LeagueRepository,
@@ -70,7 +70,6 @@ class UpdateRosterNameCommandExecutor(BaseCommandExecutor[UpdateRosterNameComman
         self.league_week_matchup_repo = league_week_matchup_repo
 
     def on_execute(self, command: UpdateRosterNameCommand) -> UpdateRosterNameResult:
-
         @firestore.transactional
         def update(transaction):
             league = self.league_repo.get(command.league_id, transaction)
@@ -140,7 +139,8 @@ class UpdateRosterNameCommandExecutor(BaseCommandExecutor[UpdateRosterNameComman
             self.league_roster_repo.partial_update(command.league_id, command.roster_id, updates, transaction)
 
             league_transaction = LeagueTransaction.change_roster_name(
-                command.league_id, command.roster_id, command.roster_name, old_name, commissioner_override)
+                command.league_id, command.roster_id, command.roster_name, old_name, commissioner_override
+            )
             self.league_transaction_repo.create(command.league_id, league_transaction, transaction)
 
             return UpdateRosterNameResult(command=command)

@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional
 
-from app.yards_py.core.base_entity import BaseEntity
-from app.yards_py.domain.entities.player_league_game_score import PlayerLeagueGameScore
-from app.yards_py.domain.entities.player_season import PlayerSeason
-from app.yards_py.domain.entities.scoring_settings import ScoringSettings
+from app.core.base_entity import BaseEntity
+from app.domain.entities.player_league_game_score import PlayerLeagueGameScore
+from app.domain.entities.player_season import PlayerSeason
+from app.domain.entities.scoring_settings import ScoringSettings
 
 
 class PlayerLeagueSeasonScore(BaseEntity):

@@ -1,19 +1,17 @@
-
-from app.domain.enums.draft_state import DraftState
-from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
-from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
 from typing import Optional
 
-from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.core.base_command_executor import (BaseCommand, BaseCommandExecutor,
-                                                 BaseCommandResult)
-from app.yards_py.domain.entities.league import League
-from app.domain.enums.draft_type import DraftType
-from app.domain.repositories.league_repository import (
-    LeagueRepository, create_league_repository)
 from fastapi import Depends
 from firebase_admin import firestore
+
+from app.core.annotate_args import annotate_args
+from app.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from app.domain.entities.league import League
+from app.domain.enums.draft_state import DraftState
+from app.domain.enums.draft_type import DraftType
+from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
+from app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
 
 
 def create_update_league_command_executor(
@@ -22,11 +20,7 @@ def create_update_league_command_executor(
     league_roster_repo: LeagueRosterRepository = Depends(create_league_roster_repository),
     user_league_repo: UserLeagueRepository = Depends(create_user_league_repository),
 ):
-    return UpdateLeagueCommandExecutor(
-        league_repo,
-        league_config_repo,
-        league_roster_repo,
-        user_league_repo)
+    return UpdateLeagueCommandExecutor(league_repo, league_config_repo, league_roster_repo, user_league_repo)
 
 
 @annotate_args
@@ -50,19 +44,19 @@ class UpdateLeagueResult(BaseCommandResult[UpdateLeagueCommand]):
 
 
 class UpdateLeagueCommandExecutor(BaseCommandExecutor[UpdateLeagueCommand, UpdateLeagueResult]):
-
-    def __init__(self,
-                 league_repo: LeagueRepository,
-                 league_config_repo: LeagueConfigRepository,
-                 league_roster_repo: LeagueRosterRepository,
-                 user_league_repo: UserLeagueRepository):
+    def __init__(
+        self,
+        league_repo: LeagueRepository,
+        league_config_repo: LeagueConfigRepository,
+        league_roster_repo: LeagueRosterRepository,
+        user_league_repo: UserLeagueRepository,
+    ):
         self.league_repo = league_repo
         self.league_config_repo = league_config_repo
         self.league_roster_repo = league_roster_repo
         self.user_league_repo = user_league_repo
 
     def on_execute(self, command: UpdateLeagueCommand) -> UpdateLeagueResult:
-
         @firestore.transactional
         def update(transaction):
             league = self.league_repo.get(command.league_id, transaction)

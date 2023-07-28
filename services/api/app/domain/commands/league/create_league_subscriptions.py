@@ -1,24 +1,23 @@
 from typing import List, Optional
 
-from app.config.settings import Settings, get_settings
-from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.core.base_command_executor import (BaseCommand, BaseCommandExecutor,
-                                                 BaseCommandResult)
-from app.yards_py.core.logging import Logger
-from app.yards_py.core.publisher import Publisher
-from app.di import create_publisher
-from app.yards_py.domain.entities.league import League
-from app.domain.repositories.league_repository import (
-    LeagueRepository, create_league_repository)
-from app.yards_py.domain.topics import LEAGUE_COMMAND_TOPIC
 from fastapi.param_functions import Depends
 from firebase_admin import firestore
+
+from app.config.settings import Settings, get_settings
+from app.core.annotate_args import annotate_args
+from app.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from app.core.logging import Logger
+from app.core.publisher import Publisher
+from app.di import create_publisher
+from app.domain.entities.league import League
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.domain.topics import LEAGUE_COMMAND_TOPIC
 
 
 def create_league_subscriptions_command_executor(
     settings: Settings = Depends(get_settings),
     league_repo: LeagueRepository = Depends(create_league_repository),
-    publisher: Publisher = Depends(create_publisher)
+    publisher: Publisher = Depends(create_publisher),
 ):
     return CreateLeagueSubscriptionsCommandExecutor(settings, league_repo, publisher)
 
@@ -35,11 +34,7 @@ class CreateLeagueSubscriptionsResult(BaseCommandResult[CreateLeagueSubscription
 
 
 class CreateLeagueSubscriptionsCommandExecutor(BaseCommandExecutor[CreateLeagueSubscriptionsCommand, CreateLeagueSubscriptionsResult]):
-
-    def __init__(self,
-                 settings: Settings,
-                 league_repo: LeagueRepository,
-                 publisher: Publisher):
+    def __init__(self, settings: Settings, league_repo: LeagueRepository, publisher: Publisher):
         self.settings = settings
         self.league_repo = league_repo
         self.publisher = publisher

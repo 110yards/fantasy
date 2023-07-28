@@ -2,9 +2,9 @@ from typing import List, Union
 
 from google.cloud.firestore_v1.transaction import Transaction
 
+from app.core.firestore_proxy import FirestoreProxy, Query
+from app.domain.entities.player_league_season_score import PlayerLeagueSeasonScore
 from app.domain.repositories.league_repository import LeagueRepository
-from app.yards_py.core.firestore_proxy import FirestoreProxy, Query
-from app.yards_py.domain.entities.player_league_season_score import PlayerLeagueSeasonScore
 
 
 def create_player_league_season_score_repository():

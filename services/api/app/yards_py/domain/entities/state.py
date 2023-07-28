@@ -3,8 +3,8 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.core.base_entity import BaseEntity
+from app.core.annotate_args import annotate_args
+from app.core.base_entity import BaseEntity
 
 
 @annotate_args

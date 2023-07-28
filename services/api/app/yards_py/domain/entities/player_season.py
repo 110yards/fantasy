@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import List
 
-from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.core.base_entity import BaseEntity
-from app.yards_py.domain.entities.player_game import PlayerGame
-from app.yards_py.domain.entities.stats import Stats
+from app.core.annotate_args import annotate_args
+from app.core.base_entity import BaseEntity
+from app.domain.entities.player_game import PlayerGame
+from app.domain.entities.stats import Stats
 
 
 @annotate_args

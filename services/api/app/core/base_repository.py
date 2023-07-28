@@ -1,9 +1,10 @@
 from abc import abstractmethod
 from typing import Callable, Generic, List, TypeVar, Union
 
-from app.yards_py.core.base_entity import BaseEntity
 from firebase_admin import firestore
 from google.cloud.firestore_v1.transaction import Transaction
+
+from app.core.base_entity import BaseEntity
 
 T = TypeVar("T", bound=BaseEntity)
 

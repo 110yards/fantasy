@@ -4,10 +4,10 @@ from google.cloud.firestore import Client
 from google.cloud.firestore_v1.base_document import BaseDocumentReference, DocumentSnapshot
 from google.cloud.firestore_v1.transaction import Transaction
 
-from app.yards_py.core.base_entity import BaseEntity
-from app.yards_py.core.batching import create_batches
+from app.core.base_entity import BaseEntity
+from app.core.batching import create_batches
 
-from ...config.settings import get_settings
+from ..config.settings import get_settings
 
 T = TypeVar("T", bound=BaseEntity)
 

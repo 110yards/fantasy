@@ -2,9 +2,9 @@ from typing import Dict, List
 
 from google.cloud.firestore_v1.transaction import Transaction
 
+from app.core.firestore_proxy import FirestoreProxy
+from app.domain.entities.user_league_preview import UserLeaguePreview
 from app.domain.repositories.user_repository import UserRepository
-from app.yards_py.core.firestore_proxy import FirestoreProxy
-from app.yards_py.domain.entities.user_league_preview import UserLeaguePreview
 
 
 def create_user_league_repository():

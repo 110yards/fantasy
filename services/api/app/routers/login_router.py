@@ -1,9 +1,10 @@
-from app.config import settings
-from app.yards_py.core import firebase
 from fastapi import Depends
+from pydantic import BaseModel
+
+from app.config import settings
+from app.core import firebase
 
 from .api_router import APIRouter
-from pydantic import BaseModel
 
 router = APIRouter(prefix="/login")
 

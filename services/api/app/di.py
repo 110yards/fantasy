@@ -2,7 +2,7 @@ from fastapi import Depends
 
 from app.config.settings import Settings, get_settings
 from app.domain.repositories.virtual_pubsub_repository import VirtualPubsubRepository, create_virtual_pubsub_repository
-from app.yards_py.core.publisher import PubSubPublisher, VirtualPubSubPublisher
+from app.core.publisher import PubSubPublisher, VirtualPubSubPublisher
 
 
 def create_publisher(

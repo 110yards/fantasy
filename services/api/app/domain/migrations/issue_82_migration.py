@@ -1,10 +1,10 @@
-
-from app.yards_py.core.logging import Logger
-from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from app.domain.enums.draft_state import DraftState
 from fastapi.param_functions import Depends
-from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from firebase_admin.firestore import firestore
+
+from app.core.logging import Logger
+from app.domain.enums.draft_state import DraftState
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
 
 
 def create_issue_82_migration(
@@ -15,7 +15,7 @@ def create_issue_82_migration(
 
 
 class Issue82Migration:
-    '''Fixes the stuck roster scores https://github.com/mdryden/110yards-api/issues/82'''
+    """Fixes the stuck roster scores https://github.com/mdryden/110yards-api/issues/82"""
 
     def __init__(
         self,
@@ -26,7 +26,6 @@ class Issue82Migration:
         self.league_roster_repo = league_roster_repo
 
     def run(self, league_id) -> str:
-
         if league_id:
             leagues = [self.league_repo.get(league_id)]
         else:

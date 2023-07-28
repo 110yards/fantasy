@@ -1,8 +1,8 @@
+from app.core.publisher import VirtualPubSubPublisher
 from app.domain.commands.user.update_profile import UpdateProfileCommand, UpdateProfileCommandExecutor
+from app.domain.entities.user import User
 from app.domain.enums.login_type import LoginType
 from app.domain.repositories.user_repository import UserRepository
-from app.yards_py.core.publisher import VirtualPubSubPublisher
-from app.yards_py.domain.entities.user import User
 from tests.asserts import are_equal
 from tests.mocks.mock_firestore_proxy import MockFirestoreProxy
 

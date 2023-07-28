@@ -1,10 +1,9 @@
-
-
 from fastapi.param_functions import Depends
-from app.yards_py.domain.entities.scoring_settings import ScoringSettings
-from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from firebase_admin.firestore import firestore
+
+from app.domain.entities.scoring_settings import ScoringSettings
+from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 
 
 def create_issue_46_migration(
@@ -15,10 +14,10 @@ def create_issue_46_migration(
 
 
 class Issue46Migration:
-    '''Fixes a problem with the original default scoring config
+    """Fixes a problem with the original default scoring config
 
     This resets the default scoring config for all affected leagues.
-    '''
+    """
 
     def __init__(self, league_repo: LeagueRepository, league_config_repo: LeagueConfigRepository):
         self.league_repo = league_repo

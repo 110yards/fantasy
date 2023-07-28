@@ -1,9 +1,9 @@
-
-from app.yards_py.core.logging import Logger
 from fastapi import Request, Response
 from fastapi.exceptions import HTTPException
 from starlette import status
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+
+from app.core.logging import Logger
 
 
 class LoggingMiddleware(BaseHTTPMiddleware):

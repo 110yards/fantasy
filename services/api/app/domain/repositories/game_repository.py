@@ -2,9 +2,9 @@ from typing import List
 
 from google.cloud.firestore_v1.transaction import Transaction
 
-from app.yards_py.core.base_repository import Query
-from app.yards_py.core.firestore_proxy import FirestoreProxy
-from app.yards_py.domain.entities.game import Game
+from app.core.base_repository import Query
+from app.core.firestore_proxy import FirestoreProxy
+from app.domain.entities.game import Game
 
 
 def create_game_repository():

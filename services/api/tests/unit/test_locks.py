@@ -1,7 +1,7 @@
 import pytest
 
-from app.yards_py.domain.entities.state import Locks
-from app.yards_py.domain.entities.team import Team
+from app.domain.entities.state import Locks
+from app.domain.entities.team import Team
 from tests.asserts import are_equal
 
 test_cases = [

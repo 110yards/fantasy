@@ -1,15 +1,15 @@
 from __future__ import annotations
-from app.yards_py.domain.entities.league_position import LeaguePosition
-from app.yards_py.domain.entities.draft import DraftOrder
-from app.yards_py.domain.entities.schedule import PlayoffType
 
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.core.base_entity import BaseEntity
-from app.yards_py.domain.enums.draft_state import DraftState
-from app.yards_py.domain.enums.draft_type import DraftType
+from app.core.annotate_args import annotate_args
+from app.core.base_entity import BaseEntity
+from app.domain.entities.draft import DraftOrder
+from app.domain.entities.league_position import LeaguePosition
+from app.domain.entities.schedule import PlayoffType
+from app.domain.enums.draft_state import DraftState
+from app.domain.enums.draft_type import DraftType
 
 
 @annotate_args

@@ -1,18 +1,20 @@
+from typing import Optional
 
-from app.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository, create_league_week_matchup_repository
-from app.domain.repositories.state_repository import StateRepository, create_state_repository
+from fastapi import Depends
+from firebase_admin import firestore
+
+from app.config.settings import Settings, get_settings
+from app.core.annotate_args import annotate_args
+from app.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from app.domain.entities.schedule import PlayoffType, Schedule
+from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
+
 # from app.domain.services.schedule_service import generate_schedule
 from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from app.domain.repositories.league_week_matchup_repository import LeagueWeekMatchupRepository, create_league_week_matchup_repository
+from app.domain.repositories.state_repository import StateRepository, create_state_repository
 from app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
-from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from app.yards_py.domain.entities.schedule import PlayoffType, Schedule
-from typing import Optional
-from app.config.settings import Settings, get_settings
-from fastapi import Depends
-from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
-from firebase_admin import firestore
 
 
 def create_complete_draft_command_executor(
@@ -23,7 +25,6 @@ def create_complete_draft_command_executor(
     league_roster_repo: LeagueRosterRepository = Depends(create_league_roster_repository),
     state_repo: StateRepository = Depends(create_state_repository),
     league_week_matchup_repo: LeagueWeekMatchupRepository = Depends(create_league_week_matchup_repository),
-
 ):
     return CompleteDraftCommandExecutor(
         settings.season_weeks,
@@ -50,16 +51,16 @@ class CompleteDraftResult(BaseCommandResult[CompleteDraftCommand]):
 
 
 class CompleteDraftCommandExecutor(BaseCommandExecutor[CompleteDraftCommand, CompleteDraftResult]):
-
-    def __init__(self,
-                 season_weeks: int,
-                 league_repo: LeagueRepository,
-                 league_config_repo: LeagueConfigRepository,
-                 user_league_repo: UserLeagueRepository,
-                 league_roster_repo: LeagueRosterRepository,
-                 state_repo: StateRepository,
-                 league_week_matchup_repo: LeagueWeekMatchupRepository,
-                 ):
+    def __init__(
+        self,
+        season_weeks: int,
+        league_repo: LeagueRepository,
+        league_config_repo: LeagueConfigRepository,
+        user_league_repo: UserLeagueRepository,
+        league_roster_repo: LeagueRosterRepository,
+        state_repo: StateRepository,
+        league_week_matchup_repo: LeagueWeekMatchupRepository,
+    ):
         self.season_weeks = season_weeks
         self.league_repo = league_repo
         self.league_config_repo = league_config_repo
@@ -69,7 +70,6 @@ class CompleteDraftCommandExecutor(BaseCommandExecutor[CompleteDraftCommand, Com
         self.league_week_matchup_repo = league_week_matchup_repo
 
     def on_execute(self, command: CompleteDraftCommand) -> CompleteDraftResult:
-
         # state = self.state_repo.get()
 
         @firestore.transactional

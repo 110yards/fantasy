@@ -8,16 +8,16 @@ from typing import Dict, List, Optional
 
 from dateutil import parser
 
-from app.yards_py.core.base_entity import BaseEntity
-from app.yards_py.core.hash_dict import hash_dict
-from app.yards_py.core.sim_state import SimState
-from app.yards_py.domain.entities.event_status import EventStatus
-from app.yards_py.domain.entities.event_type import EventType
-from app.yards_py.domain.entities.game_player import GamePlayer
-from app.yards_py.domain.entities.game_score import GameScore
-from app.yards_py.domain.entities.game_teams import GameTeams
-from app.yards_py.domain.entities.player_game import PlayerGame
-from app.yards_py.domain.enums.position_type import PositionType
+from app.core.base_entity import BaseEntity
+from app.core.hash_dict import hash_dict
+from app.core.sim_state import SimState
+from app.domain.entities.event_status import EventStatus
+from app.domain.entities.event_type import EventType
+from app.domain.entities.game_player import GamePlayer
+from app.domain.entities.game_score import GameScore
+from app.domain.entities.game_teams import GameTeams
+from app.domain.entities.player_game import PlayerGame
+from app.domain.enums.position_type import PositionType
 
 
 class Game(BaseEntity):

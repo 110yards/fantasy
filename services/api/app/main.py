@@ -18,8 +18,8 @@ from app.routers import (
     roster_router,
     user_router,
 )
-from app.yards_py.core.initialize_firebase import initialize_firebase
-from app.yards_py.core.logging import Logger
+from app.core.initialize_firebase import initialize_firebase
+from app.core.logging import Logger
 
 app = FastAPI(middleware=app_middleware)
 

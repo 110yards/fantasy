@@ -1,17 +1,17 @@
 from __future__ import annotations
-from copy import deepcopy
 
-from app.yards_py.domain.enums.week_type import WeekType
-from app.yards_py.domain.enums.matchup_type import MatchupType
-from app.yards_py.core.base_entity import BaseEntity
-from app.yards_py.domain.entities.roster import Roster
+from copy import deepcopy
 from enum import Enum
 from typing import List, Optional
 
+from pydantic import BaseModel
 from pydantic.class_validators import root_validator
 
-from pydantic import BaseModel
-from app.yards_py.core.annotate_args import annotate_args
+from app.core.annotate_args import annotate_args
+from app.core.base_entity import BaseEntity
+from app.domain.entities.roster import Roster
+from app.domain.enums.matchup_type import MatchupType
+from app.domain.enums.week_type import WeekType
 
 
 class PlayoffType(int, Enum):
@@ -39,7 +39,7 @@ def get_playoff_type_config():
         {"id": str(PlayoffType.TOP_2.value), "name": "Top 2", "weeks": 1},
         {"id": str(PlayoffType.TOP_3.value), "name": "Top 3", "weeks": 2},
         {"id": str(PlayoffType.TOP_4.value), "name": "Top 4", "weeks": 2},
-        {"id": str(PlayoffType.TOP_6.value), "name": "Top 6", "weeks": 3}
+        {"id": str(PlayoffType.TOP_6.value), "name": "Top 6", "weeks": 3},
     ]
 
 

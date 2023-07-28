@@ -3,14 +3,14 @@ from typing import Optional
 from fastapi import Depends
 from firebase_admin import firestore
 
+from app.core.annotate_args import annotate_args
+from app.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from app.domain.entities.schedule import PlayoffType, Schedule
 from app.domain.enums.draft_state import DraftState
 from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
-from app.yards_py.domain.entities.schedule import PlayoffType, Schedule
-from app.yards_py.domain.services.schedule_service import generate_schedule
+from app.domain.services.schedule_service import generate_schedule
 
 from ...repositories.public_repository import PublicRepository, create_public_repository
 from ...stores.season_schedule_store import SeasonScheduleStore, create_season_schedule_store

@@ -3,14 +3,14 @@ from datetime import datetime
 import pytest
 
 from app.domain.commands.league.update_league_positions import UpdateLeaguePositionsCommand, UpdateLeaguePositionsCommandExecutor
+from app.domain.entities.draft import DraftOrder
+from app.domain.entities.league import League
+from app.domain.entities.league_positions_config import LeaguePositionsConfig
 from app.domain.enums.draft_state import DraftState
 from app.domain.enums.draft_type import DraftType
 from app.domain.enums.position_type import PositionType
 from app.domain.repositories.league_config_repository import LeagueConfigRepository
 from app.domain.repositories.league_repository import LeagueRepository
-from app.yards_py.domain.entities.draft import DraftOrder
-from app.yards_py.domain.entities.league import League
-from app.yards_py.domain.entities.league_positions_config import LeaguePositionsConfig
 from tests.asserts import are_equal
 from tests.mocks.mock_firestore_proxy import MockFirestoreProxy
 

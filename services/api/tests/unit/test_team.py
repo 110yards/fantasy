@@ -1,6 +1,6 @@
 import pytest
 
-from app.yards_py.domain.entities.team import Team
+from app.domain.entities.team import Team
 from tests.asserts import are_equal
 
 

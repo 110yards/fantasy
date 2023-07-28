@@ -1,10 +1,10 @@
-
-
 from typing import List, Union
+
 from fastapi.param_functions import Query
 from google.cloud.firestore_v1.transaction import Transaction
-from app.yards_py.core.firestore_proxy import FirestoreProxy
-from app.yards_py.domain.entities.player_game import PlayerGame
+
+from app.core.firestore_proxy import FirestoreProxy
+from app.domain.entities.player_game import PlayerGame
 
 
 def create_player_game_repository():
@@ -12,7 +12,7 @@ def create_player_game_repository():
     return PlayerGameRepository(firestore)
 
 
-class PlayerGameRepository():
+class PlayerGameRepository:
     def __init__(self, firestore: FirestoreProxy[PlayerGame]):
         self.firestore = firestore
 

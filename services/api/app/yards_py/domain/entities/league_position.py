@@ -1,10 +1,12 @@
 from __future__ import annotations
-from app.yards_py.domain.entities.player import Player
+
 from typing import Optional
 
-from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.domain.enums.position_type import PositionType
 from pydantic.main import BaseModel
+
+from app.core.annotate_args import annotate_args
+from app.domain.entities.player import Player
+from app.domain.enums.position_type import PositionType
 
 
 @annotate_args

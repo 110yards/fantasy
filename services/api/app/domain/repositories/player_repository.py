@@ -3,8 +3,8 @@ from typing import List, Union
 
 from google.cloud.firestore_v1.transaction import Transaction
 
-from app.yards_py.core.firestore_proxy import FirestoreProxy, Query
-from app.yards_py.domain.entities.player import Player
+from app.core.firestore_proxy import FirestoreProxy, Query
+from app.domain.entities.player import Player
 
 
 def create_player_repository():
