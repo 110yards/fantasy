@@ -11,8 +11,8 @@ from app.core.base_entity import BaseEntity
 class State(BaseEntity):
     current_week: int
     current_season: int
-    waivers_end: Optional[datetime]
-    waivers_active = False
+    waivers_end: Optional[datetime] = None
+    waivers_active: bool = False
     is_offseason: bool = False
 
     id: str = "state"

@@ -9,8 +9,8 @@ from app.core.annotate_args import annotate_args
 
 @annotate_args
 class BaseEntity(BaseModel):
-    id: Optional[str]
-    hash: Optional[str]
+    id: Optional[str] = None
+    hash: Optional[str] = None
 
     # Workaround for serializing properties with pydantic until
     # https://github.com/samuelcolvin/pydantic/issues/935

@@ -46,12 +46,12 @@ def create_player_list_service(
 
 
 class RankedPlayer(Player):
-    rank: Optional[int]
+    rank: Optional[int] = None
     average: float = 0
     points: float = 0
     games_played: int = 0
     last_week_score: Optional[float] | Optional[int]
-    season_stats: Optional[Stats]
+    season_stats: Optional[Stats] = None
 
 
 class CacheData(BaseModel):
@@ -59,8 +59,8 @@ class CacheData(BaseModel):
     season: int
     scoring_settings_hash: str
     players: List[RankedPlayer]
-    recalc_date: Optional[int]
-    last_player_update: Optional[datetime]
+    recalc_date: Optional[int] = None
+    last_player_update: Optional[datetime] = None
     generated_at: datetime
 
 

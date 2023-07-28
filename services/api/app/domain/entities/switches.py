@@ -7,24 +7,24 @@ from app.core.base_entity import BaseEntity
 
 @annotate_args
 class Switches(BaseEntity):
-    id = "switches"
-    enable_relaxed_ir = True
-    enable_game_roster_status = False
-    donate_message = "Like the site?  Click here to donate and help pay the bill :)"
-    enable_admin_switch_override = False
-    enable_client_scoring = True
-    enable_draft = True
-    enable_facebook_login = False
-    enable_game_roster_status = True
-    enable_invite_by_email = False
-    enable_login = True
-    enable_matchup_progress = True
-    enable_player_links = True
-    enable_projections = True
-    enable_public_leagues = False
-    enable_relaxed_ir = True
-    enable_score_testing = False
-    enable_twitter_login = False
-    show_donation_link = True
-    show_new_roster_ui_tip = False
-    enable_discord_integration = True
+    id: str = "switches"
+    enable_relaxed_ir: bool = True
+    enable_game_roster_status: bool = False
+    donate_message: str = "Like the site?  Click here to donate and help pay the bill :)"
+    enable_admin_switch_override: bool = False
+    enable_client_scoring: bool = True
+    enable_draft: bool = True
+    enable_facebook_login: bool = False
+    enable_game_roster_status: bool = True
+    enable_invite_by_email: bool = False
+    enable_login: bool = True
+    enable_matchup_progress: bool = True
+    enable_player_links: bool = True
+    enable_projections: bool = True
+    enable_public_leagues: bool = False
+    enable_relaxed_ir: bool = True
+    enable_score_testing: bool = False
+    enable_twitter_login: bool = False
+    show_donation_link: bool = True
+    show_new_roster_ui_tip: bool = False
+    enable_discord_integration: bool = True

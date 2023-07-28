@@ -25,15 +25,15 @@ class Game(BaseEntity):
     # game_number: int
     week: int
     season: int
-    game_duration: Optional[int]
+    game_duration: Optional[int] = None
     event_type: EventType
     event_status: EventStatus
     score: GameScore
     teams: GameTeams
     player_stats: Dict[str, PlayerGame]
-    hash: Optional[str]
-    away_roster: Optional[Dict[str, GamePlayer]]
-    home_roster: Optional[Dict[str, GamePlayer]]
+    hash: Optional[str] = None
+    away_roster: Optional[Dict[str, GamePlayer]] = None
+    home_roster: Optional[Dict[str, GamePlayer]] = None
 
     def calculate_hash(self):
         for stats in self.player_stats.values():

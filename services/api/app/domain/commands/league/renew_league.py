@@ -64,7 +64,7 @@ class RenewLeagueCommand(BaseCommand):
 
 @annotate_args
 class RenewLeagueResult(BaseCommandResult):
-    league: Optional[League]
+    league: Optional[League] = None
 
 
 class RenewLeagueCommandExecutor(BaseCommandExecutor[RenewLeagueCommand, RenewLeagueResult]):

@@ -11,7 +11,7 @@ from app.domain.entities.event_status import (
     EVENT_STATUS_PRE_GAME,
     EventStatus,
 )
-from app.domain.entities.scoreboard import Scoreboard, ScoreboardGame
+from app.domain.entities.scoreboard import Scoreboard, ScoreboardGame, Team, Teams
 from tests.asserts import are_equal
 
 
@@ -50,4 +50,26 @@ is_game_complete_inputs = [
 def test_is_game_complete(expected: bool, game: ScoreboardGame):
     actual = game.is_complete()
 
+    are_equal(expected, actual)
+
+
+lock_cases = [
+    ({}, False),  # No teams locked
+    ({"bc": True}, True),
+    ({"cgy": True}, True),
+    ({"edm": True}, True),
+    ({"ssk": True}, True),
+    ({"wpg": True}, True),
+    ({"ham": True}, True),
+    ({"tor": True}, True),
+    ({"ott": True}, True),
+    ({"mtl": True}, True),
+]
+
+
+@pytest.mark.parametrize("locked_team, expected", lock_cases)
+def test_any_locks_works_with_all_teams(locked_team: Team, expected: bool):
+    scoreboard = Scoreboard.construct(teams=Teams(**locked_team))
+
+    actual = scoreboard.any_locks()
     are_equal(expected, actual)

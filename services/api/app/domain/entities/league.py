@@ -21,10 +21,10 @@ class League(BaseEntity):
     draft_type: DraftType
     draft_state: DraftState
     draft_order: List[DraftOrder]
-    playoff_type: Optional[PlayoffType]
-    first_playoff_week: Optional[int]
+    playoff_type: Optional[PlayoffType] = None
+    first_playoff_week: Optional[int] = None
     positions: Dict[str, LeaguePosition] = None
-    league_command_subscription = False
+    league_command_subscription: bool = False
     registration_closed: bool = False
     enable_loser_playoff: bool = False
     schedule_generated: bool = False
@@ -57,6 +57,6 @@ class League(BaseEntity):
 
 @annotate_args
 class PrivateConfig(BaseEntity):
-    password: Optional[str]
+    password: Optional[str] = None
     id: str = "private"
     discord_webhook_url: str = None

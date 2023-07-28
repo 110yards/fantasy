@@ -42,7 +42,7 @@ class UpdateRosterNameCommand(BaseCommand):
     league_id: str
     roster_id: str
     roster_name: str
-    current_user_id: Optional[str]
+    current_user_id: Optional[str] = None
 
 
 @annotate_args

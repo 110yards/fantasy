@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.param_functions import Depends
 
 from app.config.settings import Settings, get_settings
+from app.core.initialize_firebase import initialize_firebase
+from app.core.logging import Logger
 from app.middleware.config import app_middleware
 from app.routers import (
     admin_router,
@@ -18,18 +20,11 @@ from app.routers import (
     roster_router,
     user_router,
 )
-from app.core.initialize_firebase import initialize_firebase
-from app.core.logging import Logger
 
 app = FastAPI(middleware=app_middleware)
 
 settings = get_settings()
-Logger.initialize(
-    settings.is_dev(),
-    settings.gcloud_project,
-    settings.service_name,
-    settings.region,
-)
+Logger.initialize(settings.is_dev(), settings.gcloud_project, settings.service_name, settings.region)
 
 origins = settings.origins.split(";")
 app.add_middleware(

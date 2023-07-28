@@ -48,16 +48,16 @@ class Player(BaseEntity):
     player_id: Optional[str] = None
     first_name: str
     last_name: str
-    birth_date: Optional[datetime]
-    birth_place: Optional[str]
+    birth_date: Optional[datetime] = None
+    birth_place: Optional[str] = None
     height: Optional[str] = None
     weight: Optional[int] = None
     canadian_player: bool
     position: Position
-    team_abbr: Optional[str]
+    team_abbr: Optional[str] = None
     alternate_computed_ids: list[str] = []
     uniform: Optional[int] = None
-    school: Optional[str]
+    school: Optional[str] = None
     seasons: list[int]
     injury_status: Optional[InjuryDetails] = None
     boxscore_source_id: str

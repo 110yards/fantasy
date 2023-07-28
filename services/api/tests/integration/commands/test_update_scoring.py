@@ -2,7 +2,6 @@ from app.core.publisher import VirtualPubSubPublisher
 from app.domain.commands.league.update_league_scoring import UpdateLeagueScoringCommand, UpdateLeagueScoringCommandExecutor
 from app.domain.entities.league import League
 from app.domain.entities.scoring_settings import ScoringSettings
-from app.domain.entities.state import Locks, State
 from app.domain.enums.draft_state import DraftState
 from app.domain.repositories.league_config_repository import LeagueConfigRepository
 from app.domain.repositories.league_repository import LeagueRepository
@@ -55,10 +54,6 @@ def test_can_update_when_not_started():
     state_repo = StateRepository(MockFirestoreProxy())
     transaction_repo = LeagueTransactionRepository(MockFirestoreProxy())
 
-    locks = Locks()
-    state = State.construct(locks=locks, current_season=2021)
-    state_repo.set(state)
-
     command_executor = UpdateLeagueScoringCommandExecutor(league_repo, league_config_repo, state_repo, transaction_repo, get_publisher())
     command = UpdateLeagueScoringCommand(league_id=league.id, **scoring.dict())
 
@@ -75,10 +70,6 @@ def test_returns_error_when_no_league():
     league_config_repo = LeagueConfigRepository(MockFirestoreProxy())
     state_repo = StateRepository(MockFirestoreProxy())
     transaction_repo = LeagueTransactionRepository(MockFirestoreProxy())
-
-    locks = Locks()
-    state = State.construct(locks=locks)
-    state_repo.set(state)
 
     command_executor = UpdateLeagueScoringCommandExecutor(league_repo, league_config_repo, state_repo, transaction_repo, get_publisher())
     command = UpdateLeagueScoringCommand.construct(league_id="league1")

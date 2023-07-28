@@ -6,7 +6,5 @@ router = APIRouter(prefix="/news")
 
 
 @router.get("/")
-async def get_news(
-    service: NewsService = Depends(create_news_service)
-):
+async def get_news(service: NewsService = Depends(create_news_service)):
     return service.get_news()

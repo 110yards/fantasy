@@ -4,7 +4,7 @@ import logging
 from abc import ABCMeta, abstractmethod
 from typing import Generic, Optional, TypeVar
 
-from pydantic import root_validator
+from pydantic import computed_field
 from pydantic.main import BaseModel
 from starlette_context import context
 
@@ -26,14 +26,13 @@ TCommand = TypeVar("TCommand", bound=BaseCommand)
 @annotate_args
 class BaseCommandResult(Generic[TCommand], BaseModel):
     command: TCommand
-    error: Optional[str]
+    error: Optional[str] = None
     success = True
 
-    @root_validator
-    def validate_success(cls, values):
-        if "error" in values and values["error"]:
-            values["success"] = False
-        return values
+    @computed_field
+    @property
+    def success(self) -> bool:
+        return not self.error
 
 
 TResult = TypeVar("TResult", bound=BaseModel)

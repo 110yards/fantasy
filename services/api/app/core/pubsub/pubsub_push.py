@@ -11,7 +11,7 @@ from app.core.pubsub.pubsub_message import PubSubMessage
 
 class PubSubPush(BaseModel):
     message: PubSubMessage
-    subscription: Optional[str]
+    subscription: Optional[str] = None
 
     def get_data(self) -> Dict:
         Logger.debug("Getting data from PubSubPush", extra=self.dict())

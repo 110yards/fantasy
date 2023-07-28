@@ -46,14 +46,14 @@ class AddPlayerCommand(BaseCommand):
     league_id: str
     roster_id: str
     player_id: str
-    drop_player_id: Optional[str]
-    bid: Optional[int]
+    drop_player_id: Optional[str] = None
+    bid: Optional[int] = None
     admin_override: bool = False
 
 
 @annotate_args
 class AddPlayerResult(BaseCommandResult[AddPlayerCommand]):
-    league: Optional[League]
+    league: Optional[League] = None
     transactions: List[LeagueTransaction] = None
 
 

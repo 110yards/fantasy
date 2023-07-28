@@ -29,14 +29,14 @@ def create_join_league_command_executor(
 
 @annotate_args
 class JoinLeagueCommand(BaseCommand):
-    league_id: Optional[str]
-    user_id: Optional[str]
-    password: Optional[str]
+    league_id: Optional[str] = None
+    user_id: Optional[str] = None
+    password: Optional[str] = None
 
 
 @annotate_args
 class JoinLeagueResult(BaseCommandResult[JoinLeagueCommand]):
-    roster: Optional[Roster]
+    roster: Optional[Roster] = None
 
 
 class JoinLeagueCommandExecutor(BaseCommandExecutor[JoinLeagueCommand, BaseCommandResult]):

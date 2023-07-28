@@ -33,7 +33,7 @@ class UndoLastDraftPickCommand(BaseCommand):
 
 @annotate_args
 class UndoLastDraftPickResult(BaseCommandResult[UndoLastDraftPickCommand]):
-    draft_event: Optional[str]
+    draft_event: Optional[str] = None
 
 
 class UndoLastDraftPickCommandExecutor(BaseCommandExecutor[UndoLastDraftPickCommand, UndoLastDraftPickResult]):

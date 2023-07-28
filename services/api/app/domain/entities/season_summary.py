@@ -19,8 +19,8 @@ class PositionSummary(BaseModel):
     position_id: int
     name: str
     position_type: PositionType
-    player_id: Optional[str]
-    player_name: Optional[str]
+    player_id: Optional[str] = None
+    player_name: Optional[str] = None
 
     @staticmethod
     def from_position(position: LeaguePosition) -> PositionSummary:
@@ -62,10 +62,10 @@ class RosterSummary(BaseModel):
 
 @annotate_args
 class MatchupSummary(BaseModel):
-    away_id: Optional[str]
-    away_name: Optional[str]
-    home_id: Optional[str]
-    home_name: Optional[str]
+    away_id: Optional[str] = None
+    away_name: Optional[str] = None
+    home_id: Optional[str] = None
+    home_name: Optional[str] = None
     matchup_type: str
     away_score: Optional[float] | Optional[int]
     home_score: Optional[float] | Optional[int]
@@ -87,10 +87,10 @@ class MatchupSummary(BaseModel):
 
 @annotate_args
 class WeekSummary(BaseModel):
-    week_id: Optional[str]
+    week_id: Optional[str] = None
     week_number: int
     week_type: WeekType
-    heading: Optional[str]
+    heading: Optional[str] = None
     matchups: List[MatchupSummary] = []
 
     @staticmethod
@@ -111,12 +111,12 @@ class WeekSummary(BaseModel):
 @annotate_args
 class DraftPickSummary(BaseModel):
     pick_number: int
-    roster_id: Optional[str]
-    player_id: Optional[str]
-    player_name: Optional[str]
-    nominator: Optional[str]
-    bid: Optional[int]
-    result: Optional[str]
+    roster_id: Optional[str] = None
+    player_id: Optional[str] = None
+    player_name: Optional[str] = None
+    nominator: Optional[str] = None
+    bid: Optional[int] = None
+    result: Optional[str] = None
 
     @staticmethod
     def create_from_draft_slot(draft_slot: DraftSlot) -> DraftPickSummary:

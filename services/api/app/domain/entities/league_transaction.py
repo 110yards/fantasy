@@ -28,8 +28,8 @@ class TransactionType(str, Enum):
 class LeagueTransaction(BaseEntity):
     type: TransactionType
     league_id: str
-    roster_id: Optional[str]
-    player_id: Optional[str]
+    roster_id: Optional[str] = None
+    player_id: Optional[str] = None
     message: str
     timestamp: datetime
 

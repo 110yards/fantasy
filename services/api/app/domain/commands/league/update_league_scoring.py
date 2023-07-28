@@ -26,7 +26,7 @@ def create_update_league_scoring_command_executor(
 
 @annotate_args
 class UpdateLeagueScoringCommand(BaseCommand):
-    league_id: Optional[str]
+    league_id: Optional[str] = None
     pass_attempts: float
     pass_completions: float
     pass_net_yards: float

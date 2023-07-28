@@ -13,7 +13,7 @@ class UserLeaguePreview(BaseEntity):
     user_id: str
     league_name: str
     roster_name: str
-    matchup: Optional[MatchupPreview]
+    matchup: Optional[MatchupPreview] = None
     joined: datetime = datetime.now()
 
     def update_league(self, league: League):

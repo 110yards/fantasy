@@ -39,7 +39,7 @@ def create_complete_draft_command_executor(
 
 @annotate_args
 class CompleteDraftCommand(BaseCommand):
-    league_id: Optional[str]
+    league_id: Optional[str] = None
     first_playoff_week: int
     playoff_type: PlayoffType
     enable_loser_playoff: bool

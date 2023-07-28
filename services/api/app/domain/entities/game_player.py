@@ -14,7 +14,7 @@ class GamePlayer(BaseEntity):
     first_name: str
     middle_name: str
     last_name: str
-    birth_date: Optional[str]
+    birth_date: Optional[str] = None
     # uniform: int
     position: PositionType
     is_national: bool

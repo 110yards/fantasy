@@ -18,11 +18,11 @@ class EventStatus(BaseModel):
     event_status_id: int
     name: str
     is_active: bool
-    quarter: Optional[int]
-    minutes: Optional[int]
-    seconds: Optional[int]
-    down: Optional[int]
-    yards_to_go: Optional[int]
+    quarter: Optional[int] = None
+    minutes: Optional[int] = None
+    seconds: Optional[int] = None
+    down: Optional[int] = None
+    yards_to_go: Optional[int] = None
 
     def has_started(self) -> bool:
         if self.event_status_id in [EVENT_STATUS_IN_PROGRESS, EVENT_STATUS_FINAL]:

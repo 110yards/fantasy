@@ -21,7 +21,7 @@ class SetNameChangeBanCommand(BaseCommand):
     league_id: str
     roster_id: str
     banned: bool
-    current_user_id: Optional[str]
+    current_user_id: Optional[str] = None
 
 
 @annotate_args

@@ -3,7 +3,7 @@ from functools import lru_cache
 from typing import Optional
 
 from dotenv import load_dotenv
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Environment(str, Enum):
@@ -17,16 +17,14 @@ class Settings(BaseSettings):
     firebase_api_key: str
     endpoint: str
     gcloud_project: str
-    service_name: Optional[str]
-    region: Optional[str]
+    service_name: Optional[str] = None
+    region: Optional[str] = None
     origins: str
     version: str = "dev"
     rtdb_emulator_host: Optional[str] = None
     firebase_auth_emulator_host: Optional[str] = None
     firestore_emulator_host: str
-
-    class Config:
-        env_file = ".env"
+    model_config = SettingsConfigDict(env_file=".env")
 
     def is_dev(self):
         return self.dev

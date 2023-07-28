@@ -4,9 +4,11 @@ from random import randint
 
 
 class SimState(BaseModel):
-    game_id: Optional[int]
-    quarter: Optional[int]
+    game_id: Optional[int] = None
+    quarter: Optional[int] = None
 
+    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
     @validator("quarter", pre=True, always=True)
     def validate_quarter(cls, v):
         if v and (v > 3 or v < 1):

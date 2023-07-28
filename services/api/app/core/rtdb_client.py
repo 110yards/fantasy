@@ -8,7 +8,6 @@ def create_rtdb_client():
 
 
 class RTDBClient:
-
     def get(self, path: str) -> Optional[tuple | Any]:
         ref = db.reference(path)
         document = ref.get()

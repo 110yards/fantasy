@@ -1,27 +1,18 @@
 # TODO: REMOVE THIS
 
-from app.domain.commands.league.calculate_playoffs import (
-    CalculatePlayoffsCommand, CalculatePlayoffsCommandExecutor,
-    create_calculate_playoffs_command_executor)
-from app.domain.commands.league.calculate_results import (
-    CalculateResultsCommand, CalculateResultsCommandExecutor,
-    create_calculate_results_command_executor)
+from app.domain.commands.league.calculate_playoffs import CalculatePlayoffsCommand, CalculatePlayoffsCommandExecutor, create_calculate_playoffs_command_executor
+from app.domain.commands.league.calculate_results import CalculateResultsCommand, CalculateResultsCommandExecutor, create_calculate_results_command_executor
 from app.domain.commands.league.calculate_season_score import (
-    CalculateSeasonScoreCommand, CalculateSeasonScoreCommandExecutor,
-    create_calculate_season_score_command_executor)
-from app.domain.commands.league.process_waivers import (
-    ProcessWaiversCommand, ProcessWaiversCommandExecutor,
-    create_process_waivers_command_executor)
-from app.domain.commands.system.end_system_waivers import \
-    EndSystemWaiversResult
-from app.domain.commands.system.start_system_waivers import \
-    StartSystemWaiversResult
-from app.domain.repositories.league_repository import (
-    LeagueRepository, create_league_repository)
-from app.domain.services.end_of_day_service import (
-    EndOfDayService, create_end_of_day_service)
-from app.domain.services.end_of_week_service import (
-    EndOfWeekService, create_end_of_week_service)
+    CalculateSeasonScoreCommand,
+    CalculateSeasonScoreCommandExecutor,
+    create_calculate_season_score_command_executor,
+)
+from app.domain.commands.league.process_waivers import ProcessWaiversCommand, ProcessWaiversCommandExecutor, create_process_waivers_command_executor
+from app.domain.commands.system.end_system_waivers import EndSystemWaiversResult
+from app.domain.commands.system.start_system_waivers import StartSystemWaiversResult
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.domain.services.end_of_day_service import EndOfDayService, create_end_of_day_service
+from app.domain.services.end_of_week_service import EndOfWeekService, create_end_of_week_service
 from fastapi.param_functions import Depends
 
 

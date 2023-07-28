@@ -53,9 +53,9 @@ class SelectPlayerCommand(BaseCommand):
 
 @annotate_args
 class SelectPlayerResult(BaseCommandResult[SelectPlayerCommand]):
-    league: Optional[League]
-    slot: Optional[DraftSlot]
-    next_slot: Optional[DraftSlot]
+    league: Optional[League] = None
+    slot: Optional[DraftSlot] = None
+    next_slot: Optional[DraftSlot] = None
     draft_complete: bool = False
 
 

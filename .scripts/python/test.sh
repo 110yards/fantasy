@@ -1,3 +1,8 @@
 #!/bin/bash
 
-pytest $1 --disable-warnings
+current_dir=$(pwd)
+cd $1
+
+pytest tests/ --disable-warnings
+
+cd $current_dir

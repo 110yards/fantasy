@@ -29,13 +29,13 @@ class DraftBidder(BaseModel):
 @annotate_args
 class DraftSlot(BaseModel):
     pick_number: int
-    roster_id: Optional[str]
-    player: Optional[Player]
-    nominator: Optional[str]
-    bidder_index: Optional[int]
-    bid: Optional[int]
-    bidders: Optional[List[DraftBidder]]
-    result: Optional[str]
+    roster_id: Optional[str] = None
+    player: Optional[Player] = None
+    nominator: Optional[str] = None
+    bidder_index: Optional[int] = None
+    bid: Optional[int] = None
+    bidders: Optional[List[DraftBidder]] = None
+    result: Optional[str] = None
     completed: bool = False
 
     def get_next_bidder(self, current_bidder_index) -> Union[DraftBidder, None]:
@@ -62,7 +62,7 @@ class DraftSlot(BaseModel):
 @annotate_args
 class DraftRosterPosition(BaseModel):
     position: LeaguePosition
-    player: Optional[Player]
+    player: Optional[Player] = None
 
 
 @annotate_args
@@ -78,7 +78,7 @@ class Draft(BaseEntity):
     commissioner_id: str
     draft_type: DraftType
     slots: List[DraftSlot]
-    draft_order: Optional[Dict[str, DraftOrder]]
+    draft_order: Optional[Dict[str, DraftOrder]] = None
     is_paused: bool = False
     id: str = "draft"
     draft_events: List[str] = []

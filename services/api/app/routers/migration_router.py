@@ -1,5 +1,3 @@
-
-
 from app.domain.migrations.issue_102_migration import Issue102Migration, create_issue_102_migration
 from app.domain.migrations.issue_121_migration import Issue121Migration, create_issue_121_migration
 from app.domain.migrations.issue_84_migration import Issue84Migration, create_issue_84_migration
@@ -19,10 +17,7 @@ router = APIRouter(prefix="/migration")
 
 @router.post("/issue-46")
 @require_role(Role.admin)
-async def issue_46(
-    request: Request,
-    issue_46_migration: Issue46Migration = Depends(create_issue_46_migration)
-):
+async def issue_46(request: Request, issue_46_migration: Issue46Migration = Depends(create_issue_46_migration)):
     return issue_46_migration.run()
 
 

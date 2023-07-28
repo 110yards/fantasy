@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from functools import cmp_to_key
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Literal, Optional, Union
 
 from app.core.annotate_args import annotate_args
 from app.core.base_entity import BaseEntity
@@ -16,14 +16,14 @@ DEFAULT_WAIVER_BUDGET = 100
 @annotate_args
 class Roster(BaseEntity):
     name: str
-    draft_budget: Optional[int]
-    current_matchup: Optional[str]
+    draft_budget: Optional[int] = None
+    current_matchup: Optional[str] = None
     positions: Dict[str, LeaguePosition] = {}
     record: str = "0-0"
     points_for: float = 0.0
     points_against: float = 0.0
     transaction_count: int = 0
-    last_week_result = "-"
+    last_week_result: Literal["-", "W", "L", "T"] = "-"
     waiver_budget: int = DEFAULT_WAIVER_BUDGET
     active_player_count: int = 0
     this_week_points_for: float = 0.0

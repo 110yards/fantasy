@@ -14,8 +14,8 @@ class LeaguePosition(BaseModel):
     id: int
     name: str
     position_type: PositionType
-    player: Optional[Player]
-    game_id: Optional[str]
+    player: Optional[Player] = None
+    game_id: Optional[str] = None
     game_score: float = 0
 
     @staticmethod

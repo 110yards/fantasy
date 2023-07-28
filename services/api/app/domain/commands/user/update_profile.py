@@ -20,7 +20,7 @@ def create_update_profile_command_executor(
 class UpdateProfileCommand(BaseCommand):
     uid: str
     display_name: str
-    current_user_id: Optional[str]
+    current_user_id: Optional[str] = None
 
 
 @annotate_args

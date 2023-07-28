@@ -32,7 +32,7 @@ class RegisterEmailCommand(BaseCommand):
 
 @annotate_args
 class RegisterEmailResult(BaseCommandResult[RegisterEmailCommand]):
-    user_id: Optional[str]
+    user_id: Optional[str] = None
 
 
 class RegisterCommandExecutor(BaseCommandExecutor[RegisterEmailCommand, RegisterEmailResult]):

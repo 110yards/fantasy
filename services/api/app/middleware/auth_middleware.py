@@ -1,5 +1,3 @@
-
-
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from app.core.auth import check_token

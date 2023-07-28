@@ -11,8 +11,8 @@ class User(BaseEntity):
     display_name: str
     email: str  # optional?
     login_type: LoginType
-    social_id: Optional[str]
-    last_sign_in: Optional[datetime]
+    social_id: Optional[str] = None
+    last_sign_in: Optional[datetime] = None
     confirmed: bool = False
     commissioner_of: List[str] = []
     is_admin: bool = False

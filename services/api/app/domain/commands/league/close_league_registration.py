@@ -20,7 +20,7 @@ class CloseLeagueRegistrationCommand(BaseCommand):
 
 @annotate_args
 class CloseLeagueRegistrationResult(BaseCommandResult[CloseLeagueRegistrationCommand]):
-    league: Optional[League]
+    league: Optional[League] = None
 
 
 class CloseLeagueRegistrationCommandExecutor(BaseCommandExecutor[CloseLeagueRegistrationCommand, CloseLeagueRegistrationResult]):

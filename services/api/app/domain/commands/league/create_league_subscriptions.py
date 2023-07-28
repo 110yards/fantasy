@@ -24,8 +24,8 @@ def create_league_subscriptions_command_executor(
 
 @annotate_args
 class CreateLeagueSubscriptionsCommand(BaseCommand):
-    league: Optional[League]
-    league_id: Optional[str]
+    league: Optional[League] = None
+    league_id: Optional[str] = None
 
 
 @annotate_args

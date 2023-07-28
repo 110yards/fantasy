@@ -4,8 +4,7 @@ from copy import deepcopy
 from enum import Enum
 from typing import List, Optional
 
-from pydantic import BaseModel
-from pydantic.class_validators import root_validator
+from pydantic import BaseModel, computed_field
 
 from app.core.annotate_args import annotate_args
 from app.core.base_entity import BaseEntity
@@ -45,55 +44,42 @@ def get_playoff_type_config():
 
 @annotate_args
 class Matchup(BaseEntity):
-    away: Optional[Roster]
-    home: Optional[Roster]
+    away: Optional[Roster] = None
+    home: Optional[Roster] = None
     type: MatchupType
-    type_display: Optional[str]
+    type_display: Optional[str] = None
     away_score: float = 0.0
     home_score: float = 0.0
     away_bench_score: float = 0.0
     home_bench_score: float = 0.0
 
-    @root_validator
-    def set_auto_properties(cls, values: dict):
-        type = values.get("type", None)  # type: MatchupType
-
-        if type:
-            values["type_display"] = type.display()
-
-        return values
+    @computed_field
+    @property
+    def type_display(self) -> str:
+        return self.type.display()
 
 
 @annotate_args
-class ScheduleWeek(BaseModel):  # base entity?
-    week_id: Optional[str]
+class ScheduleWeek(BaseModel):
     week_number: int
     week_type: WeekType
-    heading: Optional[str]
     matchups: List[Matchup] = []
 
-    @root_validator
-    def set_auto_properties(cls, values: dict):
-        week_number = values.get("week_number", None)
-        week_type = values.get("week_type", None)
+    @computed_field
+    @property
+    def week_id(self) -> str | None:
+        return f"{self.week_number:02}" if self.week_number else None
 
-        if week_number:
-            values["week_id"] = f"{week_number:02}"
-
-        if week_number and week_type:
-            values["heading"] = ScheduleWeek.get_week_heading(week_type, week_number)
-
-        return values
-
-    @staticmethod
-    def get_week_heading(week_type: WeekType, week_number):
-        if week_type == WeekType.PLAYOFFS:
+    @computed_field
+    @property
+    def heading(self) -> str | None:
+        if self.week_type == WeekType.PLAYOFFS:
             return "Playoffs"
 
-        if week_type == WeekType.CHAMPIONSHIP:
+        if self.week_type == WeekType.CHAMPIONSHIP:
             return "Championship"
 
-        return f"Week {week_number}"
+        return f"Week {self.week_number}"
 
     def assign_playoff_matchups(self, playoff_type: PlayoffType, rosters: List[Roster], previous_week: ScheduleWeek):
         if previous_week.week_type == WeekType.REGULAR:
@@ -160,7 +146,7 @@ class ScheduleWeek(BaseModel):  # base entity?
 class Schedule(BaseEntity):
     weeks: List[ScheduleWeek]
     playoff_type: PlayoffType
-    first_playoff_week: Optional[int]
+    first_playoff_week: Optional[int] = None
     enable_loser_playoff: bool
     id: str = "schedule"
 

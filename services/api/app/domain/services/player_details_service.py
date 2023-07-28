@@ -30,8 +30,8 @@ class GameLog(BaseModel):
 
 class PlayerDetails(BaseModel):
     player: Player
-    season_stats: Optional[Stats]
-    season_score: Optional[PlayerLeagueSeasonScore]
+    season_stats: Optional[Stats] = None
+    season_score: Optional[PlayerLeagueSeasonScore] = None
     game_log: List[GameLog] = []
 
 

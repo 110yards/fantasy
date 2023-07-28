@@ -36,7 +36,7 @@ class ResetDraftCommand(BaseCommand):
 @annotate_args
 class ResetDraftResult(BaseCommandResult[ResetDraftCommand]):
     draft: Draft
-    league: Optional[League]
+    league: Optional[League] = None
 
 
 class ResetDraftCommandExecutor(BaseCommandExecutor[ResetDraftCommand, ResetDraftResult]):

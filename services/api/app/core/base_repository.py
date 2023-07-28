@@ -14,19 +14,19 @@ T = TypeVar("T", bound=BaseEntity)
 class Query:
     def __init__(self, field_path: str, op_string: str, value):
         """Create a "where" query to be used on a firestore collection.
-           See
-           :meth:`~google.cloud.firestore_v1.query.Query.where` for
-           more information on the underlying method.
-           Args:
-               field_path (str): A field path (``.``-delimited list of
-                   field names) for the field to filter on.
-               op_string (str): A comparison operation in the form of a string.
-                   Acceptable values are ``<``, ``<=``, ``==``, ``>=``
-                   and ``>``.
-               value (Any): The value to compare the field against in the filter.
-                   If ``value`` is :data:`None` or a NaN, then ``==`` is the only
-                   allowed operation.
-           """
+        See
+        :meth:`~google.cloud.firestore_v1.query.Query.where` for
+        more information on the underlying method.
+        Args:
+            field_path (str): A field path (``.``-delimited list of
+                field names) for the field to filter on.
+            op_string (str): A comparison operation in the form of a string.
+                Acceptable values are ``<``, ``<=``, ``==``, ``>=``
+                and ``>``.
+            value (Any): The value to compare the field against in the filter.
+                If ``value`` is :data:`None` or a NaN, then ``==`` is the only
+                allowed operation.
+        """
         self.field_path = field_path
         self.op_string = op_string
         self.value = value

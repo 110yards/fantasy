@@ -34,7 +34,7 @@ def create_generate_schedule_command_executor(
 
 @annotate_args
 class GenerateScheduleCommand(BaseCommand):
-    league_id: Optional[str]
+    league_id: Optional[str] = None
     first_playoff_week: int
     playoff_type: PlayoffType
     enable_loser_playoff: bool
@@ -42,7 +42,7 @@ class GenerateScheduleCommand(BaseCommand):
 
 @annotate_args
 class GenerateScheduleResult(BaseCommandResult[GenerateScheduleCommand]):
-    schedule: Optional[Schedule]
+    schedule: Optional[Schedule] = None
 
 
 class GenerateScheduleCommandExecutor(BaseCommandExecutor[GenerateScheduleCommand, GenerateScheduleResult]):

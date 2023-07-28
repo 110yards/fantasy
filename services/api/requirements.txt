@@ -1,4 +1,5 @@
-fastapi==0.68.2 # Fix for https://github.com/tiangolo/fastapi/issues/4025
+fastapi==0.100.0-beta2
+pydantic-settings==2.*
 feedparser==6.0.10
 firebase_admin==6.2.0
 google-cloud-logging==2.7.0

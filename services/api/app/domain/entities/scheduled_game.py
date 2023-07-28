@@ -14,7 +14,7 @@ class ScheduledGame(BaseEntity):
     # game_number: int
     week: int
     season: int
-    game_duration: Optional[int]
+    game_duration: Optional[int] = None
     event_type: EventType
     event_status: EventStatus
     score: GameScore

@@ -25,13 +25,13 @@ def create_update_league_command_executor(
 
 @annotate_args
 class UpdateLeagueCommand(BaseCommand):
-    league_id: Optional[str]
+    league_id: Optional[str] = None
     name: str
     private: bool
-    password: Optional[str]
+    password: Optional[str] = None
     draft_type: DraftType
     enable_discord_notifications: bool
-    discord_webhook_url: Optional[str]
+    discord_webhook_url: Optional[str] = None
     notifications_draft: bool = False
     notifications_end_of_week: bool = False
     notifications_transactions: bool = False
@@ -40,7 +40,7 @@ class UpdateLeagueCommand(BaseCommand):
 
 @annotate_args
 class UpdateLeagueResult(BaseCommandResult[UpdateLeagueCommand]):
-    league: Optional[League]
+    league: Optional[League] = None
 
 
 class UpdateLeagueCommandExecutor(BaseCommandExecutor[UpdateLeagueCommand, UpdateLeagueResult]):

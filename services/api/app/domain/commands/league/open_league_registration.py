@@ -21,7 +21,7 @@ class OpenLeagueRegistrationCommand(BaseCommand):
 
 @annotate_args
 class OpenLeagueRegistrationResult(BaseCommandResult[OpenLeagueRegistrationCommand]):
-    league: Optional[League]
+    league: Optional[League] = None
 
 
 class OpenLeagueRegistrationCommandExecutor(BaseCommandExecutor[OpenLeagueRegistrationCommand, OpenLeagueRegistrationResult]):

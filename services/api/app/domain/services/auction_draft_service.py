@@ -20,7 +20,7 @@ def create_auction_draft_service(
 @annotate_args
 class CompleteSlotResult(BaseModel):
     player_assigned: bool
-    error: Optional[str]
+    error: Optional[str] = None
     draft_complete: bool = False
 
     @property

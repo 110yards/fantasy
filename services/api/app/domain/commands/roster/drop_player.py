@@ -43,8 +43,8 @@ class DropPlayerCommand(BaseCommand):
 
 @annotate_args
 class DropPlayerResult(BaseCommandResult[DropPlayerCommand]):
-    league: Optional[League]
-    transaction: Optional[LeagueTransaction]
+    league: Optional[League] = None
+    transaction: Optional[LeagueTransaction] = None
 
 
 class DropPlayerCommandExecutor(BaseCommandExecutor[DropPlayerCommand, DropPlayerResult]):

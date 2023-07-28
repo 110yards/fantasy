@@ -21,13 +21,13 @@ def create_update_draft_order_command_executor(
 
 @annotate_args
 class UpdateDraftOrderCommand(BaseCommand):
-    league_id: Optional[str]
+    league_id: Optional[str] = None
     draft_order: List[DraftOrder]
 
 
 @annotate_args
 class UpdateDraftOrderResult(BaseCommandResult[UpdateDraftOrderCommand]):
-    league: Optional[League]
+    league: Optional[League] = None
 
 
 class UpdateDraftOrderCommandExecutor(BaseCommandExecutor[UpdateDraftOrderCommand, UpdateDraftOrderResult]):

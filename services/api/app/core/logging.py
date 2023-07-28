@@ -37,7 +37,7 @@ class Logger:
 
     @classmethod
     def get_trace_id(cls) -> Optional[str]:
-        return context.data['X-Request-ID'] if context.exists() else None
+        return context.data["X-Request-ID"] if context.exists() else None
 
     @classmethod
     def debug(cls, message: str, extra: Dict = None):
@@ -115,7 +115,8 @@ class StackDriverLogger(Logger):
                 "project_id": self.project_id,
                 "service_name": self.service_name,
                 "location": self.region,
-            })
+            },
+        )
 
     def __log(self, severity: str, message: str, extra: Dict = None, exc_info=None):
         trace = self.get_trace_id()
@@ -128,9 +129,7 @@ class StackDriverLogger(Logger):
 
             if exc_info:
                 struct["exception"] = exc_info
-                struct["serviceContext"] = {
-                    "service": self.service_name
-                }
+                struct["serviceContext"] = {"service": self.service_name}
                 struct["@type"] = "type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent"
 
             self.client.logger(self.service_name).log_struct(struct, severity=severity, resource=self.__get_resource(), trace=trace)

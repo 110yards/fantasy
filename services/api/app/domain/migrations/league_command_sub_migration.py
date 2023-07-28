@@ -1,10 +1,9 @@
-
-
 from app.domain.commands.league.create_league_subscriptions import (
-    CreateLeagueSubscriptionsCommand, CreateLeagueSubscriptionsCommandExecutor,
-    create_league_subscriptions_command_executor)
-from app.domain.repositories.league_repository import (
-    LeagueRepository, create_league_repository)
+    CreateLeagueSubscriptionsCommand,
+    CreateLeagueSubscriptionsCommandExecutor,
+    create_league_subscriptions_command_executor,
+)
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from fastapi.param_functions import Depends
 from firebase_admin.firestore import firestore
 
@@ -17,18 +16,13 @@ def create_league_command_sub_migration(
 
 
 class LeagueCommandSubMigration:
-    '''Adds the League Command subscription to all leagues'''
+    """Adds the League Command subscription to all leagues"""
 
-    def __init__(
-            self,
-            league_repo: LeagueRepository,
-            command_executor: CreateLeagueSubscriptionsCommandExecutor
-    ):
+    def __init__(self, league_repo: LeagueRepository, command_executor: CreateLeagueSubscriptionsCommandExecutor):
         self.league_repo = league_repo
         self.command_executor = command_executor
 
     def run(self, league_id: str = None) -> str:
-
         if league_id:
             leagues = [self.league_repo.get(league_id)]
         else:

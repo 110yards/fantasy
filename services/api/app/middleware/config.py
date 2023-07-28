@@ -14,10 +14,6 @@ app_middleware = [
             CorrelationIdPlugin(),
         ),
     ),
-    Middleware(
-        LoggingMiddleware
-    ),
-    Middleware(
-        AuthMiddleware
-    ),
+    Middleware(LoggingMiddleware),
+    Middleware(AuthMiddleware),
 ]

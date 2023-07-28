@@ -12,7 +12,7 @@ class Team(BaseModel):
     location: str
     name: str
     abbreviation: str
-    roster_id: Optional[int]
+    roster_id: Optional[int] = None
 
     @staticmethod
     def all():

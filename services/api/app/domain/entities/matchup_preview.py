@@ -19,9 +19,9 @@ class MatchupPreviewTeam(BaseModel):
 
 @annotate_args
 class MatchupPreview(BaseModel):
-    matchup_id: Optional[int]
-    away: Optional[MatchupPreviewTeam]
-    home: Optional[MatchupPreviewTeam]
+    matchup_id: Optional[int] = None
+    away: Optional[MatchupPreviewTeam] = None
+    home: Optional[MatchupPreviewTeam] = None
     away_score: Optional[int] = 0
     home_score: Optional[int] = 0
 

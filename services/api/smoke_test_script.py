@@ -23,10 +23,7 @@ def api_smoke_test():
 
 def cors_smoke_test():
     url = f"{endpoint}/"
-    headers = {
-        "Origin": os.environ.get("CLIENT_ORIGIN", "http://localhost"),
-        "Access-Control-Request-Method": "GET"
-    }
+    headers = {"Origin": os.environ.get("CLIENT_ORIGIN", "http://localhost"), "Access-Control-Request-Method": "GET"}
     response = requests.options(url, headers=headers)
     check_response(response, "cors_smoke_test")
 

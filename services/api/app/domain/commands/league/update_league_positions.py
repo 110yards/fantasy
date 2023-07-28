@@ -18,7 +18,7 @@ def create_update_league_positions_command_executor(
 
 @annotate_args
 class UpdateLeaguePositionsCommand(BaseCommand):
-    league_id: Optional[str]
+    league_id: Optional[str] = None
     qb: int
     rb: int
     wr: int

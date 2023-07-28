@@ -1,4 +1,3 @@
-
 from fastapi.param_functions import Depends
 from app.domain.enums.draft_state import DraftState
 from app.domain.repositories.league_repository import LeagueRepository, create_league_repository

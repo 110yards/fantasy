@@ -45,10 +45,10 @@ def create_league_command_executor(
 
 @annotate_args
 class CreateLeagueCommand(BaseCommand):
-    commissioner_id: Optional[str]
+    commissioner_id: Optional[str] = None
     name: str
     private: bool
-    password: Optional[str]
+    password: Optional[str] = None
 
 
 @annotate_args

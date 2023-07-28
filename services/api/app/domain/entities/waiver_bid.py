@@ -25,7 +25,7 @@ class WaiverBidResult(int, Enum):
 class WaiverBid(BaseModel):
     roster_id: str
     player: Player
-    drop_player: Optional[Player]
+    drop_player: Optional[Player] = None
     amount: int
     timestamp: datetime = datetime.now()
     result: WaiverBidResult = WaiverBidResult.Unprocessed

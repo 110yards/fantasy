@@ -1,4 +1,3 @@
-
 from .api_router import APIRouter
 
 router = APIRouter(prefix="/dev")
