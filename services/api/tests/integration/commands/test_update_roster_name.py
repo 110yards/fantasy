@@ -62,7 +62,7 @@ def create_mock_schedule(week_number) -> Schedule:
 
 
 def test_update_roster_name():
-    league = League.construct(id="league1", draft_state=DraftState.NOT_STARTED, name="Test League", commissioner_id="commish")
+    league = League.model_construct(id="league1", draft_state=DraftState.NOT_STARTED, name="Test League", commissioner_id="commish")
     roster = Roster(id="roster1", name="Mock Roster")
     user_league = UserLeaguePreview.create(roster, league)
 
@@ -97,7 +97,7 @@ def test_update_roster_name():
 def test_update_roster_name_updates_schedule_config_away():
     week_number = 1
 
-    league = League.construct(id="league1", draft_state=DraftState.NOT_STARTED, name="Test League", schedule_generated=True, commissioner_id="commish")
+    league = League.model_construct(id="league1", draft_state=DraftState.NOT_STARTED, name="Test League", schedule_generated=True, commissioner_id="commish")
     roster = Roster(id="roster1", name="Mock Roster")
     user_league = UserLeaguePreview.create(roster, league)
     schedule = create_mock_schedule(week_number)
@@ -140,7 +140,7 @@ def test_update_roster_name_updates_schedule_config_away():
 def test_update_roster_name_updates_schedule_config_home():
     week_number = 1
 
-    league = League.construct(id="league1", draft_state=DraftState.NOT_STARTED, name="Test League", schedule_generated=True, commissioner_id="commish")
+    league = League.model_construct(id="league1", draft_state=DraftState.NOT_STARTED, name="Test League", schedule_generated=True, commissioner_id="commish")
     roster = Roster(id="roster1", name="Mock Roster")
     user_league = UserLeaguePreview.create(roster, league)
     schedule = create_mock_schedule(week_number)
@@ -181,7 +181,7 @@ def test_update_roster_name_updates_schedule_config_home():
 
 
 def test_update_roster_name_updates_user_leagues_home():
-    league = League.construct(id="league1", draft_state=DraftState.NOT_STARTED, name="Test League", commissioner_id="commish")
+    league = League.model_construct(id="league1", draft_state=DraftState.NOT_STARTED, name="Test League", commissioner_id="commish")
     roster = Roster(id="roster1", name="Mock Roster")
     user_league = UserLeaguePreview.create(roster, league)
 
@@ -214,7 +214,7 @@ def test_update_roster_name_updates_user_leagues_home():
 
 
 def test_update_another_user_should_fail():
-    league = League.construct(id="league1", draft_state=DraftState.NOT_STARTED, name="Test League", commissioner_id="commish")
+    league = League.model_construct(id="league1", draft_state=DraftState.NOT_STARTED, name="Test League", commissioner_id="commish")
     roster = Roster(id="roster1", name="Mock Roster")
     user_league = UserLeaguePreview.create(roster, league)
 
@@ -242,7 +242,7 @@ def test_update_another_user_should_fail():
 
 
 def test_cannot_change_while_drafting():
-    league = League.construct(id="league1", draft_state=DraftState.IN_PROGRESS, name="Test League", commissioner_id="commish")
+    league = League.model_construct(id="league1", draft_state=DraftState.IN_PROGRESS, name="Test League", commissioner_id="commish")
     roster = Roster(id="roster1", name="Mock Roster")
     user_league = UserLeaguePreview.create(roster, league)
 
@@ -270,7 +270,7 @@ def test_cannot_change_while_drafting():
 
 
 def test_update_by_commisssioner():
-    league = League.construct(id="league1", draft_state=DraftState.NOT_STARTED, name="Test League", commissioner_id="commish")
+    league = League.model_construct(id="league1", draft_state=DraftState.NOT_STARTED, name="Test League", commissioner_id="commish")
     roster = Roster(id="roster1", name="Mock Roster")
     user_league = UserLeaguePreview.create(roster, league)
 
@@ -302,7 +302,7 @@ def test_update_by_commisssioner():
 
 
 def test_update_by_other_user():
-    league = League.construct(id="league1", draft_state=DraftState.NOT_STARTED, name="Test League", commissioner_id="commish")
+    league = League.model_construct(id="league1", draft_state=DraftState.NOT_STARTED, name="Test League", commissioner_id="commish")
     roster = Roster(id="roster1", name="Mock Roster")
     user_league = UserLeaguePreview.create(roster, league)
 

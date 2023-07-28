@@ -53,7 +53,7 @@ class ScoringSettings(BaseModel):
 
     @staticmethod
     def create_default() -> ScoringSettings:
-        settings = ScoringSettings.construct()
+        settings = ScoringSettings.model_construct()
 
         getcontext().prec = 1
 
@@ -119,7 +119,7 @@ class ScoringSettings(BaseModel):
 
     @staticmethod
     def create_admins_choice() -> ScoringSettings:
-        settings = ScoringSettings.construct()
+        settings = ScoringSettings.model_construct()
 
         getcontext().prec = 1
 
@@ -176,7 +176,7 @@ class ScoringSettings(BaseModel):
         return settings
 
     def calculate_score(self, stats: Stats) -> PlayerScore:
-        score = PlayerScore.construct(total_score=0)
+        score = PlayerScore.model_construct(total_score=0)
 
         keys = self.dict(exclude={"id": ...})
         for key in keys:

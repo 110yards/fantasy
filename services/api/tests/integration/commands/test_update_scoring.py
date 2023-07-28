@@ -12,7 +12,7 @@ from tests.mocks.mock_firestore_proxy import MockFirestoreProxy
 
 # def test_cannot_update_when_week_started():
 #     # keeping this in case I decide to go back to this rule
-#     league = League.construct(id="league1")
+#     league = League.model_construct(id="league1")
 #     league_repo = LeagueRepository(MockFirestoreProxy())
 #     league_repo.create(league)
 
@@ -24,7 +24,7 @@ from tests.mocks.mock_firestore_proxy import MockFirestoreProxy
 #     transaction_repo = LeagueTransactionRepository(MockFirestoreProxy())
 
 #     locks = Locks(BC=True)
-#     state = State.construct(locks=locks)
+#     state = State.model_construct(locks=locks)
 #     state_repo.set(state)
 
 #     command_executor = UpdateLeagueScoringCommandExecutor(league_repo, league_config_repo, state_repo, transaction_repo)
@@ -43,7 +43,7 @@ def get_publisher() -> VirtualPubSubPublisher:
 
 
 def test_can_update_when_not_started():
-    league = League.construct(id="league1", draft_state=DraftState.NOT_STARTED)
+    league = League.model_construct(id="league1", draft_state=DraftState.NOT_STARTED)
     league_repo = LeagueRepository(MockFirestoreProxy())
     league_repo.create(league)
 
@@ -72,7 +72,7 @@ def test_returns_error_when_no_league():
     transaction_repo = LeagueTransactionRepository(MockFirestoreProxy())
 
     command_executor = UpdateLeagueScoringCommandExecutor(league_repo, league_config_repo, state_repo, transaction_repo, get_publisher())
-    command = UpdateLeagueScoringCommand.construct(league_id="league1")
+    command = UpdateLeagueScoringCommand.model_construct(league_id="league1")
 
     result = command_executor.execute(command)
 

@@ -36,15 +36,15 @@ class Team(BaseModel):
 
 
 class Teams(BaseModel):
-    bc: Team
-    cgy: Team
-    edm: Team
-    ham: Team
-    mtl: Team
-    ott: Team
-    ssk: Team
-    tor: Team
-    wpg: Team
+    bc: Team = Team()
+    cgy: Team = Team()
+    edm: Team = Team()
+    ham: Team = Team()
+    mtl: Team = Team()
+    ott: Team = Team()
+    ssk: Team = Team()
+    tor: Team = Team()
+    wpg: Team = Team()
 
     def values(self) -> list[Team]:
         return [self.bc, self.cgy, self.edm, self.ham, self.mtl, self.ott, self.ssk, self.tor, self.wpg]

@@ -8,14 +8,14 @@ from app.domain.services.schedule_service import generate_playoffs
 from tests.asserts import are_equal
 
 # MANAGERS
-team_1 = Roster(id=1, name="team 1", rank=1)
-team_2 = Roster(id=2, name="team 2", rank=2)
-team_3 = Roster(id=3, name="team 3", rank=3)
-team_4 = Roster(id=4, name="team 4", rank=4)
-team_5 = Roster(id=5, name="team 5", rank=5)
-team_6 = Roster(id=6, name="team 6", rank=6)
-team_7 = Roster(id=7, name="team 7", rank=7)
-team_8 = Roster(id=8, name="team 8", rank=8)
+team_1 = Roster(id="1", name="team 1", rank=1)
+team_2 = Roster(id="2", name="team 2", rank=2)
+team_3 = Roster(id="3", name="team 3", rank=3)
+team_4 = Roster(id="4", name="team 4", rank=4)
+team_5 = Roster(id="5", name="team 5", rank=5)
+team_6 = Roster(id="6", name="team 6", rank=6)
+team_7 = Roster(id="7", name="team 7", rank=7)
+team_8 = Roster(id="8", name="team 8", rank=8)
 
 teams = [
     team_1,

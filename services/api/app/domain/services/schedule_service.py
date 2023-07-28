@@ -230,7 +230,6 @@ def generate_schedule(season_weeks: int, rosters: List[Roster], first_playoff_we
 
     week_number = 1
     for week in weeks:
-        week.week_id = f"{week_number:02}"
         week.week_number = week_number
         week_number += 1
         matchup_id = 1

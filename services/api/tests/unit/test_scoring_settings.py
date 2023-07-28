@@ -3,7 +3,7 @@ from app.domain.entities.stats import Stats
 
 
 def test_score_calculation():
-    stats = Stats.construct()
+    stats = Stats.model_construct()
     stats = stats.dict()
 
     for key in stats:

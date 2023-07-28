@@ -9,16 +9,16 @@ SEASON_WEEKS = 21
 
 # MANAGERS
 teams = [
-    Roster(id=1, name="team 1"),
-    Roster(id=2, name="team 2"),
-    Roster(id=3, name="team 3"),
-    Roster(id=4, name="team 4"),
-    Roster(id=5, name="team 5"),
-    Roster(id=6, name="team 6"),
-    Roster(id=7, name="team 7"),
-    Roster(id=8, name="team 8"),
-    Roster(id=9, name="team 9"),
-    Roster(id=10, name="team 10"),
+    Roster(id="1", name="team 1"),
+    Roster(id="2", name="team 2"),
+    Roster(id="3", name="team 3"),
+    Roster(id="4", name="team 4"),
+    Roster(id="5", name="team 5"),
+    Roster(id="6", name="team 6"),
+    Roster(id="7", name="team 7"),
+    Roster(id="8", name="team 8"),
+    Roster(id="9", name="team 9"),
+    Roster(id="10", name="team 10"),
 ]
 
 teamCounts = [2, 4, 6, 8, 10]
