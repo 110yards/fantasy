@@ -1,10 +1,7 @@
-
-
-from app.yards_py.domain.entities.state import State
-from app.yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
+from app.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from app.domain.entities.state import State
+from app.domain.repositories.public_repository import PublicRepository, create_public_repository
 from fastapi import Depends
-from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
 from firebase_admin.firestore import firestore
 from google.cloud.firestore import Transaction
 
@@ -17,10 +14,8 @@ def create_end_system_waivers_command_executor(
     )
 
 
-
 class EndSystemWaiversCommand(BaseCommand):
     pass
-
 
 
 class EndSystemWaiversResult(BaseCommandResult[EndSystemWaiversCommand]):
@@ -35,7 +30,6 @@ class EndSystemWaiversCommandExecutor(BaseCommandExecutor[EndSystemWaiversComman
         self.public_repo = public_repo
 
     def on_execute(self, command: EndSystemWaiversCommand) -> EndSystemWaiversResult:
-
         @firestore.transactional
         def end_system_waivers(transaction: Transaction) -> EndSystemWaiversResult:
             state = self.public_repo.get_state(transaction)

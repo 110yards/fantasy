@@ -1,13 +1,13 @@
 from typing import List, Optional
 
 from app.config.settings import Settings, get_settings
-from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
-from app.yards_py.core.logging import Logger
-from app.yards_py.core.publisher import Publisher, create_publisher
-from app.yards_py.domain.entities.league import League
-from app.yards_py.domain.repositories.league_config_repository import LeagueConfigRepository
-from app.yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from app.yards_py.domain.topics import LEAGUE_COMMAND_TOPIC
+from app.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from app.core.logging import Logger
+from app.core.publisher import Publisher, create_publisher
+from app.domain.entities.league import League
+from app.domain.repositories.league_config_repository import LeagueConfigRepository
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.domain.topics import LEAGUE_COMMAND_TOPIC
 from fastapi.param_functions import Depends
 from firebase_admin import firestore
 

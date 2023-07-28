@@ -1,8 +1,7 @@
-from app.yards_py.domain.entities.league import League
+from app.domain.entities.league import League
 
 
 class MockNotificationService:
-
     def send_draft_event(self, league: League, message: str):
         pass
 

@@ -1,8 +1,8 @@
-
 from typing import List
+
+from app.core.firestore_proxy import FirestoreProxy
+from app.domain.entities.season_summary import SeasonSummary
 from google.cloud.firestore_v1.transaction import Transaction
-from app.yards_py.core.firestore_proxy import FirestoreProxy
-from app.yards_py.domain.entities.season_summary import SeasonSummary
 
 
 def create_season_summary_repository():

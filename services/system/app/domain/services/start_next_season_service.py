@@ -1,13 +1,13 @@
 from typing import Any, Optional
 
-from app.yards_py.core.logging import Logger
-from app.yards_py.domain.entities.league import League
-from app.yards_py.domain.entities.state import State
-from app.yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from app.yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
-from app.yards_py.domain.repositories.user_archive_league_repository import UserArchiveLeagueRepository, create_user_archive_league_repository
-from app.yards_py.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
-from app.yards_py.domain.repositories.user_repository import UserRepository, create_user_repository
+from app.core.logging import Logger
+from app.domain.entities.league import League
+from app.domain.entities.state import State
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.domain.repositories.public_repository import PublicRepository, create_public_repository
+from app.domain.repositories.user_archive_league_repository import UserArchiveLeagueRepository, create_user_archive_league_repository
+from app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
+from app.domain.repositories.user_repository import UserRepository, create_user_repository
 from fastapi import Depends
 from pydantic.main import BaseModel
 

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import Optional
 
-from app.yards_py.core.base_entity import BaseEntity
-from app.yards_py.domain.enums.draft_state import DraftState
+from app.core.base_entity import BaseEntity
+from app.domain.enums.draft_state import DraftState
 
 
 class League(BaseEntity):

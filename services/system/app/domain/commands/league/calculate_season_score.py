@@ -1,18 +1,18 @@
 from datetime import datetime, timezone
 from typing import List, Optional
 
-from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
-from app.yards_py.domain.entities.player_league_season_score import PlayerLeagueSeasonScore, rank_player_seasons
-from app.yards_py.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
-from app.yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from app.yards_py.domain.repositories.player_league_season_score_repository import (
+from app.core.annotate_args import annotate_args
+from app.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from app.domain.entities.player_league_season_score import PlayerLeagueSeasonScore, rank_player_seasons
+from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.domain.repositories.player_league_season_score_repository import (
     PlayerLeagueSeasonScoreRepository,
     create_player_league_season_score_repository,
 )
-from app.yards_py.domain.repositories.player_repository import PlayerRepository, create_player_repository
-from app.yards_py.domain.repositories.player_season_repository import PlayerSeasonRepository, create_player_season_repository
-from app.yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
+from app.domain.repositories.player_repository import PlayerRepository, create_player_repository
+from app.domain.repositories.player_season_repository import PlayerSeasonRepository, create_player_season_repository
+from app.domain.repositories.public_repository import PublicRepository, create_public_repository
 from fastapi import Depends
 from firebase_admin import firestore
 

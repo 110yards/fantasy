@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from typing import List, Optional
 
-from app.yards_py.core.base_entity import BaseEntity
-from app.yards_py.domain.entities.draft import Draft, DraftSlot
-from app.yards_py.domain.entities.league_position import LeaguePosition
-from app.yards_py.domain.entities.roster import Roster
-from app.yards_py.domain.entities.schedule import Matchup, PlayoffType, Schedule, ScheduleWeek
-from app.yards_py.domain.enums.position_type import PositionType
-from app.yards_py.domain.enums.week_type import WeekType
+from app.core.base_entity import BaseEntity
+from app.domain.entities.draft import Draft, DraftSlot
+from app.domain.entities.league_position import LeaguePosition
+from app.domain.entities.roster import Roster
+from app.domain.entities.schedule import Matchup, PlayoffType, Schedule, ScheduleWeek
+from app.domain.enums.position_type import PositionType
+from app.domain.enums.week_type import WeekType
 from pydantic.main import BaseModel
 
 

@@ -1,10 +1,8 @@
 from datetime import datetime
 from typing import List, Optional
 
-from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.core.base_entity import BaseEntity
-from app.yards_py.domain.enums.login_type import LoginType
-
+from app.core.base_entity import BaseEntity
+from app.domain.enums.login_type import LoginType
 
 
 class User(BaseEntity):

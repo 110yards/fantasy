@@ -1,9 +1,9 @@
-from typing import Optional
-from pydantic import BaseModel
-from app.yards_py.domain.entities.player import Player
 from datetime import datetime
-from app.yards_py.core.annotate_args import annotate_args
 from enum import Enum
+from typing import Optional
+
+from app.domain.entities.player import Player
+from pydantic import BaseModel
 
 
 class WaiverBidResult(int, Enum):
@@ -17,7 +17,6 @@ class WaiverBidResult(int, Enum):
     FailedNoRosterSpace = -3
     FailedOutBid = -4
     FailedLowerPriority = -5
-
 
 
 class WaiverBid(BaseModel):

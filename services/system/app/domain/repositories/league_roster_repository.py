@@ -1,8 +1,9 @@
-from app.yards_py.domain.repositories.league_repository import LeagueRepository
-from google.cloud.firestore_v1.transaction import Transaction
 from typing import Dict, List
-from app.yards_py.core.firestore_proxy import FirestoreProxy
-from app.yards_py.domain.entities.roster import Roster
+
+from app.core.firestore_proxy import FirestoreProxy
+from app.domain.entities.roster import Roster
+from app.domain.repositories.league_repository import LeagueRepository
+from google.cloud.firestore_v1.transaction import Transaction
 
 
 def create_league_roster_repository():
@@ -11,7 +12,6 @@ def create_league_roster_repository():
 
 
 class LeagueRosterRepository:
-
     def __init__(self, firestore: FirestoreProxy[Roster]):
         self.firestore = firestore
 

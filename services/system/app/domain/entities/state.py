@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from app.yards_py.core.base_entity import BaseEntity
+from app.core.base_entity import BaseEntity
 
 
 class State(BaseEntity):

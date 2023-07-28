@@ -1,6 +1,6 @@
-from app.yards_py.core.firestore_proxy import FirestoreProxy
-from app.yards_py.domain.entities.state import State
-from app.yards_py.domain.entities.switches import Switches
+from app.core.firestore_proxy import FirestoreProxy
+from app.domain.entities.state import State
+from app.domain.entities.switches import Switches
 from google.cloud.firestore_v1.transaction import Transaction
 
 from ..entities.scoreboard import Scoreboard

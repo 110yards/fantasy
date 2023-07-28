@@ -1,7 +1,7 @@
-# from app.yards_py.domain.entities.league_week import LeagueWeek
-# from app.yards_py.domain.repositories.league_repository import LeagueRepository
+# from app.domain.entities.league_week import LeagueWeek
+# from app.domain.repositories.league_repository import LeagueRepository
 # from google.cloud.firestore_v1.transaction import Transaction
-# from app.yards_py.core.firestore_proxy import FirestoreProxy
+# from app.core.firestore_proxy import FirestoreProxy
 
 
 # def create_league_week_repository():

@@ -1,14 +1,12 @@
-
-
-from app.yards_py.domain.entities.league_transaction import LeagueTransaction
-from app.yards_py.domain.entities.waiver_bid import WaiverBid, WaiverBidResult
-from app.yards_py.domain.entities.roster import Roster
+from copy import deepcopy
 from typing import Dict, List, Optional, Union
 
-from google.cloud.firestore_v1.transaction import Transaction
+from app.domain.entities.league_transaction import LeagueTransaction
+from app.domain.entities.roster import Roster
+from app.domain.entities.waiver_bid import WaiverBid, WaiverBidResult
+from app.domain.services.roster_player_service import RosterPlayerService, create_roster_player_service
 from fastapi import Depends
-from app.yards_py.domain.services.roster_player_service import RosterPlayerService, create_roster_player_service
-from copy import deepcopy
+from google.cloud.firestore_v1.transaction import Transaction
 
 
 def create_waiver_service(roster_player_service: RosterPlayerService = Depends(create_roster_player_service)):
@@ -126,9 +124,9 @@ class WaiverService:
         if not target_position:
             bid.result = WaiverBidResult.FailedNoRosterSpace
         else:
-            success, trx_or_error = self.roster_player_service.assign_player_to_roster(league_id, roster, bid.player, transaction,
-                                                                                       target_position=target_position, record_transaction=True,
-                                                                                       waiver_bid=bid.amount)
+            success, trx_or_error = self.roster_player_service.assign_player_to_roster(
+                league_id, roster, bid.player, transaction, target_position=target_position, record_transaction=True, waiver_bid=bid.amount
+            )
 
             if success:
                 bid.result = WaiverBidResult.Success

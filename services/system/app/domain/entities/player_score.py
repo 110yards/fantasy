@@ -1,6 +1,4 @@
-
-
-from app.yards_py.core.base_entity import BaseEntity
+from app.core.base_entity import BaseEntity
 
 
 class PlayerScore(BaseEntity):

@@ -1,8 +1,8 @@
 from datetime import datetime
 from typing import List, Optional
 
-from app.yards_py.core.base_entity import BaseEntity
-from app.yards_py.core.firestore_proxy import FirestoreProxy
+from app.core.base_entity import BaseEntity
+from app.core.firestore_proxy import FirestoreProxy
 
 
 class VirtualPubSubPayload(BaseEntity):

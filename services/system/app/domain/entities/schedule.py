@@ -4,10 +4,10 @@ from copy import deepcopy
 from enum import Enum
 from typing import List, Optional
 
-from app.yards_py.core.base_entity import BaseEntity
-from app.yards_py.domain.entities.roster import Roster
-from app.yards_py.domain.enums.matchup_type import MatchupType
-from app.yards_py.domain.enums.week_type import WeekType
+from app.core.base_entity import BaseEntity
+from app.domain.entities.roster import Roster
+from app.domain.enums.matchup_type import MatchupType
+from app.domain.enums.week_type import WeekType
 from pydantic import BaseModel, computed_field
 
 

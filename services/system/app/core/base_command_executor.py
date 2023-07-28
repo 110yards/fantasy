@@ -4,7 +4,7 @@ import logging
 from abc import ABCMeta, abstractmethod
 from typing import Generic, Optional, TypeVar
 
-from app.yards_py.core.logging import Logger
+from app.core.logging import Logger
 from pydantic import computed_field
 from pydantic.main import BaseModel
 from starlette_context import context

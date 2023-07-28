@@ -1,7 +1,8 @@
 from typing import Dict, List, Union
-from app.yards_py.core.firestore_proxy import FirestoreProxy, Query
+
+from app.core.firestore_proxy import FirestoreProxy, Query
+from app.domain.entities.league import League
 from google.cloud.firestore_v1.transaction import Transaction
-from app.yards_py.domain.entities.league import League
 
 
 def create_league_repository():

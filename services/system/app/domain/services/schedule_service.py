@@ -1,8 +1,9 @@
-from app.yards_py.domain.entities.roster import Roster
-from pydantic.main import BaseModel
-from app.yards_py.domain.entities.schedule import Matchup, MatchupType, PlayoffType, ScheduleWeek, WeekType
-from app.yards_py.core.exceptions import NotSupportedException
 from typing import List
+
+from app.core.exceptions import NotSupportedException
+from app.domain.entities.roster import Roster
+from app.domain.entities.schedule import Matchup, MatchupType, PlayoffType, ScheduleWeek, WeekType
+from pydantic.main import BaseModel
 
 
 class ScheduledMatchup(BaseModel):
@@ -210,20 +211,14 @@ def generate_playoffs(
 def combine_schedule(season_weeks: int, weeks: List[ScheduleWeek], playoffs: List[ScheduleWeek]) -> List[ScheduleWeek]:
     if len(weeks) + len(playoffs) > season_weeks:
         weeks_over = len(weeks) + len(playoffs) - season_weeks
-        weeks = weeks[0:len(weeks) - weeks_over]
+        weeks = weeks[0 : len(weeks) - weeks_over]
 
     weeks.extend(playoffs)
 
     return weeks
 
 
-def generate_schedule(
-    season_weeks: int,
-    rosters: List[Roster],
-    first_playoff_week: int,
-    playoff_type: PlayoffType,
-    enable_loser_playoff: bool
-):
+def generate_schedule(season_weeks: int, rosters: List[Roster], first_playoff_week: int, playoff_type: PlayoffType, enable_loser_playoff: bool):
     sequence = get_sequence_for_count(len(rosters))
     number_of_weeks = first_playoff_week - 1
 

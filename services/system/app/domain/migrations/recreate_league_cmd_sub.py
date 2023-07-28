@@ -1,26 +1,24 @@
-
-
 from app.domain.commands.league.create_league_subscriptions import (
-    CreateLeagueSubscriptionsCommand, CreateLeagueSubscriptionsCommandExecutor,
-    create_league_subscriptions_command_executor)
-from app.yards_py.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
-from app.yards_py.domain.repositories.league_repository import (
-    LeagueRepository, create_league_repository)
+    CreateLeagueSubscriptionsCommand,
+    CreateLeagueSubscriptionsCommandExecutor,
+    create_league_subscriptions_command_executor,
+)
+from app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
+from app.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from app.domain.repositories.state_repository import StateRepository, create_state_repository
 from fastapi.param_functions import Depends
 from firebase_admin.firestore import firestore
 
-from app.yards_py.domain.repositories.state_repository import StateRepository, create_state_repository
-
 
 class LeagueCommandSubMigration:
-    '''Adds the League Command subscription to all leagues'''
+    """Adds the League Command subscription to all leagues"""
 
     def __init__(
-            self,
-            league_repo: LeagueRepository,
-            league_config_repo: LeagueConfigRepository,
-            command_executor: CreateLeagueSubscriptionsCommandExecutor,
-            state_repo: StateRepository,
+        self,
+        league_repo: LeagueRepository,
+        league_config_repo: LeagueConfigRepository,
+        command_executor: CreateLeagueSubscriptionsCommandExecutor,
+        state_repo: StateRepository,
     ):
         self.league_repo = league_repo
         self.league_config_repo = league_config_repo
@@ -28,7 +26,6 @@ class LeagueCommandSubMigration:
         self.state_repo = state_repo
 
     def run(self, league_id: str = None) -> str:
-
         state = self.state_repo.get()
         if league_id:
             leagues = [self.league_repo.get(league_id)]
@@ -37,9 +34,7 @@ class LeagueCommandSubMigration:
 
         fixed_count = 0
 
-
         for league in leagues:
-
             if not league.is_active_for_season(state.current_season):
                 continue
 

@@ -1,17 +1,18 @@
-from app.yards_py.domain.repositories.league_config_repository import LeagueConfigRepository
-from app.yards_py.domain.repositories.league_transaction_repository import LeagueTransactionRepository
-from app.yards_py.domain.repositories.league_roster_repository import LeagueRosterRepository
-from api.tests.mocks.mock_firestore_proxy import MockFirestoreProxy
-from app.yards_py.domain.repositories.league_owned_player_repository import LeagueOwnedPlayerRepository
-from app.yards_py.domain.services.roster_player_service import RosterPlayerService
-from app.yards_py.domain.entities.league_positions_config import LeaguePositionsConfig
-from app.domain.services.waiver_service import WaiverService
-from app.yards_py.domain.entities.team import Team
-from app.yards_py.domain.enums.position_type import PositionType
-from app.yards_py.domain.entities.player import Player
-from app.yards_py.domain.entities.waiver_bid import WaiverBid, WaiverBidResult
-from app.yards_py.domain.entities.roster import Roster
 from copy import deepcopy
+
+from api.tests.mocks.mock_firestore_proxy import MockFirestoreProxy
+from app.domain.entities.league_positions_config import LeaguePositionsConfig
+from app.domain.entities.player import Player
+from app.domain.entities.roster import Roster
+from app.domain.entities.team import Team
+from app.domain.entities.waiver_bid import WaiverBid, WaiverBidResult
+from app.domain.enums.position_type import PositionType
+from app.domain.repositories.league_config_repository import LeagueConfigRepository
+from app.domain.repositories.league_owned_player_repository import LeagueOwnedPlayerRepository
+from app.domain.repositories.league_roster_repository import LeagueRosterRepository
+from app.domain.repositories.league_transaction_repository import LeagueTransactionRepository
+from app.domain.services.roster_player_service import RosterPlayerService
+from app.domain.services.waiver_service import WaiverService
 
 MOCK_LEAGUE_ID = "0"
 
@@ -68,7 +69,6 @@ def test_highest_bid_wins_first_team():
 
 
 def test_highest_bid_wins_second_team():
-
     roster1 = Roster(id="1", name="team 1", rank=1, positions=deepcopy(league_positions))
     roster2 = Roster(id="2", name="team 2", rank=2, positions=deepcopy(league_positions))
 
@@ -84,7 +84,6 @@ def test_highest_bid_wins_second_team():
 
 
 def test_tie_bids_different_players_both_succeed():
-
     roster1 = Roster(id="1", name="team 1", rank=1, positions=deepcopy(league_positions))
     roster2 = Roster(id="2", name="team 2", rank=2, positions=deepcopy(league_positions))
 

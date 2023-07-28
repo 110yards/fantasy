@@ -1,6 +1,6 @@
-from app.yards_py.core.firestore_proxy import FirestoreProxy
+from app.core.firestore_proxy import FirestoreProxy
+from app.domain.entities.user_roles import UserRoles
 from google.cloud.firestore_v1.transaction import Transaction
-from app.yards_py.domain.entities.user_roles import UserRoles
 
 
 def create_user_roles_repository():

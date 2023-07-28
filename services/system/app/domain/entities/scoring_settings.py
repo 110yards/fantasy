@@ -1,11 +1,11 @@
 from __future__ import annotations
+
 import hashlib
 import json
-from app.yards_py.domain.entities.stats import Stats
-
 from decimal import getcontext
 
-from app.yards_py.domain.entities.player_score import PlayerScore
+from app.domain.entities.player_score import PlayerScore
+from app.domain.entities.stats import Stats
 from pydantic.main import BaseModel
 
 

@@ -1,6 +1,6 @@
 from app.config.settings import Settings, get_settings
-from app.yards_py.core.publisher import Publisher, SubscriptionConfig, create_publisher
-from app.yards_py.domain import topics
+from app.core.publisher import Publisher, SubscriptionConfig, create_publisher
+from app.domain import topics
 from fastapi.params import Depends
 
 

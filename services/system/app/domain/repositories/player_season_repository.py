@@ -1,9 +1,8 @@
-
-
 from typing import List
+
+from app.core.firestore_proxy import FirestoreProxy
+from app.domain.entities.player_season import PlayerSeason
 from google.cloud.firestore_v1.transaction import Transaction
-from app.yards_py.core.firestore_proxy import FirestoreProxy
-from app.yards_py.domain.entities.player_season import PlayerSeason
 
 
 def create_player_season_repository():
@@ -11,7 +10,7 @@ def create_player_season_repository():
     return PlayerSeasonRepository(firestore)
 
 
-class PlayerSeasonRepository():
+class PlayerSeasonRepository:
     def __init__(self, firestore: FirestoreProxy[PlayerSeason]):
         self.firestore = firestore
 

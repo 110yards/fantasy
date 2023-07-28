@@ -1,9 +1,8 @@
-from app.yards_py.domain.entities.stats import Stats
-from app.yards_py.domain.entities.scoring_settings import ScoringSettings
+from app.domain.entities.scoring_settings import ScoringSettings
+from app.domain.entities.stats import Stats
 
 
 def test_score_calculation():
-
     stats = Stats.construct()
     stats = stats.dict()
 

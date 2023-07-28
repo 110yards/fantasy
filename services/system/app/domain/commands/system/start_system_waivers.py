@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
 
-from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
-from app.yards_py.core.publisher import Publisher, create_publisher
-from app.yards_py.domain.entities.state import State
-from app.yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
+from app.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from app.core.publisher import Publisher, create_publisher
+from app.domain.entities.state import State
+from app.domain.repositories.public_repository import PublicRepository, create_public_repository
 from fastapi import Depends
 from firebase_admin.firestore import firestore
 from google.cloud.firestore import Transaction

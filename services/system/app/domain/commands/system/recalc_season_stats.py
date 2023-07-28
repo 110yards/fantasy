@@ -1,17 +1,17 @@
 from typing import Optional
 
-from app.yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
-from app.yards_py.domain.entities.player_season import PlayerSeason
-from app.yards_py.domain.repositories.player_season_repository import PlayerSeasonRepository, create_player_season_repository
-from app.yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
 from fastapi import Depends
 from strivelogger import StriveLogger
 
-from ....yards_py.domain.entities.player_game import GameResult, PlayerGame
-from ....yards_py.domain.entities.stats import Stats
-from ....yards_py.domain.entities.system_schedule import SystemScheduleGame
-from ....yards_py.domain.stores.boxscore_store import BoxscoreStore, create_boxscore_store
-from ....yards_py.domain.stores.system_schedule_store import SystemScheduleStore, create_system_schedule_store
+from ....core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from ...entities.player_game import GameResult, PlayerGame
+from ...entities.player_season import PlayerSeason
+from ...entities.stats import Stats
+from ...entities.system_schedule import SystemScheduleGame
+from ...repositories.player_season_repository import PlayerSeasonRepository, create_player_season_repository
+from ...repositories.public_repository import PublicRepository, create_public_repository
+from ...stores.boxscore_store import BoxscoreStore, create_boxscore_store
+from ...stores.system_schedule_store import SystemScheduleStore, create_system_schedule_store
 
 
 class RecalcSeasonStatsCommand(BaseCommand):

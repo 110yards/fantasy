@@ -1,13 +1,3 @@
-from app.config.settings import Settings, get_settings
-from app.routers import (
-    dev_router,
-    league_router,
-    migration_router,
-    system_router,
-)
-from app.yards_py.core.logging import Logger
-from app.yards_py.middleware.api_key_auth_middleware import ApiKeyAuthMiddleware
-from app.yards_py.middleware.logging_middleware import LoggingMiddleware
 from fastapi import FastAPI
 from fastapi.param_functions import Depends
 from starlette.middleware import Middleware
@@ -15,7 +5,17 @@ from starlette_context.middleware.context_middleware import ContextMiddleware
 from starlette_context.plugins.correlation_id import CorrelationIdPlugin
 from starlette_context.plugins.request_id import RequestIdPlugin
 
-from .yards_py.core.initialize_firebase import initialize_firebase
+from .config.settings import Settings, get_settings
+from .core.initialize_firebase import initialize_firebase
+from .core.logging import Logger
+from .middleware.api_key_auth_middleware import ApiKeyAuthMiddleware
+from .middleware.logging_middleware import LoggingMiddleware
+from .routers import (
+    dev_router,
+    league_router,
+    migration_router,
+    system_router,
+)
 
 settings = get_settings()
 ApiKeyAuthMiddleware.setup(settings.api_key, anonymous_routes=[""])

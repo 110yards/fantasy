@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import Optional
 
-from app.yards_py.domain.entities.player import Player
-from app.yards_py.domain.enums.position_type import PositionType
+from app.domain.entities.player import Player
+from app.domain.enums.position_type import PositionType
 from pydantic.main import BaseModel
 
 

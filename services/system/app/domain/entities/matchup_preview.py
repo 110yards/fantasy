@@ -1,7 +1,7 @@
 from typing import Optional
 
-from app.yards_py.domain.entities.roster import Roster
-from app.yards_py.domain.entities.schedule import Matchup
+from app.domain.entities.roster import Roster
+from app.domain.entities.schedule import Matchup
 from pydantic.main import BaseModel
 
 

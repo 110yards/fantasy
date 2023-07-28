@@ -1,10 +1,11 @@
 
 
 from typing import List, Union
+
+from app.core.firestore_proxy import FirestoreProxy
+from app.domain.entities.player import Player
 from fastapi.param_functions import Query
 from google.cloud.firestore_v1.transaction import Transaction
-from app.yards_py.core.firestore_proxy import FirestoreProxy
-from app.yards_py.domain.entities.player import Player
 
 
 def create_player_repository():

@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Literal
 
-from app.yards_py.domain.entities.stats import Stats
+from app.domain.entities.stats import Stats
 from pydantic import BaseModel
 
 from .boxscore import BoxscoreGame

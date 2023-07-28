@@ -1,8 +1,10 @@
-from fastapi import Depends
+from app.core.pubsub.pubsub_push import PubSubPush
 from app.domain.commands.league.create_league_subscriptions import (
-    CreateLeagueSubscriptionsCommand, CreateLeagueSubscriptionsCommandExecutor,
-    create_league_subscriptions_command_executor)
-from app.yards_py.core.pubsub.pubsub_push import PubSubPush
+    CreateLeagueSubscriptionsCommand,
+    CreateLeagueSubscriptionsCommandExecutor,
+    create_league_subscriptions_command_executor,
+)
+from fastapi import Depends
 
 from .api_router import APIRouter
 
@@ -11,8 +13,7 @@ router = APIRouter(prefix="/league")
 
 @router.post("/subscriptions")
 async def configure_subscriptions(
-    push: PubSubPush,
-    command_executor: CreateLeagueSubscriptionsCommandExecutor = Depends(create_league_subscriptions_command_executor)
+    push: PubSubPush, command_executor: CreateLeagueSubscriptionsCommandExecutor = Depends(create_league_subscriptions_command_executor)
 ):
     league = push.get_data()
     command = CreateLeagueSubscriptionsCommand(league=league)
@@ -22,6 +23,6 @@ async def configure_subscriptions(
 @router.post("/fix_subscriptions")
 async def fix_subscriptions(
     command: CreateLeagueSubscriptionsCommand,
-    command_executor: CreateLeagueSubscriptionsCommandExecutor = Depends(create_league_subscriptions_command_executor)
+    command_executor: CreateLeagueSubscriptionsCommandExecutor = Depends(create_league_subscriptions_command_executor),
 ):
     return command_executor.execute(command)

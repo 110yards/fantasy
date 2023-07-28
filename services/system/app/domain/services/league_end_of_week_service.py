@@ -1,20 +1,20 @@
-
-
-from app.yards_py.core.publisher import Publisher, create_publisher
+from app.core.publisher import Publisher, create_publisher
 from app.domain.commands.league.calculate_season_score import CalculateSeasonScoreCommand
 from app.domain.commands.system.recalc_season_stats import (
-    RecalcSeasonStatsCommand, RecalcSeasonStatsCommandExecutor, create_recalc_season_stats_command_executor)
+    RecalcSeasonStatsCommand,
+    RecalcSeasonStatsCommandExecutor,
+    create_recalc_season_stats_command_executor,
+)
+from app.domain.enums.league_command_type import LeagueCommandType
+from app.domain.services.league_command_push_data import LeagueCommandPushData
+from app.domain.topics import LEAGUE_COMMAND_TOPIC
 from fastapi import Depends
 from pydantic.main import BaseModel
-
-from app.yards_py.domain.enums.league_command_type import LeagueCommandType
-from app.domain.services.league_command_push_data import LeagueCommandPushData
-from app.yards_py.domain.topics import LEAGUE_COMMAND_TOPIC
 
 
 def create_end_of_week_service(
     publisher: Publisher = Depends(create_publisher),
-    recalc_season_stats_command_executor: RecalcSeasonStatsCommandExecutor = Depends(create_recalc_season_stats_command_executor)
+    recalc_season_stats_command_executor: RecalcSeasonStatsCommandExecutor = Depends(create_recalc_season_stats_command_executor),
 ):
     return EndOfWeekService(publisher, recalc_season_stats_command_executor)
 
@@ -24,11 +24,7 @@ class EndOfWeekRequest(BaseModel):
 
 
 class EndOfWeekService:
-    def __init__(
-        self,
-        publisher: Publisher,
-        recalc_season_stats_command_executor: RecalcSeasonStatsCommandExecutor
-    ):
+    def __init__(self, publisher: Publisher, recalc_season_stats_command_executor: RecalcSeasonStatsCommandExecutor):
         self.publisher = publisher
         self.recalc_season_stats_command_executor = recalc_season_stats_command_executor
 

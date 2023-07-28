@@ -1,12 +1,10 @@
 from datetime import datetime
-from app.yards_py.core.base_entity import BaseEntity
-from app.yards_py.domain.entities.league import League
 from typing import Optional
 
-from app.yards_py.core.annotate_args import annotate_args
-from app.yards_py.domain.entities.matchup_preview import MatchupPreview, MatchupPreviewTeam
-from app.yards_py.domain.entities.roster import Roster
-
+from app.core.base_entity import BaseEntity
+from app.domain.entities.league import League
+from app.domain.entities.matchup_preview import MatchupPreview, MatchupPreviewTeam
+from app.domain.entities.roster import Roster
 
 
 class UserLeaguePreview(BaseEntity):
@@ -34,11 +32,7 @@ class UserLeaguePreview(BaseEntity):
             user_id=roster.id,
             league_name=league.name,
             roster_name=roster.name,
-            matchup=MatchupPreview(
-                home=MatchupPreviewTeam(
-                    id=roster.id,
-                    name=roster.name
-                )
-            ))
+            matchup=MatchupPreview(home=MatchupPreviewTeam(id=roster.id, name=roster.name)),
+        )
 
         return preview

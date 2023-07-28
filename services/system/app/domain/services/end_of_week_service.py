@@ -1,13 +1,13 @@
+from app.core.publisher import Publisher, create_publisher
 from app.domain.commands.league.calculate_season_score import CalculateSeasonScoreCommand
 from app.domain.commands.system.recalc_season_stats import (
     RecalcSeasonStatsCommand,
     RecalcSeasonStatsCommandExecutor,
     create_recalc_season_stats_command_executor,
 )
+from app.domain.enums.league_command_type import LeagueCommandType
 from app.domain.services.league_command_push_data import LeagueCommandPushData
-from app.yards_py.core.publisher import Publisher, create_publisher
-from app.yards_py.domain.enums.league_command_type import LeagueCommandType
-from app.yards_py.domain.topics import LEAGUE_COMMAND_TOPIC
+from app.domain.topics import LEAGUE_COMMAND_TOPIC
 from fastapi import Depends
 from pydantic.main import BaseModel
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from app.yards_py.domain.entities.player_score import PlayerScore
+from app.domain.entities.player_score import PlayerScore
 from pydantic import BaseModel
 
 from .player_game import GameResult

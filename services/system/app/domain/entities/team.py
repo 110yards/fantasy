@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from pydantic.main import BaseModel
-from app.yards_py.core.exceptions import ApiException
 from typing import Dict, Optional
+
+from app.core.exceptions import ApiException
+from pydantic.main import BaseModel
 
 
 class Team(BaseModel):
