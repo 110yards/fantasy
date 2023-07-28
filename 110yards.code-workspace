@@ -1,6 +1,7 @@
 {
     "folders": [
         {
+            "name": "root",
             "path": "."
         },
         {
@@ -15,9 +16,5 @@
             "path": "services/system",
             "name": "system"
         },
-        {
-            "path": "services/system-old",
-            "name": "system-old"
-        }
     ]
 }
