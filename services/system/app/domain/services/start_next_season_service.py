@@ -1,73 +1,64 @@
-from typing import Any, Optional
-
 from fastapi import Depends
 from pydantic.main import BaseModel
+
 from yards_py.core.logging import Logger
-from yards_py.domain.entities.event_type import EVENT_TYPE_REGULAR
+from yards_py.domain.entities.event_type import EventType
 from yards_py.domain.entities.league import League
 from yards_py.domain.entities.opponents import Opponents
 from yards_py.domain.entities.scoreboard import Scoreboard
 from yards_py.domain.entities.state import Locks, State
-from yards_py.domain.repositories.league_repository import (
-    LeagueRepository, create_league_repository)
-from yards_py.domain.repositories.public_repository import (
-    PublicRepository, create_public_repository)
-from yards_py.domain.repositories.user_archive_league_repository import (
-    UserArchiveLeagueRepository, create_user_archive_league_repository)
-from yards_py.domain.repositories.user_league_repository import (
-    UserLeagueRepository, create_user_league_repository)
-from yards_py.domain.repositories.user_repository import (
-    UserRepository, create_user_repository)
-
-from services.system.app.domain.commands.system.update_schedule import (
-    UpdateScheduleCommand, UpdateScheduleCommandExecutor,
-    create_update_schedule_command_executor)
+from yards_py.domain.repositories.league_repository import LeagueRepository, create_league_repository
+from yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
+from yards_py.domain.repositories.scheduled_game_repository import ScheduledGameRepository, create_scheduled_game_repository
+from yards_py.domain.repositories.user_archive_league_repository import UserArchiveLeagueRepository, create_user_archive_league_repository
+from yards_py.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
+from yards_py.domain.repositories.user_repository import UserRepository, create_user_repository
 
 
 def create_start_next_season_service(
-    update_schedule_command_executor: UpdateScheduleCommandExecutor = Depends(create_update_schedule_command_executor),
     public_repo: PublicRepository = Depends(create_public_repository),
     league_repo: LeagueRepository = Depends(create_league_repository),
     user_league_repo: UserLeagueRepository = Depends(create_user_league_repository),
     user_archive_league_repo: UserArchiveLeagueRepository = Depends(create_user_archive_league_repository),
     user_repo: UserRepository = Depends(create_user_repository),
+    scheduled_game_repo: ScheduledGameRepository = Depends(create_scheduled_game_repository),
 ):
     return StartNextSeasonService(
-        update_schedule_command_executor=update_schedule_command_executor,
         public_repo=public_repo,
         league_repo=league_repo,
         user_league_repo=user_league_repo,
         user_archive_league_repo=user_archive_league_repo,
         user_repo=user_repo,
+        scheduled_game_repo=scheduled_game_repo,
     )
 
 
 class StartNextSeasonResult(BaseModel):
     success: bool
-    error: Optional[str]
-    state: Optional[State]
-    scoreboard: Optional[Scoreboard]
-    opponents: Optional[Opponents]
+    error: str | None
+    state: State | None
+    scoreboard: Scoreboard | None
+    opponents: Opponents | None
 
 
 class StartNextSeasonService:
     def __init__(
         self,
-        update_schedule_command_executor: UpdateScheduleCommandExecutor,
         public_repo: PublicRepository,
         league_repo: LeagueRepository,
         user_league_repo: UserLeagueRepository,
         user_archive_league_repo: UserArchiveLeagueRepository,
         user_repo: UserRepository,
+        scheduled_game_repo: ScheduledGameRepository,
     ):
-        self.update_schedule_command_executor = update_schedule_command_executor
         self.public_repo = public_repo
         self.league_repo = league_repo
         self.user_league_repo = user_league_repo
         self.user_archive_league_repo = user_archive_league_repo
         self.user_repo = user_repo
+        self.scheduled_game_repo = scheduled_game_repo
 
-    def run_workflow(self, target_season: Optional[int]) -> Any:
+    def run_workflow(self, target_season: int | None) -> StartNextSeasonResult:
         Logger.info("Start next season workflow started")
 
         # update season / week (state)
@@ -88,18 +79,11 @@ class StartNextSeasonService:
         state.waivers_end = None
         state.waivers_active = False
 
-        # update schedule
-        # not strictly necessary to include final, but maybe helpful for testing with old seasons
-        Logger.info("Updating schedule")
-        command = UpdateScheduleCommand(include_final=True, season=state.current_season)
-        schedule_result = self.update_schedule_command_executor.execute(command)
-
-        if not schedule_result.success:
-            return StartNextSeasonResult(success=False, error=schedule_result.error)
+        scheduled_games = self.scheduled_game_repo.get_all(target_season)
 
         # update scoreboard
         Logger.info("Updating scoreboard")
-        week_one_games = [game for game in schedule_result.games if game.week == 1 and game.event_type.event_type_id == EVENT_TYPE_REGULAR]
+        week_one_games = [game for game in scheduled_games if game.week_number == 1 and game.game_type == EventType.regular]
         scoreboard = Scoreboard.create(week_one_games)  # kinda sketchy, relies on ScheduledGame being similar enough to Game
 
         # update opponents

@@ -30,7 +30,7 @@ $ python3.10 -m venv .env
 
 2. Node 16
 
-3. Firebase SDK:
+3. Firebase SDK (v12.x)
 
 ```
 $ npm install -g firebase-tools

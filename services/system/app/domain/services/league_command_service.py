@@ -1,29 +1,32 @@
-
 from typing import Tuple
 
-from yards_py.core.base_command_executor import (
-    BaseCommand, BaseCommandExecutor, BaseCommandResult)
-from yards_py.core.pubsub.pubsub_push import PubSubPush
-from services.system.app.domain.commands.league.calculate_playoffs import (
-    CalculatePlayoffsCommand, CalculatePlayoffsCommandExecutor,
-    create_calculate_playoffs_command_executor)
-from services.system.app.domain.commands.league.calculate_results import (
-    CalculateResultsCommand, CalculateResultsCommandExecutor,
-    create_calculate_results_command_executor)
-from services.system.app.domain.commands.league.calculate_season_score import (
-    CalculateSeasonScoreCommand, CalculateSeasonScoreCommandExecutor,
-    create_calculate_season_score_command_executor)
-from services.system.app.domain.commands.league.process_waivers import (
-    ProcessWaiversCommand, ProcessWaiversCommandExecutor,
-    create_process_waivers_command_executor)
-from services.system.app.domain.commands.league.update_league_player_details import (
-    UpdateLeaguePlayerDetailsCommand, UpdateLeaguePlayerDetailsCommandExecutor,
-    create_update_league_player_details_command_executor)
-from yards_py.domain.enums.league_command_type import \
-    LeagueCommandType
-from services.system.app.domain.services.league_command_push_data import \
-    LeagueCommandPushData
 from fastapi import Depends
+
+from services.system.app.domain.commands.league.calculate_playoffs import (
+    CalculatePlayoffsCommand,
+    CalculatePlayoffsCommandExecutor,
+    create_calculate_playoffs_command_executor,
+)
+from services.system.app.domain.commands.league.calculate_results import (
+    CalculateResultsCommand,
+    CalculateResultsCommandExecutor,
+    create_calculate_results_command_executor,
+)
+from services.system.app.domain.commands.league.calculate_season_score import (
+    CalculateSeasonScoreCommand,
+    CalculateSeasonScoreCommandExecutor,
+    create_calculate_season_score_command_executor,
+)
+from services.system.app.domain.commands.league.process_waivers import ProcessWaiversCommand, ProcessWaiversCommandExecutor, create_process_waivers_command_executor
+from services.system.app.domain.commands.league.update_league_player_details import (
+    UpdateLeaguePlayerDetailsCommand,
+    UpdateLeaguePlayerDetailsCommandExecutor,
+    create_update_league_player_details_command_executor,
+)
+from services.system.app.domain.services.league_command_push_data import LeagueCommandPushData
+from yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from yards_py.core.pubsub.pubsub_push import PubSubPush
+from yards_py.domain.enums.league_command_type import LeagueCommandType
 
 
 def create_league_command_service(
@@ -34,11 +37,7 @@ def create_league_command_service(
     calculate_playoffs_cmd_ex: CalculatePlayoffsCommandExecutor = Depends(create_calculate_playoffs_command_executor),
 ):
     return LeagueCommandService(
-        update_league_player_details_cmd_ex,
-        calculate_results_cmd_ex,
-        calculate_season_score_cmd_ex,
-        process_waivers_cmd_ex,
-        calculate_playoffs_cmd_ex
+        update_league_player_details_cmd_ex, calculate_results_cmd_ex, calculate_season_score_cmd_ex, process_waivers_cmd_ex, calculate_playoffs_cmd_ex
     )
 
 

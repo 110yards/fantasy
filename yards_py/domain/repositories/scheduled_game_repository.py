@@ -1,7 +1,9 @@
 from typing import List
-from yards_py.domain.entities.scheduled_game import ScheduledGame
-from yards_py.core.firestore_proxy import FirestoreProxy, Query
+
 from google.cloud.firestore_v1.transaction import Transaction
+
+from yards_py.core.firestore_proxy import FirestoreProxy, Query
+from yards_py.domain.entities.scheduled_game import ScheduledGame
 
 
 def create_scheduled_game_repository():
@@ -10,7 +12,6 @@ def create_scheduled_game_repository():
 
 
 class ScheduledGameRepository:
-
     def __init__(self, firestore: FirestoreProxy[ScheduledGame]):
         self.firestore = firestore
 

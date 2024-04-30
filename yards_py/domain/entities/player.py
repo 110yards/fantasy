@@ -1,50 +1,77 @@
 from __future__ import annotations
-from datetime import datetime
 
+from datetime import datetime, timezone
+from enum import Enum
+from typing import Dict, Optional
+
+from pydantic import BaseModel, Field
 from pydantic.class_validators import root_validator
+
+from yards_py.core.annotate_args import annotate_args
+from yards_py.core.base_entity import BaseEntity
+from yards_py.core.hash_dict import hash_dict
 from yards_py.domain.entities.game_player import GamePlayer
 from yards_py.domain.entities.injury_status import InjuryStatus
 from yards_py.domain.enums.position_type import PositionType
-from yards_py.core.hash_dict import hash_dict
-from typing import Dict, Optional
-from yards_py.core.base_entity import BaseEntity
+
 from .team import Team
-from yards_py.core.annotate_args import annotate_args
 
 STATUS_INACTIVE = 0
 STATUS_ACTIVE = 1
 
 
-@annotate_args
+class PlayerPosition(str, Enum):
+    qb = "qb"
+    rb = "rb"
+    wr = "wr"
+    k = "k"
+    lb = "lb"
+    dl = "dl"
+    db = "db"
+    unknown = "unknown"
+
+    @staticmethod
+    def from_core(position_id: str) -> PlayerPosition:
+        match position_id:
+            case "qb":
+                return PlayerPosition.qb
+            case "rb" | "fb":
+                return PlayerPosition.rb
+            case "wr" | "te":
+                return PlayerPosition.wr
+            case "k" | "p":
+                return PlayerPosition.k
+            case "lb":
+                return PlayerPosition.lb
+            case "dl":
+                return PlayerPosition.dl
+            case "db" | "s":
+                return PlayerPosition.db
+            case _:
+                return PlayerPosition.unknown
+
+
 class Player(BaseEntity):
-    player_id: Optional[str]
-    stats_inc_id: Optional[str]
-    cfl_central_id: Optional[int]
+    player_id: str | None
+    source_id: str | None
     first_name: str
     last_name: str
-    display_name: Optional[str]
-    uniform: Optional[str]
-    position: PositionType
-    height: Optional[str]
-    weight: Optional[int]
+    uniform: str | None
+    position: PlayerPosition
+    height: str | None
+    weight: int | None
     team: Team
-    birth_date: Optional[str]
-    birth_place: Optional[str]
-    college: Optional[str]
-    foreign_player: Optional[bool]
-    image_url: Optional[str]
-    status_current: int = 1
-    injury_status: Optional[InjuryStatus] = None
+    birth_date: datetime | None
+    birth_place: str | None
+    school: str | None
+    canadian_player: bool
+    injury_status: InjuryStatus | None = None
 
     hash: str = ""
 
     @property
-    def national_status(self):
-        return None if self.foreign_player else "N"
-
-    @property
-    def cfl_url(self) -> str:
-        return f"https://www.cfl.ca/players/player/{self.id}"
+    def display_name(self):
+        return f"{self.first_name} {self.last_name}" if self.first_name and self.last_name else None
 
     @property
     def formatted_height(self) -> str:
@@ -72,8 +99,7 @@ class Player(BaseEntity):
             return None
 
         try:
-            birth_date = datetime.strptime(self.birth_date, "%Y-%m-%d")
-            return int((datetime.now() - birth_date).days / 365.25)
+            return int((datetime.now(tz=timezone.utc) - self.birth_date).days / 365.25)
         except ValueError:
             return None
 
@@ -81,24 +107,14 @@ class Player(BaseEntity):
         self.hash = hash_dict(self.dict())
 
     @staticmethod
-    def from_cfl_api(input: Dict, official_api: bool) -> Player:
-        uniform = input["team"].get("uniform", None)
-        input["team"] = Team.from_cfl_api(input["team"])
-        input["position"] = PositionType.from_cfl_roster(input["position"]["abbreviation"])
-        input["last_name"] = input["last_name"].title()
+    def from_core(data: dict) -> Player:
+        position = data.pop("position")
+        position_id = position.get("id") if position else None
+        player_id = data.get("player_id")
 
-        player = Player(**input)
-        player.id = str(player.cfl_central_id) if official_api else player.player_id
-        assert player.id is not None, "Player id is none"
-        player.college = input.get("school", {}).get("name", None)
-        player.uniform = uniform
-        return player
+        position = PlayerPosition.from_core(position_id)
 
-    @root_validator
-    def set_display_name(cls, values):
-        if "first_name" in values and "last_name" in values:
-            values["display_name"] = f"{values['first_name']} {values['last_name']}"
-        return values
+        return Player(id=player_id, position=position, **data)
 
 
 def from_team_roster(player: dict) -> Player:

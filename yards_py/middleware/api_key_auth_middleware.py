@@ -1,18 +1,17 @@
-
-
-from typing import List, Optional
 from xmlrpc.client import Boolean
+
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+
 from yards_py.core.abort import abort_unauthorized
 
 
 class ApiKeyAuthMiddleware(BaseHTTPMiddleware):
     key: str = None
-    anonymous_routes: List[str] = None
+    anonymous_routes: list[str] = None
 
     @classmethod
-    def setup(cls, key: str, anonymous_routes: Optional[List[str]] = None):
+    def setup(cls, key: str, anonymous_routes: list[str] | None = None):
         cls.key = key
         cls.anonymous_routes = anonymous_routes
 

@@ -1,9 +1,9 @@
+from fastapi import Depends
 
+from yards_py.core.annotate_args import annotate_args
+from yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
 from yards_py.domain.entities.scoring_info import ScoringInfo
 from yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
-from fastapi import Depends
-from yards_py.core.annotate_args import annotate_args
-from yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
 
 
 def create_insert_public_config_command_executor(
@@ -23,7 +23,6 @@ class InsertPublicConfigResult(BaseCommandResult[InsertPublicConfigCommand]):
 
 
 class InsertPublicConfigCommandExecutor(BaseCommandExecutor[InsertPublicConfigCommand, InsertPublicConfigResult]):
-
     def __init__(
         self,
         public_repo: PublicRepository,
@@ -31,7 +30,6 @@ class InsertPublicConfigCommandExecutor(BaseCommandExecutor[InsertPublicConfigCo
         self.public_repo = public_repo
 
     def on_execute(self, command: InsertPublicConfigCommand) -> InsertPublicConfigResult:
-
         self.public_repo.set_scoring_info(ScoringInfo())
 
         return InsertPublicConfigResult(command=command)

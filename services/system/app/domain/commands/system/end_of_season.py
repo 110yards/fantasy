@@ -1,6 +1,11 @@
+from typing import List, Optional
 
+from fastapi import Depends
 
 from services.system.app.di import create_publisher
+from yards_py.core.annotate_args import annotate_args
+from yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
+from yards_py.core.publisher import Publisher
 from yards_py.domain.entities.scoreboard import Scoreboard
 from yards_py.domain.entities.season_summary import SeasonSummary
 from yards_py.domain.enums.draft_state import DraftState
@@ -10,11 +15,6 @@ from yards_py.domain.repositories.league_roster_repository import LeagueRosterRe
 from yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
 from yards_py.domain.repositories.season_summary_repository import SeasonSummaryRepository, create_season_summary_repository
 from yards_py.domain.repositories.state_repository import StateRepository, create_state_repository
-from typing import List, Optional
-from yards_py.core.publisher import Publisher
-from fastapi import Depends
-from yards_py.core.annotate_args import annotate_args
-from yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
 
 
 def create_end_of_season_command_executor(
@@ -68,7 +68,6 @@ class EndOfSeasonCommandExecutor(BaseCommandExecutor[EndOfSeasonCommand, EndOfSe
         self.public_repo = public_repo
 
     def on_execute(self, command: EndOfSeasonCommand) -> EndOfSeasonResult:
-
         if command.league_id:
             leagues = [self.league_repo.get(command.league_id)]
         else:

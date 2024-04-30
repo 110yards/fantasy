@@ -1,16 +1,14 @@
 from __future__ import annotations
 
 from pydantic.main import BaseModel
+
 from yards_py.core.exceptions import ApiException
-from typing import Dict, Optional
 
 
 class Team(BaseModel):
-    id: int
     location: str
     name: str
-    abbreviation: str
-    roster_id: Optional[int]
+    abbr: str
 
     @staticmethod
     def all():
@@ -46,7 +44,7 @@ class Team(BaseModel):
         return team
 
     @staticmethod
-    def from_cfl_api(input: Dict) -> Team:
+    def from_cfl_api(input: dict) -> Team:
         if not input["is_set"]:
             return Team.free_agent()
         else:

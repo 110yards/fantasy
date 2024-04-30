@@ -1,14 +1,14 @@
+from typing import List
 
+from fastapi import Depends
 
+from yards_py.core.annotate_args import annotate_args
+from yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
 from yards_py.core.firestore_proxy import Query
 from yards_py.domain.entities.player_season import PlayerSeason
 from yards_py.domain.repositories.player_game_repository import PlayerGameRepository, create_player_game_repository
 from yards_py.domain.repositories.player_season_repository import PlayerSeasonRepository, create_player_season_repository
-from typing import List
 from yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
-from fastapi import Depends
-from yards_py.core.annotate_args import annotate_args
-from yards_py.core.base_command_executor import BaseCommand, BaseCommandResult, BaseCommandExecutor
 
 
 def create_recalc_season_stats_command_executor(
@@ -16,11 +16,7 @@ def create_recalc_season_stats_command_executor(
     player_game_repo: PlayerGameRepository = Depends(create_player_game_repository),
     player_season_repo: PlayerSeasonRepository = Depends(create_player_season_repository),
 ):
-    return RecalcSeasonStatsCommandExecutor(
-        public_repo=public_repo,
-        player_game_repo=player_game_repo,
-        player_season_repo=player_season_repo
-    )
+    return RecalcSeasonStatsCommandExecutor(public_repo=public_repo, player_game_repo=player_game_repo, player_season_repo=player_season_repo)
 
 
 @annotate_args
@@ -34,18 +30,12 @@ class RecalcSeasonStatsResult(BaseCommandResult[RecalcSeasonStatsCommand]):
 
 
 class RecalcSeasonStatsCommandExecutor(BaseCommandExecutor[RecalcSeasonStatsCommand, RecalcSeasonStatsResult]):
-    def __init__(
-        self,
-        public_repo: PublicRepository,
-        player_game_repo: PlayerGameRepository,
-        player_season_repo: PlayerSeasonRepository
-    ):
+    def __init__(self, public_repo: PublicRepository, player_game_repo: PlayerGameRepository, player_season_repo: PlayerSeasonRepository):
         self.public_repo = public_repo
         self.player_game_repo = player_game_repo
         self.player_season_repo = player_season_repo
 
     def on_execute(self, command: RecalcSeasonStatsCommand) -> RecalcSeasonStatsResult:
-
         state = self.public_repo.get_state()
 
         query = Query("week_number", "==", command.completed_week_number)

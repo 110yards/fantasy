@@ -1,51 +1,26 @@
-
 from __future__ import annotations
 
 from typing import Optional
+
 from yards_py.core.base_entity import BaseEntity
 from yards_py.domain.entities.event_status import EventStatus
 from yards_py.domain.entities.event_type import EventType
 from yards_py.domain.entities.game_score import GameScore
 from yards_py.domain.entities.game_teams import GameTeams
 
+from .team import Team
+
 
 class ScheduledGame(BaseEntity):
     date_start: str
-    # game_number: int
-    week: int
+    week_number: int
     season: int
-    game_duration: Optional[int]
-    event_type: EventType
-    event_status: EventStatus
-    score: GameScore
-    teams: GameTeams
+    game_type: EventType
+    away: Team
+    home: Team
 
     @staticmethod
-    def from_cfl(game: dict) -> ScheduledGame:
-        game["id"] = str(game["game_id"])
+    def from_core(year: int, data: dict):
+        game_id = data.get("game_id")
 
-        game["score"] = {
-            "away": game["team_1"]["score"],
-            "home": game["team_2"]["score"],
-        }
-
-        game["teams"] = {
-            "away": {
-                "id": game["team_1"]["team_id"],
-                "location": game["team_1"]["location"],
-                "name": game["team_1"]["nickname"],
-                "abbreviation": game["team_1"]["abbreviation"],
-            },
-
-            "home": {
-                "id": game["team_2"]["team_id"],
-                "location": game["team_2"]["location"],
-                "name": game["team_2"]["nickname"],
-                "abbreviation": game["team_2"]["abbreviation"],
-            },
-        }
-
-        game_entity = ScheduledGame(**game)
-        game_entity.calculate_hash()
-
-        return game_entity
+        return ScheduledGame(id=game_id, season=year, **data)
