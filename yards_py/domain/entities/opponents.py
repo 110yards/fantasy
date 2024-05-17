@@ -49,8 +49,8 @@ class Opponents(BaseEntity):
         opponents: Dict[str, str] = {}
 
         for game in games:
-            if game.event_status.event_status_id == EVENT_STATUS_POSTPONED:
-                continue
+            # if game.event_status.event_status_id == EVENT_STATUS_POSTPONED:
+            #     continue
 
             opponents[game.teams.away.abbreviation] = game.teams.home.abbreviation
             opponents[game.teams.home.abbreviation] = game.teams.away.abbreviation

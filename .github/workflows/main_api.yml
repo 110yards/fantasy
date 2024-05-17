@@ -55,8 +55,8 @@ jobs:
           REGISTRY: ${{ secrets.REGISTRY }}
           TAG: ${{ github.sha }}
           TARGET_PROJECT: ${{ secrets.TEST_GCLOUD_PROJECT }}
-          ENDPOINT: ${{ secrets.TEST_ENDPOINT }}
-          ORIGINS: ${{ secrets.TEST_ORIGINS }}
+          ENDPOINT: ${{ vars.TEST_ENDPOINT }}
+          ORIGINS: ${{ vars.TEST_ORIGINS }}
           API_KEY: ${{ secrets.TEST_API_KEY }}
         run: |
           ./archive.sh $TAG $REGISTRY
@@ -66,9 +66,9 @@ jobs:
         working-directory: .tmp
         env:
           TAG: ${{ github.sha }}
-          ENDPOINT: ${{ secrets.TEST_ENDPOINT }}
+          ENDPOINT: ${{ vars.TEST_ENDPOINT }}
           API_KEY: ${{ secrets.TEST_API_KEY }}
-          CLIENT_ORIGIN: ${{ secrets.TEST_ORIGINS }}
+          CLIENT_ORIGIN: ${{ vars.TEST_ORIGINS }}
         run: python smoke_test_script.py
 
       # Deploy to live
@@ -79,8 +79,8 @@ jobs:
           REGISTRY: ${{ secrets.REGISTRY }}
           TAG: ${{ github.sha }}
           TARGET_PROJECT: ${{ secrets.LIVE_GCLOUD_PROJECT }}
-          ENDPOINT: ${{ secrets.LIVE_ENDPOINT }}
-          ORIGINS: ${{ secrets.LIVE_ORIGINS }}
+          ENDPOINT: ${{ vars.LIVE_ENDPOINT }}
+          ORIGINS: ${{ vars.LIVE_ORIGINS }}
         run: |
           ./deploy.sh $TAG $REGISTRY $TARGET_PROJECT $ENDPOINT $ORIGINS
 
@@ -88,7 +88,7 @@ jobs:
         working-directory: .tmp
         env:
           TAG: ${{ github.sha }}
-          ENDPOINT: ${{ secrets.LIVE_ENDPOINT }}
+          ENDPOINT: ${{ vars.LIVE_ENDPOINT }}
           API_KEY: ${{ secrets.LIVE_API_KEY }}
           CLIENT_ORIGIN: ${{ secrets.LIVE_ORIGINS }}
         run: python smoke_test_script.py

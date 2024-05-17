@@ -45,7 +45,7 @@ class ImportSeasonService:
         if clean:
             self.game_repo.delete_all(season)
 
-        result = self.cfl_game_proxy.get_game_summaries_for_season(season)
+        result = self.cfl_game_proxy.get_schedule(season)
         games: List[Dict] = result["data"]
 
         game_ids = [g["game_id"] for g in games if g["event_type"]["event_type_id"] == EVENT_TYPE_REGULAR]

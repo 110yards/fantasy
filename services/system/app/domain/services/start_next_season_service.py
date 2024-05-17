@@ -100,7 +100,7 @@ class StartNextSeasonService:
         # update scoreboard
         Logger.info("Updating scoreboard")
         week_one_games = [game for game in schedule_result.games if game.week == 1 and game.event_type.event_type_id == EVENT_TYPE_REGULAR]
-        scoreboard = Scoreboard.create(week_one_games)  # kinda sketchy, relies on ScheduledGame being similar enough to Game
+        # scoreboard = Scoreboard.create(week_one_games)  # kinda sketchy, relies on ScheduledGame being similar enough to Game
 
         # update opponents
         opponents = Opponents.from_scheduled_games(week_one_games)
@@ -108,7 +108,7 @@ class StartNextSeasonService:
         # save state new state
         Logger.info("Saving state")
         self.public_repo.set_state(state)
-        self.public_repo.set_scoreboard(scoreboard)
+        # self.public_repo.set_scoreboard(scoreboard)
         self.public_repo.set_opponents(opponents)
 
         leagues = self.league_repo.get_all()
@@ -128,7 +128,7 @@ class StartNextSeasonService:
         return StartNextSeasonResult(
             success=True,
             state=state,
-            scoreboard=scoreboard,
+            # scoreboard=scoreboard,
             opponents=opponents,
         )
 

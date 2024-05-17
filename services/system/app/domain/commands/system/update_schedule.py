@@ -66,17 +66,7 @@ class UpdateScheduleCommandExecutor(BaseCommandExecutor[UpdateScheduleCommand, U
         Logger.info("Updating schedule")
 
         Logger.debug(f"Loading games from CFL ({timer() - start})")
-        future_games = self.get_future_games(season, command.include_final)
-        Logger.debug(f"Loading games from DB ({timer() - start})")
-        stored_games = self.get_stored_games(season)
-
-        updated_games = []
-
-        for game in future_games:
-            stored_game = stored_games.get(game.id, None)
-            if not stored_game or stored_game.hash != game.hash:
-                self.scheduled_game_repo.set(season, game)
-                updated_games.append(game)
+        future_games = self.get_future_games(season)
 
         Logger.info(f"Schedule update complete ({timer() - start})")
         return UpdateScheduleResult(
@@ -84,14 +74,11 @@ class UpdateScheduleCommandExecutor(BaseCommandExecutor[UpdateScheduleCommand, U
             games=future_games
         )
 
-    def get_future_games(self, season: int, include_final: bool) -> List[ScheduledGame]:
-        response = self.cfl_proxy.get_game_summaries_for_season(season)
+    def get_future_games(self, season: int) -> List[ScheduledGame]:
+        response = self.cfl_proxy.get_schedule(season)
 
-        games = [ScheduledGame.from_cfl(game) for game in response["data"]]
+        games = [ScheduledGame.map(season, game) for game in response["games"]]
         games = [game for game in games if game.event_type.event_type_id == EVENT_TYPE_REGULAR]
-
-        if not include_final:
-            games = [game for game in games if game.event_status.event_status_id != EVENT_STATUS_FINAL]
 
         return games
 

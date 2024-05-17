@@ -1,51 +1,31 @@
 
 from __future__ import annotations
 
-from typing import Optional
 from yards_py.core.base_entity import BaseEntity
-from yards_py.domain.entities.event_status import EventStatus
 from yards_py.domain.entities.event_type import EventType
-from yards_py.domain.entities.game_score import GameScore
-from yards_py.domain.entities.game_teams import GameTeams
+from .game_teams import GameTeams
+from .team import Team
 
 
 class ScheduledGame(BaseEntity):
     date_start: str
-    # game_number: int
+    game_number: int
     week: int
     season: int
-    game_duration: Optional[int]
     event_type: EventType
-    event_status: EventStatus
-    score: GameScore
     teams: GameTeams
 
     @staticmethod
-    def from_cfl(game: dict) -> ScheduledGame:
-        game["id"] = str(game["game_id"])
-
-        game["score"] = {
-            "away": game["team_1"]["score"],
-            "home": game["team_2"]["score"],
-        }
-
-        game["teams"] = {
-            "away": {
-                "id": game["team_1"]["team_id"],
-                "location": game["team_1"]["location"],
-                "name": game["team_1"]["nickname"],
-                "abbreviation": game["team_1"]["abbreviation"],
-            },
-
-            "home": {
-                "id": game["team_2"]["team_id"],
-                "location": game["team_2"]["location"],
-                "name": game["team_2"]["nickname"],
-                "abbreviation": game["team_2"]["abbreviation"],
-            },
-        }
-
-        game_entity = ScheduledGame(**game)
-        game_entity.calculate_hash()
-
-        return game_entity
+    def map(year, data: dict) -> ScheduledGame:
+        return ScheduledGame(
+            id=data["game_id"],
+            date_start=data["date_start"],
+            game_number=data["game_number"],
+            week=data["week_number"],
+            season=year,
+            event_type=EventType.map(data["game_type"]),
+            teams=GameTeams(
+                away=Team.by_abbreviation(data["away"]["abbr"]),
+                home=Team.by_abbreviation(data["home"]["abbr"]),
+            )
+        )
