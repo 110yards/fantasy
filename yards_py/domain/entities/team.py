@@ -46,14 +46,6 @@ class Team(BaseModel):
         return team
 
     @staticmethod
-    def from_cfl_api(input: Dict) -> Team:
-        if not input["is_set"]:
-            return Team.free_agent()
-        else:
-            abbreviation = input["abbreviation"]
-            return Team.by_abbreviation(abbreviation)
-
-    @staticmethod
     def free_agent():
         return Team(id=0, abbreviation="FA", location="Free", name="Agent")
 

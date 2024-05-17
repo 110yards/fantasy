@@ -81,16 +81,16 @@ class Player(BaseEntity):
         self.hash = hash_dict(self.dict())
 
     @staticmethod
-    def from_cfl_api(input: Dict, official_api: bool) -> Player:
+    def from_cfl_api(input: Dict) -> Player:
         uniform = input["team"].get("uniform", None)
-        input["team"] = Team.from_cfl_api(input["team"])
-        input["position"] = PositionType.from_cfl_roster(input["position"]["abbreviation"])
+        input["team"] = Team.by_abbreviation(input["team"]["abbr"])
+        input["position"] = PositionType.from_cfl_roster(input["position"]["id"])
         input["last_name"] = input["last_name"].title()
 
         player = Player(**input)
-        player.id = str(player.cfl_central_id) if official_api else player.player_id
+        player.id =player.player_id
         assert player.id is not None, "Player id is none"
-        player.college = input.get("school", {}).get("name", None)
+        player.college = input.get("school")
         player.uniform = uniform
         return player
 

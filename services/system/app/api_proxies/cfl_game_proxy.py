@@ -11,8 +11,8 @@ class CflGameProxy():
     def __init__(self, proxy: CflProxy):
         self.proxy = proxy
 
-    def get_game_summaries_for_season(self, season: int) -> dict:
-        return self.proxy.get(f"games/{season}")
+    def get_schedule(self, season: int) -> dict:
+        return self.proxy.get(f"schedule?season={season}")
 
     def get_game_summaries_for_week(self, season: int, week: int) -> dict:
         return self.proxy.get(f"games/{season}?filter[week][eq]={week}")

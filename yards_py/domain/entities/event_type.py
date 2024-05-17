@@ -17,3 +17,19 @@ class EventType(BaseModel):
     event_type_id: int
     name: str
     title: str
+
+    @staticmethod
+    def map(game_type: str) -> EventType:
+        match game_type:
+            case "regular":
+                return EventType(event_type_id=EVENT_TYPE_REGULAR, name="Regular Season", title="Regular Season")
+            case "preseason":
+                return EventType(event_type_id=EVENT_TYPE_PRESEASON, name="Preseason", title="Preseason")
+            case "division-semifinal" | "division-final":
+                return EventType(event_type_id=EVENT_TYPE_PLAYOFFS, name="Playoffs", title="Playoffs")
+            case "grey-cup":
+                return EventType(event_type_id=EVENT_TYPE_GREY_CUP, name="Grey Cup", title="Grey Cup")
+            case _:
+                raise ValueError(game_type)
+            
+
