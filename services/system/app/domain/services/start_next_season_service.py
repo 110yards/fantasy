@@ -135,7 +135,9 @@ class StartNextSeasonService:
     def archive_league(self, league: League):
         """Preserve a link to this link which the commissioner can access to renew for future seasons"""
         league_preview = self.user_league_repo.get(league.commissioner_id, league.id)
-        self.user_archive_league_repo.set(league.commissioner_id, league_preview)
+
+        if league_preview:
+            self.user_archive_league_repo.set(league.commissioner_id, league_preview)
 
     def cleanup_league(self, league: League):
         """Remove an inactive league from the system (maybe in the future?)"""
