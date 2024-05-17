@@ -36,8 +36,8 @@ jobs:
         env:
           VUE_APP_FIREBASE_API_KEY: ${{ secrets.TEST_FIREBASE_API_KEY }}
           VUE_APP_FIREBASE_PROJECT: ${{ secrets.TEST_GCLOUD_PROJECT }}
-          VUE_APP_WEB_URL: "https://test.110yards.ca"
-          VUE_APP_API_110_YARDS_URL: "https://api.test.110yards.ca"
+          VUE_APP_WEB_URL: "https://fantasy.test.110yards.ca"
+          VUE_APP_API_110_YARDS_URL: "https://api.fantasy.test.110yards.ca"
         run: npm run build:test
 
       - name: Deploy (test)
@@ -46,7 +46,7 @@ jobs:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
           TARGET_PROJECT: ${{ secrets.TEST_GCLOUD_PROJECT }}
         run: |
-          npm install -g firebase-tools
+          npm install -g firebase-tools@12.4.4
           firebase deploy --only hosting --token $FIREBASE_TOKEN --project $TARGET_PROJECT
 
       - name: Build (live)
@@ -54,8 +54,8 @@ jobs:
         env:
           VUE_APP_FIREBASE_API_KEY: ${{ secrets.LIVE_FIREBASE_API_KEY }}
           VUE_APP_FIREBASE_PROJECT: ${{ secrets.LIVE_GCLOUD_PROJECT }}
-          VUE_APP_WEB_URL: "https://110yards.ca"
-          VUE_APP_API_110_YARDS_URL: "https://api.110yards.ca"
+          VUE_APP_WEB_URL: "https://fantasy.110yards.ca"
+          VUE_APP_API_110_YARDS_URL: "https://api.fantasy.110yards.ca"
         run: npm run build:test
 
       - name: Deploy (live)
