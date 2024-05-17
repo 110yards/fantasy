@@ -34,8 +34,8 @@ jobs:
         env:
           VUE_APP_FIREBASE_API_KEY: ${{ secrets.TEST_FIREBASE_API_KEY }}
           VUE_APP_FIREBASE_PROJECT: ${{ secrets.TEST_GCLOUD_PROJECT }}
-          VUE_APP_WEB_URL: "https://test.110yards.ca"
-          VUE_APP_API_110_YARDS_URL: "https://api.test.110yards.ca"
+          VUE_APP_WEB_URL: "https://fantasy.test.110yards.ca"
+          VUE_APP_API_110_YARDS_URL: "https://api.fantasy.test.110yards.ca"
         run: npm run build:test
 
       - name: Setup firebase
