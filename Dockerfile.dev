@@ -1,0 +1,9 @@
+#########################################################
+# A dockerfile for testing clean builds and CI commands
+
+FROM node:16
+
+WORKDIR /src
+COPY . .
+
+CMD ["/bin/bash"]

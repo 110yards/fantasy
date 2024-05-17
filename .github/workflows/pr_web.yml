@@ -49,5 +49,5 @@ jobs:
           TARGET_PROJECT: ${{ secrets.TEST_GCLOUD_PROJECT }}
           GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcloud.json
         run: |
-          npm install -g firebase-tools@12.9.1
+          npm install -g firebase-tools@12.4.4
           firebase deploy --only hosting --project $TARGET_PROJECT
