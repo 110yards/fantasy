@@ -90,5 +90,5 @@ jobs:
           TAG: ${{ github.sha }}
           ENDPOINT: ${{ vars.LIVE_ENDPOINT }}
           API_KEY: ${{ secrets.LIVE_API_KEY }}
-          CLIENT_ORIGIN: ${{ secrets.LIVE_ORIGINS }}
+          CLIENT_ORIGIN: ${{ vars.LIVE_ORIGINS }}
         run: python smoke_test_script.py
