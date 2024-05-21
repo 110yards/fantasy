@@ -10,7 +10,7 @@ on:
       - ".python-version"
       - ".github/workflows/pr_api.yml"
       - ".scripts/python/**"
-      - "yards-py/**"
+      - "yards_py/**"
 
 jobs:
   build:
