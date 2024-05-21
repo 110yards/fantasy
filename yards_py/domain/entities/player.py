@@ -31,7 +31,7 @@ class Player(BaseEntity):
     birth_date: Optional[str]
     birth_place: Optional[str]
     college: Optional[str]
-    foreign_player: Optional[bool]
+    canadian_player: Optional[bool]
     image_url: Optional[str]
     status_current: int = 1
     injury_status: Optional[InjuryStatus] = None
@@ -41,6 +41,10 @@ class Player(BaseEntity):
     @property
     def national_status(self):
         return None if self.foreign_player else "N"
+    
+    @property
+    def foreign_player(self) -> bool:
+        return not self.canadian_player
 
     @property
     def cfl_url(self) -> str:
