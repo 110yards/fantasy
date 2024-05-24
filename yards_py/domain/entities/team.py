@@ -38,6 +38,9 @@ class Team(BaseModel):
     def by_abbreviation(abbreviation: str):
         if not abbreviation:
             raise ApiException("Abbreviation must not be None")
+        
+        if abbreviation == "FA":
+            return Team.free_agent()
 
         team = next((team for team in Team.all() if team.abbreviation == abbreviation.upper()), None)
         if not team:
