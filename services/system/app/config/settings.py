@@ -17,14 +17,18 @@ class Settings(BaseSettings):
     firebase_api_key: str
     endpoint: str
     cfl_api_key: Optional[str]
-    cfl_api_endpoint: str = "http://api.cfl.ca/v1"
-    cfl_roster_endpoint: str = "http://www.cfl.ca/wp-content/themes/cfl.ca/inc/admin-ajax.php?action=get_roster&teamId="
+    cfl_api_endpoint: str 
+    cfl_roster_endpoint: str = "to be removed"
     gcloud_project: str
     service_name: Optional[str]
     region: Optional[str]
     api_key: str
     version: str = "dev"
     min_stat_correction_hours: int = 24
+
+    @property
+    def core_api_key(self) -> str:
+        return self.cfl_api_key # temp until the CFL proxy is removed
 
     class Config:
         env_file = ".env"

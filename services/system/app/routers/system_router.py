@@ -4,6 +4,7 @@ from fastapi import Depends, Response, status
 from services.system.app.domain.commands.system.end_of_season import (
     EndOfSeasonCommand, EndOfSeasonCommandExecutor,
     create_end_of_season_command_executor)
+from ..domain.commands.system.import_prior_season_player_stats import ImportPriorSeasonPlayerStatsCommand, ImportPriorSeasonPlayerStatsCommandExecutor, create_import_prior_season_player_stats_command_executor
 from services.system.app.domain.commands.system.insert_public_config import (
     InsertPublicConfigCommand, InsertPublicConfigCommandExecutor,
     create_insert_public_config_command_executor)
@@ -95,6 +96,13 @@ async def update_players(
     command = command or UpdateActivePlayersCommand()
     return command_executor.execute(command)
 
+@router.post("/player_stats/import/{year}")
+async def import_prior_season_player_stats(
+    year: int,
+    command_executor: ImportPriorSeasonPlayerStatsCommandExecutor = Depends(create_import_prior_season_player_stats_command_executor),
+):
+    command = ImportPriorSeasonPlayerStatsCommand(year=year)
+    return command_executor.execute(command)
 
 @router.post("/end_of_day")
 async def end_of_day(
