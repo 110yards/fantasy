@@ -12,8 +12,8 @@ class CflPlayerProxy():
     def __init__(self, proxy: CflProxy):
         self.proxy = proxy
 
-    def get_players_for_season(self) -> dict:
-        return self.proxy.get("players")
+    def get_players_for_season(self, season: int | None = None, include_season_stats: bool | None = None) -> dict:
+        return self.proxy.get(f"players?year={season}&include_season_stats={include_season_stats}")
 
     def get_player(self, player_id: int) -> dict:
         return self.proxy.get(f"players/{player_id}")
