@@ -85,24 +85,24 @@ class PositionType(str, Enum):
         return self == position_type
 
     @staticmethod
-    def from_cfl_roster(abbreviation: str):
-        if abbreviation in ["DE", "DT"]:
-            abbreviation = "DL"
+    def from_cfl_roster(abbreviation: str):    
+        if abbreviation in ["de", "dt"]:
+            abbreviation = "dl"
 
-        if abbreviation in ["OL", "LS", "G", "T", "OT"]:
+        if abbreviation in ["ol", "ls", "g", "t", "ot"]:
             abbreviation = "ol"
 
-        if abbreviation in ["P"]:
-            abbreviation = "K"
+        if abbreviation in ["p"]:
+            abbreviation = "k"
 
-        if abbreviation in ["FB"]:
-            abbreviation = "RB"
+        if abbreviation in ["fb"]:
+            abbreviation = "rb"
 
-        if abbreviation in ["SB", "TE"]:
-            abbreviation = "WR"
+        if abbreviation in ["sb", "te"]:
+            abbreviation = "wr"
 
-        if abbreviation in ["S", "CB"]:
-            abbreviation = "DB"
+        if abbreviation in ["s", "cb"]:
+            abbreviation = "db"
 
         try:
             return PositionType(abbreviation.lower())
