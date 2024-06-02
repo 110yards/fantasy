@@ -79,7 +79,7 @@ class PlayerProjectionService:
         if (player.status_current != STATUS_ACTIVE):
             return 0.0
 
-        if (player.team.id == Team.free_agent().id):
+        if (player.team.abbr == Team.free_agent().abbr):
             return 0.0
 
         if opponents.is_team_on_bye(player.team):
