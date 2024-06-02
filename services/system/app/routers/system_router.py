@@ -11,9 +11,9 @@ from services.system.app.domain.commands.system.insert_public_config import (
 from services.system.app.domain.commands.system.update_active_players import (
     UpdateActivePlayersCommand, UpdateActivePlayersCommandExecutor,
     UpdateActivePlayersCommandResult, update_active_players_command_executor)
-from services.system.app.domain.commands.system.update_games import (
-    SimState, UpdateGamesCommand, UpdateGamesCommandExecutor,
-    create_update_games_command_executor)
+# from services.system.app.domain.commands.system.update_games import (
+#     SimState, UpdateGamesCommand, UpdateGamesCommandExecutor,
+#     create_update_games_command_executor)
 from services.system.app.domain.commands.system.update_schedule import (
     UpdateScheduleCommand, UpdateScheduleCommandExecutor,
     create_update_schedule_command_executor)
@@ -69,22 +69,22 @@ async def run_smoke_test(
     return output
 
 
-@router.post("/games")
-async def update_games(
-    week: Optional[int] = None,
-    sim_state: Optional[SimState] = None,
-    command_executor: UpdateGamesCommandExecutor = Depends(create_update_games_command_executor)
-):
-    command = UpdateGamesCommand(week=week, sim_state=sim_state)
-    return command_executor.execute(command)
+# @router.post("/games")
+# async def update_games(
+#     week: Optional[int] = None,
+#     sim_state: Optional[SimState] = None,
+#     command_executor: UpdateGamesCommandExecutor = Depends(create_update_games_command_executor)
+# ):
+#     command = UpdateGamesCommand(week=week, sim_state=sim_state)
+#     return command_executor.execute(command)
 
 
-@router.post("/games/all")
-async def update_all_games(
-    command_executor: UpdateGamesCommandExecutor = Depends(create_update_games_command_executor)
-):
-    command = UpdateGamesCommand()
-    return command_executor.execute(command)
+# @router.post("/games/all")
+# async def update_all_games(
+#     command_executor: UpdateGamesCommandExecutor = Depends(create_update_games_command_executor)
+# ):
+#     command = UpdateGamesCommand()
+#     return command_executor.execute(command)
 
 
 @router.post("/players", response_model=UpdateActivePlayersCommandResult)

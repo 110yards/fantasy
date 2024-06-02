@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from yards_py.domain.entities.opponents import Opponents
 from yards_py.domain.entities.scoreboard import Scoreboard
 from yards_py.domain.entities.season_schedule import SeasonSchedule
 from yards_py.domain.entities.state import Locks
@@ -59,10 +60,13 @@ class UpdateScheduleCommandExecutor(BaseCommandExecutor[UpdateScheduleCommand, U
             games = [game for game in schedule.games if game.week == state.current_week]
 
             scoreboard = Scoreboard.create(games)
+            opponents = Opponents.from_scheduled_games(games)
             state.locks = Locks.create_from_scoreboard(scoreboard)
 
+
             self.public_repo.set_schedule(schedule, transaction)
-            self.public_repo.set_scoreboard(scoreboard, transaction)            
+            self.public_repo.set_scoreboard(scoreboard, transaction)
+            self.public_repo.set_opponents(opponents, transaction)                      
 
             self.public_repo.set_state(state, transaction)
 
