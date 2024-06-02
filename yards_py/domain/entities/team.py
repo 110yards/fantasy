@@ -9,8 +9,16 @@ from typing import Optional
 class Team(BaseModel):
     location: str
     name: str
-    abbr: str
+    abbr: str | None
+    abbreviation: str | None
     roster_id: Optional[int]
+
+    # use pydantic validator to set abbr from _abbreviation
+    def __init__(self, **data):
+        super().__init__(**data)
+        if not self.abbr:
+            self.abbr = self.abbreviation
+    
 
     @staticmethod
     def all():

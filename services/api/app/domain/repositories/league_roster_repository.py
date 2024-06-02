@@ -7,27 +7,27 @@ from typing import Dict
 
 
 def create_league_roster_repository():
-    def patch_abbreviation(obj: Dict) -> Roster:
-        # Create a copy of the dictionary keys
-        keys = list(obj.keys())
+    # def patch_abbreviation(obj: Dict) -> Roster:
+    #     # Create a copy of the dictionary keys
+    #     keys = list(obj.keys())
         
-        # Iterate over the copied keys
-        for key in keys:
-            if key == "abbreviation":
-                obj["abbr"] = obj.pop(key)
-            elif isinstance(obj[key], dict):
-                obj[key] = patch_abbreviation(obj[key])
+    #     # Iterate over the copied keys
+    #     for key in keys:
+    #         if key == "abbreviation":
+    #             obj["abbr"] = obj.pop(key)
+    #         elif isinstance(obj[key], dict):
+    #             obj[key] = patch_abbreviation(obj[key])
 
-        return obj
+    #     return obj
 
     
-    def parse(obj: Dict):
-        obj = patch_abbreviation(obj)
-        return Roster(**obj)
+    # def parse(obj: Dict):
+    #     obj = patch_abbreviation(obj)
+    #     return Roster(**obj)
 
         
 
-    firestore = FirestoreProxy[Roster](parse)
+    firestore = FirestoreProxy[Roster](Roster.parse_obj)
     return LeagueRosterRepository(firestore)
 
 
