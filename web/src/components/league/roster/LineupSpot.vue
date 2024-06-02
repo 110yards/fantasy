@@ -179,7 +179,7 @@ export default {
 
       if (this.spot.player.team.id == teamId.FreeAgent) return 0
 
-      if (this.$root.getOpponent(this.spot.player.team.abbreviation) == "FA") return 0
+      if (this.$root.getOpponent(this.spot.player.team.abbr) == "FA") return 0
 
       return this.playerScore.average_score
     },
@@ -191,7 +191,7 @@ export default {
     },
 
     isLocked() {
-      return !!this.spot.player && this.$root.isLocked(this.spot.player.team.abbreviation)
+      return !!this.spot.player && this.$root.isLocked(this.spot.player.team.abbr)
     },
 
     positionsForSpot() {
@@ -219,7 +219,7 @@ export default {
     game() {
       if (!this.spot.player) return null
 
-      return this.$root.getGameForTeam(this.spot.player.team.abbreviation, this.scoreboard)
+      return this.$root.getGameForTeam(this.spot.player.team.abbr, this.scoreboard)
     },
 
     gameStarted() {

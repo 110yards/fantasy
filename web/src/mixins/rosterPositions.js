@@ -84,7 +84,7 @@ export default {
       }
 
       if (positionType == "bye" && includeReserves) {
-        let opponent = this.$root.getOpponent(player.team.abbreviation)
+        let opponent = this.$root.getOpponent(player.team.abbr)
         return opponent == "BYE"
       }
 

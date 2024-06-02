@@ -3,14 +3,14 @@
     <table class="scoreboard">
       <tbody v-for="game in games" :key="game.id" class="score">
         <tr class="away">
-          <td class="team" :class="awayClass(game)">{{ game.teams.away.abbreviation }}</td>
-          <td class="pts" :class="awayClass(game)">{{ game.score.away }}</td>
+          <td class="team" :class="awayClass(game)">{{ game.away.abbr }}</td>
+          <td class="pts" :class="awayClass(game)">{{ game.away_score }}</td>
           <td class="caption">{{ gameStatus(game) }}</td>
         </tr>
 
         <tr class="home">
-          <td class="team" :class="homeClass(game)">{{ game.teams.home.abbreviation }}</td>
-          <td class="pts" :class="homeClass(game)">{{ game.score.home }}</td>
+          <td class="team" :class="homeClass(game)">{{ game.home.abbr }}</td>
+          <td class="pts" :class="homeClass(game)">{{ game.home_score }}</td>
           <td class="caption">{{ gameStatusLine2(game) }}</td>
         </tr>
       </tbody>
@@ -73,19 +73,19 @@ export default {
 
   methods: {
     awayClass(game) {
-      let awayWon = game.event_status.event_status_id == eventStatus.Final && game.score.away >= game.score.home
+      let awayWon = game.winner == "away"
 
       return awayWon ? "won" : ""
     },
 
     homeClass(game) {
-      let homeWon = game.event_status.event_status_id == eventStatus.Final && game.score.home >= game.score.away
+      let homeWon = game.winner == "home"
 
       return homeWon ? "won" : ""
     },
 
     gameStatus(game) {
-      switch (game.event_status.event_status_id) {
+      switch (game.game_status.status_id) {
         case eventStatus.PreGame:
           return `${shortDate(game.date_start.toDate())}`
 
@@ -99,7 +99,7 @@ export default {
           return "Final"
 
         default:
-          return `${this.formatQuarter(game.event_status.quarter)}`
+          return `${this.formatQuarter(game.game_status.quarter)}`
       }
     },
 
@@ -119,12 +119,12 @@ export default {
     },
 
     gameStatusLine2(game) {
-      switch (game.event_status.event_status_id) {
+      switch (game.game_status.status_id) {
         case eventStatus.PreGame:
           return `${shortTime(game.date_start.toDate())}`
 
         case eventStatus.InProgress:
-          return `${game.event_status.minutes}:${String(game.event_status.seconds).padStart(2, "0")}`
+          return `${game.game_status.minutes}:${String(game.game_status.seconds).padStart(2, "0")}`
 
         default:
           return ""

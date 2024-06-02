@@ -80,7 +80,7 @@ export default {
         case "last_name":
           return player.last_name.replace(",", "")
         case "team":
-          return player.team.abbreviation
+          return player.team.abbr
         case "position":
           return player.position.toUpperCase()
         case "status_current":

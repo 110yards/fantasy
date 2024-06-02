@@ -1,7 +1,6 @@
 from __future__ import annotations
-from yards_py.domain.entities.event_status import EVENT_STATUS_POSTPONED
-from yards_py.domain.entities.scheduled_game import ScheduledGame
 
+from .season_schedule import ScheduleGame
 from yards_py.domain.entities.team import Team
 from typing import Dict, List, Union
 from yards_py.core.base_entity import BaseEntity
@@ -26,7 +25,7 @@ class Opponents(BaseEntity):
 
     def is_team_on_bye(self, team: Union[Team, str]):
         if isinstance(team, Team):
-            team = team.abbreviation
+            team = team.abbr
 
         return self.dict()[team] == BYE
 
@@ -45,15 +44,12 @@ class Opponents(BaseEntity):
         )
 
     @staticmethod
-    def from_scheduled_games(games: List[ScheduledGame]) -> Opponents:
+    def from_scheduled_games(games: List[ScheduleGame]) -> Opponents:
         opponents: Dict[str, str] = {}
 
         for game in games:
-            # if game.event_status.event_status_id == EVENT_STATUS_POSTPONED:
-            #     continue
-
-            opponents[game.teams.away.abbreviation] = game.teams.home.abbreviation
-            opponents[game.teams.home.abbreviation] = game.teams.away.abbreviation
+            opponents[game.away.abbr] = game.home.abbr
+            opponents[game.home.abbr] = game.away.abbr
 
         return Opponents.create(opponents)
 

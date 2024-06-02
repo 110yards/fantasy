@@ -22,7 +22,7 @@
             <v-row v-if="mobile" class="">
               <v-col class="mt-n2 pb-0 grey--text caption">
                 <span v-if="getPlayer(position.id, away)">
-                  <span>{{ getPlayer(position.id, away).team.abbreviation }}</span>
+                  <span>{{ getPlayer(position.id, away).team.abbr }}</span>
                   <span>&nbsp;- {{ getPlayer(position.id, away).position.toUpperCase() }}</span>
                   <national-status
                     v-if="getPlayer(position.id, away)"
@@ -115,7 +115,7 @@
                     v-if="getPlayer(position.id, home)"
                     :national_status="getPlayer(position.id, home).national_status"
                   />
-                  <span>{{ getPlayer(position.id, home).team.abbreviation }}</span>
+                  <span>{{ getPlayer(position.id, home).team.abbr }}</span>
                   <span>&nbsp;- {{ getPlayer(position.id, home).position.toUpperCase() }}</span>
                 </span>
               </v-col>

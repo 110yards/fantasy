@@ -146,7 +146,7 @@ export default {
 
   methods: {
     getNextOpponent(player) {
-      return player != null && player.team != null ? this.$root.getOpponent(player.team.abbreviation) : ""
+      return player != null && player.team != null ? this.$root.getOpponent(player.team.abbr) : ""
     },
 
     getSeasonPoints(player) {
@@ -158,7 +158,7 @@ export default {
     },
 
     isLocked(player) {
-      return this.$root.isLocked(player.team.abbreviation)
+      return this.$root.isLocked(player.team.abbr)
     },
 
     async confirmAddPlayer(dropTarget) {

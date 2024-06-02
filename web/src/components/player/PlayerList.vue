@@ -343,7 +343,7 @@ export default {
     isLocked(player) {
       if (this.isDraft) return false
 
-      return this.$root.isLocked(player.team.abbreviation)
+      return this.$root.isLocked(player.team.abbr)
     },
 
     searchPlayers(value, search, item) {
@@ -371,7 +371,7 @@ export default {
     },
 
     getNextOpponent(player) {
-      return player != null && player.team != null ? this.$root.getOpponent(player.team.abbreviation) : ""
+      return player != null && player.team != null ? this.$root.getOpponent(player.team.abbr) : ""
     },
 
     getPlayerScore(player) {

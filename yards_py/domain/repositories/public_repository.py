@@ -1,3 +1,5 @@
+from ..entities.season_schedule import SeasonSchedule
+from ..entities.schedule import Schedule
 from yards_py.domain.entities.state import State
 from yards_py.domain.entities.scoreboard import Scoreboard
 from yards_py.domain.entities.opponents import Opponents
@@ -49,3 +51,11 @@ class PublicRepository:
 
     def set_state(self, state: State, transaction: Transaction = None):
         self.firestore.set(self.path, state, transaction)
+
+    def get_schedule(self, transaction: Transaction = None) -> SeasonSchedule:
+        schedule = self.firestore.get(self.path, "schedule", transaction)
+        return SeasonSchedule(**schedule) if schedule else SeasonSchedule()
+    
+    def set_schedule(self, schedule: SeasonSchedule, transaction: Transaction = None):
+        self.firestore.set(self.path, schedule, transaction)
+        

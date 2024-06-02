@@ -1,61 +1,54 @@
 from __future__ import annotations
 
-import pytz
 
-from yards_py.domain.entities.game import Game
-from typing import Dict, List, Optional
-from yards_py.domain.entities.game_teams import GameTeams
-from yards_py.domain.entities.event_type import EventType
-from yards_py.domain.entities.game_score import GameScore
-from yards_py.domain.entities.event_status import EVENT_STATUS_CANCELLED, EVENT_STATUS_FINAL, EVENT_STATUS_POSTPONED, EventStatus
+from typing import Dict, List, Literal, Optional
+from yards_py.domain.entities.game_status import GameStatus
 from pydantic.main import BaseModel
 from yards_py.core.base_entity import BaseEntity
-from yards_py.core.annotate_args import annotate_args
 from datetime import datetime
+
+from .season_schedule import ScheduleGame
+
+from .team import Team
 
 POSTPONED_IS_CANCELLED_AFTER_HOURS = 24
 
 
-@annotate_args
 class ScoreboardGame(BaseModel):
-    id: str
-    date_start: datetime
-    # game_number: int
+    year: int
     week: int
-    season: int
-    event_type: EventType
-    event_status: EventStatus
-    score: GameScore
-    teams: GameTeams
-    hash: Optional[str]
+    game_id: str
+    date_start: datetime
+    away: Team
+    home: Team
+    away_score: int
+    home_score: int
+    game_status: GameStatus
+    winner: Literal["home", "away", "tie", "no_result"]
+
 
     @staticmethod
-    def create_from_game(game: Game) -> ScoreboardGame:
+    def create_from_game(game: ScheduleGame) -> ScoreboardGame:
         return ScoreboardGame(
-            id=str(game.id),
-            date_start=game.date_start,
-            # game_number=game.game_number,
+            year=game.year,
             week=game.week,
-            season=game.season,
-            event_type=game.event_type,
-            event_status=game.event_status,
-            score=game.score,
-            teams=game.teams,
-            hash=game.hash
+            game_id=game.game_id,
+            date_start=game.date_start,
+            game_status=GameStatus.create_pre_game(),
+            away=game.away,
+            home=game.home,
+            away_score=0,
+            home_score=0,
+            winner="no_result",        
         )
+    
+    def has_started(self) -> bool:
+        return self.game_status.has_started
 
     def is_complete(self) -> bool:
-        if self.event_status.event_status_id == EVENT_STATUS_POSTPONED:
-            seconds_past_start = (datetime.now(tz=pytz.utc) - self.date_start).total_seconds()
-            hours_past_start = seconds_past_start / 3600
-            return hours_past_start >= POSTPONED_IS_CANCELLED_AFTER_HOURS
-
-        complete_statuses = [EVENT_STATUS_FINAL, EVENT_STATUS_CANCELLED]
-
-        return self.event_status.event_status_id in complete_statuses
+        return self.game_status.is_final
 
 
-@annotate_args
 class Scoreboard(BaseEntity):
     games: Dict[str, ScoreboardGame]
     id = "scoreboard"
@@ -70,10 +63,10 @@ class Scoreboard(BaseEntity):
         last_start = max(start_times)
         return last_start
 
-    def get_game_for_team(self, team_id) -> Optional[ScoreboardGame]:
+    def get_game_for_team(self, team_abbr) -> Optional[ScoreboardGame]:
         game = next(
             (game for game in self.games.values()
-             if (game.teams.away and game.teams.away.id == team_id) or (game.teams.home and game.teams.home.id == team_id)), None)
+             if (game.away and game.away.abbr == team_abbr) or (game.home and game.home.abbr == team_abbr)), None)
 
         return game
 
@@ -81,27 +74,15 @@ class Scoreboard(BaseEntity):
         game_weeks = set(game.week for game in self.games.values())
         return max(game_weeks)
 
-    def changed(self, other: Scoreboard) -> bool:
-        if not other:
-            return True
-
-        for game in self.games.values():
-            other_game = other.games.get(game.id, None)
-            if not other_game:
-                return True
-
-            if game.hash != other_game.hash:
-                return True
-
-        return False
 
     @staticmethod
-    def create(games: List[Game]) -> Scoreboard:
+    def create(games: List[ScheduleGame]) -> Scoreboard:
         scoreboard_games: List[ScoreboardGame] = []
         for game in games:
             scoreboard_game = ScoreboardGame.create_from_game(game)
             scoreboard_games.append(scoreboard_game)
 
-        scoreboard_games = {game.id: game for game in scoreboard_games}
+        scoreboard_games = {game.game_id: game for game in scoreboard_games}
 
         return Scoreboard(games=scoreboard_games)
+

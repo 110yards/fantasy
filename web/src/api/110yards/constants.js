@@ -153,11 +153,11 @@ export const matchupType = {
 }
 
 export const eventStatus = {
-  PreGame: 1,
-  InProgress: 2,
-  Final: 4,
-  Postponed: 6,
-  Cancelled: 9,
+  PreGame: "pre_game",
+  InProgress: "in_progress",
+  Final: "final",
+  Postponed: "postponed",
+  Cancelled: "cancelled",
 }
 
 export const waiverBidResult = {

@@ -22,17 +22,17 @@ export default {
   computed: {
     gameStatus() {
       if (!this.player) return null
-      if (this.player.team.abbreviation == "FA") return "No game"
+      if (this.player.team.abbr == "FA") return "No game"
 
-      let game = this.$root.getGameForTeam(this.player.team.abbreviation, this.scoreboard)
+      let game = this.$root.getGameForTeam(this.player.team.abbr, this.scoreboard)
 
       if (!game) return "Bye week"
 
-      let isHomePlayer = game.teams.home.abbreviation == this.player.team.abbreviation
+      let isHomePlayer = game.teams.home.abbreviation == this.player.team.abbr
       let vsMarker = isHomePlayer ? "v" : "@"
       let scoreFor = isHomePlayer ? game.score.home : game.score.away
       let scoreAgainst = isHomePlayer ? game.score.away : game.score.home
-      let opponent = this.$root.getOpponent(this.player.team.abbreviation)
+      let opponent = this.$root.getOpponent(this.player.team.abbr)
 
       switch (game.event_status.event_status_id) {
         case eventStatus.PreGame: {
