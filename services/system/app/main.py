@@ -17,6 +17,7 @@ from services.system.app.routers import (
     system_router,
     league_router,
     dev_router,
+    core_event_router,
 )
 
 settings = get_settings()
@@ -44,6 +45,7 @@ app.include_router(migration_router.router)
 app.include_router(system_router.router)
 app.include_router(logging_router.router)
 app.include_router(league_router.router)
+app.include_router(core_event_router.router)
 if settings.is_dev():
     app.include_router(dev_router.router)
 

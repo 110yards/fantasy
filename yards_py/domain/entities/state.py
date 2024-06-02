@@ -1,5 +1,6 @@
 from __future__ import annotations
 from datetime import datetime
+from .scoreboard import Scoreboard
 from yards_py.domain.entities.team import Team
 from yards_py.core.base_entity import BaseEntity
 from typing import List, Optional, Union
@@ -21,7 +22,7 @@ class Locks(BaseModel):
 
     def is_locked(self, team: Union[Team, str]) -> bool:
         if isinstance(team, Team):
-            team = team.abbreviation
+            team = team.abbr
 
         if team == "FA":
             return False
@@ -34,6 +35,16 @@ class Locks(BaseModel):
                 return True
 
         return False
+    
+    @staticmethod
+    def create_from_scoreboard(scoreboard: Scoreboard) -> Locks:
+        locks = Locks()
+        for game in scoreboard.games.values():
+            if game.has_started():
+                setattr(locks, game.away.abbr, True)
+                setattr(locks, game.home.abbr, True)
+
+        return locks
 
     @staticmethod
     def create(locked_teams: List[str] = None, all_games_active: bool = False) -> Locks:

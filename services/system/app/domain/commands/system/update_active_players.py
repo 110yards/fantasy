@@ -137,7 +137,7 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
                 player_ids_on_game_roster.extend(ids)
 
         for player in current_players.values():
-            scratched = player.team.id in teams_with_rosters and player.id not in player_ids_on_game_roster
+            scratched = player.team.abbr in teams_with_rosters and player.id not in player_ids_on_game_roster
             if player.status_current == STATUS_ACTIVE and scratched:
                 player.status_current = STATUS_INACTIVE
 
@@ -153,7 +153,7 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
         for player in stored_players.values():
             rostered = player.id in rostered_players
 
-            if not rostered and player.team.id != Team.free_agent().id:
+            if not rostered and player.team.abbr != Team.free_agent().abbr:
                 player.team = Team.free_agent()
                 player.compute_hash()
                 unrostered.append(player)

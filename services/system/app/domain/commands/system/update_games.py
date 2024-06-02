@@ -1,6 +1,5 @@
 from __future__ import annotations
 from yards_py.core.sim_state import SimState
-from yards_py.domain.entities.event_status import EVENT_STATUS_POSTPONED
 
 from pydantic.main import BaseModel
 from yards_py.domain.entities.opponents import Opponents
@@ -128,7 +127,7 @@ class UpdateGamesCommandExecutor(BaseCommandExecutor[UpdateGamesCommand, UpdateG
 
         Logger.debug(f"Initializing locks ({timer() - start})")
         for game in current_games.values():
-            if game.event_status.event_status_id == EVENT_STATUS_POSTPONED:
+            if game.event_status.is_postponed:
                 continue
 
             opponents[game.teams.away.abbreviation] = game.teams.home.abbreviation

@@ -14,7 +14,7 @@ from typing import Dict, List, Optional
 
 from yards_py.core.base_entity import BaseEntity
 from yards_py.core.hash_dict import hash_dict
-from yards_py.domain.entities.event_status import EventStatus
+from yards_py.domain.entities.game_status import GameStatus
 from yards_py.domain.entities.event_type import EventType
 from yards_py.domain.entities.game_score import GameScore
 from yards_py.domain.entities.game_teams import GameTeams
@@ -27,7 +27,7 @@ class Game(BaseEntity):
     season: int
     game_duration: Optional[int]
     event_type: EventType
-    event_status: EventStatus
+    event_status: GameStatus
     score: GameScore
     teams: GameTeams
     player_stats: Dict[str, PlayerGame]

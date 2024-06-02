@@ -1,5 +1,4 @@
 from __future__ import annotations
-from yards_py.domain.entities.event_status import EVENT_STATUS_POSTPONED
 from yards_py.domain.entities.scheduled_game import ScheduledGame
 
 from yards_py.domain.entities.team import Team

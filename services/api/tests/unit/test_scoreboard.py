@@ -7,9 +7,9 @@ import pytz
 from yards_py.domain.entities.scoreboard import (Scoreboard,
                                                  ScoreboardGame)
 from api.tests.asserts import are_equal
-from yards_py.domain.entities.event_status import (
+from yards_py.domain.entities.game_status import (
     EVENT_STATUS_CANCELLED, EVENT_STATUS_FINAL, EVENT_STATUS_IN_PROGRESS,
-    EVENT_STATUS_POSTPONED, EVENT_STATUS_PRE_GAME, EventStatus)
+    EVENT_STATUS_POSTPONED, EVENT_STATUS_PRE_GAME, GameStatus)
 
 
 def test_last_game_start():
@@ -27,7 +27,7 @@ def test_last_game_start():
 
 
 def get_event_status(status_id: int):
-    return EventStatus.construct(event_status_id=status_id)
+    return GameStatus.construct(event_status_id=status_id)
 
 
 is_game_complete_inputs = [

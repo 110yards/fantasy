@@ -1,87 +1,86 @@
 from __future__ import annotations
-from yards_py.domain.entities.event_status import EVENT_STATUS_FINAL
-from yards_py.domain.entities.event_type import EVENT_TYPE_REGULAR
-from yards_py.domain.entities.scheduled_game import ScheduledGame
+
+from yards_py.domain.entities.scoreboard import Scoreboard
+from yards_py.domain.entities.season_schedule import SeasonSchedule
+from yards_py.domain.entities.state import Locks
+from ....api_proxies.core.core_schedule_proxy import CoreScheduleProxy, create_core_schedule_proxy
 
 
 from yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
 from yards_py.core.logging import Logger
 
 import logging
-from typing import Dict, List, Optional
 
-from services.system.app.api_proxies.cfl_game_proxy import CflGameProxy, create_cfl_game_proxy
 from yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
 
 from fastapi.param_functions import Depends
 from timeit import default_timer as timer
 
-from yards_py.domain.repositories.scheduled_game_repository import ScheduledGameRepository, create_scheduled_game_repository
-
+from firebase_admin import firestore
 
 logger = logging.getLogger()
 
 
-def create_update_schedule_command_executor(
-    cfl_proxy: CflGameProxy = Depends(create_cfl_game_proxy),
-    game_repo: ScheduledGameRepository = Depends(create_scheduled_game_repository),
-    public_repo: PublicRepository = Depends(create_public_repository),
-):
-    return UpdateScheduleCommandExecutor(
-        cfl_proxy=cfl_proxy,
-        scheduled_game_repo=game_repo,
-        public_repo=public_repo)
 
-
+"""
+Not sure if this will persist past 2024, right now it pulls the schedule and adds it to the state, that should happen on import.  Maybe this should happen periodically as well?
+"""
 class UpdateScheduleCommand(BaseCommand):
-    include_final: bool = False
-    season: Optional[int]
+    season: int | None = None
 
 
 class UpdateScheduleResult(BaseCommandResult):
-    games: Optional[List[ScheduledGame]]
+    schedule: SeasonSchedule
 
 
 class UpdateScheduleCommandExecutor(BaseCommandExecutor[UpdateScheduleCommand, UpdateScheduleResult]):
 
     def __init__(
         self,
-        cfl_proxy: CflGameProxy,
-        scheduled_game_repo: ScheduledGameRepository,
+        proxy: CoreScheduleProxy,
         public_repo: PublicRepository,
     ):
-        self.cfl_proxy = cfl_proxy
-        self.scheduled_game_repo = scheduled_game_repo
+        self.proxy = proxy
         self.public_repo = public_repo
 
     def on_execute(self, command: UpdateScheduleCommand) -> UpdateScheduleResult:
         start = timer()
 
-        if not command.season:
-            state = self.public_repo.get_state()
-            season = state.current_season
-        else:
-            season = command.season
-
         Logger.info("Updating schedule")
 
-        Logger.debug(f"Loading games from CFL ({timer() - start})")
-        future_games = self.get_future_games(season)
+        Logger.debug(f"Loading schedule ({timer() - start})")
+        schedule_data = self.proxy.get_schedule(command.season)
+        schedule = SeasonSchedule(**schedule_data)
 
-        Logger.info(f"Schedule update complete ({timer() - start})")
-        return UpdateScheduleResult(
-            command=command,
-            games=future_games
-        )
+        @firestore.transactional
+        def update(transaction) -> SeasonSchedule:
+            state = self.public_repo.get_state(transaction)
 
-    def get_future_games(self, season: int) -> List[ScheduledGame]:
-        response = self.cfl_proxy.get_schedule(season)
+            games = [game for game in schedule.games if game.week == state.current_week]
 
-        games = [ScheduledGame.map(season, game) for game in response["games"]]
-        games = [game for game in games if game.event_type.event_type_id == EVENT_TYPE_REGULAR]
+            scoreboard = Scoreboard.create(games)
+            state.locks = Locks.create_from_scoreboard(scoreboard)
 
-        return games
+            self.public_repo.set_schedule(schedule, transaction)
+            self.public_repo.set_scoreboard(scoreboard, transaction)            
 
-    def get_stored_games(self, season: int) -> Dict[str, ScheduledGame]:
-        games = self.scheduled_game_repo.get_all(season)
-        return {game.id: game for game in games}
+            self.public_repo.set_state(state, transaction)
+
+            return schedule
+        
+        transaction = self.public_repo.firestore.create_transaction()
+        schedule = update(transaction)
+
+        Logger.debug(f"Schedule updated ({timer() - start})")
+
+        return UpdateScheduleResult(command=command, schedule=schedule)
+
+
+def create_update_schedule_command_executor(    
+    proxy: CoreScheduleProxy = Depends(create_core_schedule_proxy),
+    public_repo: PublicRepository = Depends(create_public_repository),
+):
+    return UpdateScheduleCommandExecutor(
+        proxy=proxy,
+        public_repo=public_repo,
+    )

@@ -8,7 +8,9 @@ def create_scheduled_game_repository():
     firestore = FirestoreProxy(ScheduledGame.parse_obj)
     return ScheduledGameRepository(firestore)
 
-
+"""
+Deprecated
+"""
 class ScheduledGameRepository:
 
     def __init__(self, firestore: FirestoreProxy[ScheduledGame]):

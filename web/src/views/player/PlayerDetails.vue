@@ -5,7 +5,7 @@
         <v-col cols="12">
           <v-card>
             <v-card-title>
-              <div class="team-colors" :class="details.player.team.abbreviation">
+              <div class="team-colors" :class="details.player.team.abbr">
                 {{ details.player.uniform || "-" }}
               </div>
               {{ details.player.display_name }}

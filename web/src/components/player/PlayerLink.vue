@@ -13,7 +13,7 @@
         {{ displayName }}
       </span>
 
-      <span v-if="showTeamName" class="pl-1">{{ player.team.abbreviation }}</span>
+      <span v-if="showTeamName" class="pl-1">{{ player.team.abbr }}</span>
       <span v-if="showPosition" class="pl-1">&nbsp;- {{ player.position.toUpperCase() }}</span>
 
       <span
@@ -49,7 +49,7 @@
         {{ displayName }}
       </span>
 
-      <span v-if="showTeamName" class="">{{ player.team.abbreviation }}</span>
+      <span v-if="showTeamName" class="">{{ player.team.abbr }}</span>
       <span v-if="showPosition" class="">&nbsp;- {{ player.position.toUpperCase() }}</span>
 
       <span v-if="showTeamLogo" class="team-icon pl-1" :class="team"> </span>
@@ -121,7 +121,7 @@ export default {
       return this.boldName ? "font-weight-bold" : ""
     },
     team() {
-      return this.player.team != null ? this.player.team.abbreviation : "FA"
+      return this.player.team != null ? this.player.team.abbr : "FA"
     },
     showPlayerStatus() {
       return this.isInjured

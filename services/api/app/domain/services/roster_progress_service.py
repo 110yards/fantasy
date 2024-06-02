@@ -1,6 +1,5 @@
 
 
-from yards_py.domain.entities.event_status import EVENT_STATUS_FINAL, EVENT_STATUS_IN_PROGRESS, EVENT_STATUS_PRE_GAME
 from services.api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
 
 from fastapi.param_functions import Depends
@@ -40,16 +39,16 @@ class ProgressService:
         for position in roster.positions.values():
             if position.position_type.is_starting_position_type() and position.player:
 
-                game = scoreboard.get_game_for_team(position.player.team.id)
+                game = scoreboard.get_game_for_team(position.player.team.abbr)
 
-                if game and game.event_status.event_status_id == EVENT_STATUS_PRE_GAME:
+                if game and game.game_status.is_pre_game:
                     total += 1
 
-                if game and game.event_status.event_status_id == EVENT_STATUS_IN_PROGRESS:
+                if game and game.game_status.is_in_progress:
                     total += 1
                     in_progress += 1
 
-                if game and game.event_status.event_status_id == EVENT_STATUS_FINAL:
+                if game and game.game_status.is_final:
                     total += 1
                     completed += 1
 
