@@ -3,10 +3,31 @@ from google.cloud.firestore_v1.transaction import Transaction
 from typing import Dict, List
 from yards_py.core.firestore_proxy import FirestoreProxy
 from yards_py.domain.entities.roster import Roster
+from typing import Dict
 
 
 def create_league_roster_repository():
-    firestore = FirestoreProxy[Roster](Roster.parse_obj)
+    def patch_abbreviation(obj: Dict) -> Roster:
+        # Create a copy of the dictionary keys
+        keys = list(obj.keys())
+        
+        # Iterate over the copied keys
+        for key in keys:
+            if key == "abbreviation":
+                obj["abbr"] = obj.pop(key)
+            elif isinstance(obj[key], dict):
+                obj[key] = patch_abbreviation(obj[key])
+
+        return obj
+
+    
+    def parse(obj: Dict):
+        obj = patch_abbreviation(obj)
+        return Roster(**obj)
+
+        
+
+    firestore = FirestoreProxy[Roster](parse)
     return LeagueRosterRepository(firestore)
 
 

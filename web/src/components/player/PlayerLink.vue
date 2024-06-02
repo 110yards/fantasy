@@ -13,7 +13,7 @@
         {{ displayName }}
       </span>
 
-      <span v-if="showTeamName" class="pl-1">{{ player.team.abbr }}</span>
+      <span v-if="showTeamName" class="pl-1">{{ player.team.abbr || player.team.abbreviation }}</span>
       <span v-if="showPosition" class="pl-1">&nbsp;- {{ player.position.toUpperCase() }}</span>
 
       <span
@@ -121,7 +121,7 @@ export default {
       return this.boldName ? "font-weight-bold" : ""
     },
     team() {
-      return this.player.team != null ? this.player.team.abbr : "FA"
+      return this.player.team != null ? this.player.team.abbr || this.player.team.abbreviation : "FA" // abbr || abbreviation is because I pushed a bad update early 2024. can go away eventually.
     },
     showPlayerStatus() {
       return this.isInjured

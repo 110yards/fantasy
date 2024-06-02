@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from pydantic import Field
 from pydantic.main import BaseModel
 from yards_py.core.exceptions import ApiException
-from typing import Dict, Optional
+from typing import Optional
 
 
 class Team(BaseModel):
@@ -27,7 +28,7 @@ class Team(BaseModel):
 
     @staticmethod
     def by_id(id):
-        team = next((team for team in Team.all() if team.id == id), None)
+        team = next((team for team in Team.all() if team.abbr == id), None)
         if not team:
             raise ApiException(f"Invalid team id '{id}'")
 
