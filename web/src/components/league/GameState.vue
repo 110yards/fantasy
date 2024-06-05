@@ -28,13 +28,13 @@ export default {
 
       if (!game) return "Bye week"
 
-      let isHomePlayer = game.teams.home.abbreviation == this.player.team.abbr
+      let isHomePlayer = game.home.abbr == this.player.team.abbr
       let vsMarker = isHomePlayer ? "v" : "@"
-      let scoreFor = isHomePlayer ? game.score.home : game.score.away
-      let scoreAgainst = isHomePlayer ? game.score.away : game.score.home
+      let scoreFor = isHomePlayer ? game.home_score : game.away
+      let scoreAgainst = isHomePlayer ? game.away_score : game.home_score
       let opponent = this.$root.getOpponent(this.player.team.abbr)
 
-      switch (game.event_status.event_status_id) {
+      switch (game.game_status.status_id) {
         case eventStatus.PreGame: {
           let date = game.date_start.toDate()
           let start = formatter.gameStartTime(date, this.short)

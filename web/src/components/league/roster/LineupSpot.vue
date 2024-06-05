@@ -224,7 +224,7 @@ export default {
 
     gameStarted() {
       if (!this.game) return false
-      return [eventStatus.InProgress, eventStatus.Final].includes(this.game.event_status.event_status_id)
+      return [eventStatus.InProgress, eventStatus.Final].includes(this.game.game_status.status_id)
     },
 
     weekNumber() {

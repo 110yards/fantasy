@@ -22,11 +22,11 @@ export default {
       }
 
       for (let game of Object.values(scoreboard.games)) {
-        if (game.teams.away && game.teams.away.abbreviation == teamAbbreviation) {
+        if (game.away && game.away.abbr == teamAbbreviation) {
           return game
         }
 
-        if (game.teams.home && game.teams.home.abbreviation == teamAbbreviation) {
+        if (game.home && game.home.abbr == teamAbbreviation) {
           return game
         }
       }

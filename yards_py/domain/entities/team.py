@@ -13,9 +13,10 @@ class Team(BaseModel):
     abbreviation: str | None
     roster_id: Optional[int]
 
-    # use pydantic validator to set abbr from _abbreviation
+
     def __init__(self, **data):
         super().__init__(**data)
+        # stupid mistake - I shouldn't have renamed the property mid-season
         if not self.abbr:
             self.abbr = self.abbreviation
     
