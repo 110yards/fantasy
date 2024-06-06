@@ -71,43 +71,30 @@ export const selectablePositions = [
 ]
 
 export const playerStatus = {
-  Inactive: 0,
-  Active: 1,
-  InjuredOneGame: 2,
-  InjuredSixGames: 3,
-  PracticeSquad: 4,
-  Suspended: 5,
-  Disabled: 7,
-  Questionable: 8,
-  Probable: 9,
+  Out: "out",
+  Probable: "probable",
+  Questionable: "questionable",
+  InjuredSixGames: "six-game",
 
   getText: status => {
     switch (status) {
-      case playerStatus.Active:
-        return ""
-      case playerStatus.InjuredOneGame:
-        return "IL-1"
       case playerStatus.InjuredSixGames:
         return "IL-6"
-      case playerStatus.Suspended:
-        return "SUSP"
-      case playerStatus.PracticeSquad:
-        return "PS"
       case playerStatus.Questionable:
         return "Q"
       case playerStatus.Probable:
         return "P"
-      default:
+      case playerStatus.Out:
         return "OUT"
+      default:
+        return ""
     }
   },
 
   getSeverity: status => {
     switch (status) {
-      case playerStatus.InjuredOneGame:
+      case playerStatus.Out:
       case playerStatus.InjuredSixGames:
-      case playerStatus.Suspended:
-      case playerStatus.PracticeSquad:
         return 3
       case playerStatus.Questionable:
         return 2
