@@ -30,7 +30,7 @@ export default {
 
       let isHomePlayer = game.home.abbr == this.player.team.abbr
       let vsMarker = isHomePlayer ? "v" : "@"
-      let scoreFor = isHomePlayer ? game.home_score : game.away
+      let scoreFor = isHomePlayer ? game.home_score : game.away_score
       let scoreAgainst = isHomePlayer ? game.away_score : game.home_score
       let opponent = this.$root.getOpponent(this.player.team.abbr)
 
@@ -42,7 +42,7 @@ export default {
         }
 
         case eventStatus.InProgress:
-          return `Q${game.event_status.quarter} ${scoreFor}-${scoreAgainst} ${vsMarker} ${opponent}`
+          return `Q${game.game_status.quarter} ${scoreFor}-${scoreAgainst} ${vsMarker} ${opponent}`
 
         case eventStatus.Final: {
           let won = scoreFor > scoreAgainst
@@ -54,7 +54,7 @@ export default {
           return game.event_status.name
 
         default:
-          return `${vsMarker} ${opponent} - ${game.event_status.name}`
+          return `${vsMarker} ${opponent} - ${game.game_status.name}`
       }
     },
   },
