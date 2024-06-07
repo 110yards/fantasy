@@ -123,7 +123,10 @@ export default {
 
       let positions = Object.values(this.currentRoster.positions)
       let eligibleDropPositions = positions.filter(
-        p => p.player != null && this.$root.playerIsEligibleForPosition(this.player, p.position_type),
+        p =>
+          p.player != null &&
+          this.$root.playerIsEligibleForPosition(this.player, p.position_type) &&
+          !this.isLocked(p.player),
       )
 
       return eligibleDropPositions

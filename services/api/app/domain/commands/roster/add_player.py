@@ -110,6 +110,9 @@ class AddPlayerCommandExecutor(BaseCommandExecutor[AddPlayerCommand, AddPlayerRe
             if command.drop_player_id:
                 target_position = roster.find_player_position(command.drop_player_id)
 
+            if target_position and target_position.player and state.locks.is_locked(target_position.player.team) and not command.admin_override:
+                return AddPlayerResult(command=command, error=f"{target_position.player.team.location} players are locked")
+
             if state.waivers_active and not command.admin_override:
                 bid = WaiverBid(roster_id=command.roster_id, player=player, amount=command.bid)
                 if command.drop_player_id:
