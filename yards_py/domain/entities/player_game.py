@@ -1,4 +1,5 @@
 from __future__ import annotations
+from datetime import datetime
 
 from yards_py.domain.entities.stats import Stats
 from yards_py.core.base_entity import BaseEntity
@@ -14,6 +15,7 @@ class PlayerGame(BaseEntity):
     team: Team
     opponent: Team
     stats: Stats
+    date_updated: datetime
 
     # TODO: automatically set this in init
     def set_id(self):
