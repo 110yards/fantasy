@@ -15,7 +15,7 @@ class PlayerGame(BaseEntity):
     team: Team
     opponent: Team
     stats: Stats
-    date_updated: datetime
+    date_updated: datetime | None = None
 
     # TODO: automatically set this in init
     def set_id(self):

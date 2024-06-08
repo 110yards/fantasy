@@ -73,7 +73,7 @@ class UpdatePlayerStatsCommandExecutor(BaseCommandExecutor[UpdatePlayerStatsComm
         def update(transaction) -> PlayerGame | None:
             existing = self.player_game_repo.get(state.current_season, player_game.id, transaction)
 
-            needs_update = not existing or existing.date_updated < player_game.date_updated
+            needs_update = not existing or not existing.date_updated or existing.date_updated < player_game.date_updated
 
             if not needs_update:
                 return None
