@@ -51,7 +51,7 @@ class TransferOwnershipCommandExecutor(BaseCommandExecutor[TransferOwnershipComm
 
     def on_execute(self, command: TransferOwnershipCommand) -> TransferOwnershipResult:
 
-        new_owner = self.user_repo.get_by_email(command.new_owner_email)
+        new_owner = self.user_repo.get_by_email(command.new_owner_email.lower())
         state = self.public_repo.get_state()
 
         if not new_owner:
@@ -70,8 +70,10 @@ class TransferOwnershipCommandExecutor(BaseCommandExecutor[TransferOwnershipComm
 
             is_commissioner = league.commissioner_id == command.request_user_id
 
-            if not is_commissioner:
-                return TransferOwnershipResult(command=command, error="Forbidden")
+            if not is_commissioner:                
+                user = self.user_repo.get(command.request_user_id)
+                if not user.is_admin:
+                    return TransferOwnershipResult(command=command, error="Forbidden")
 
             roster = self.league_roster_repo.get(command.league_id, command.roster_id, transaction)
 
