@@ -1,5 +1,5 @@
 
-from ..commands.system.update_schedule import UpdateScheduleCommand, UpdateScheduleCommandExecutor
+from ..commands.system.update_schedule import UpdateScheduleCommand, UpdateScheduleCommandExecutor, create_update_schedule_command_executor
 from yards_py.core.publisher import Publisher
 from services.system.app.di import create_publisher
 from services.system.app.domain.commands.league.calculate_season_score import CalculateSeasonScoreCommand
@@ -51,7 +51,12 @@ class EndOfWeekService:
 
 def create_end_of_week_service(
     publisher: Publisher = Depends(create_publisher),
+    update_schedule_command_executor: UpdateScheduleCommandExecutor = Depends(create_update_schedule_command_executor),
     recalc_season_stats_command_executor: RecalcSeasonStatsCommandExecutor = Depends(create_recalc_season_stats_command_executor)
 ):
-    return EndOfWeekService(publisher, recalc_season_stats_command_executor)
+    return EndOfWeekService(
+        publisher, 
+        update_schedule_command_executor,
+        recalc_season_stats_command_executor
+    )
 

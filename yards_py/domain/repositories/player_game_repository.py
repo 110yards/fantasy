@@ -1,9 +1,8 @@
 
 
 from typing import List, Union
-from fastapi.param_functions import Query
 from google.cloud.firestore_v1.transaction import Transaction
-from yards_py.core.firestore_proxy import FirestoreProxy
+from yards_py.core.firestore_proxy import FirestoreProxy, Query
 from yards_py.domain.entities.player_game import PlayerGame
 
 
@@ -34,3 +33,7 @@ class PlayerGameRepository():
 
     def where(self, season: int, queries: Union[Query, List[Query]], transaction: Transaction = None) -> List[PlayerGame]:
         return self.firestore.where(PlayerGameRepository.path(season), queries, transaction)
+
+    def for_week(self, season: int, week_number: int, transaction: Transaction = None) -> List[PlayerGame]:
+        query = Query("week_number", "==", week_number)
+        return self.where(season, query, transaction)

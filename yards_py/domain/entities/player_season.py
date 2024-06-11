@@ -36,6 +36,5 @@ class PlayerSeason(BaseEntity):
         id = f"{player_id}"
         games_played = len(player_games)
         player_season = PlayerSeason(id=id, player_id=player_id, season=season, stats=stats, games_played=games_played, games=player_games)
-        player_season.calculate_hash()
 
         return player_season

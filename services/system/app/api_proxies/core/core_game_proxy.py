@@ -13,4 +13,3 @@ class CoreGameProxy():
 
 def create_cfl_game_proxy(proxy: CoreProxy = Depends(create_core_proxy)):
     return CoreGameProxy(proxy)
-
