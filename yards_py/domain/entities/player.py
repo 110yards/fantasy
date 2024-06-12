@@ -86,7 +86,7 @@ class Player(BaseEntity):
 
     @staticmethod
     def from_cfl_api(input: Dict) -> Player:
-        uniform = input["team"].get("uniform", None)
+        uniform = input.get("uniform", None)
         input["team"] = Team.by_abbreviation(input["team"]["abbr"])
         input["position"] = PositionType.from_cfl_roster(input["position"]["id"])
         input["last_name"] = input["last_name"].title()
