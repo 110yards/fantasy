@@ -83,26 +83,37 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
 
         if state.current_week > last_playoff_week:
             return CalculateResultsResult(command=command)
+        
+        
+        #  This happens first, to block users from adding players in the event that the next part fails.
+        @firestore.transactional
+        def is_league_active(transaction):
+            league = self.league_repo.get(command.league_id, transaction)
+
+            return league.is_active_for_season(state.current_season)
+        
+
+        transaction = self.league_repo.firestore.create_transaction()
+        league_inactive = not is_league_active(transaction)
+        
+        if league_inactive:
+            # nothing to do here.
+            return CalculateResultsResult(command=command)
 
         #  This happens first, to block users from adding players in the event that the next part fails.
         @firestore.transactional
         def mark_league_waivers_active(transaction):
             league = self.league_repo.get(command.league_id, transaction)
 
-            if not league.is_active_for_season(state.current_season):
-                return True
-
             league.waivers_active = True
             self.league_repo.update(league, transaction)
 
-        transaction = self.league_repo.firestore.create_transaction()
-        league_inactive = mark_league_waivers_active(transaction)
+        # don't start waivers if this is a recalc
+        if not command.past_week:
+            transaction = self.league_repo.firestore.create_transaction()
+            mark_league_waivers_active(transaction)
 
-        if league_inactive:
-            # nothing to do here.
-            return CalculateResultsResult(command=command)
-
-        player_games_for_week = self.player_game_repo.for_week(state.current_season, command.week)
+        player_games_for_week = self.player_game_repo.for_week(state.current_season, command.week_number)
         self.player_games_for_week = {x.player_id:x for x in player_games_for_week}
         self.league_scoring = self.league_config_repo.get_scoring_config(command.league_id)
 
@@ -127,14 +138,16 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
                         matchup.home = self.archive_roster(rosters[matchup.home.id])
                     matchup.home.this_week_points_for = matchup.home.calculate_score()
                     matchup.home.this_week_bench_points_for = matchup.home.calculate_bench_score()
-                    matchup.home_score = matchup.home.this_week_points_for
+                    matchup.home_score_calculated = matchup.home.this_week_points_for
+                    matchup.home_score = matchup.home.this_week_points_for + matchup.home_adjustment
 
                 if matchup.away:
                     if not command.past_week:
                         matchup.away = self.archive_roster(rosters[matchup.away.id])
                     matchup.away.this_week_points_for = matchup.away.calculate_score()
                     matchup.away.this_week_bench_points_for = matchup.away.calculate_bench_score()
-                    matchup.away_score = matchup.away.this_week_points_for
+                    matchup.away_score_calculated = matchup.away.this_week_points_for
+                    matchup.away_score = matchup.away.this_week_points_for + matchup.away_adjustment
 
                 if matchup.home and matchup.away:
                     home_won = matchup.home_score > matchup.away_score

@@ -16,7 +16,7 @@
         </v-btn>
         <v-btn class="caption" text v-if="isAuction" @click="setView('budgets')">Draft Budgets</v-btn>
         <v-btn class="caption" text @click="setView('rosters')">Roster options</v-btn>
-        <v-btn class="caption" text @click="setView('schedule')">Schedule settings</v-btn>
+        <v-btn class="caption" text @click="setView('schedule')">Schedule</v-btn>
         <v-btn class="caption" text @click="setView('notes')">Notes</v-btn>
       </v-card-text>
 

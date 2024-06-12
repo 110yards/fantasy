@@ -1,4 +1,5 @@
-from yards_py.core.abort import abort_not_found
+from ..domain.commands.league.adjust_matchup_scores import AdjustMatchupScoresCommand, AdjustMatchupScoresCommandExecutor, create_adjust_matchup_scores_command_executor
+from yards_py.core.abort import abort_not_found, abort_unauthorized
 from services.api.app.domain.commands.league.close_league_registration import (
     CloseLeagueRegistrationCommand, CloseLeagueRegistrationCommandExecutor,
     create_close_league_registration_command_executor)
@@ -202,3 +203,14 @@ async def get_players_ref(
         abort_not_found()
     else:
         return ref
+
+@router.put("/{league_id}/adjust_matchup_scores")
+async def adjust_matchup(
+    league_id: str,
+    command: AdjustMatchupScoresCommand,
+    command_executor: AdjustMatchupScoresCommandExecutor = Depends(create_adjust_matchup_scores_command_executor),
+):
+    if  league_id != command.league_id:
+        abort_unauthorized()
+        
+    return command_executor.execute(command)

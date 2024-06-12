@@ -9,7 +9,7 @@
     </v-alert>
 
     <h3>Add player</h3>
-    <v-col cols="2" v-if="waiversActive">
+    <v-col md="2" v-if="waiversActive">
       <v-form ref="bidForm">
         <app-number-field
           v-model="bid"

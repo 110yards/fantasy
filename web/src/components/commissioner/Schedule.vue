@@ -65,7 +65,7 @@
             <tr v-for="week in schedule.weeks" :key="week.week_number">
               <th>{{ week.week_number }}</th>
               <td v-for="(matchup, index) in week.matchups" :key="index">
-                <span v-if="matchup.type == 'regular'">{{ matchup.away.name }} @ {{ matchup.home.name }}</span>
+                <span v-if="matchup.type == 'regular'">{{ matchup.away.name }} vs {{ matchup.home.name }}</span>
                 <span v-else>{{ matchup.type_display }}</span>
               </td>
             </tr>
