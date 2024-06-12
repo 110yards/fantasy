@@ -105,3 +105,7 @@ export const setNotes = async (user, leagueId, command) => {
 export const getPlayersRef = async leagueId => {
   return client.get(null, `/league/${leagueId}/players`)
 }
+
+export const adjustMatchupScores = async (leagueId, command) => {
+  return client.put(null, `/league/${leagueId}/adjust_matchup_scores`, command)
+}

@@ -51,8 +51,17 @@ class Matchup(BaseEntity):
     type_display: Optional[str]
     away_score: float = 0.0
     home_score: float = 0.0
+    away_score_calculated: float = 0.0
+    home_score_calculated: float = 0.0
     away_bench_score: float = 0.0
     home_bench_score: float = 0.0
+    away_adjustment: float = 0.0
+    home_adjustment: float = 0.0
+
+    @property
+    def was_adjusted(self) -> bool:
+        return self.away_adjustment != 0 or self.home_adjustment != 0
+
 
     @root_validator
     def set_auto_properties(cls, values: dict):

@@ -28,15 +28,15 @@
 
         <v-toolbar>
           <v-tabs v-model="tabB">
-            <v-tab key="news">CFL News</v-tab>
             <v-tab key="transactions">League Transactions</v-tab>
+            <v-tab key="news">CFL News</v-tab>
           </v-tabs>
         </v-toolbar>
         <v-tabs-items v-model="tabB">
-          <v-tab-item key="news"><news /></v-tab-item>
           <v-tab-item key="transactions">
             <transactions class="mt-5" v-if="!isOffseason" :leagueId="leagueId" />
           </v-tab-item>
+          <v-tab-item key="news"><news /></v-tab-item>
         </v-tabs-items>
       </v-col>
 
