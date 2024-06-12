@@ -47,6 +47,12 @@
       <v-row v-if="details">
         <v-col cols="12">
           <h4>Game Log</h4>
+
+          <v-alert type="warning"
+            >There is currently a data issue affecting this page causing all scores to be 0-0. This will be fixed as
+            soon as possible.</v-alert
+          >
+
           <v-simple-table v-if="details.game_log">
             <template>
               <thead>
