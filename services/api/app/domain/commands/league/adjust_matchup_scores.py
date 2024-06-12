@@ -1,5 +1,6 @@
 
-from ......system.app.domain.services.league_command_push_data import LeagueCommandPushData
+
+from yards_py.core.pubsub.league_command_push_data import LeagueCommandPushData
 from yards_py.domain.enums.league_command_type import LeagueCommandType
 from yards_py.core.logging import Logger
 from yards_py.domain.topics import LEAGUE_COMMAND_TOPIC
