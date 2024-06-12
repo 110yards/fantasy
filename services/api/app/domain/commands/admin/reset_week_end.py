@@ -1,7 +1,7 @@
 from fastapi import Depends
 
 from yards_py.core.base_command_executor import BaseCommand, BaseCommandExecutor, BaseCommandResult
-from services.api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
+from yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
 
 
 def create_reset_week_end_command_executor(

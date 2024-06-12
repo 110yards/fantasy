@@ -2,7 +2,7 @@ from datetime import datetime
 from yards_py.domain.entities.state import State
 from services.api.app.domain.repositories.league_config_repository import LeagueConfigRepository
 from services.api.app.domain.repositories.league_roster_repository import LeagueRosterRepository
-from services.api.app.domain.repositories.public_repository import PublicRepository
+from yards_py.domain.repositories.public_repository import PublicRepository
 from services.api.app.domain.repositories.user_league_repository import UserLeagueRepository
 from services.api.app.domain.repositories.league_repository import LeagueRepository
 from yards_py.core.publisher import VirtualPubSubPublisher

@@ -13,7 +13,7 @@ from yards_py.domain.entities.scoring_info import ScoringInfo
 from yards_py.domain.entities.state import State
 from yards_py.domain.entities.switches import Switches
 from services.api.app.domain.enums.position_type import get_position_type_config
-from services.api.app.domain.repositories.public_repository import create_public_repository
+from yards_py.domain.repositories.public_repository import create_public_repository
 from services.api.app.domain.repositories.user_repository import create_user_repository
 
 DEV_PROJECT_ID = "yards-dev"

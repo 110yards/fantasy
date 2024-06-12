@@ -1,6 +1,6 @@
 
 
-from services.api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
+from yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
 
 from fastapi.param_functions import Depends
 from pydantic.main import BaseModel

@@ -16,7 +16,7 @@ from services.api.app.domain.repositories.player_league_season_score_repository 
     create_player_league_season_score_repository)
 from services.api.app.domain.repositories.player_repository import (
     PlayerRepository, create_player_repository)
-from services.api.app.domain.repositories.public_repository import (
+from yards_py.domain.repositories.public_repository import (
     PublicRepository, create_public_repository)
 from services.api.app.domain.repositories.state_repository import (
     StateRepository, create_state_repository)

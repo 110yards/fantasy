@@ -20,13 +20,13 @@ export default {
 
   computed: {
     isHome() {
-      return this.game.teams.home.id == this.playerTeam.id
+      return this.game.home.id == this.playerTeam.id
     },
     scoreFor() {
-      return this.isHome ? this.game.score.home : this.game.score.away
+      return this.isHome ? this.game.home_score : this.game.away_score
     },
     scoreAgainst() {
-      return this.isHome ? this.game.score.away : this.game.score.home
+      return this.isHome ? this.game.away_score : this.game.home_score
     },
 
     letterResult() {
@@ -50,10 +50,10 @@ export default {
 
     opponent() {
       let game = this.game
-      let isHome = game.teams.home.id == this.playerTeam.id
-      let opponent = isHome ? game.teams.away : game.teams.home
+      let isHome = game.home.abbr == this.playerTeam.abbr
+      let opponent = isHome ? game.away : game.home
 
-      return isHome ? `v ${opponent.abbreviation}` : `@ ${opponent.abbreviation}`
+      return isHome ? `v ${opponent.abbr}` : `@ ${opponent.abbr}`
     },
   },
 }

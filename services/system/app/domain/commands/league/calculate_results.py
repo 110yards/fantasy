@@ -102,7 +102,7 @@ class CalculateResultsCommandExecutor(BaseCommandExecutor[CalculateResultsComman
             # nothing to do here.
             return CalculateResultsResult(command=command)
 
-        player_games_for_week = self.player_game_repo.for_week(state.current_season, command.week_number)
+        player_games_for_week = self.player_game_repo.for_week(state.current_season, command.week)
         self.player_games_for_week = {x.player_id:x for x in player_games_for_week}
         self.league_scoring = self.league_config_repo.get_scoring_config(command.league_id)
 

@@ -20,7 +20,7 @@ from services.api.app.domain.repositories.league_week_repository import (
 from services.api.app.domain.repositories.player_league_season_score_repository import (
     PlayerLeagueSeasonScoreRepository,
     create_player_league_season_score_repository)
-from services.api.app.domain.repositories.public_repository import (
+from yards_py.domain.repositories.public_repository import (
     PublicRepository, create_public_repository)
 from services.api.app.domain.repositories.user_archive_league_repository import (
     UserArchiveLeagueRepository, create_user_archive_league_repository)

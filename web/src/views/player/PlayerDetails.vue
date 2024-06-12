@@ -401,7 +401,7 @@ export default {
     },
 
     showReceiving() {
-      return this.hasStatKey("receive_attempts")
+      return this.hasStatKey("receive_caught")
     },
 
     showRushingFirst() {

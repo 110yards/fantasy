@@ -4,7 +4,7 @@ from yards_py.domain.entities.user_league_preview import UserLeaguePreview
 from services.api.app.domain.commands.league.join_league import create_roster
 from services.api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from services.api.app.domain.repositories.league_roster_repository import LeagueRosterRepository, create_league_roster_repository
-from services.api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
+from yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
 from services.api.app.domain.repositories.user_league_repository import UserLeagueRepository, create_user_league_repository
 from datetime import datetime
 from typing import Optional

@@ -1,4 +1,3 @@
-from services.api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
 from services.api.app.domain.repositories.league_config_repository import LeagueConfigRepository, create_league_config_repository
 from google.cloud.firestore_v1.transaction import Transaction
 from services.api.app.domain.enums.draft_state import DraftState
@@ -6,6 +5,8 @@ from yards_py.domain.entities.league import League
 from yards_py.domain.entities.draft import Draft
 from services.api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
 from fastapi import Depends
+
+from yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
 
 
 def create_draft_service(

@@ -2,7 +2,7 @@
 from yards_py.domain.entities.league_transaction import LeagueTransaction
 from services.api.app.domain.repositories.league_transaction_repository import LeagueTransactionRepository, create_league_transaction_repository
 from services.api.app.domain.repositories.league_repository import LeagueRepository, create_league_repository
-from services.api.app.domain.repositories.public_repository import PublicRepository, create_public_repository
+from yards_py.domain.repositories.public_repository import PublicRepository, create_public_repository
 from yards_py.domain.entities.player import Player, STATUS_ACTIVE
 from services.api.app.domain.enums.position_type import PositionType
 from services.api.app.domain.repositories.state_repository import StateRepository, create_state_repository
