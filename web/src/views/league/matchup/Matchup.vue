@@ -34,11 +34,11 @@
         :weekNumber="weekNumber"
       />
 
-      <v-row class="mt-2" v-if="canEdit && !editing">
+      <!-- <v-row class="mt-2" v-if="canEdit && !editing">
         <v-col cols="12">
           <v-btn @click="startEditing">Edit scores</v-btn>
         </v-col>
-      </v-row>
+      </v-row> -->
     </v-sheet>
 
     <v-sheet v-if="editing">
