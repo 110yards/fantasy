@@ -192,6 +192,7 @@ export const transactionType = {
   commissionerChangeRosterName: "commissioner_change_roster_name",
   commissionerChangeScoring: "commissioner_change_scoring",
   commissionerMovePlayer: "commissioner_move_player",
+  commissionerAdjustResult: "commissioner_adjust_result",
 
   isCommissionerChange(trxType) {
     switch (trxType) {
@@ -199,6 +200,7 @@ export const transactionType = {
       case transactionType.commissionerChangeScoring:
       case transactionType.commissionerDropPlayer:
       case transactionType.commissionerMovePlayer:
+      case transactionType.commissionerAdjustResult:
         return true
       default:
         return false
