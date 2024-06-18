@@ -105,7 +105,7 @@ class AdjustMatchupScoresCommandExecutor(BaseCommandExecutor[AdjustMatchupScores
                                         {
                                             "league_id": command.league_id,
                                             "week_number": command.week_number,
-                                            "pass_week": True
+                                            "past_week": True
                                         })
 
         try:
