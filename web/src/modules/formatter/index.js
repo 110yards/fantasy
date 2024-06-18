@@ -31,3 +31,7 @@ export const gameStartTime = (date, short) => {
 export const shortName = player => {
   return `${player.first_name[0]}. ${player.last_name}`
 }
+
+export const birthDate = date => {
+  return format(date, "MMMM d, yyyy")
+}
