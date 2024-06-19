@@ -142,38 +142,6 @@ export default {
       matchPlayer: null,
     }
   },
-  methods: {
-    formatDate(dateString) {
-      if (!dateString) {
-        return "-"
-      }
-      let date = new Date(dateString)
-      return birthDate(date)
-    },
-    review(player) {
-      this.reviewPlayer = player
-      this.searchCriteria = player.last_name
-    },
-    async addNew() {
-      let command = {
-        approval_player_id: this.reviewPlayer.player_id,
-      }
-      await addNewPlayer(command)
-      this.clear()
-    },
-    async match() {
-      let command = {
-        approval_player_id: this.reviewPlayer.player_id,
-        match_player_id: this.matchPlayer.player_id,
-      }
-      await matchPlayer(command)
-      this.clear()
-    },
-    clear() {
-      this.reviewPlayer = null
-      this.matchPlayer = null
-    },
-  },
   computed: {
     anyMatches() {
       return this.matches.length > 0
@@ -203,6 +171,44 @@ export default {
       return this.$root.state.current_season
     },
   },
+  methods: {
+    formatDate(dateString) {
+      if (!dateString) {
+        return "-"
+      }
+      let date = new Date(dateString)
+      return birthDate(date)
+    },
+    review(player) {
+      this.reviewPlayer = player
+      this.searchCriteria = player.last_name
+    },
+    async addNew() {
+      let command = {
+        approval_player_id: this.reviewPlayer.player_id,
+      }
+      await addNewPlayer(command)
+      this.clear()
+    },
+    async match() {
+      let command = {
+        approval_player_id: this.reviewPlayer.player_id,
+        match_player_id: this.matchPlayer.player_id,
+      }
+      await matchPlayer(command)
+      this.clear()
+    },
+    clear() {
+      this.players = null
+      this.bindPlayers()
+      this.reviewPlayer = null
+      this.matchPlayer = null
+    },
+    bindPlayers() {
+      let playersRef = firestore.collection(`season/${this.season}/player`)
+      this.$bind("players", playersRef)
+    },
+  },
   watch: {
     season: {
       immediate: true,
@@ -211,8 +217,7 @@ export default {
           return
         }
 
-        let playersRef = firestore.collection(`season/${value}/player`)
-        this.$bind("players", playersRef)
+        this.bindPlayers()
       },
     },
   },

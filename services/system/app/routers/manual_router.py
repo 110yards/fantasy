@@ -18,3 +18,11 @@ async def update_scoreboard(
     
     return executor.execute(command)
     
+
+@router.post("/update_game")
+async def update_game(
+    executor: ManualUpdateScoreboardCommandExecutor = Depends(create_manual_update_scoreboard_command_executor),
+):
+    command = ManualUpdateScoreboardCommand()
+    
+    return executor.execute(command)

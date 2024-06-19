@@ -71,6 +71,9 @@ export default {
       if (!this.switchesLoaded) return false
       return this.getSwitch("official_discord_link")
     },
+    enablePlayerApprovals() {
+      return this.getSwitch("enable_player_approvals")
+    },
   },
   created() {
     this.$bind("switches", firestore.collection("public").doc("switches"))

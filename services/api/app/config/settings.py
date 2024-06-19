@@ -22,6 +22,8 @@ class Settings(BaseSettings):
     origins: str
     version: str = "dev"
     rtdb_emulator_host: Optional[str] = None
+    system_api: str
+    system_api_key: str
 
     class Config:
         env_file = ".env"

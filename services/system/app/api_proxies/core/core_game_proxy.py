@@ -8,8 +8,10 @@ class CoreGameProxy():
 
     def get_schedule(self, season: int) -> dict:
         return self.proxy.get(f"schedule?season={season}")
+    
+    def get_game()
 
 
 
-def create_cfl_game_proxy(proxy: CoreProxy = Depends(create_core_proxy)):
+def create_core_game_proxy(proxy: CoreProxy = Depends(create_core_proxy)):
     return CoreGameProxy(proxy)

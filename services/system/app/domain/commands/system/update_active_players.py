@@ -54,7 +54,6 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
         publisher: Publisher,
         cfl_player_proxy: CflPlayerProxy,
         game_repo: GameRepository,
-        state_repo: StateRepository,
         public_repo: PublicRepository,
         approval_repo: ApprovalPlayerRepository,
     ):
@@ -63,14 +62,14 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
         self.publisher = publisher
         self.cfl_player_proxy = cfl_player_proxy
         self.game_repo = game_repo
-        self.state_repo = state_repo
         self.public_repo = public_repo
         self.approval_repo = approval_repo
 
     def on_execute(self, command: UpdateActivePlayersCommand) -> UpdateActivePlayersCommandResult:
-        season = self.state_repo.get().current_season
-        self.current_season = season
+        state = self.public_repo.get_state()
+        season = state.current_season
 
+        enable_player_approvals = self.public_repo.get_switches().enable_player_approvals
 
         current_players = self.cfl_player_proxy.get_players_for_season()
         
@@ -90,6 +89,10 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
 
         if auto_accept_all:
             Logger.info("No players found in database, accepting all players")
+
+        if not enable_player_approvals:
+            Logger.info("Player approvals disabled, accepting all players")
+            auto_accept_all = True
             
 
         # if self.public_repo.get_switches().enable_game_roster_status:
@@ -121,7 +124,6 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
                     to_update.append(player)
             else:
                 Logger.info(f"New player: {player.display_name} ({player.team.abbr})")
-                new_players.append(player)
 
                 if auto_accept_all:
                     to_update.append(player)
@@ -130,6 +132,9 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
         
         # anyone left in stored_players is a free agent
         for player in stored_players.values():
+            if player.team.abbr == Team.free_agent().abbr:
+                continue # already a free agent
+            
             player.team = Team.free_agent()
             to_update.append(player)
             Logger.info(f"Player became free agent: {player.display_name}")
@@ -155,11 +160,11 @@ class UpdateActivePlayersCommandExecutor(BaseCommandExecutor[UpdateActivePlayers
         
         @firestore.transactional
         def update_state(transaction: Transaction):
-            state = self.state_repo.get(transaction)
+            state = self.public_repo.get_state(transaction)
             state.last_player_update = datetime.now().astimezone(tz=timezone.utc)
-            self.state_repo.set(state, transaction)
+            self.public_repo.set_state(state, transaction)
 
-        transaction = self.state_repo.firestore.create_transaction()
+        transaction = self.public_repo.firestore.create_transaction()
         update_state(transaction)
         return UpdateActivePlayersCommandResult(
             command=command, 
@@ -242,7 +247,6 @@ def update_active_players_command_executor(
     publisher: Publisher = Depends(create_publisher),
     cfl_player_proxy: CflPlayerProxy = Depends(create_cfl_player_proxy),
     game_repo: GameRepository = Depends(create_game_repository),
-    state_repo: StateRepository = Depends(create_state_repository),
     public_repo: PublicRepository = Depends(create_public_repository),
     approval_repo: ApprovalPlayerRepository = Depends(create_approval_player_repository),
 ):
@@ -252,7 +256,6 @@ def update_active_players_command_executor(
         publisher,
         cfl_player_proxy,
         game_repo,
-        state_repo,
         public_repo,
         approval_repo,
     )

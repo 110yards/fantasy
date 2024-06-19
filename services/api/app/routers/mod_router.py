@@ -1,5 +1,7 @@
 from fastapi import Depends, Request
 
+from ..domain.services.system_proxy_service import SystemProxyService, create_system_proxy_service
+
 from ..core.auth import require_role
 from ..core.role import Role
 from ..domain.commands.mod.add_new_player import AddNewPlayerCommand, AddNewPlayerCommandExecutor, create_add_new_player_command_executor
@@ -27,3 +29,13 @@ async def match_player(
     command_executor: MatchPlayerCommandExecutor = Depends(create_match_player_command_executor),
 ):
     return command_executor.execute(command)
+
+@router.post("/update_game_data/{game_id}")
+@require_role(Role.mod)
+async def update_game_data(
+    request: Request,
+    game_id: str,
+    system_proxy_service: SystemProxyService = Depends(create_system_proxy_service),
+):
+    return system_proxy_service.post(f"manual/update_game/{game_id}")
+    
