@@ -204,13 +204,13 @@ async def get_players_ref(
     else:
         return ref
 
-# @router.put("/{league_id}/adjust_matchup_scores")
-# async def adjust_matchup(
-#     league_id: str,
-#     command: AdjustMatchupScoresCommand,
-#     command_executor: AdjustMatchupScoresCommandExecutor = Depends(create_adjust_matchup_scores_command_executor),
-# ):
-#     if  league_id != command.league_id:
-#         abort_unauthorized()
+@router.put("/{league_id}/adjust_matchup_scores")
+async def adjust_matchup(
+    league_id: str,
+    command: AdjustMatchupScoresCommand,
+    command_executor: AdjustMatchupScoresCommandExecutor = Depends(create_adjust_matchup_scores_command_executor),
+):
+    if  league_id != command.league_id:
+        abort_unauthorized()
         
-#     return command_executor.execute(command)
+    return command_executor.execute(command)

@@ -34,11 +34,11 @@
         :weekNumber="weekNumber"
       />
 
-      <!-- <v-row class="mt-2" v-if="canEdit && !editing">
+      <v-row class="mt-2" v-if="canEdit && !editing">
         <v-col cols="12">
           <v-btn @click="startEditing">Edit scores</v-btn>
         </v-col>
-      </v-row> -->
+      </v-row>
     </v-sheet>
 
     <v-sheet v-if="editing">
@@ -54,8 +54,8 @@
             <app-number-field v-model="form.home_adjustment" :label="homeRoster.name + ' adjustment'" required />
 
             <p class="body-1">Adjusted scores</p>
-            <p class="body-2">{{ awayRoster.name }}: {{ adjustedScores.away }}</p>
-            <p class="body-2">{{ homeRoster.name }}: {{ adjustedScores.home }}</p>
+            <p class="body-2">{{ awayRoster.name }}: <Score :score="adjustedScores.away" /></p>
+            <p class="body-2">{{ homeRoster.name }}: <Score :score="adjustedScores.home" /></p>
 
             <app-primary-button>Update</app-primary-button>
             <app-default-button class="ml-2" @click="editing = false">Cancel</app-default-button>
@@ -87,6 +87,7 @@ import AppNumberField from "../../../components/inputs/AppNumberField.vue"
 import AppPrimaryButton from "../../../components/buttons/AppPrimaryButton.vue"
 import AppDefaultButton from "../../../components/buttons/AppDefaultButton.vue"
 import eventBus from "../../../modules/eventBus"
+import Score from "../../../components/Score.vue"
 
 export default {
   name: "matchup",
@@ -96,6 +97,7 @@ export default {
     AppNumberField,
     AppPrimaryButton,
     AppDefaultButton,
+    Score,
   },
   mixins: [scoreboard],
   props: {
@@ -125,7 +127,9 @@ export default {
   },
   computed: {
     canEdit() {
-      return !this.isCurrentWeek && (this.$root.isCommissioner || this.$store.state.isAdmin)
+      return (
+        !this.isCurrentWeek && (this.$root.isCommissioner || this.$store.state.isAdmin) && this.$root.enableEditScores
+      )
     },
     enableProjections() {
       return this.isCurrentWeek && this.$root.enableProjections
