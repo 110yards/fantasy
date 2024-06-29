@@ -21,7 +21,7 @@ from firebase_admin import firestore
 
 
 class ManualUpdateGameCommand(BaseCommand):
-    pass
+    game_id: int
 
 
 class ManualUpdateGameResult(BaseCommandResult):
@@ -38,28 +38,30 @@ class ManualUpdateGameCommandExecutor(BaseCommandExecutor[ManualUpdateGameComman
         self.player_game_repo = player_game_repo
 
     def on_execute(self, command: ManualUpdateGameCommand) -> ManualUpdateGameResult:
-        @firestore.transactional
-        def update(transaction) -> Scoreboard | None:
-            state = self.public_repo.get_state(transaction)
 
-            data = self.proxy.get_scoreboard(state.current_season, state.current_week)
+        
+        # @firestore.transactional
+        # def update(transaction) -> Scoreboard | None:
+        #     state = self.public_repo.get_state(transaction)
 
-            games = [ScoreboardGame(**x) for x in data["games"]]
-            games = {x.game_id: x for x in games}
-            scoreboard = Scoreboard(games=games)            
+        #     data = self.proxy.get_scoreboard(state.current_season, state.current_week)
 
-            locks = Locks.create_from_scoreboard(scoreboard)
+        #     games = [ScoreboardGame(**x) for x in data["games"]]
+        #     games = {x.game_id: x for x in games}
+        #     scoreboard = Scoreboard(games=games)            
 
-            if locks.changed(state.locks):
-                state.locks = locks
-                self.public_repo.set_state(state, transaction)
+        #     locks = Locks.create_from_scoreboard(scoreboard)
 
-            self.public_repo.set_scoreboard(scoreboard, transaction)
+        #     if locks.changed(state.locks):
+        #         state.locks = locks
+        #         self.public_repo.set_state(state, transaction)
 
-            return scoreboard
+        #     self.public_repo.set_scoreboard(scoreboard, transaction)
+
+        #     return scoreboard
 
 
-        transaction = self.public_repo.firestore.create_transaction()
+        # transaction = self.public_repo.firestore.create_transaction()
 
         scoreboard = update(transaction)
 
