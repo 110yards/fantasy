@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-.scripts/common/install-dependencies-api.sh
+.scripts/common/install-dependencies-services.sh
 .scripts/common/install-dependencies-web.sh
