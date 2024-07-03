@@ -20,16 +20,16 @@
         </tbody>
       </template>
     </v-simple-table>
-    <ReviewGame v-else :game="reviewGame" />
+    <ReviewGame v-else :game="reviewGame" @close="reviewGame = null" />
   </div>
 </template>
-  
+
 <script>
-import AppDefaultButton from "../buttons/AppDefaultButton.vue"
-import AppPrimaryButton from "../buttons/AppPrimaryButton.vue"
-import AppTextField from "../inputs/AppTextField.vue"
+import AppDefaultButton from "../../buttons/AppDefaultButton.vue"
+import AppPrimaryButton from "../../buttons/AppPrimaryButton.vue"
+import AppTextField from "../../inputs/AppTextField.vue"
 import ReviewGame from "./ReviewGame.vue"
-import scoreboard from "../../mixins/scoreboard"
+import scoreboard from "../../../mixins/scoreboard"
 
 const minHoursToEdit = 72
 

@@ -14,5 +14,7 @@
     "run-pty": "^5.0.0",
     "selenium-webdriver": "^4.0.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "firebase-tools": "^13.13.0"
+  }
 }

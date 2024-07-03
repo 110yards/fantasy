@@ -1,6 +1,12 @@
 from __future__ import annotations
 
-from .......yards_py.domain.repositories.player_game_repository import PlayerGameRepository
+from yards_py.core.logging import Logger
+from yards_py.domain.entities.player_game import PlayerGame
+
+from yards_py.domain.entities.boxscore import Boxscore
+
+from yards_py.domain.entities.game import Game
+from yards_py.domain.repositories.player_game_repository import PlayerGameRepository, create_player_game_repository
 
 from ....api_proxies.core.core_game_proxy import CoreGameProxy, create_core_game_proxy
 
@@ -25,7 +31,7 @@ class ManualUpdateGameCommand(BaseCommand):
 
 
 class ManualUpdateGameResult(BaseCommandResult):
-    scoreboard: Scoreboard | None
+    pass
 
 
 class ManualUpdateGameCommandExecutor(BaseCommandExecutor[ManualUpdateGameCommand, ManualUpdateGameResult]):
@@ -33,46 +39,78 @@ class ManualUpdateGameCommandExecutor(BaseCommandExecutor[ManualUpdateGameComman
         self,
         proxy: CoreGameProxy,
         player_game_repo: PlayerGameRepository,
+        public_repo: PublicRepository,
     ):
         self.proxy = proxy
         self.player_game_repo = player_game_repo
+        self.public_repo = public_repo
 
     def on_execute(self, command: ManualUpdateGameCommand) -> ManualUpdateGameResult:
-
+        data = self.proxy.get_game(command.game_id)
+        state = self.public_repo.get_state()
         
-        # @firestore.transactional
-        # def update(transaction) -> Scoreboard | None:
-        #     state = self.public_repo.get_state(transaction)
+        boxscore = Boxscore(**data)
 
-        #     data = self.proxy.get_scoreboard(state.current_season, state.current_week)
+        player_games = []
 
-        #     games = [ScoreboardGame(**x) for x in data["games"]]
-        #     games = {x.game_id: x for x in games}
-        #     scoreboard = Scoreboard(games=games)            
+        for away_stats in boxscore.teams.away_stats:
+            player_game = PlayerGame(
+                player_id=away_stats.player_id,
+                game_id=away_stats.game_id,
+                week_number=away_stats.week,
+                team=away_stats.team,
+                opponent=away_stats.opponent,
+                stats=away_stats.stats,
+                date_updated=away_stats.date_updated,
+            )
+            player_game.set_id()
+            player_games.append(player_game)
 
-        #     locks = Locks.create_from_scoreboard(scoreboard)
+        for home_stats in boxscore.teams.home_stats:
+            player_game = PlayerGame(
+                player_id=home_stats.player_id,
+                game_id=home_stats.game_id,
+                week_number=home_stats.week,
+                team=home_stats.team,
+                opponent=home_stats.opponent,
+                stats=home_stats.stats,
+                date_updated=home_stats.date_updated,
+            )
+            player_game.set_id()
+            player_games.append(player_game)
 
-        #     if locks.changed(state.locks):
-        #         state.locks = locks
-        #         self.public_repo.set_state(state, transaction)
+        @firestore.transactional
+        def update(transaction, player_game: PlayerGame) -> None:
+            existing = self.player_game_repo.get(state.current_season, player_game.id, transaction)
 
-        #     self.public_repo.set_scoreboard(scoreboard, transaction)
+            if player_game.id == None:
+                raise Exception("Player game id is None")
 
-        #     return scoreboard
+            needs_update = not existing or not existing.date_updated or existing.date_updated < player_game.date_updated
 
+            if not needs_update:
+                return None
+            
+            Logger.info(f"Updating player game: {player_game.id}")
+            
+            self.player_game_repo.set(state.current_season, player_game, transaction)
 
-        # transaction = self.public_repo.firestore.create_transaction()
+            return player_game
+        
+        for player_game in player_games:
+            transaction = self.public_repo.firestore.create_transaction()
+            update(transaction, player_game)
 
-        scoreboard = update(transaction)
-
-        return ManualUpdateGameResult(command=command, scoreboard=scoreboard)
+        return ManualUpdateGameResult(command=command)
 
 
 def create_manual_update_game_command_executor(
     proxy: CoreGameProxy = Depends(create_core_game_proxy),
-    public_repo: PublicRepository = Depends(create_public_repository)
+    player_game_repo: PlayerGameRepository = Depends(create_player_game_repository),
+    public_repo: PublicRepository = Depends(create_public_repository),
 ):
     return ManualUpdateGameCommandExecutor(
         proxy=proxy,
-        public_repo=public_repo
+        player_game_repo=player_game_repo,
+        public_repo=public_repo,
     )

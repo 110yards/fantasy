@@ -1,6 +1,7 @@
 from __future__ import annotations
 from datetime import datetime
 
+from yards_py.domain.entities.boxscore import BoxscorePlayerStats
 from yards_py.domain.entities.stats import Stats
 
 from yards_py.domain.entities.team import Team
@@ -20,16 +21,6 @@ from pydantic import BaseModel
 
 from yards_py.core.logging import Logger
 
-class BoxscorePlayerStats(BaseModel):
-    player_id: str
-    game_id: str
-    year: int
-    week: int
-    team: Team
-    opponent: Team
-    name: str
-    date_updated: datetime
-    stats: Stats
 
 
 class UpdatePlayerStatsCommand(BaseCommand):

@@ -16,6 +16,10 @@ export default {
       return this.playerApprovals != null && this.playerApprovals.length > 0
     },
 
+    isAdmin() {
+      return this.$store.state.isAdmin
+    },
+
     isMod() {
       return this.$store.state.isAdmin || this.$store.state.isMod
     },
