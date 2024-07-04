@@ -7,13 +7,9 @@
 <script>
 
 import { firestore } from "../../../modules/firebase/index.js"
-import AppDefaultButton from "../../buttons/AppDefaultButton.vue"
-import AppPrimaryButton from "../../buttons/AppPrimaryButton.vue"
-import AppTextField from "../../inputs/AppTextField.vue"
 
 export default {
     name: "ReviewPlayer",
-    components: { AppPrimaryButton, AppDefaultButton, AppTextField },
     props: {
         season: {
             type: Number,

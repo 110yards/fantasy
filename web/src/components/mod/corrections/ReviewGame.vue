@@ -31,6 +31,8 @@
   </div>
 </template>
 
+<style scoped></style>
+
 <script>
 import { firestore } from "../../../modules/firebase/index.js"
 import AppDefaultButton from "../../buttons/AppDefaultButton.vue"
