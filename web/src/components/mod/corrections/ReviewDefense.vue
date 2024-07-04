@@ -1,36 +1,17 @@
 <template>
     <div>
-        <v-simple-table>
-            <template>
-                <thead>
-                    <tr>
-                        <th>Defense</th>
-                        <th>DT</th>
-                        <th>STT</th>
-                        <th>Sacks</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="player in inScope" :key="player.player_id">
-                        <td>
-                            <ReviewPlayer :season="season" :playerGame="player" />
-                        </td>
-                        <td>{{ player.stats.tackles_defensive }}</td>
-                        <td>{{ player.stats.tackles_special_teams }}</td>
-                        <td>{{ player.stats.sacks_qb_made }}</td>
-                    </tr>
-                </tbody>
-            </template>
-        </v-simple-table>
+        <h3>Defense</h3>
+        <EditPlayerStats v-for="player in inScope" :key="player.player_id" :season="season" :text="getText(player)"
+            :playerGame="player" @save="$emit('save')" />
     </div>
 </template>
 
 <script>
-import ReviewPlayer from "./ReviewPlayer.vue"
+import EditPlayerStats from "./EditPlayerStats.vue"
 
 export default {
     name: "ReviewDefense",
-    components: { ReviewPlayer },
+    components: { EditPlayerStats },
     props: {
         season: {
             type: Number,
@@ -45,6 +26,11 @@ export default {
         inScope() {
             return this.players.filter((player) => player.stats.tackles_defensive > 0 || player.stats.tackles_special_teams).sort((a, b) => b.stats.tackles_defensive - a.stats.tackles_defensive)
         },
+    },
+    methods: {
+        getText(player) {
+            return `${player.stats.tackles_defensive} tkl, ${player.stats.tackles_special_teams} stt, ${player.stats.sacks_qb_made} sacks, ${player.stats.interceptions} INT, ${player.stats.fumbles_recovered} FR`
+        }
     }
 }
 

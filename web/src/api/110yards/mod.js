@@ -11,3 +11,11 @@ export const matchPlayer = async command => {
 export const updateGameData = async gameId => {
   return client.post(null, `/mod/update_game_data/${gameId}`, null)
 }
+
+export const updatePlayerGame = async command => {
+  return client.post(null, "/mod/update_player_game", command)
+}
+
+export const revertPlayerGame = async command => {
+  return client.post(null, "/mod/revert_player_game", command)
+}

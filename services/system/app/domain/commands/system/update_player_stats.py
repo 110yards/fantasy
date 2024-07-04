@@ -69,6 +69,10 @@ class UpdatePlayerStatsCommandExecutor(BaseCommandExecutor[UpdatePlayerStatsComm
             if not needs_update:
                 return None
             
+            if existing and existing.manual_override:
+                Logger.info(f"Player game {existing.id} has manual override, will not update")
+                return existing
+            
             self.player_game_repo.set(state.current_season, player_game, transaction)
 
             return player_game

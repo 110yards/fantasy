@@ -39,12 +39,11 @@ import AppDefaultButton from "../../buttons/AppDefaultButton.vue"
 import AppPrimaryButton from "../../buttons/AppPrimaryButton.vue"
 import AppTextField from "../../inputs/AppTextField.vue"
 import { updateGameData } from "../../../api/110yards/mod.js"
-import ReviewPlayer from "./ReviewPlayer.vue"
 import ReviewTeam from "./ReviewTeam.vue"
 
 export default {
   name: "ReviewGame",
-  components: { AppPrimaryButton, AppDefaultButton, AppTextField, ReviewPlayer, ReviewTeam },
+  components: { AppPrimaryButton, AppDefaultButton, AppTextField, ReviewTeam },
   emit: ["close"],
   props: {
     game: {
