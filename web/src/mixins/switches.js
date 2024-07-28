@@ -74,6 +74,9 @@ export default {
     enablePlayerApprovals() {
       return this.getSwitch("enable_player_approvals")
     },
+    enableEditScores() {
+      return this.getSwitch("enable_edit_scores")
+    },
   },
   created() {
     this.$bind("switches", firestore.collection("public").doc("switches"))
