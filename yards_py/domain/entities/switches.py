@@ -27,3 +27,4 @@ class Switches(BaseEntity):
     show_donation_link = True
     show_new_roster_ui_tip = False
     enable_discord_integration = True
+    enable_player_approvals = False

@@ -16,6 +16,8 @@ class PlayerGame(BaseEntity):
     opponent: Team
     stats: Stats
     date_updated: datetime | None = None
+    manual_override: bool = False
+    original_stats: Stats | None = None
 
     # TODO: automatically set this in init
     def set_id(self):

@@ -35,8 +35,7 @@ class Player(BaseEntity):
     image_url: Optional[str]
     status_current: int = 1
     injury_status: Optional[InjuryStatus] = None
-
-    hash: str = ""
+    alternate_computed_ids: list[str] = []
 
     @property
     def national_status(self):
@@ -81,8 +80,12 @@ class Player(BaseEntity):
         except ValueError:
             return None
 
-    def compute_hash(self):
-        self.hash = hash_dict(self.dict())
+    def computed_hash(self) -> str:
+        to_compare = self.dict(
+            exclude={"last_updated"},
+        )
+
+        return hash_dict(to_compare)
 
     @staticmethod
     def from_cfl_api(input: Dict) -> Player:

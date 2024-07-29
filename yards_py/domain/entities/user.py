@@ -15,3 +15,4 @@ class User(BaseEntity):
     confirmed: bool = False
     commissioner_of: List[str] = []
     is_admin: bool = False
+    is_mod: bool = False

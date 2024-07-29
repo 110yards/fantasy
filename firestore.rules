@@ -2,7 +2,11 @@ service cloud.firestore {
   match /databases/{database}/documents {
     function userIsAdmin() {
       return get(/databases/$(database)/documents/user/$(request.auth.uid)).data.is_admin || false;
-    }    
+    }   
+    
+    function userIsMod() {
+      return get(/databases/$(database)/documents/user/$(request.auth.uid)).data.is_mod || userIsAdmin();
+    }      
       
     function isSignedIn() {
       return request.auth != null;
@@ -47,9 +51,13 @@ service cloud.firestore {
     match /user_roles/{uid} {
       allow read: if isForUserOrAdmin(uid)
     }
+
+    match /season/{document=**} {
+    	allow read: if true;
+    }
     
     match /season/{season}/game/{document=**} {
-    	allow read: if true;
+    	allow read: if isSignedIn();
     }
     
     match /season/{season}/player/{document=**} {
@@ -57,11 +65,11 @@ service cloud.firestore {
     }
     
     match /season/{season}/player_game/{document=**} {
-    	allow read: if true;
+    	allow read: if isSignedIn();
     }
     
     match /season/{season}/player_season/{document=**} {
-    	allow read: if true;
+    	allow read: if isSignedIn();
     }
     
     match /roster-positions/{document=**} {
@@ -143,6 +151,18 @@ service cloud.firestore {
       	allow read: if userInLeague() || userIsAdmin();
       }
     }
+
+    match /mod/{document=**} {
+      allow read: if userIsMod();
+    }
     
+    match /mod/approvals/players/{document=**} {
+      allow read: if userIsMod();
+    }
+
+    match /system_transactions/{document=**} {
+      allow read: if userIsMod();
+    }
+
   }
 }

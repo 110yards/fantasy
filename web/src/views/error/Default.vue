@@ -8,7 +8,7 @@
       happened.
     </p>
     <v-alert type="error">
-      <pre>{{ message }}</pre>
+      {{ message }}
     </v-alert>
   </div>
 </template>

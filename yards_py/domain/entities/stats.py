@@ -30,6 +30,7 @@ class Stats(BaseModel):
     receive_fumbles: Optional[int]
     punts: Optional[int]
     punt_yards: Optional[int]
+    punt_gross_yards: Optional[int]
     punt_net_yards: Optional[int]
     punt_long: Optional[int]
     punt_singles: Optional[int]

@@ -20,6 +20,7 @@ import opponents from "./mixins/opponents"
 import state from "./mixins/state"
 import league from "./mixins/league"
 import teamGames from "./mixins/teamGames"
+import modTools from "./mixins/modTools"
 
 Vue.config.productionTip = false
 
@@ -34,5 +35,5 @@ new Vue({
   store,
   vuetify,
   render: h => h(App),
-  mixins: [switches, rosterPositions, opponents, state, league, teamGames],
+  mixins: [switches, rosterPositions, opponents, state, league, teamGames, modTools],
 }).$mount("#app")

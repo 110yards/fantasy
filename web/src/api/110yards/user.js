@@ -19,3 +19,11 @@ export const signIn = async user => {
 export const userExists = async email => {
   return client.post(null, "/user/exists", { email: email })
 }
+
+export const makeMod = async uid => {
+  return client.put(null, `/user/${uid}/mod`)
+}
+
+export const removeMod = async uid => {
+  return client.del(null, `/user/${uid}/mod`)
+}

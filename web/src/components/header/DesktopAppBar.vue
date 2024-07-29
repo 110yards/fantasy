@@ -11,6 +11,7 @@
     <support-link class="nav-primary" />
     <faq-link class="nav-primary" />
     <admin-link v-if="isAdmin" class="nav-primary" />
+    <mod-link v-if="isMod" class="nav-primary" />
     <discord-link class="nav-primary" />
     <log-in-link v-if="isAnonymous" class="nav-primary" />
     <log-out-link v-if="!isAnonymous" class="nav-primary" />
@@ -82,6 +83,7 @@ import PlayersLink from "../nav/PlayersLink.vue"
 import ProfileLink from "../nav/ProfileLink.vue"
 import RosterLink from "../nav/RosterLink.vue"
 import SupportLink from "../nav/SupportLink.vue"
+import ModLink from "../nav/ModLink.vue"
 
 export default {
   components: {
@@ -96,6 +98,7 @@ export default {
     SupportLink,
     ProfileLink,
     DiscordLink,
+    ModLink,
   },
 
   props: {
@@ -108,6 +111,7 @@ export default {
     hasLeague: { required: true },
     hasRoster: { required: true },
     hasNotes: { required: true },
+    isMod: { required: true },
   },
 
   computed: {

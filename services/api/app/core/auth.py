@@ -113,8 +113,11 @@ def require_role(roles: Union[str, List[Role]], **kwargs):
                 return abort_unauthorized()
 
             for role in roles_to_check:
-                # this could be better
                 if role == Role.admin and user.is_admin:
+                    allowed = True
+                    break
+
+                if role == Role.mod and (user.is_mod or user.is_admin):
                     allowed = True
                     break
 
