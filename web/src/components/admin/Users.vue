@@ -46,8 +46,8 @@
     </v-simple-table>
   </div>
 </template>
-  
-  <script>
+
+<script>
 import { firestore } from "../../modules/firebase"
 import AppDefaultButton from "../buttons/AppDefaultButton.vue"
 import AppPrimaryButton from "../buttons/AppPrimaryButton.vue"

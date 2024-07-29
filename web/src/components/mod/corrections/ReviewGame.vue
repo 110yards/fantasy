@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h3> {{ game.away.location }} at {{ game.home.location }} </h3>
+    <h3>{{ game.away.location }} at {{ game.home.location }}</h3>
     <p class="text-subtitle">
       If you need to make corrections to the game data, you can do so here. Please use official sources to verify data.
     </p>
@@ -27,7 +27,6 @@
         </v-tab-item>
       </v-tabs-items>
     </v-tabs>
-
   </div>
 </template>
 
@@ -54,7 +53,7 @@ export default {
   data() {
     return {
       playerGames: null,
-      tab: "away"
+      tab: "away",
     }
   },
   computed: {
@@ -63,12 +62,12 @@ export default {
     },
 
     awayPlayers() {
-      return this.playerGames.filter((pg) => pg.team.abbr == this.game.away.abbr)
+      return this.playerGames.filter(pg => pg.team.abbr == this.game.away.abbr)
     },
 
     homePlayers() {
-      return this.playerGames.filter((pg) => pg.team.abbr == this.game.home.abbr)
-    }
+      return this.playerGames.filter(pg => pg.team.abbr == this.game.home.abbr)
+    },
   },
   methods: {
     async updateData() {
@@ -81,7 +80,11 @@ export default {
       handler(v) {
         if (v) {
           // console.log(`season/${v.year}/player_game where game_id == ${v.game_id}`)
-          let ref = firestore.collection("season").doc(`${v.year}`).collection("player_game").where("game_id", "==", parseInt(v.game_id))
+          let ref = firestore
+            .collection("season")
+            .doc(`${v.year}`)
+            .collection("player_game")
+            .where("game_id", "==", parseInt(v.game_id))
 
           this.$bind("playerGames", ref)
         }
