@@ -121,8 +121,8 @@
     </v-card-actions>
   </v-card>
 </template>
-  
-  <script>
+
+<script>
 import { firestore } from "../../modules/firebase/index.js"
 import AppDefaultButton from "../buttons/AppDefaultButton.vue"
 import AppPrimaryButton from "../buttons/AppPrimaryButton.vue"

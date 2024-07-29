@@ -24,8 +24,8 @@
     </v-card-text>
   </v-card>
 </template>
-  
-  <script>
+
+<script>
 import { firestore } from "../../modules/firebase/index.js"
 import { longDate, shortTime } from "../../modules/formatter/index.js"
 export default {
