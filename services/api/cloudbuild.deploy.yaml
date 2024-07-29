@@ -26,6 +26,8 @@ steps:
             "--update-secrets=CFL_API_KEY=CFL_API_KEY:latest",
             "--update-secrets=FIREBASE_API_KEY=FIREBASE_API_KEY:latest",
             "--update-secrets=API_KEY=PUSH_API_KEY:latest"
+            "--update-secrets=SYSTEM_API_KEY=PUSH_API_KEY:latest",
+            "--update-secrets=SYSTEM_API_ENDPOINT:latest"
   ]
 
 substitutions:
