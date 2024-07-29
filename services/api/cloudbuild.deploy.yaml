@@ -27,7 +27,7 @@ steps:
             "--update-secrets=FIREBASE_API_KEY=FIREBASE_API_KEY:latest",
             "--update-secrets=API_KEY=PUSH_API_KEY:latest",
             "--update-secrets=SYSTEM_API_KEY=PUSH_API_KEY:latest",
-            "--update-secrets=SYSTEM_API_ENDPOINT=SYSTEM_API_ENDPOINT:latest"
+            "--update-secrets=SYSTEM_API=SYSTEM_API_ENDPOINT:latest"
   ]
 
 substitutions:
