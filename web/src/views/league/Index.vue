@@ -159,7 +159,8 @@ export default {
       handler(league) {
         if (league == null) return
         this.season = league.season
-      }
+      },
+    },
   },
 }
 </script>
