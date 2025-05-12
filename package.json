@@ -2,11 +2,15 @@
   "license": "MIT",
   "scripts": {
     "start": "run-pty run-pty.json",
+    "start:win": "run-pty run-pty-win.json",
     "start:api": "services/api/run.sh",
+    "start:api:win": "powershell -ExecutionPolicy Bypass -File services/api/run.ps1",
     "start:system": "services/system/run.sh",
+    "start:system:win": "powershell -ExecutionPolicy Bypass -File services/system/run.ps1",
     "start:emulators": "firebase emulators:start --only auth,firestore,pubsub,database --import=./.data --export-on-exit --project yards-dev",
     "start:web": "(cd web && npm run serve)",
     "config:dependencies": "npm install && .scripts/common/install-dependencies-service.sh services/api && .scripts/common/install-dependencies-service.sh services/system",
+    "config:dependencies:win": "npm install && powershell -ExecutionPolicy Bypass -File .\\.scripts\\common\\install-dependencies-service.ps1 services\\api && powershell -ExecutionPolicy Bypass -File .\\.scripts\\common\\install-dependencies-service.ps1 services\\system",
     "config:switches": "python setup-dev.py"
   },
   "devDependencies": {
