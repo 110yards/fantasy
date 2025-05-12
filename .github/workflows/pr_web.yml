@@ -39,10 +39,8 @@ jobs:
         run: npm run build:test
 
       - name: Deploy
+        uses: FirebaseExtended/action-hosting-deploy@v0
         working-directory: web
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.TEST_GCLOUD_CREDENTIALS }}
-          TARGET_PROJECT: ${{ vars.TEST_GCLOUD_PROJECT }}
-        run: |
-          npm install -g firebase-tools@12.4.4
-          firebase deploy --only hosting --project $TARGET_PROJECT
+        with:
+          firebaseServiceAccount: ${{ secrets.TEST_GCLOUD_CREDENTIALS }}
+          projectId: ${{ vars.TEST_GCLOUD_PROJECT }}
