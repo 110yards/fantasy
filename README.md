@@ -76,6 +76,7 @@ ENDPOINT=http://localhost:8000
 FIRESTORE_EMULATOR_HOST="localhost:9000"
 FIREBASE_AUTH_EMULATOR_HOST="localhost:9099"
 PUBSUB_EMULATOR_HOST="localhost:9085"
+RTDB_EMULATOR_HOST="localhost:9001"
 ```
 
 #### Sample Web Client .env

@@ -99,7 +99,7 @@ class StartNextSeasonService:
 
         # update scoreboard
         Logger.info("Updating scoreboard")
-        week_one_games = [game for game in schedule_result.games if game.week == 1 and game.event_type.event_type_id == EVENT_TYPE_REGULAR]
+        week_one_games = [game for game in schedule_result.schedule.games if game.week == 1 and game.game_type == "regular"]
         # scoreboard = Scoreboard.create(week_one_games)  # kinda sketchy, relies on ScheduledGame being similar enough to Game
 
         # update opponents
