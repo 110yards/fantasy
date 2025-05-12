@@ -1,0 +1,147 @@
+[
+  {
+    "cwd": "web",
+    "command": [
+      "npm",
+      "run",
+      "serve"
+    ],
+    "title": "Web Client\t\thttp://localhost:8080",
+    "status": {
+      " ERROR ": [
+        "🔴",
+        "E"
+      ],
+      "Warning": [
+        "🟡",
+        "W"
+      ],
+      " DONE ": [
+        "🟢",
+        "U"
+      ],
+      " WAIT ": [
+        "⚪",
+        "R"
+      ]
+    },
+    "defaultStatus": [
+      "⚪",
+      "L"
+    ]
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "start:emulators"
+    ],
+    "title": "Firestore Emulators\thttp://localhost:4000",
+    "status": {
+      "emulators: Starting emulators": [
+        "⚪",
+        "L"
+      ],
+      "✔": [
+        "🟢",
+        "U"
+      ],
+      "WARNING": [
+        "🟡",
+        "W"
+      ],
+      "error:": [
+        "🔴",
+        "E"
+      ],
+      "ERROR": [
+        "🔴",
+        "E"
+      ],
+      "firestore: Change detected": [
+        "⚪",
+        "R"
+      ]
+    },
+    "defaultStatus": [
+      "⚪",
+      "S"
+    ]
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "start:api:win"
+    ],
+    "title": "API\t\t\thttp://localhost:8000",
+    "status": {
+      "Loading": [
+        "⚪",
+        "L"
+      ],
+      "startup complete": [
+        "🟢",
+        "U"
+      ],
+      "INFO:": [
+        "🟢",
+        "U"
+      ],
+      "DEBUG:": [
+        "🟢",
+        "U"
+      ],
+      "Error:": [
+        "🔴",
+        "E"
+      ],
+      "StatReload": [
+        "⚪",
+        "R"
+      ]
+    },
+    "defaultStatus": [
+      "⚪",
+      "S"
+    ]
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "start:system:win"
+    ],
+    "title": "System\t\t\thttp://localhost:8001",
+    "status": {
+      "Loading": [
+        "⚪",
+        "L"
+      ],
+      "startup complete": [
+        "🟢",
+        "U"
+      ],
+      "INFO:": [
+        "🟢",
+        "U"
+      ],
+      "DEBUG:": [
+        "🟢",
+        "U"
+      ],
+      "Error:": [
+        "🔴",
+        "E"
+      ],
+      "StatReload": [
+        "⚪",
+        "R"
+      ]
+    },
+    "defaultStatus": [
+      "⚪",
+      "S"
+    ]
+  }
+]

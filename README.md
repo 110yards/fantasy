@@ -25,7 +25,7 @@ The following dependencies should be installed for development:
 1. Python 3.10 (a virtual environment is recommended):
 
 ```
-$ python3.10 -m venv .env
+$ python3.10 -m venv .venv
 ```
 
 2. Node 16
@@ -46,6 +46,12 @@ After configuring pre-requisite tools and activating the virtual environment (if
 
 ```
 $ npm run config:dependencies
+```
+
+For Windows, use the following command:
+
+```
+$ npm run config:dependencies:win
 ```
 
 ### Configuring the dev environment

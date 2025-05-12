@@ -3,7 +3,7 @@
   "version": "3.0.0",
   "private": false,
   "scripts": {
-    "serve": "NODE_OPTIONS=--openssl-legacy-provider vue-cli-service serve --mode dev",
+    "serve": "vue-cli-service serve --mode dev",
     "build": "vue-cli-service build",
     "build:test": "vue-cli-service build --mode test",
     "build:live": "vue-cli-service build --mode live",
@@ -35,7 +35,7 @@
     "@vue/runtime-dom": "^3.2.23",
     "fs": "^0.0.1-security",
     "jest": "^27.3.1",
-    "prettier": "^2.4.1",
+    "prettier": "^3.5.3",
     "sass": "^1.32.13",
     "sass-loader": "^10.2.0",
     "selenium-webdriver": "^4.0.0",

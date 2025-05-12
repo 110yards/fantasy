@@ -10,6 +10,7 @@ const authEmulatorHost = process.env.VUE_APP_AUTH_EMULATOR_HOST
 
 const firebaseApiKey = process.env.VUE_APP_FIREBASE_API_KEY
 const firebaseProject = process.env.VUE_APP_FIREBASE_PROJECT
+const webUrl = process.env.VUE_APP_WEB_URL.replace(/^https?:\/\//, "")
 
 console.log(`project: ${firebaseProject}`)
 
@@ -23,7 +24,7 @@ const databaseUrl = () => {
 
 const config = {
   apiKey: firebaseApiKey,
-  authDomain: `${firebaseProject}.firebaseapp.com`,
+  authDomain: webUrl,
   projectId: firebaseProject,
   storageBucket: "",
   messagingSenderId: "",
