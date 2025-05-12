@@ -44,7 +44,7 @@ jobs:
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           firebaseServiceAccount: ${{ secrets.TEST_GCLOUD_CREDENTIALS }}
-          projectId: ${{ vars.TEST_GCLOUD_PROJECT }}
+          projectId: ${{ secrets.TEST_GCLOUD_PROJECT }}
           channelId: live
 
       - name: Build (live)
@@ -60,5 +60,5 @@ jobs:
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           firebaseServiceAccount: ${{ secrets.LIVE_GCLOUD_CREDENTIALS }}
-          projectId: ${{ vars.LIVE_GCLOUD_PROJECT }}
+          projectId: ${{ secrets.LIVE_GCLOUD_PROJECT }}
           channelId: live
