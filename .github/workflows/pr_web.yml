@@ -40,7 +40,6 @@ jobs:
 
       - name: Deploy
         uses: FirebaseExtended/action-hosting-deploy@v0
-        working-directory: web
         with:
           firebaseServiceAccount: ${{ secrets.TEST_GCLOUD_CREDENTIALS }}
           projectId: ${{ vars.TEST_GCLOUD_PROJECT }}
