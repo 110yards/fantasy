@@ -60,7 +60,7 @@ export default {
   components: { LeagueHeader },
   props: {
     leagueId: {
-      type: [String, Number],
+      type: String,
       required: true,
     },
     season: {

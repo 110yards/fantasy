@@ -1,6 +1,6 @@
 <template>
   <div v-if="league">
-    <league-header class="mb-n16" :leagueName="league.name" :leagueId="league.id" />
+    <league-header class="mb-n16" :leagueName="league.name" :leagueId="league.id" :season="season" />
     <v-row>
       <v-col cols="12" md="8">
         <start-draft :league="league" />
@@ -9,7 +9,7 @@
           >Start {{ currentSeason }} Season</app-primary-button
         >
 
-        <season-summary :leagueId="leagueId" v-if="isOffseason" :season="league.season" />
+        <season-summary :leagueId="leagueId" v-if="isOffseason" :season="season" />
 
         <v-toolbar v-if="!isOffseason">
           <v-tabs v-model="tabA">
@@ -95,6 +95,7 @@ export default {
       weeks: [],
       tabA: null,
       tabB: null,
+      season: null,
     }
   },
   computed: {
@@ -152,6 +153,13 @@ export default {
         this.$bind("league", firestore.collection("league").doc(leagueId))
       },
     },
+
+    league: {
+      immediate: true,
+      handler(league) {
+        if (league == null) return
+        this.season = league.season
+      }
   },
 }
 </script>
