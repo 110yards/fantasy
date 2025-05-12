@@ -43,3 +43,4 @@ jobs:
         with:
           firebaseServiceAccount: ${{ secrets.TEST_GCLOUD_CREDENTIALS }}
           projectId: ${{ vars.TEST_GCLOUD_PROJECT }}
+          channelId: live
