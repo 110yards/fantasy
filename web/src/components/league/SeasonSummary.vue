@@ -1,7 +1,5 @@
 <template>
   <div>
-    <league-header v-if="league" :leagueName="league.name" :leagueId="league.id" :season="season" />
-
     <v-card v-if="seasonSummary">
       <v-card-title class="heading-6">{{ title }}</v-card-title>
 
@@ -62,7 +60,7 @@ export default {
   components: { LeagueHeader },
   props: {
     leagueId: {
-      type: String,
+      type: [String, Number],
       required: true,
     },
     season: {
